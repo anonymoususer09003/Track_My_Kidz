@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Application using StompJs</title>
+</head>
+<body>
+<div id="wrapper">
+    <ul>
+        <li>Adjust the <a href="https://stomp-js.github.io/api-docs/latest/classes/StompConfig.html">configuration</a>
+            as per your STOMP broker.</li>
+        <li>A guide at <a href="https://stomp-js.github.io/guide/stompjs/2018/06/28/using-stompjs-v5.html">
+            Using StompJs v5</a></li>
+        <li>
+            <a href="https://stomp-js.github.io/guide/stompjs/rx-stomp/ng2-stompjs/2018/09/10/using-stomp-with-sockjs.html">
+                Using STOMP with SockJS</a></li>
+        <li>For details on API calls see:
+            <a href="https://stomp-js.github.io/api-docs/latest/classes/Client.html">
+                API Reference</a></li>
+    </ul>
+    <div id="menu">
+        <p class="welcome">Welcome
+        </p>
+    </div>
+    <div id="chatbox"></div>
+</div>
+<!-- It is used for DOM manipulation, not mandatory to use stompjs -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<!-- Include from CDN for better performance, alternatively you can locally copy as well -->
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.min.js"></script>
+<script type="application/javascript">
+  $(function () {
+    let stompClient;
+    const stompConfig = {
+      // Typically login, passcode and vhost
+      // Adjust these for your broker
+      // Broker URL, should start with ws:// or wss:// - adjust for your broker setup
+      brokerURL:  'wss://staging-api.baftrends.com/api/sockets',
+      // Keep it off for production, it can be quit verbose
+      // Skip this key to disable
+      debug: function (str) {
+        ;
+      },
+      // If disconnected, it will retry after 200ms
+      reconnectDelay: 200,
+      // Subscriptions should be done inside onConnect as those need to reinstated when the broker reconnects
+      onConnect: function (frame) {
+        // The return object has a method called `unsubscribe`
+        const subscription = stompClient.subscribe('/post', function (message) {
+          displayIncomingMessage( message.body);
+        });
+      }
+    };
+    // Create an instance
+    stompClient = new StompJs.Client(stompConfig);
+    // You can set additional configuration here
+    // Attempt to connect
+    stompClient.activate();
+
+    function displayIncomingMessage(message) {
+      const msgDiv = $("<div>").addClass("msgln");
+      msgDiv.html('<span class="message">' + message + '</span>');
+      $("#chatbox").append(msgDiv);
+    }
+  })
+</script>
+</body>
+</html>

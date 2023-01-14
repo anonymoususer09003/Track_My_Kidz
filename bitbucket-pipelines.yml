@@ -1,0 +1,21 @@
+
+image: reactnativecommunity/react-native-android
+
+pipelines:
+  branches:
+    master:
+     - step:
+        size: 2x
+        name: Build Android
+        caches:
+          - node
+          - gradle
+          - docker
+        script:
+          - docker pull reactnativecommunity/react-native-android
+          - npm install 
+          - cd android && chmod +x gradlew && ./gradlew bundleRelease assembleRelease
+        artifacts:
+          - android/app/build/outputs/**
+        services:
+         - docker

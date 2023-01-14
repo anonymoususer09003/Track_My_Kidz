@@ -1,0 +1,67 @@
+workflows:
+  ios:
+    instance_type: mac_mini
+    environment:
+      vars:
+                # Env vars for automatic iOS code signing
+                # See the following link for more details - https://docs.codemagic.io/code-signing-yaml/signing-ios/
+                XCODE_WORKSPACE: "ios/BaFTrends.xcworkspace" # <-- Put the name of your Xcode workspace here
+                XCODE_SCHEME: "BaFTrends" # <-- Put the name of your Xcode scheme here
+                # https://appstoreconnect.apple.com/access/api
+                APP_STORE_CONNECT_ISSUER_ID: 69a6de7e-1310-47e3-e053-5b8c7c11a4d1 # <-- Put your App Store Connect Issuer Id here
+                APP_STORE_CONNECT_KEY_IDENTIFIER: 75D2Q3TB3Q # <-- Put your App Store Connect Key Identifier here
+                APP_STORE_CONNECT_PRIVATE_KEY: -----BEGIN PRIVATE KEY----- MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgf09eKSh6+vdoabIV 0foE4XOyFlyGafOJhnWbGk07QXSgCgYIKoZIzj0DAQehRANCAAQTg0r2ro++0x0T u6aFyhTg/NwlPMaGdRAc7GBGC5JqN8wLF3oVs5Uak7F4z4ux+XuDfKkXHc8ZtlAH 32AqaH4j -----END PRIVATE KEY----- # <-- Put your App Store Connect Private Key here
+                CERTIFICATE_PRIVATE_KEY: -----BEGIN PRIVATE KEY----- MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC1EC+NilRRTipz NjFXkuZR9xukkxZl+V+YYHCO44Cdz8tzQrkE1Wkj8VYn5/L4tqdksMo+GiLilwKT RkJ55pYHt1U2Ox+F6DBsTpj6CkRjLdz3KnIZCIsY646HkhG9ipNU8QCSlF8Rwwai fiPeawPzSoskjlT5aVaK5ybEIyYKcEAfoZkXuzLYV2Mnzf3Sfw3t0hRucXNnmgp1 GRF6qnM5j3btIpKzy+LcljLRLBMjbJTxpkL99avPhK3rTInh5RT4vOTwatRJUpl8 +mxDSGgXBO7JEC1ZlVX9lEtt8XqGVOQETiAjOXGlU7T3bqXKVBkaoB4Jq9u2auQi EgGKyB57AgMBAAECggEBAI9nbGJMBxAGOrTZXSchH+4XKvujy3+kjMQgzcU+BqX2 6Ao39FYRuJ5RDI26tcOq1tV2+BdLmAmi1NVUNl5Z9MXTvFehaAwkpAWEEsEm1JdA wdu48HlHPPPVzSMu24IleR8zaeKuRMXKkzyrbzk/xPcyORYQ7NhFR9fnz9pUhFKK 0+//+pb07GDbd1jb8f/Xul8033EJBl6H2dv3ksIH0IYBtKxXf6OL0PpouoT/AMoQ KpXCkCTy4tR1j1yz7kFSYe6IlOx86l0dIVKt09e3MvFV91MACZmgB4Dxv0vHOdbM vAmJitBw+Y+0+4MMialoYbQLu1HA36MdCtZwvuTARpECgYEA3afl/1NAQvyr00p2 VG+zmahHjmxMEVtEswHpLI5V4u7vLjB3//4cAEyIxVAWHNDXhxXQa6emCvLBU46q CVEZdADW4Pqqn21cK4mA/VQEIDgxDRYdSz3CjOp2CT9TjM4ptfg+pXQivwNOkHW/ vN8W8C0IocaTNm4HsjWHGSdB4E0CgYEA0R4oi6M9sdqqMJtEX5MjtMmQfOySOaM7 ROgT/sxgyEpMqe00xIIAoQZ4leOFVmcEBVEfTv/jOWmAIXwdPrKWFzum1FdbERys QAuG5SWaLtU+yMSZPIOGeNsfwbS+q0aF2vimdKWy/hvWbj1dcxWBgH+Z6kIHrr4N Nf2R5Q6mHecCgYBU60I+c5KnF05tAJYc+z5/m+zuL6dk7uZ+/jhrDYzyCEAyHfeb Z6sqoie0EF6oY4pvAnh7BhujDiXq8TlLoHpz6u5n+yDrO2aYd3GnnEyIW37PWK2Y aezjN+BI4q4Lv+BTCuxVTw0QyR+MUNBId9+93EL2V7GGpNjl+YPsqxGd8QKBgGp8 DPFuIpBaZKdzqRFx/5CjwyuZ26v17sxb0TLCJ9ZV30v4OhKGkINupCDPRqqEsoty j5rOuooVquViKhIvJjaWbZFbGkhQbXX/aKVuzGBkvh/F3LHv153bFwSwYRceRjMG wtxLNCYpTru8C8X6gYNJdrrO/NKCfH+tq4kUOIqpAoGBAM8dtCyYFc9BYWw74acD xow5YcYqv65Ry3vR/jvEp1dtpAkA3s7gAwr2lokLOXpvJjO7wFuYPrjrfLPS1EC7 g+P83jcPjZKrix5/0QrNb4ExN1mm8HPl9h4IpfxG6VBuyq9D1U54JeutLsYo6J7W vuJ9a379mnolXdoDA/hYUha6 -----END PRIVATE KEY----- # <-- Put your Certificate Private key here
+                BUNDLE_ID: "com.greinchville.trackmykidz" # <-- Put your Bundle Id here e.g com.domain.myapp
+                APP_STORE_APP_ID: 1520390446 
+      xcode: 12.5
+      node: 16.9.0
+      npm: latest
+      cocoapods: 1.10.2
+    scripts:
+            - name: Install npm dependencies
+              script: |
+                npm install
+            - name: Install CocoaPods dependencies
+              script: |
+                cd ios && pod install
+            - name: Set up keychain to be used for codesigning using Codemagic CLI 'keychain' command
+              script: |
+                keychain initialize
+            - name: Fetch signing files
+              script: |
+                # For information about Codemagic CLI commands visit: https://github.com/codemagic-ci-cd/cli-tools/blob/master/docs/app-store-connect/README.md
+                # For details about the --type paramater below - https://github.com/codemagic-ci-cd/cli-tools/blob/master/docs/app-store-connect/fetch-signing-files.md#--typeios_app_adhoc--ios_app_development--ios_app_inhouse--ios_app_store--mac_app_development--mac_app_direct--mac_app_store--mac_catalyst_app_development--mac_catalyst_app_direct--mac_catalyst_app_store--tvos_app_adhoc--tvos_app_development--tvos_app_inhouse--tvos_app_store
+                app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+            - name: Use system default keychain
+              script: |
+                keychain add-certificates
+            - name: Increment build number
+              script: |
+                #!/bin/sh
+                set -e
+                set -x
+                cd $FCI_BUILD_DIR/ios
+                # agvtool new-version -all $(($BUILD_NUMBER + 1))
+                agvtool new-version -all $(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APP_ID") + 1))
+            - name: Set up code signing settings on Xcode project
+              script: |
+                xcode-project use-profiles --warn-only
+            - name: Build ipa for distribution
+              script: |
+                xcode-project build-ipa --workspace "$FCI_BUILD_DIR/ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME" 
+    artifacts:
+            - build/ios/ipa/*.ipa
+            - /tmp/xcodebuild_logs/*.log
+            - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+            - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
+    cache:
+      cache_paths:
+        - $HOME/Library/Caches/CocoaPods
+        - $FCI_BUILD_DIR/node_modules

@@ -1,0 +1,11 @@
+{
+  "name": "TrackMyKidz",
+  "iosName": "TrackMyKidz",
+  "displayName": "TrackMyKidz",
+  "androidStatusBar": {
+    "backgroundColor": "#000000"
+  },
+  "android": {
+    "softwareKeyboardLayoutMode": "pan"
+  }
+}
