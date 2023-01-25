@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useStateValue } from "@/Context/state/State";
 import { useDispatch, useSelector } from "react-redux";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -17,6 +18,9 @@ import Colors from "@/Theme/Colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import fetchOneUserService from "@/Services/User/FetchOne";
+import ChangeUserState from "@/Store/User/FetchOne";
+import { actions } from "@/Context/state/Reducer";
 import { InstructionsModal, RequestPermissionModalGroups } from "@/Modals";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {
@@ -24,6 +28,7 @@ import {
   GetAllGroup,
   GetgroupByUserId,
   FindGroupsByName,
+  GetGroupCount,
 } from "@/Services/Group";
 import {
   loadId,
@@ -39,7 +44,7 @@ import {
   GetInstructor,
   FindInstructorBySchoolOrg,
 } from "@/Services/Instructor";
-
+import axios from "axios";
 import MaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
 const InstructorGroupScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -47,7 +52,19 @@ const InstructorGroupScreen = ({ route }) => {
   const isFocused = useIsFocused();
   const swipeableRef = useRef(null);
   const [user, setUser] = useState(null);
+  const currentUser = useSelector(
+    (state: { user: UserState }) => state.user.item
+  );
+  const abortControllerRef = useRef(new AbortController());
+
+  let signal = {
+    signal: abortControllerRef.current.signal,
+  };
+  const cancelToken = axios.CancelToken;
+  const source = cancelToken.source();
+  const [, _dispatch] = useStateValue();
   const dispatch = useDispatch();
+  const [initialize, setInitialize] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
   const [loading, setLoading] = useState(true);
@@ -65,6 +82,7 @@ const InstructorGroupScreen = ({ route }) => {
   const [pageSize, setPageSize] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
   const previousSearchParam = usePrevious(searchParam);
+  const [groupCount, setGroupCount] = useState({});
   const isVisible = useSelector(
     (state: { modal: ModalState }) =>
       state.modal.requestPermissionModalGroupVisibility
@@ -78,7 +96,9 @@ const InstructorGroupScreen = ({ route }) => {
     const id = await loadId();
     // console.log("id", id);
 
-    GetAllGroup(id, refreshing ? page : 0, pageSize)
+    GetAllGroup(id, refreshing ? page : 0, pageSize, {
+      cancelToken: source.token,
+    })
       .then((res) => {
         console.log("res", res);
 
@@ -114,7 +134,9 @@ const InstructorGroupScreen = ({ route }) => {
     }
     const id = await loadId();
     console.log("id", id);
-    GetgroupByUserId(id, refreshing ? page : 0, pageSize)
+    GetgroupByUserId(id, refreshing ? page : 0, pageSize, {
+      cancelToken: source.token,
+    })
       .then((res) => {
         setTotalRecords(res.totalRecords);
         setRefreshing(false);
@@ -137,7 +159,9 @@ const InstructorGroupScreen = ({ route }) => {
 
   const getGroupByInstructor = async (id: number) => {
     console.log("id----", id);
-    GetGroupByInstructor(id, 0, 15)
+    GetGroupByInstructor(id, 0, 15, {
+      cancelToken: source.token,
+    })
       .then((res) => {
         console.log("getGroupByInstructor", res);
         setSelectedInstructorGroup(res);
@@ -155,33 +179,105 @@ const InstructorGroupScreen = ({ route }) => {
       });
   };
 
+  const findInstructorBySchoolId = async (res: any) => {
+    try {
+      let instructorsList = await FindInstructorBySchoolOrg(
+        {
+          schoolId: res?.schoolId,
+          // 2198,
+          // res?.schoolId,
+          orgId: res?.orgId || null,
+        },
+        {
+          cancelToken: source.token,
+        }
+        // {
+        //   signal: abortControllerRef.current.signal,
+        // }
+      );
+      if (instructorsList) {
+        _dispatch({
+          type: actions.ORG_INSTRUCTORS,
+          payload: { result: instructorsList },
+        });
+
+        setInstructors({ result: instructorsList });
+        // setOrgInfo(org);
+        //   })
+      }
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
   const getInstructor = async () => {
     const userId = await loadUserId();
-    const res = null;
-    GetInstructor(userId)
-      .then((res) => {
+    console.log("instructor------------------", userId);
+    try {
+      if (!currentUser) {
+        let res = await GetInstructor(userId, {
+          cancelToken: source.token,
+        });
+        dispatch(ChangeUserState.action({ item: res }));
+        _dispatch({
+          type: actions.INSTRUCTOR_DETAIL,
+          payload: res,
+        });
         setUser(res);
-
+        console.log("res", res.isAdmin);
         if (res?.isAdmin) {
-          getGroups();
+          await getGroups();
+          findInstructorBySchoolId(res);
         } else {
-          getGroupsByUserId();
+          getGroupsByUserId(userId);
         }
-        FindInstructorBySchoolOrg({
-          schoolId: res?.schoolId,
-          orgId: res?.orgId || null,
-        })
-          .then((instructors) => {
-            setInstructors({ result: instructors });
-            // setOrgInfo(org);
-          })
-          .catch((err) => console.log(err));
-      })
-
-      .catch((err) => {
-        console.log("Error:", err);
-      });
+      } else {
+        _dispatch({
+          type: actions.INSTRUCTOR_DETAIL,
+          payload: currentUser,
+        });
+        setUser(currentUser);
+        setUser(currentUser);
+        console.log("currentUser", currentUser.isAdmin);
+        if (currentUser?.isAdmin) {
+          getGroups();
+          findInstructorBySchoolId(currentUser);
+        } else {
+          getGroupsByUserId(userId);
+        }
+      }
+    } catch (err) {
+      console.log("err", err);
+    }
   };
+
+  // const getInstructor = async () => {
+  //   const userId = await loadUserId();
+  //   const res = null;
+  //   GetInstructor(userId)
+  //     .then((res) => {
+  //       setUser(res);
+  //       console.log("res", res.isAdmin);
+  //       if (res?.isAdmin) {
+  //         getGroups();
+  //       } else {
+  //         getGroupsByUserId();
+  //       }
+  //       FindInstructorBySchoolOrg({
+  //         schoolId: res?.schoolId,
+  //         orgId: res?.orgId || null,
+  //       })
+  //         .then((instructors) => {
+  //           setInstructors({ result: instructors });
+  //           // setOrgInfo(org);
+  //         })
+  //         .catch((err) => console.log(err));
+  //     })
+
+  //     .catch((err) => {
+  //       console.log("Error:", err);
+  //     });
+  // };
   const RightActions = (dragX: any, item) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
@@ -319,6 +415,7 @@ const InstructorGroupScreen = ({ route }) => {
     }
   };
   useEffect(() => {
+    setInitialize(true);
     getCacheGroups();
   }, []);
 
@@ -346,7 +443,7 @@ const InstructorGroupScreen = ({ route }) => {
         (searchParam.length === 0 || searchParam.length > 3)
       ) {
         search();
-      } else {
+      } else if (searchParam == "" && initialize) {
         if (user?.isAdmin) {
           getGroups();
         } else {
@@ -359,7 +456,7 @@ const InstructorGroupScreen = ({ route }) => {
   );
 
   const search = (text: String) => {
-    if (searchParam === "") {
+    if (searchParam == "") {
       if (user?.isAdmin) {
         getGroups();
       } else {
@@ -399,9 +496,48 @@ const InstructorGroupScreen = ({ route }) => {
     }
     prevOpenedRow = row[index];
   };
+
+  const getGroupCountApi = async (body: any) => {
+    try {
+      let temp = {};
+      let res = await GetGroupCount(body);
+      res.map((item) => {
+        temp[item.groupId] = item;
+      });
+      setGroupCount({ ...groupCount, ...temp });
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
   useEffect(() => {
-    getInstructor();
-  }, []);
+    if (isFocused) {
+      let temp = [];
+      if (groups?.length > 0) {
+        groups?.forEach(async (element) => {
+          temp.push(element.groupId);
+        });
+        getGroupCountApi(temp);
+        // getGroupCountApi(temp);
+      } else if (
+        selectedInstructorGroup &&
+        selectedInstructorGroup?.length > 0
+      ) {
+        selectedInstructorGroup?.forEach(async (element) => {
+          temp.push(element.groupId);
+        });
+        getGroupCountApi(temp);
+        // getGroupCountApi(temp);
+      }
+    }
+  }, [groups?.length || selectedInstructorGroup?.length, isFocused]);
+  useEffect(() => {
+    if (isFocused) {
+      getInstructor();
+    }
+    return () => source.cancel("axios request cancelled");
+    //  abortControllerRef.current.abort();
+  }, [isFocused]);
   return (
     <>
       {isVisible && (
@@ -416,6 +552,7 @@ const InstructorGroupScreen = ({ route }) => {
           setSelectedInstructions={setSelectedInstructions}
         />
       )}
+
       <View style={styles.layout}>
         <View
           style={{
@@ -504,8 +641,8 @@ const InstructorGroupScreen = ({ route }) => {
                   >{`Instructors: ${temp.toString()}`}</Text>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <Text style={styles.text}>{`Approval: ${
-                      item?.countApprovedStudents || 0
-                    } `}</Text>
+                      groupCount[item.groupId]?.countApprovedStudents || "0"
+                    }`}</Text>
                     <Entypo
                       name="book"
                       color={Colors.primary}
@@ -513,7 +650,10 @@ const InstructorGroupScreen = ({ route }) => {
                       style={{ marginHorizontal: 5 }}
                     />
                     <Text style={styles.text}>
-                      {item?.countApprovedInstructors || `0`}
+                      <Text style={styles.text}>
+                        {groupCount[item.groupId]?.countApprovedInstructors ||
+                          "0"}
+                      </Text>
                     </Text>
                     <Ionicons
                       name="person"
@@ -525,8 +665,8 @@ const InstructorGroupScreen = ({ route }) => {
 
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <Text style={styles.text}>{`Declined: ${
-                      item?.countDeclinedStudents || 0
-                    } `}</Text>
+                      groupCount[item.groupId]?.countDeclinedStudents || "0"
+                    }`}</Text>
                     <Entypo
                       name="book"
                       color={Colors.primary}
@@ -534,7 +674,8 @@ const InstructorGroupScreen = ({ route }) => {
                       style={{ marginHorizontal: 5 }}
                     />
                     <Text style={styles.text}>
-                      {item?.countDeclinedInstructors || `0`}
+                      {groupCount[item.groupId]?.countDeclinedInstructors ||
+                        "0"}
                     </Text>
                     <Ionicons
                       name="person"
@@ -545,9 +686,11 @@ const InstructorGroupScreen = ({ route }) => {
                   </View>
 
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text style={styles.text}>{`Pending:  ${
-                      item?.countPendingStudents || 0
-                    } `}</Text>
+                    <Text style={styles.text}>
+                      {`Pending:  ${
+                        groupCount[item.groupId]?.countPendingStudents || "0"
+                      }`}
+                    </Text>
                     <Entypo
                       name="book"
                       color={Colors.primary}
@@ -555,7 +698,8 @@ const InstructorGroupScreen = ({ route }) => {
                       style={{ marginHorizontal: 5 }}
                     />
                     <Text style={styles.text}>
-                      {item.countPendingInstructors || `0`}
+                      {groupCount[item.groupId]?.countPendingInstructors || "0"}
+                      {/* {item.countPendingInstructors || `0`} */}
                     </Text>
                     <Ionicons
                       name="person"

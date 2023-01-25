@@ -42,22 +42,22 @@ const LeftDrawerContent = (props: any) => {
         <View>
           <ProfileAvatar
             style={
-              userData.pictureUrl == ""
+              userData?.pictureUrl == ""
                 ? styles.profileAvatar
                 : styles.profileImage
             }
             source={
-              userData.pictureUrl == ""
+              userData?.pictureUrl == ""
                 ? require("@/Screens/Auth/SignUp/assets/image-person.png")
-                : { uri: userData.pictureUrl }
+                : { uri: userData?.pictureUrl }
             }
           />
-          {!!userData.firstName && (
+          {!!userData?.firstName && (
             <Text style={styles.basicDetails}>
-              {userData.firstName + " " + userData.lastName}
+              {userData?.firstName + " " + userData?.lastName}
             </Text>
           )}
-          <Text style={styles.basicDetails}>{userData.username}</Text>
+          <Text style={styles.basicDetails}>{userData?.username}</Text>
         </View>
         <View style={styles.drawerSection}>
           {leftDrawerOptions.map((option, index) => {

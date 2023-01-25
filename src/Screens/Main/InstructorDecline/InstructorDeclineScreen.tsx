@@ -51,17 +51,14 @@ const InstructorGroupPendingScreen = ({ route }) => {
       .then((res) => {
         const data =
           res &&
-          res.data &&
-          res.data.map((item) => ({
+          res.map((item) => ({
             ...item,
             // scheduler: {
             //   fromDate: new Date(item.scheduler.fromDate),
             // },
           }));
         // .sort((a, b) => b?.date - a?.date);
-        setGroups({
-          result: data,
-        });
+        setGroups(data);
       })
       .catch((err) => {
         console.log("getActivities Error:", err);
@@ -158,7 +155,10 @@ const InstructorGroupPendingScreen = ({ route }) => {
             data={groups}
             style={{ padding: 10, width: "100%" }}
             renderItem={({ item, index }) => (
-              <>
+              <Swipeable
+                ref={swipeableRef}
+                renderRightActions={(e) => RightActions(e, item)}
+              >
                 <View style={[styles.item, { backgroundColor: "#fff" }]}>
                   <Text
                     style={styles.text}
@@ -166,12 +166,12 @@ const InstructorGroupPendingScreen = ({ route }) => {
                   <Text style={styles.text}>{`Status: ${
                     item?.status ? "Active" : "Inactive"
                   }`}</Text>
-                  <Text style={styles.text}>{`${
+                  {/* <Text style={styles.text}>{`${
                     item?.students && item?.students?.length
                   } Students`}</Text>
                   <Text style={styles.text}>{`Instructors: ${
                     (item?.instructors && item?.instructors?.length) || 0
-                  }`}</Text>
+                  }`}</Text> */}
                 </View>
                 <TouchableOpacity
                   onPress={() => setSelectedInstructions(item?.optin)}
@@ -181,7 +181,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
                     style={styles.text}
                   >{`Instructions / Disclaimer / Agreement`}</Text>
                 </TouchableOpacity>
-              </>
+              </Swipeable>
             )}
           />
         </View>

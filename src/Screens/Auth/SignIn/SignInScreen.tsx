@@ -25,7 +25,7 @@ import * as yup from "yup";
 import { Login } from "@/Services/LoginServices";
 import { Normalize } from "../../../Utils/Shared/NormalizeDisplay";
 import LoginStore from "@/Store/Authentication/LoginStore";
-import { useDispatch } from "react-redux";
+// import { useDispatch } from "react-redux";
 import Toast from "react-native-toast-message";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import messaging from "@react-native-firebase/messaging";
@@ -40,7 +40,10 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import FastImage from "react-native-fast-image";
 import Colors from "@/Theme/Colors";
 import UserType from "@/Store/UserType";
-
+import { useSelector, useDispatch } from "react-redux";
+import ChangeCountryState from "@/Store/Places/FetchCountries";
+import FetchCountries from "@/Store/Places/FetchCountries";
+import { GetAllCountries } from "@/Services/PlaceServices";
 const user_type = [
   { id: 1, label: "Parent", value: "Parent" },
   { id: 2, label: "Instructor", value: "Instructor" },
@@ -49,22 +52,45 @@ const user_type = [
 const screenHeight = Dimensions.get("screen").height;
 // @ts-ignore
 const SignInScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
+  const countries = useSelector(
+    (state: { state: any }) => state.places.countries
+  );
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const { login, register } = useContext(AuthContext);
-
-  useEffect(() => {
-    loadBiometricToken().then((token) => {
-      if (token) {
-        authenticateAsync().then((result) => {
-          if (result.success) {
-            dispatch(LoginStore.action(token));
-          }
-        });
+  const fetchCountries = async () => {
+    try {
+      console.log("usertype", countries);
+      if (!countries) {
+        let res = await GetAllCountries();
+        dispatch(ChangeCountryState.action({ countries: res }));
       }
-    });
-  });
+    } catch (err) {
+      console.log("err fetch coutnries", err);
+    }
+  };
+  useEffect(() => {
+    fetchCountries();
+    // dispatch(FetchCountries.action());
+    // console.log("alert");
+    // Alert.alert("kk");
+    // MainNavigator = null;
+  }, []);
+
+  // useEffect(() => {
+  //   loadBiometricToken().then((token) => {
+  //     if (token) {
+  //       authenticateAsync().then((result) => {
+  //         if (result.success) {
+  //           dispatch(LoginStore.action(token));
+  //         }
+  //       });
+  //     }
+  //   });
+  // });
   const styles = useStyleSheet(themedStyles);
-  const dispatch = useDispatch();
+
   //#region Button functions
   const OnRegisterButtonPress = (): void => {
     navigation && navigation.navigate("SignUp1");

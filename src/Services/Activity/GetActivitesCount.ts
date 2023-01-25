@@ -1,8 +1,9 @@
 import api from "@/Services";
 
-export default async (id: string) => {
-  const response = await api.get(
-    `/activity/count-pending-students-instructors?activity_id=${id}`
+export default async (body: any, config: any) => {
+  const response = await api.post(
+    `/activity/count-pending-students-instructors`,
+    body
   );
   return response.data;
 };

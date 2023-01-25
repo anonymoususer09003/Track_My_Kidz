@@ -39,7 +39,7 @@
     "@ui-kitten/components": "^5.1.0",
     "@ui-kitten/eva-icons": "^5.1.0",
     "aws-sdk": "^2.969.0",
-    "axios": "^0.21.1",
+    "axios": "1.2.3",
     "date-fns": "^2.23.0",
     "date-fns-tz": "^1.2.2",
     "expo-av": "^9.2.3",

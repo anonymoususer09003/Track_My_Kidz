@@ -1,16 +1,14 @@
-import {
-    buildAsyncState,
-    buildAsyncReducers,
-    buildAsyncActions,
-} from '@thecodingmachine/redux-toolkit-wrapper'
-import {GetAllCountries} from "@/Services/PlaceServices";
+import { createAction } from "@reduxjs/toolkit";
+import { ModalState } from "@/Store/Modal";
+
+interface PayloadInterface {
+  payload: Partial<ModalState>;
+}
 
 export default {
-    initialState: buildAsyncState('fetchCountries'),
-    action: buildAsyncActions('places/fetchCountries', GetAllCountries),
-    reducers: buildAsyncReducers({
-        itemKey: 'countries',
-        errorKey: 'fetchCountries.error', // Optionally, if you scoped variables, you can use a key with dot notation
-        loadingKey: 'fetchCountries.loading',
-    }),
-}
+  initialState: {},
+  action: createAction<Partial<any>>("places/fetchCountries"),
+  reducers(state: any, { payload }: any) {
+    state.countries = payload?.countries;
+  },
+};

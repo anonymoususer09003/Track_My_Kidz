@@ -63,7 +63,7 @@ const RightDrawerContent = (props: any) => {
     try {
       const result = await Share.share({
         url: "",
-        message: `${userData?.firstName} ${userData.lastName} (${userData?.username}) would like to invite you to TrackMyKidz. See and share TrackMyKidz from all around the world. You may download TrackMyKidz app by clicking on this link https://trackmykidz.com/apps/ OR search for TrackMyKidz on the Apple App Store or Google Play Store`,
+        message: `${userData?.firstName} ${userData?.lastName} (${userData?.username}) would like to invite you to TrackMyKidz. See and share TrackMyKidz from all around the world. You may download TrackMyKidz app by clicking on this link https://trackmykidz.com/apps/ OR search for TrackMyKidz on the Apple App Store or Google Play Store`,
       });
       if (result.action === Share.sharedAction) {
         Toast.show({
@@ -93,20 +93,20 @@ const RightDrawerContent = (props: any) => {
         <View>
           <ProfileAvatar
             style={
-              userData.pictureUrl === ""
+              userData?.pictureUrl === ""
                 ? styles.profileAvatar
                 : styles.profileImage
             }
             source={
-              userData.pictureUrl === ""
+              userData?.pictureUrl === ""
                 ? require("@/Screens/Auth/SignUp/assets/image-person.png")
-                : { uri: userData.pictureUrl }
+                : { uri: userData?.pictureUrl }
             }
           />
           <Text style={styles.basicDetails}>
-            {userData.firstName + " " + userData.lastName}
+            {userData?.firstName + " " + userData?.lastName}
           </Text>
-          <Text style={styles.basicDetails}>{userData.username}</Text>
+          <Text style={styles.basicDetails}>{userData?.username}</Text>
         </View>
         <View style={styles.drawerSection}>
           {rightDrawerOptions.map((option, index) => {

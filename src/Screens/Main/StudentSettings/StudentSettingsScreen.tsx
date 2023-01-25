@@ -38,7 +38,8 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
   const [openDeactivateModal, setopenDeactivateModal] = useState(false);
   const [canAdvertise, setcanAdvertise] = useState(false);
   const user = useSelector((state: { user: UserState }) => state.user.item);
-  const [twoFAActive, setTwoFAActive] = useState(user.isTwoFA);
+  console.log("user", user);
+  const [twoFAActive, setTwoFAActive] = useState(user?.isTwoFA);
   const [isSending, setisSending] = useState(false);
   const [isSent, setisSent] = useState(false);
   const [verifyType, setVerifyType] = useState("");

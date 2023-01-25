@@ -13,10 +13,12 @@ export default async () => {
   if (userType?.toLowerCase() === "parent") {
     const response = await api.get(`/user/parent/${userId}`);
     return response.data;
-  } else if (userType?.toLowerCase() === "instructor") {
-    const response = await api.get(`/user/instructor/${userId}`);
-    return response.data;
-  } else {
+  } else if (false && userType?.toLowerCase() === "instructor") {
+    // console.log("log0-0-0--00-");
+    // const response = await api.get(`/user/instructor/${userId}`);
+    // return response.data;
+    // return {};
+  } else if (userType?.toLowerCase() === "student") {
     const response = await api.get(`/user/student/${userId}`);
     console.log("RESPONSE", response);
     return response.data;

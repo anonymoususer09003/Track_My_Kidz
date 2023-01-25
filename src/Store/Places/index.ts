@@ -1,17 +1,18 @@
-import {buildSlice} from '@thecodingmachine/redux-toolkit-wrapper'
-import {CountryDTO} from "@/Models/CountryDTOs";
+import { buildSlice } from "@thecodingmachine/redux-toolkit-wrapper";
+import { CountryDTO } from "@/Models/CountryDTOs";
 import FetchCountries from "@/Store/Places/FetchCountries";
 
 const sliceInitialState = {
-    countries: [],
-}
+  countries: null,
+};
 
-export default buildSlice('places', [FetchCountries], sliceInitialState).reducer
+export default buildSlice("places", [FetchCountries], sliceInitialState)
+  .reducer;
 
 export interface PlaceState {
-    countries: CountryDTO[]
-    fetchCountries: {
-        loading: boolean
-        error: any
-    }
+  countries: CountryDTO[];
+  fetchCountries: {
+    loading: boolean;
+    error: any;
+  };
 }

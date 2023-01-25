@@ -69,6 +69,24 @@ export const clearUserId = async () => {
   await AsyncStorage.removeItem("user_id");
 };
 
+export const storeCountryDetail = async (data: any) => {
+  await AsyncStorage.setItem("country_detail", data);
+};
+export const removeCountryDetail = async () => {
+  await AsyncStorage.removeItem("country_detail");
+};
+export const getCountryDetail = async () => {
+  return await AsyncStorage.getItem("country_detail");
+};
+export const storeInstructorDetail = async (data: any) => {
+  await AsyncStorage.setItem("instructor_detail", data);
+};
+export const removeInstructorDetail = async () => {
+  await AsyncStorage.removeItem("instructor_detail");
+};
+export const getInstructorDetail = async () => {
+  return await AsyncStorage.getItem("instructor_detail");
+};
 export const storeUserId = async (userId: string) => {
   await AsyncStorage.setItem("user_id", userId);
 };

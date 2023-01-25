@@ -17,3 +17,4 @@ export { default as UpdateInstructorGroupStatus } from "./UpdateInstructorGroupS
 export { default as GetOptInGroup } from "./GetOptInGroup";
 export { default as FindGroupsByName } from "./FindGroupsByName";
 export { default as DeleteParticipant } from "./DeleteParticipant";
+export { default as GetGroupCount } from "./GetGroupCount";

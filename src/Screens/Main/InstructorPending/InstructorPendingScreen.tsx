@@ -61,6 +61,9 @@ const InstructorGroupPendingScreen = ({ route }) => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const swipeableRef = useRef(null);
+  const [pageGroup, pageNumberGroup] = useState(0);
+  const [pageSizeGroup, setPageSizeGroup] = useState(15);
+  const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
   const dispatch = useDispatch();
   const [students, setStudents] = useState(_students);
   const approveActivityModalVisibility = useSelector(
@@ -127,23 +130,20 @@ const InstructorGroupPendingScreen = ({ route }) => {
       .then((res) => {
         const data =
           res &&
-          res.result &&
-          res.result
-            .map((item) => ({
-              ...item,
-              // scheduler: {
-              //   fromDate: new Date(item.scheduler.fromDate),
-              // },
-            }))
-            .sort((a, b) => b?.date - a?.date);
-        setGroups({
-          result: data,
-        });
+          res.map((item) => ({
+            ...item,
+            // scheduler: {
+            //   fromDate: new Date(item.scheduler.fromDate),
+            // },
+          }));
+        // .sort((a, b) => b?.date - a?.date);
+        setGroups(data);
       })
       .catch((err) => {
         console.log("getActivities Error:", err);
       });
   };
+  console.log("groups", groups);
 
   useEffect(() => {
     // Alert.alert("kk");
@@ -246,10 +246,8 @@ const InstructorGroupPendingScreen = ({ route }) => {
 
                 setActivities({ result: filter });
               } else {
-                let filter = groups?.result?.filter(
-                  (item) => item?.groupId != id
-                );
-                setGroups({ result: filter });
+                let filter = groups?.filter((item) => item?.groupId != id);
+                setGroups(filter);
               }
             }}
           />
@@ -269,10 +267,8 @@ const InstructorGroupPendingScreen = ({ route }) => {
                 setDeclineActivity(false);
                 setActivities({ result: filter });
               } else {
-                let filter = groups?.result.filter(
-                  (item) => item?.groupId != id
-                );
-                setGroups({ result: filter });
+                let filter = groups?.filter((item) => item?.groupId != id);
+                setGroups(filter);
               }
             }}
           />
@@ -351,7 +347,11 @@ const InstructorGroupPendingScreen = ({ route }) => {
                 </Swipeable>
               );
             }}
+            // onEndReached={() => Alert.alert("kk")}
           />
+          {/* {groups.length > 0 && (
+            <Text style={{ marginVertical: 10, mar }}>Groups</Text>
+          )} */}
           <FlatList
             data={groups}
             style={{ padding: 10, width: "100%" }}
@@ -367,12 +367,12 @@ const InstructorGroupPendingScreen = ({ route }) => {
                   <Text style={styles.text}>{`Status: ${
                     item?.status ? "Active" : "Inactive"
                   }`}</Text>
-                  <Text style={styles.text}>{`${
+                  {/* <Text style={styles.text}>{`${
                     item?.students && item?.students?.length
                   } Students`}</Text>
                   <Text style={styles.text}>{`Instructors: ${
                     (item?.instructors && item?.instructors?.length) || 0
-                  }`}</Text>
+                  }`}</Text> */}
                 </View>
                 <TouchableOpacity
                   onPress={() => setSelectedInstructions(item?.optin)}

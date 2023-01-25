@@ -1,5 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import { Text, Icon } from "@ui-kitten/components";
 import {
   StyleSheet,
@@ -9,6 +13,7 @@ import {
   Switch,
 } from "react-native";
 import { AppHeader } from "@/Components";
+import Fontisto from "react-native-vector-icons/Fontisto";
 import messaging from "@react-native-firebase/messaging";
 import { UpdateDeviceToken } from "@/Services/User";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,8 +27,9 @@ import Colors from "@/Theme/Colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { LinearGradientButton } from "@/Components";
 import MapView from "react-native-maps";
-
+import { ParticipantLocation } from "@/Services/Activity";
 const ActivityDetailsScreen = () => {
+  const ref = useRef();
   const navigation = useNavigation();
   const route = useRoute();
   const activity = route?.params?.activity || null;
@@ -34,12 +40,25 @@ const ActivityDetailsScreen = () => {
   const [thumbnail, setThumbnail] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [selectedDependent, setSelectedDependent] = useState(null);
+  const [partcipants, setParticipants] = useState([]);
+  const isFocused = useIsFocused();
   console.log("acitvity", activity);
+  const getParticipantLocation = async () => {
+    try {
+      let res = await ParticipantLocation(activity?.activityId);
+      setParticipants(res);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
   useEffect(() => {
+    if (isFocused) {
+      getParticipantLocation();
+    }
     if (selectedDependent) {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
-  }, [selectedDependent]);
+  }, [selectedDependent, isFocused]);
 
   return (
     <>
@@ -70,7 +89,7 @@ const ActivityDetailsScreen = () => {
       <View style={styles.layout}>
         {!thumbnail ? (
           <FlatList
-            data={(activity && activity?.studentsActivity) || []}
+            data={partcipants || []}
             style={{ padding: 10, width: "100%" }}
             renderItem={({ item, index }) => (
               <View style={[styles.item]}>
@@ -82,14 +101,81 @@ const ActivityDetailsScreen = () => {
           />
         ) : (
           <MapView
-            initialRegion={{
-              latitude: 37.78825,
-              longitude: -122.4324,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
+            ref={ref}
+            // onRegionChange={(region) => setRegion(region)}
+            // zoomEnabled
+            // region={region}
+            // initialRegion={{
+            //   latitude: children[0]?.latitude
+            //     ? parseFloat(children[0]?.latitude)
+            //     : parseFloat(10),
+            //   longitude: children[0]?.longititude
+            //     ? parseFloat(children[0]?.longititude)
+            //     : parseFloat(10),
+            //   latitudeDelta: 0.0922 + width / height,
+            //   longitudeDelta: 0.0421,
+            // }}
+            onLayout={() => {
+              ref?.current?.fitToCoordinates(studentsEmails, {
+                edgePadding: {
+                  top: 10,
+                  right: 10,
+                  bottom: 10,
+                  left: 10,
+                },
+                animated: true,
+              });
             }}
-            style={{ width: "100%", height: "100%" }}
-          />
+            style={{ flex: 1 }}
+          >
+            {partcipants.map((item, index) => {
+              // console.log("item", item);
+              return (
+                <View style={{ flex: 1 }}>
+                  <Marker
+                    onSelect={() => console.log("pressed")}
+                    onPress={() => {
+                      console.log("ref", ref);
+                      ref.current.fitToSuppliedMarkers(
+                        [
+                          {
+                            latitude: item?.latitude
+                              ? parseFloat(item?.latitude)
+                              : parseFloat(10),
+                            longitude: item?.longititude
+                              ? parseFloat(item?.longititude)
+                              : parseFloat(10),
+                          },
+                        ]
+                        // false, // not animated
+                      );
+                    }}
+                    identifier={item?.email}
+                    key={index}
+                    coordinate={{
+                      latitude: item?.latitude
+                        ? parseFloat(item?.latitude)
+                        : parseFloat(10),
+                      longitude: item?.longititude
+                        ? parseFloat(item?.longititude)
+                        : parseFloat(10),
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => console.log("pressed")}
+                      style={{ alignItems: "center" }}
+                    >
+                      <Text>{item?.firstName}</Text>
+                      <Text style={{ marginBottom: 2 }}>{item?.lastName}</Text>
+                      <Fontisto name="map-marker-alt" size={25} color="red" />
+                    </TouchableOpacity>
+                  </Marker>
+                </View>
+                // </>
+                // </Circle>
+              );
+            })}
+          </MapView>
         )}
       </View>
       <View

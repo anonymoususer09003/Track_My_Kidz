@@ -292,10 +292,12 @@ const AddMembersInstructorScreen = ({ route }) => {
           try {
             let notifyToParents = true;
             if (_students && _students?.length > 0) {
+              notifyToParents = false;
               notifyToParents = await NotifyToParent(
                 group?.isEdit?.groupId,
                 _students
               );
+              notifyToParents = true;
             }
 
             console.log("notiftoparent", notifyToParents);
@@ -312,6 +314,7 @@ const AddMembersInstructorScreen = ({ route }) => {
             console.log("instructris", _instructors);
             let notifyToInstructor = true;
             if (_instructors?.length > 0) {
+              notifyToInstructor = false;
               await NotifyToInstructors(group?.isEdit?.groupId, _instructors);
               notifyToInstructor = true;
             }

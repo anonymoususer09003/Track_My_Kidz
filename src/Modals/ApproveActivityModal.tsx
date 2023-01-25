@@ -1,7 +1,7 @@
 import { Card, Modal, CheckBox, Text } from "@ui-kitten/components";
 import { useDispatch, useSelector } from "react-redux";
 import { ModalState } from "@/Store/Modal";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, View, ScrollView } from "react-native";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { LinearGradientButton } from "@/Components";
@@ -14,10 +14,12 @@ import {
   GetAllActivity,
   GetActivitiesByInsructorId,
   InstructorUpdateStatus,
+  GetOptIn,
 } from "@/Services/Activity";
 import {
   GetGroupByInstructorId,
   UpdateInstructorGroupStatus,
+  GetOptInGroup,
 } from "@/Services/Group";
 const ApproveActivityModal = ({
   selectedChild,
@@ -36,6 +38,25 @@ const ApproveActivityModal = ({
   const isVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.approveActivityModalVisibility
   );
+  const [infomation, setInformation] = useState({});
+  const getActivityOptInDetail = async (id: any) => {
+    try {
+      let res = await GetOptIn(id);
+
+      setInformation({ ...infomation, ...res });
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+  const getGroupOptInDetail = async (id: any) => {
+    try {
+      let res = await GetOptInGroup(id);
+
+      setInformation({ ...infomation, ...res });
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
   const [terms, setTerms] = useState(false);
   const dispatch = useDispatch();
   const parentApproval = () => {
@@ -125,6 +146,21 @@ const ApproveActivityModal = ({
     }
   };
   console.log("activity0000", activity);
+  useEffect(() => {
+    if (fromParent) {
+      if (activity?.activity) {
+        getActivityOptInDetail(activity?.activity?.activityId);
+      } else {
+        getGroupOptInDetail(activity?.group?.groupId);
+      }
+    } else {
+      if (activity?.activityId) {
+        getActivityOptInDetail(activity?.activityId);
+      } else {
+        getGroupOptInDetail(activity?.groupId);
+      }
+    }
+  }, []);
   // @ts-ignore
   return (
     <Modal
@@ -161,11 +197,7 @@ const ApproveActivityModal = ({
             <View style={{ maxHeight: 100 }}>
               <ScrollView nestedScrollEnabled>
                 <Text style={{ fontSize: 15, marginTop: 10 }}>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Maxime mollitia, molestiae quas vel sint commodi repudiandae
-                  consequuntur voluptatum laborum numquam blanditiis harum
-                  quisquam eius sed odit fugiat iusto fuga praesentium optio,
-                  eaque rerum! Provident similique accusantium nemo autem.
+                  {infomation?.instructions}
                 </Text>
               </ScrollView>
             </View>
@@ -175,11 +207,7 @@ const ApproveActivityModal = ({
             <View style={{ maxHeight: 100 }}>
               <ScrollView nestedScrollEnabled>
                 <Text style={{ fontSize: 15, marginTop: 10 }}>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Maxime mollitia, molestiae quas vel sint commodi repudiandae
-                  consequuntur voluptatum laborum numquam blanditiis harum
-                  quisquam eius sed odit fugiat iusto fuga praesentium optio,
-                  eaque rerum! Provident similique accusantium nemo autem.
+                  {infomation?.disclaimer}
                 </Text>
               </ScrollView>
             </View>
@@ -189,11 +217,7 @@ const ApproveActivityModal = ({
             <View style={{ maxHeight: 100 }}>
               <ScrollView nestedScrollEnabled>
                 <Text style={{ fontSize: 15, marginTop: 10 }}>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Maxime mollitia, molestiae quas vel sint commodi repudiandae
-                  consequuntur voluptatum laborum numquam blanditiis harum
-                  quisquam eius sed odit fugiat iusto fuga praesentium optio,
-                  eaque rerum! Provident similique accusantium nemo autem.
+                  {infomation?.agreement}
                 </Text>
               </ScrollView>
             </View>
