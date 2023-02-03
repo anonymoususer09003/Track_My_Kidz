@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { Text } from "@ui-kitten/components";
-import { StyleSheet, View, FlatList, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { useDispatch } from "react-redux";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Colors from "@/Theme/Colors";
@@ -22,46 +28,95 @@ const InstructorGroupPendingScreen = ({ route }) => {
   const [activities, setActivities] = useState([]);
   const [selectedInstructions, setSelectedInstructions] = useState(null);
   const [groups, setGroups] = useState([]);
-  const getActivities = async () => {
+  const [pageActivity, pageNumberActivity] = useState(0);
+  const [pageSizeActivity, setPageSizeActivity] = useState(10);
+  const [totalRecordsActivity, setTotalRecordsActivity] = useState(0);
+  const [pageGroup, pageNumberGroup] = useState(0);
+  const [pageSizeGroup, setPageSizeGroup] = useState(10);
+  const [refreshing, setRefreshing] = useState(false);
+  const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
+  const getActivities = async (refreshing: any) => {
+    if (refreshing) {
+      setRefreshing(true);
+    }
     const userId = await loadUserId();
-    GetActivitiesByInsructorId(userId, "approved")
+    console.log("userId", userId);
+    let pageNumberActivityCount = refreshing ? pageActivity : 0;
+
+    GetActivitiesByInsructorId(
+      userId,
+      "approved",
+      pageNumberActivityCount,
+      pageSizeActivity
+    )
       .then((res) => {
-        const data =
-          res &&
-          res.data.map((item) => ({
-            ...item,
-            // scheduler: {
-            //   fromDate: new Date(item.scheduler.fromDate),
-            // },
-          }));
+        console.log("res", res.data);
+        setTotalRecordsActivity(res.data.totalRecords);
+        setRefreshing(false);
+        setPageSizeActivity(10);
+
+        pageNumberActivity(refreshing ? pageActivity + 1 : 1);
+        // const data =
+        //   res.data &&
+        //   res.data.map((item) => ({
+        //     ...item,
+        //     // scheduler: {
+        //     //   fromDate: new Date(item.scheduler.fromDate),
+        //     // },
+        //   }));
+        // .sort((a, b) => b?.scheduler.date - a?..date);
+        if (refreshing) {
+          setActivities([...activities, ...res.data.result]);
+        } else {
+          setActivities(res.data.result);
+        }
+      })
+      .catch((err) => {
+        setRefreshing(false);
+        setPageSizeActivity(10);
+
+        pageNumberActivity(pageActivity);
+        console.log("getActivities Error:", err);
+      });
+  };
+  const getGroup = async (refreshing: any) => {
+    const userId = await loadUserId();
+    if (refreshing) {
+      setRefreshing(true);
+    }
+    let pageNumberGroupCount = refreshing ? pageGroup : 0;
+    GetGroupByInstructorId(
+      userId,
+      "approved",
+      pageNumberGroupCount,
+      pageSizeGroup
+    )
+      .then((res) => {
+        setTotalRecordsGroup(res.totalRecords);
+        setRefreshing(false);
+        setPageSizeGroup(10);
+
+        pageNumberGroup(refreshing ? pageGroup + 1 : 1);
+        // const data =
+        //   res &&
+        //   res.map((item) => ({
+        //     ...item,
+        //     // scheduler: {
+        //     //   fromDate: new Date(item.scheduler.fromDate),
+        //     // },
+        //   }));
         // .sort((a, b) => b?.date - a?.date);
-        setActivities({
-          result: data,
-        });
+        if (refreshing) {
+          setGroups([...groups, ...res?.result]);
+        } else {
+          setGroups(res.result);
+        }
       })
       .catch((err) => {
         console.log("getActivities Error:", err);
       });
   };
-  const getGroup = async () => {
-    const userId = await loadUserId();
-    GetGroupByInstructorId(userId, "approved")
-      .then((res) => {
-        const data =
-          res &&
-          res.map((item) => ({
-            ...item,
-            // scheduler: {
-            //   fromDate: new Date(item.scheduler.fromDate),
-            // },
-          }));
-        // .sort((a, b) => b?.date - a?.date);
-        setGroups(data);
-      })
-      .catch((err) => {
-        console.log("getActivities Error:", err);
-      });
-  };
+
   useEffect(() => {
     // Alert.alert("kk");
     if (isFocused) {
@@ -76,13 +131,15 @@ const InstructorGroupPendingScreen = ({ route }) => {
         <InstructionsModal
           selectedInstructions={selectedInstructions}
           setSelectedInstructions={setSelectedInstructions}
+          activity={selectedInstructions}
         />
         <View style={{ flex: 1 }}>
           <FlatList
-            data={(activities && activities?.result) || []}
+            data={(activities && activities) || []}
+            keyExtractor={(item, index) => index}
             style={{ padding: 10, width: "100%", marginTop: 10 }}
             renderItem={({ item, index }) => {
-              let date = item?.scheduler?.fromDate.split(" ");
+              let date = item?.date || "date";
               return (
                 <>
                   <TouchableOpacity
@@ -102,10 +159,8 @@ const InstructorGroupPendingScreen = ({ route }) => {
                       },
                     ]}
                   >
-                    <Text style={styles.text}>{`Date: ${date[0]} `}</Text>
-                    <Text style={styles.text}>{`Time: ${
-                      date[2] + " " + date[3]
-                    }`}</Text>
+                    <Text style={styles.text}>{`Date: ${date} `}</Text>
+                    <Text style={styles.text}>{`Time: ${date}`}</Text>
                     <Text style={styles.text}>{`${
                       item?.activityType?.toLowerCase() === "activity"
                         ? "Activity"
@@ -130,7 +185,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
                           instructionsModalVisibility: true,
                         })
                       );
-                      setSelectedInstructions(item?.optin);
+                      setSelectedInstructions(item);
                     }}
                     style={[
                       styles.footer,
@@ -152,40 +207,59 @@ const InstructorGroupPendingScreen = ({ route }) => {
                 </>
               );
             }}
+            onEndReached={async () => {
+              if (totalRecordsActivity > activities.length) {
+                console.log("logs");
+
+                getActivities(true);
+              }
+            }}
+            refreshing={false}
+            onRefresh={() => null}
           />
           <FlatList
             data={groups}
+            keyExtractor={(item, index) => index}
             style={{ padding: 10, width: "100%" }}
             renderItem={({ item, index }) => (
-              <Swipeable
-                ref={swipeableRef}
-                renderRightActions={(e) => RightActions(e, item)}
-              >
-                <View style={[styles.item, { backgroundColor: "#fff" }]}>
-                  <Text
-                    style={styles.text}
-                  >{`Group Name: ${item?.groupName}`}</Text>
-                  <Text style={styles.text}>{`Status: ${
-                    item?.status ? "Active" : "Inactive"
-                  }`}</Text>
-                  {/* <Text style={styles.text}>{`${
+              <>
+                <TouchableOpacity>
+                  <View style={[styles.item, { backgroundColor: "#fff" }]}>
+                    <Text
+                      style={styles.text}
+                    >{`Group Name: ${item?.groupName}`}</Text>
+                    <Text style={styles.text}>{`Status: ${
+                      item?.status ? "Active" : "Inactive"
+                    }`}</Text>
+                    {/* <Text style={styles.text}>{`${
                     item?.students && item?.students?.length
                   } Students`}</Text>
                   <Text style={styles.text}>{`Instructors: ${
                     (item?.instructors && item?.instructors?.length) || 0
                   }`}</Text> */}
-                </View>
-                <TouchableOpacity
-                  onPress={() => setSelectedInstructions(item?.optin)}
-                  style={[styles.footer, { backgroundColor: "#fff" }]}
-                >
-                  <Text
-                    style={styles.text}
-                  >{`Instructions / Disclaimer / Agreement`}</Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => setSelectedInstructions(item?.optin)}
+                    style={[styles.footer, { backgroundColor: "#fff" }]}
+                  >
+                    <Text
+                      style={styles.text}
+                    >{`Instructions / Disclaimer / Agreement`}</Text>
+                  </TouchableOpacity>
                 </TouchableOpacity>
-              </Swipeable>
+              </>
             )}
+            onEndReached={async () => {
+              if (totalRecordsGroup > groups.length) {
+                getGroup(true);
+              }
+            }}
+            refreshing={false}
+            onRefresh={() => null}
           />
+          {refreshing && (
+            <ActivityIndicator size="large" color={Colors.primary} />
+          )}
         </View>
       </View>
     </>

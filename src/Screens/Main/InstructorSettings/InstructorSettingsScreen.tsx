@@ -19,6 +19,7 @@ import {
   Spinner,
 } from "@ui-kitten/components";
 // @ts-ignore
+import ChangeUserState from "@/Store/UserType/ChangeUserTypeState";
 import { useSelector, useDispatch } from "react-redux";
 import { UserState } from "@/Store/User";
 import { StripeModal, FlagBlogModal, DonationModal } from "@/Modals";
@@ -278,7 +279,15 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
               <View style={styles.background}>
                 <TouchableOpacity
                   style={styles.background}
-                  onPress={() => dispatch(LogoutStore.action())}
+                  onPress={() => {
+                    dispatch(
+                      ChangeUserState.action({
+                        userType: "",
+                      })
+                    );
+
+                    dispatch(LogoutStore.action());
+                  }}
                 >
                   <Text style={styles.button}>Log out</Text>
                 </TouchableOpacity>

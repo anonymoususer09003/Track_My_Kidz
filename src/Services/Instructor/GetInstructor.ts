@@ -8,10 +8,7 @@ export default async (id: number, config: any) => {
   if (instructorDetail) {
     return JSON.parse(instructorDetail);
   } else {
-    const response = await api.get(
-      `/user/instructor/${id}`,
-      config ? config : {}
-    );
+    const response = await api.get(`/user/instructor/${id}`);
     storeInstructorDetail(JSON.stringify(response.data));
     return response.data;
   }

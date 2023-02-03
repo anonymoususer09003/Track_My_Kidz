@@ -4,7 +4,8 @@ import { CurrentUserDTO, GetUserDTO } from "@/Models/UserDTOs";
 
 // This state is common to all the "user" module, and can be modified by any "user" reducers
 const sliceInitialState = {
-  item: null,
+  item: {},
+  fetchOne: {},
 };
 
 export default buildSlice("user", [FetchOne], sliceInitialState).reducer;

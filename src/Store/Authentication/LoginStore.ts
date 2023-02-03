@@ -11,6 +11,7 @@ import {
   storeId,
   storeIsSubscribed,
 } from "@/Storage/MainAppStorage";
+import ChangeStartUpState from "@/Store/Startup/ChangeStartUpState";
 import ChangeUserState from "@/Store/User/FetchOne";
 import ChangeLoginState from "@/Store/Authentication/ChangeLoginState";
 import FetchOne from "@/Store/User/FetchOne";
@@ -44,15 +45,21 @@ export default {
       //   // dispatch(FetchOne.action(userId));
       //   dispatch(LoadAppointments.action());
       // }
-      if (!callApi) {
-        let res = await fetchOneUserService();
-        console.log("res", res);
-        await dispatch(ChangeUserState.action({ item: res }));
-      }
+
+      let res = await fetchOneUserService();
+      console.log("res", res);
+      await dispatch(
+        ChangeUserState.action({
+          item: res,
+          fetchOne: { loading: false, error: null },
+        })
+      );
+
       //   dispatch(FetchCountries.action());
       // dispatch(LoadAds.action({ pageSize: 100 }));
       // dispatch(FetchNotifications.action());
       await dispatch(ChangeLoginState.action({ loggedIn: true }));
+      dispatch(ChangeStartUpState.action({ loadingInitialData: false }));
       dispatch(
         ChangeUserTypeState.action({
           userType: userType,

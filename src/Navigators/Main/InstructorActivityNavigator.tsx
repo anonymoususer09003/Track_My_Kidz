@@ -15,6 +15,9 @@ import ChangeInstructorActivityState from "@/Store/InstructorsActivity/ChangeIns
 // @refresh reset
 const InstructorActivityNavigator = () => {
   const dispatch = useDispatch();
+  const activeNav = useSelector(
+    (state: { navigation: any }) => state.navigation.activeNav
+  );
   const TabNavigator = createMaterialTopTabNavigator();
   const tabNames = ["Activity", "Group"];
   const [selectedMonth, setSelectedMonth] = useState(
@@ -90,6 +93,12 @@ const InstructorActivityNavigator = () => {
       );
     }
   }, [isCalendarVisible]);
+  useEffect(() => {
+    if (activeNav) {
+      setActiveTab(1);
+    }
+  }, [activeNav]);
+
   return (
     <>
       <AppHeader

@@ -156,7 +156,7 @@ const AddStudentModal = () => {
                   lastName: "",
                   school: "",
                   selectedSchool: "",
-                  grade: "",
+                  // grade: "",
                   parentName: "",
                   parentName2: "",
                   password: "",
@@ -185,7 +185,7 @@ const AddStudentModal = () => {
                       values.selectedSchool != ""
                         ? values.selectedSchool
                         : values.school,
-                    grade: values.grade,
+                    // grade: values.grade,
                     country: values.selectedCountry,
                     state: values.state,
                     city: values.city,

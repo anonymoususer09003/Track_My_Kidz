@@ -91,7 +91,7 @@ const CreateParentActivityScreen = ({ route }) => {
   const handleGetStudents = () => {
     GetAllStudents()
       .then((res) => {
-        setStudentsData(res);
+        setStudentsData(res.result);
       })
       .catch((err) => {
         console.log("err", err);

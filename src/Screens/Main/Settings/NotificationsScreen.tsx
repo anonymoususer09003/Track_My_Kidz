@@ -19,8 +19,10 @@ import Colors from "@/Theme/Colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import { useIsFocused } from "@react-navigation/native";
 const NotificationsScreen = () => {
   const [notifications, setNotifications] = useState([]);
+  const isFocused = useIsFocused();
   let prevOpenedRow: any;
   let row: Array<any> = [];
 
@@ -55,7 +57,6 @@ const NotificationsScreen = () => {
             justifyContent: "center",
           }}
           onPress={() => {
-            prevOpenedRow?.close();
             deleteNotification(item?.notificationId);
           }}
         >
@@ -68,7 +69,6 @@ const NotificationsScreen = () => {
     try {
       let res = await UserGetNotifications();
 
-      console.log("res", res);
       setNotifications(res);
     } catch (err) {
       console.log("err", err);
@@ -76,16 +76,22 @@ const NotificationsScreen = () => {
   };
   const deleteNotification = async (id: any) => {
     try {
+      prevOpenedRow?.close();
+      let temp = notifications.filter((item) => item.notificationId != id);
+      // console.log("temp", temp.length);
+      setNotifications(temp);
       let res = await UserDeleteNotifications(id);
-      console.log("res", res);
-      getNotifications();
+
+      // getNotifications();
     } catch (err) {
       console.log("err", err);
     }
   };
   useEffect(() => {
-    getNotifications();
-  }, []);
+    if (isFocused) {
+      getNotifications();
+    }
+  }, [isFocused]);
   return (
     <>
       <AppHeader title="Notifications" isBack />
@@ -100,8 +106,8 @@ const NotificationsScreen = () => {
               marginTop: 10,
               marginBottom: 20,
             }}
+            keyExtractor={(item, index) => item.notificationId}
             renderItem={({ item, index }) => {
-              console.log("item", item);
               return (
                 <Swipeable
                   ref={(ref) => (row[index] = ref)}
@@ -110,8 +116,11 @@ const NotificationsScreen = () => {
                   renderRightActions={(e) => RightActions(e, item, index)}
                 >
                   <View style={styles.card}>
-                    <Text style={{ fontWeight: "bold" }}>{item.date}</Text>
-                    <Text>{item.title}</Text>
+                    <Text style={{ fontWeight: "bold" }}>
+                      {item?.dateTime?.split(" ")[0]}
+                    </Text>
+                    <Text>{item?.title}</Text>
+                    <Text>{item?.message}</Text>
                   </View>
                 </Swipeable>
               );

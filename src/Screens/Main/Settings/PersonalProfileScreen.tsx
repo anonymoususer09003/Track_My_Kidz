@@ -79,7 +79,7 @@ const PersonalProfileScreen = () => {
   const getUserId = async () => {
     const id: any = await loadUserId();
     setuserId(id);
-    dispatch(FetchOne.action(id));
+    // dispatch(FetchOne.action(id));
   };
 
   useEffect(() => {

@@ -150,74 +150,137 @@ const OrganizationInfoScreen = ({ navigation }) => {
   const handleGetOrganizationInfo = async () => {
     const userId = await loadUserId();
     console.log("userId", userId);
-    GetInstructor(userId).then((res) => {
-      if (res.schoolId) {
-        console.log(
-          "res----------------------------------------------------------------",
-          res.schoolId + " " + userId
-        );
-        GetSchool(res.schoolId)
-          .then((org) => {
-            setOrgInfo(org);
-            let temp = { ...tableData };
-            let row = [];
-            let rowItem = [];
-            // org?.instructors?.map((item, index) => {
-            //   let { firstname, lastname, email, phone, isAdmin, state } = item;
-            //   row.push([
-            //     firstname,
-            //     lastname,
-            //     email,
-            //     phone ? phone : "",
-            //     isAdmin,
-            //     state,
-            //   ]);
-            //   rowItem.push(item);
-            // });
-            // console.log("row", row);
-            // temp.tableData = row;
-            // temp.item = rowItem;
-            // setTableData(temp);
-            // console.log("res", res);
+    let res = await GetInstructor(userId);
+    if (res.schoolId || res.orgId) {
+      GetSchool(res.schoolId)
+        .then((org) => {
+          setOrgInfo(org);
+          let temp = { ...tableData };
+          let row = [];
+          let rowItem = [];
+          // org?.instructors?.map((item, index) => {
+          //   let { firstname, lastname, email, phone, isAdmin, state } = item;
+          //   row.push([
+          //     firstname,
+          //     lastname,
+          //     email,
+          //     phone ? phone : "",
+          //     isAdmin,
+          //     state,
+          //   ]);
+          //   rowItem.push(item);
+          // });
+          // console.log("row", row);
+          // temp.tableData = row;
+          // temp.item = rowItem;
+          // setTableData(temp);
+          // console.log("res", res);
 
-            // setInstructors(res);
-            setInstructors({ result: org?.instructors });
-            // FindInstructorBySchoolOrg({
-            //   schoolId: res?.schoolId,
-            //   orgId: res?.orgId,
-            // })
-            //   .then((res) => {
-            //     let temp = { ...tableData };
-            //     let row = [];
-            //     let rowItem = [];
-            //     res.map((item, index) => {
-            //       let { firstname, lastname, email, phone, isAdmin, state } =
-            //         item;
-            //       row.push([
-            //         firstname,
-            //         lastname,
-            //         email,
-            //         phone ? phone : "",
-            //         isAdmin,
-            //         state,
-            //       ]);
-            //       rowItem.push(item);
-            //     });
-            //     console.log("row", row);
-            //     temp.tableData = row;
-            //     temp.item = rowItem;
-            //     setTableData(temp);
-            //     // console.log("res", res);
+          // setInstructors(res);
+          setInstructors({ result: org?.instructors });
+          // FindInstructorBySchoolOrg({
+          //   schoolId: res?.schoolId,
+          //   orgId: res?.orgId,
+          // })
+          //   .then((res) => {
+          //     let temp = { ...tableData };
+          //     let row = [];
+          //     let rowItem = [];
+          //     res.map((item, index) => {
+          //       let { firstname, lastname, email, phone, isAdmin, state } =
+          //         item;
+          //       row.push([
+          //         firstname,
+          //         lastname,
+          //         email,
+          //         phone ? phone : "",
+          //         isAdmin,
+          //         state,
+          //       ]);
+          //       rowItem.push(item);
+          //     });
+          //     console.log("row", row);
+          //     temp.tableData = row;
+          //     temp.item = rowItem;
+          //     setTableData(temp);
+          //     // console.log("res", res);
 
-            //     // setInstructors(res);
-            //     setInstructors({ result: res });
-            //     // setOrgInfo(org);
-            //   })
-            // .catch((err) => console.log(err));
-          })
-          .catch((err) => console.log(err));
-      }
-    });
+          //     // setInstructors(res);
+          //     setInstructors({ result: res });
+          //     // setOrgInfo(org);
+          //   })
+          // .catch((err) => console.log(err));
+        })
+        .catch((err) => console.log(err));
+    }
+    // GetInstructor(userId).then((res) => {
+    //   if (res.schoolId) {
+    //     console.log(
+    //       "res----------------------------------------------------------------",
+    //       res.schoolId + " " + userId
+    //     );
+    //     GetSchool(res.schoolId)
+    //       .then((org) => {
+    //         setOrgInfo(org);
+    //         let temp = { ...tableData };
+    //         let row = [];
+    //         let rowItem = [];
+    //         // org?.instructors?.map((item, index) => {
+    //         //   let { firstname, lastname, email, phone, isAdmin, state } = item;
+    //         //   row.push([
+    //         //     firstname,
+    //         //     lastname,
+    //         //     email,
+    //         //     phone ? phone : "",
+    //         //     isAdmin,
+    //         //     state,
+    //         //   ]);
+    //         //   rowItem.push(item);
+    //         // });
+    //         // console.log("row", row);
+    //         // temp.tableData = row;
+    //         // temp.item = rowItem;
+    //         // setTableData(temp);
+    //         // console.log("res", res);
+
+    //         // setInstructors(res);
+    //         setInstructors({ result: org?.instructors });
+    //         // FindInstructorBySchoolOrg({
+    //         //   schoolId: res?.schoolId,
+    //         //   orgId: res?.orgId,
+    //         // })
+    //         //   .then((res) => {
+    //         //     let temp = { ...tableData };
+    //         //     let row = [];
+    //         //     let rowItem = [];
+    //         //     res.map((item, index) => {
+    //         //       let { firstname, lastname, email, phone, isAdmin, state } =
+    //         //         item;
+    //         //       row.push([
+    //         //         firstname,
+    //         //         lastname,
+    //         //         email,
+    //         //         phone ? phone : "",
+    //         //         isAdmin,
+    //         //         state,
+    //         //       ]);
+    //         //       rowItem.push(item);
+    //         //     });
+    //         //     console.log("row", row);
+    //         //     temp.tableData = row;
+    //         //     temp.item = rowItem;
+    //         //     setTableData(temp);
+    //         //     // console.log("res", res);
+
+    //         //     // setInstructors(res);
+    //         //     setInstructors({ result: res });
+    //         //     // setOrgInfo(org);
+    //         //   })
+    //         // .catch((err) => console.log(err));
+    //       })
+    //       .catch((err) => console.log(err));
+    //   }
+    // });
   };
 
   useEffect(() => {
@@ -233,15 +296,6 @@ const OrganizationInfoScreen = ({ navigation }) => {
     orgInfo && orgInfo.instructors && orgInfo.instructors.length > 1
       ? orgInfo.instructors[1]
       : {};
-
-  if (!orgInfo) {
-    return (
-      <>
-        <AppHeader title="Organization Information" />
-        <ActivityIndicator style={{ marginTop: 50 }} color={Colors.primary} />
-      </>
-    );
-  }
 
   const elements = (index, data, item) => {
     switch (index) {
@@ -286,256 +340,277 @@ const OrganizationInfoScreen = ({ navigation }) => {
   // console.log("org", orgInfo);
   return (
     <>
-      {/* {visible && (
+      {!orgInfo && (
+        <>
+          <AppHeader title="Organization Information" />
+          <ActivityIndicator style={{ marginTop: 50 }} color={Colors.primary} />
+        </>
+      )}
+
+      {orgInfo && (
+        <>
+          {/* {visible && (
         <OrgInstructorsListModal
           visible={visible}
           setVisible={(value) => setVisible(value)}
         />
       )} */}
-      {/* <AddInstructorOrgModal /> */}
-      <AppHeader
-        hideCalendar={true}
-        title="Organization Information"
-        hideApproval={true}
-      />
+          {/* <AddInstructorOrgModal /> */}
+          <AppHeader
+            hideCalendar={true}
+            title="Organization Information"
+            hideApproval={true}
+          />
 
-      <KeyboardAwareScrollView
-        extraHeight={10}
-        enableOnAndroid={true}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ flex: 1 }}
-      >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <View style={styles.layout}>
-            <View style={[styles.mainLayout, { paddingLeft: 20 }]}>
-              <>
-                <Formik
-                  validateOnMount={true}
-                  initialValues={{
-                    name: orgInfo ? orgInfo.name : "",
-                    address: orgInfo ? orgInfo.address : "",
-                    country: orgInfo ? orgInfo.country : "",
-                    selectedCountry: "",
-                    selectedState: "",
-                    selectedCity: "",
-                    city: orgInfo ? orgInfo.city : "",
-                    state: orgInfo ? orgInfo.state : "",
-                    zipcode: orgInfo ? orgInfo.zipcode : "",
-                    newRepresentative1: false,
-                    newRepresentative2: false,
-                    email1: admin1 ? admin1.email : "",
-                    firstName1: admin1 ? admin1.firstname : "",
-                    lastName1: admin1 ? admin1.lastname : "",
-                    email2: admin2 ? admin2.email : "",
-                    firstName2: admin2 ? admin2.firstname : "",
-                    lastName2: admin2 ? admin2.lastname : "",
+          <KeyboardAwareScrollView
+            extraHeight={10}
+            enableOnAndroid={true}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ flex: 1 }}
+          >
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+              <View style={styles.layout}>
+                <View style={[styles.mainLayout, { paddingLeft: 20 }]}>
+                  <>
+                    <Formik
+                      validateOnMount={true}
+                      initialValues={{
+                        name: orgInfo ? orgInfo.name : "",
+                        address: orgInfo ? orgInfo.address : "",
+                        country: orgInfo ? orgInfo.country : "",
+                        selectedCountry: "",
+                        selectedState: "",
+                        selectedCity: "",
+                        city: orgInfo ? orgInfo.city : "",
+                        state: orgInfo ? orgInfo.state : "",
+                        zipcode: orgInfo ? orgInfo.zipcode : "",
+                        newRepresentative1: false,
+                        newRepresentative2: false,
+                        email1: admin1 ? admin1.email : "",
+                        firstName1: admin1 ? admin1.firstname : "",
+                        lastName1: admin1 ? admin1.lastname : "",
+                        email2: admin2 ? admin2.email : "",
+                        firstName2: admin2 ? admin2.firstname : "",
+                        lastName2: admin2 ? admin2.lastname : "",
 
-                    phone1: admin1?.phone ? admin1.phone : "",
+                        phone1: admin1?.phone ? admin1.phone : "",
 
-                    phone2: admin2.phone ? admin2.phone : "",
-                  }}
-                  enableReinitialize
-                  onSubmit={(values, { resetForm }) => {
-                    if (isEditMode) {
-                      const data = {
-                        id: orgInfo.schoolId,
-                        name: values.name,
-                        address: values.address,
-                        country: values.country,
-                        zipcode: values.zipcode,
-                        city: values.city,
-                        state: values.state,
-                        grades: [],
-                        representatives: [
-                          {
-                            id: admin1.instructorId,
-                            email: values.email1,
-                            firstname: values.firstName1,
-                            lastname: values.lastName1,
-                            type: "school",
+                        phone2: admin2.phone ? admin2.phone : "",
+                      }}
+                      enableReinitialize
+                      onSubmit={(values, { resetForm }) => {
+                        if (isEditMode) {
+                          const data = {
+                            id: orgInfo.schoolId,
+                            name: values.name,
+                            address: values.address,
+                            country: values.country,
+                            zipcode: values.zipcode,
+                            city: values.city,
+                            state: values.state,
+                            grades: [],
+                            representatives: [
+                              {
+                                id: admin1.instructorId,
+                                email: values.email1,
+                                firstname: values.firstName1,
+                                lastname: values.lastName1,
+                                type: "school",
 
-                            phone: values.phone1,
-                          },
-                          {
-                            id: admin2.instructorId,
-                            email: values.email2,
-                            firstname: values.firstName2,
-                            lastname: values.lastName2,
-                            type: "school",
-                            phone: values.phone2,
-                          },
-                        ],
-                      };
-                      UpdateSchool(data)
-                        .then((res) => {
-                          console.log("res", res);
-                          setisEditMode(false);
-                        })
-                        .catch((err) => console.log(err));
-                    } else {
-                      setisEditMode(true);
-                    }
-                  }}
-                >
-                  {({
-                    handleChange,
-                    handleSubmit,
-                    values,
-                    errors,
-                    isValid,
-                    setFieldValue,
-                  }) => (
-                    <>
-                      <View style={styles.formContainer}>
-                        <Input
-                          style={{ marginRight: 20, marginTop: 10 }}
-                          placeholder="School Name"
-                          onChangeText={handleChange("name")}
-                          value={values.name}
-                          disabled={!isEditMode}
-                        />
-                        <Input
-                          style={{ marginRight: 20, marginTop: 10 }}
-                          placeholder="School Address"
-                          onChangeText={handleChange("address")}
-                          value={values.address}
-                          disabled={!isEditMode}
-                        />
-                        <Autocomplete
-                          placeholder="Select your country"
-                          value={values.country}
-                          style={{ width: "95%" }}
-                          placement={placement}
-                          disabled={!isEditMode}
-                          label={(evaProps) => (
-                            <Text {...evaProps}>Country*</Text>
-                          )}
-                          onChangeText={(query) => {
-                            setFieldValue("country", query);
-                            setCountriesData(
-                              countries.filter((item) =>
-                                filterCountries(item, query)
-                              )
-                            );
-                          }}
-                          onSelect={(query) => {
-                            const selectedCountry = countriesData[query];
-                            setFieldValue("country", selectedCountry.name);
-                            setFieldValue(
-                              "selectedCountry",
-                              selectedCountry.name
-                            );
-                            setFieldValue("selectedState", "");
-                            setFieldValue("state", "");
-                            setStates([]);
-                            GetAllStates(
-                              selectedCountry.name.replace(/ /g, "")
-                            ).then((res) => {
-                              setStates(res.data);
-                              setStatesData(states);
-                            });
-                          }}
-                        >
-                          {countriesData.map((item, index) => {
-                            return (
-                              <AutocompleteItem key={index} title={item.name} />
-                            );
-                          })}
-                        </Autocomplete>
-                        <Select
-                          style={styles.selectSettings}
-                          value={values.state}
-                          style={{ width: "95%" }}
-                          disabled={!isEditMode}
-                          onSelect={(query: IndexPath) => {
-                            const selectedState = states[query.row];
-                            setFieldValue("state", selectedState);
-                            setFieldValue("selectedState", selectedState);
-                            setFieldValue("selectedCity", "");
-                            setFieldValue("city", "");
-                            setCities([]);
-                            GetAllCities(
-                              values.selectedCountry,
-                              selectedState
-                            ).then((res) => {
-                              setCities(res.data);
-                            });
-                          }}
-                          label={(evaProps) => <Text {...evaProps}>State</Text>}
-                        >
-                          {states?.map((state, index) => {
-                            return <SelectItem key={index} title={state} />;
-                          })}
-                        </Select>
-
-                        <Select
-                          style={styles.selectSettings}
-                          value={values.city}
-                          disabled={!isEditMode}
-                          style={{ width: "95%" }}
-                          onSelect={(index: any) => {
-                            setFieldValue("city", cities[index.row]);
-                            setFieldValue("selectedCity", cities[index.row]);
-                          }}
-                          label={(evaProps) => <Text {...evaProps}>City</Text>}
-                        >
-                          {cities.length > 0
-                            ? cities?.map((city, index) => {
-                                return <SelectItem key={index} title={city} />;
-                              })
-                            : []}
-                        </Select>
-                        <TouchableOpacity
-                          onPress={() =>
-                            navigation.navigate("InstructorList", {
-                              data: orgInfo,
+                                phone: values.phone1,
+                              },
+                              {
+                                id: admin2.instructorId,
+                                email: values.email2,
+                                firstname: values.firstName2,
+                                lastname: values.lastName2,
+                                type: "school",
+                                phone: values.phone2,
+                              },
+                            ],
+                          };
+                          UpdateSchool(data)
+                            .then((res) => {
+                              console.log("res", res);
+                              setisEditMode(false);
                             })
-                          }
-                          style={{
-                            justifyContent: "space-between",
-                            flexDirection: "row",
-                            paddingRight: 15,
-                            marginTop: 20,
-                          }}
-                        >
-                          <Text>Instructor List</Text>
-                          <Icon
-                            // style={styles.icon}
-                            size={25}
-                            // fill={Colors.gray}
-                            name="chevron-right"
-                          />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() =>
-                            navigation.navigate("BusInfo", {
-                              data: orgInfo,
-                            })
-                          }
-                          style={{
-                            justifyContent: "space-between",
-                            flexDirection: "row",
-                            paddingRight: 15,
-                            marginTop: 20,
-                          }}
-                        >
-                          <Text>Bus Information</Text>
-                          <Icon
-                            // style={styles.icon}
-                            size={25}
-                            // fill={Colors.gray}
-                            name="chevron-right"
-                          />
-                        </TouchableOpacity>
+                            .catch((err) => console.log(err));
+                        } else {
+                          setisEditMode(true);
+                        }
+                      }}
+                    >
+                      {({
+                        handleChange,
+                        handleSubmit,
+                        values,
+                        errors,
+                        isValid,
+                        setFieldValue,
+                      }) => (
+                        <>
+                          <View style={styles.formContainer}>
+                            <Input
+                              style={{ marginRight: 20, marginTop: 10 }}
+                              placeholder="School Name"
+                              onChangeText={handleChange("name")}
+                              value={values.name}
+                              disabled={!isEditMode}
+                            />
+                            <Input
+                              style={{ marginRight: 20, marginTop: 10 }}
+                              placeholder="School Address"
+                              onChangeText={handleChange("address")}
+                              value={values.address}
+                              disabled={!isEditMode}
+                            />
+                            <Autocomplete
+                              placeholder="Select your country"
+                              value={values.country}
+                              style={{ width: "95%" }}
+                              placement={placement}
+                              disabled={!isEditMode}
+                              label={(evaProps) => (
+                                <Text {...evaProps}>Country*</Text>
+                              )}
+                              onChangeText={(query) => {
+                                setFieldValue("country", query);
+                                setCountriesData(
+                                  countries.filter((item) =>
+                                    filterCountries(item, query)
+                                  )
+                                );
+                              }}
+                              onSelect={(query) => {
+                                const selectedCountry = countriesData[query];
+                                setFieldValue("country", selectedCountry.name);
+                                setFieldValue(
+                                  "selectedCountry",
+                                  selectedCountry.name
+                                );
+                                setFieldValue("selectedState", "");
+                                setFieldValue("state", "");
+                                setStates([]);
+                                GetAllStates(
+                                  selectedCountry.name.replace(/ /g, "")
+                                ).then((res) => {
+                                  setStates(res.data);
+                                  setStatesData(states);
+                                });
+                              }}
+                            >
+                              {countriesData.map((item, index) => {
+                                return (
+                                  <AutocompleteItem
+                                    key={index}
+                                    title={item.name}
+                                  />
+                                );
+                              })}
+                            </Autocomplete>
+                            <Select
+                              style={styles.selectSettings}
+                              value={values.state}
+                              style={{ width: "95%" }}
+                              disabled={!isEditMode}
+                              onSelect={(query: IndexPath) => {
+                                const selectedState = states[query.row];
+                                setFieldValue("state", selectedState);
+                                setFieldValue("selectedState", selectedState);
+                                setFieldValue("selectedCity", "");
+                                setFieldValue("city", "");
+                                setCities([]);
+                                GetAllCities(
+                                  values.selectedCountry,
+                                  selectedState
+                                ).then((res) => {
+                                  setCities(res.data);
+                                });
+                              }}
+                              label={(evaProps) => (
+                                <Text {...evaProps}>State</Text>
+                              )}
+                            >
+                              {states?.map((state, index) => {
+                                return <SelectItem key={index} title={state} />;
+                              })}
+                            </Select>
 
-                        {/* <Input
+                            <Select
+                              style={styles.selectSettings}
+                              value={values.city}
+                              disabled={!isEditMode}
+                              style={{ width: "95%" }}
+                              onSelect={(index: any) => {
+                                setFieldValue("city", cities[index.row]);
+                                setFieldValue(
+                                  "selectedCity",
+                                  cities[index.row]
+                                );
+                              }}
+                              label={(evaProps) => (
+                                <Text {...evaProps}>City</Text>
+                              )}
+                            >
+                              {cities.length > 0
+                                ? cities?.map((city, index) => {
+                                    return (
+                                      <SelectItem key={index} title={city} />
+                                    );
+                                  })
+                                : []}
+                            </Select>
+                            <TouchableOpacity
+                              onPress={() =>
+                                navigation.navigate("InstructorList", {
+                                  data: orgInfo,
+                                })
+                              }
+                              style={{
+                                justifyContent: "space-between",
+                                flexDirection: "row",
+                                paddingRight: 15,
+                                marginTop: 20,
+                              }}
+                            >
+                              <Text>Instructor List</Text>
+                              <Icon
+                                // style={styles.icon}
+                                size={25}
+                                // fill={Colors.gray}
+                                name="chevron-right"
+                              />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              onPress={() =>
+                                navigation.navigate("BusInfo", {
+                                  data: orgInfo,
+                                })
+                              }
+                              style={{
+                                justifyContent: "space-between",
+                                flexDirection: "row",
+                                paddingRight: 15,
+                                marginTop: 20,
+                              }}
+                            >
+                              <Text>Bus Information</Text>
+                              <Icon
+                                // style={styles.icon}
+                                size={25}
+                                // fill={Colors.gray}
+                                name="chevron-right"
+                              />
+                            </TouchableOpacity>
+
+                            {/* <Input
                                                     style={{ marginRight: 20, marginTop: 10 }}
                                                     placeholder="Zipcode"
                                                     onChangeText={handleChange('zipCode')}
                                                     value={values.zipcode}
                                                     disabled={!isEditMode}
                                                 /> */}
-                        {/* <Text style={{ marginTop: 10 }}>
+                            {/* <Text style={{ marginTop: 10 }}>
                           School Representative - 1
                         </Text>
                         <View
@@ -657,27 +732,29 @@ const OrganizationInfoScreen = ({ navigation }) => {
                             </Text>
                           </View>
                         </View> */}
-                        <View style={styles.buttonSettings}>
-                          <View style={[styles.background]}>
-                            <TouchableOpacity
-                              style={[styles.background]}
-                              onPress={handleSubmit}
-                            >
-                              <Text style={styles.button}>
-                                {isEditMode ? "Submit" : "Edit"}
-                              </Text>
-                            </TouchableOpacity>
+                            <View style={styles.buttonSettings}>
+                              <View style={[styles.background]}>
+                                <TouchableOpacity
+                                  style={[styles.background]}
+                                  onPress={handleSubmit}
+                                >
+                                  <Text style={styles.button}>
+                                    {isEditMode ? "Submit" : "Edit"}
+                                  </Text>
+                                </TouchableOpacity>
+                              </View>
+                            </View>
                           </View>
-                        </View>
-                      </View>
-                    </>
-                  )}
-                </Formik>
-              </>
-            </View>
-          </View>
-        </ScrollView>
-      </KeyboardAwareScrollView>
+                        </>
+                      )}
+                    </Formik>
+                  </>
+                </View>
+              </View>
+            </ScrollView>
+          </KeyboardAwareScrollView>
+        </>
+      )}
     </>
   );
 };

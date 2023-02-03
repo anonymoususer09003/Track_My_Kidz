@@ -9,6 +9,10 @@ import {
   clearUserType,
   removeCountryDetail,
   removeInstructorDetail,
+  removeStudentParentDetail,
+  removeUserId,
+  removeUserType,
+  removeStoreUserType,
 } from "@/Storage/MainAppStorage";
 import ChangeLoginState from "@/Store/Authentication/ChangeLoginState";
 
@@ -21,6 +25,10 @@ export default {
       await clearUserId();
       await clearUserType();
       await removeInstructorDetail();
+      await removeUserId();
+      await removeUserType();
+      await removeStoreUserType();
+      await removeStudentParentDetail();
       await dispatch(ChangeLoginState.action({ loggedIn: false }));
     }
   ),

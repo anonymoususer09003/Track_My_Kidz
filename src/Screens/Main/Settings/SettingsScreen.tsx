@@ -23,6 +23,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { UserState } from "@/Store/User";
 import { StripeModal, FlagBlogModal, DonationModal } from "@/Modals";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import ChangeUserState from "@/Store/UserType/ChangeUserTypeState";
 import ChangeLoginState from "@/Store/Authentication/ChangeLoginState";
 import Toast from "react-native-toast-message";
 import DeactivateTwoFAService from "@/Services/TwoFAServices/DeactivateTwoFAService";
@@ -51,8 +52,8 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
 
   const getUserId = async () => {
     setVerifyType("");
-    const id: any = await loadUserId();
-    dispatch(FetchOne.action(id));
+    // const id: any = await loadUserId();
+    // dispatch(FetchOne.action(id));
   };
 
   useEffect(() => {
@@ -365,7 +366,15 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
               <View style={styles.background}>
                 <TouchableOpacity
                   style={styles.background}
-                  onPress={() => dispatch(LogoutStore.action())}
+                  onPress={() => {
+                    dispatch(
+                      ChangeUserState.action({
+                        userType: "",
+                      })
+                    );
+
+                    dispatch(LogoutStore.action());
+                  }}
                 >
                   <Text style={styles.button}>Log out</Text>
                 </TouchableOpacity>

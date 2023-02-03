@@ -128,22 +128,38 @@ const PreviewBusInformation = ({
         >
           <View style={styles.layout}>
             <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                {isLongSeat &&
-                  rearSeats.map((item) => (
-                    <Input
-                      style={{ margin: 5, borderColor: "#000", width: "100%" }}
-                      autoCapitalize="none"
-                      value={item}
-                    />
-                  ))}
-              </View>
+              <ScrollView horizontal style={{ flex: 1, paddingBottom: 5 }}>
+                <View
+                  style={{
+                    width: "80%",
+                    alignSelf: "center",
+                    flexDirection: "row",
+                  }}
+                >
+                  {isLongSeat &&
+                    rearSeats.map((item) => (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          marginRight: 10,
+                        }}
+                      >
+                        <Input
+                          style={{
+                            margin: 5,
+                            borderColor: "#000",
+                            width: 60,
+                          }}
+                          autoCapitalize="none"
+                          value={item}
+                        />
+                      </View>
+                    ))}
+                </View>
+              </ScrollView>
+
               <ScrollView horizontal style={{ flex: 1, paddingBottom: 5 }}>
                 <View style={{ width: "80%", alignSelf: "center" }}>
                   {seats.map((item) => (

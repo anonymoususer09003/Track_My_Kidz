@@ -23,6 +23,7 @@ import ChangeCountryState from "@/Store/Places/FetchCountries";
 import FetchCountries from "@/Store/Places/FetchCountries";
 import { GetAllCountries } from "@/Services/PlaceServices";
 import { InstructorActivitiesModal, CancelActivityModal } from "@/Modals";
+import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
 import {
   InstructionsModal,
   JourneyTrackerModal,
@@ -144,6 +145,11 @@ const InstructorActivityScreen = ({}) => {
   );
   // console.log("filterday and month", filterDayAndMonth);
   useEffect(() => {
+    dispatch(
+      ChangeNavigationCustomState.action({
+        navigationLeftDrawer: "activity",
+      })
+    );
     if (selectedInstructions) {
       dispatch(ChangeModalState.action({ instructionsModalVisibility: true }));
     }
@@ -328,11 +334,14 @@ const InstructorActivityScreen = ({}) => {
     const userId = await loadUserId();
     console.log("instructor------------------", userId);
     try {
-      if (!currentUser) {
-        let res = await GetInstructor(userId, {
-          cancelToken: source.token,
-        });
-        dispatch(ChangeUserState.action({ item: res }));
+      if (Object.keys(currentUser).length == 0) {
+        let res = await GetInstructor(userId);
+        dispatch(
+          ChangeUserState.action({
+            item: res,
+            fetchOne: { loading: false, error: null },
+          })
+        );
         _dispatch({
           type: actions.INSTRUCTOR_DETAIL,
           payload: res,
@@ -342,7 +351,7 @@ const InstructorActivityScreen = ({}) => {
         if (res?.isAdmin) {
           console.log("if------------------");
           await getActivities(false);
-          // await findInstructorBySchoolId(res);
+          await findInstructorBySchoolId(res);
         } else {
           console.log("else------------------");
           await getActivitiesByUser(userId);
@@ -356,7 +365,7 @@ const InstructorActivityScreen = ({}) => {
         if (currentUser?.isAdmin) {
           console.log("if------------------");
           await getActivities(false);
-          // await findInstructorBySchoolId(currentUser);
+          await findInstructorBySchoolId(currentUser);
         } else {
           console.log("else------------------");
           await getActivitiesByUser(userId);
@@ -729,13 +738,16 @@ const InstructorActivityScreen = ({}) => {
     console.log("date", date);
     let temp = [];
     originalActivities?.result?.map((item, index) => {
-      let itemDate = item?.date.split(" ");
+      let itemDate = item?.date.split("T");
+      console.log("dsate----", moment(date).format("YYYY-MM-DD"));
       console.log("itemdate", itemDate[0]);
-      if (itemDate[0] == date) {
+
+      if (itemDate[0] == moment(date).format("YYYY-MM-DD")) {
         temp.push(item);
       }
     });
     allActivities.result = temp;
+    console.log("temp", temp);
     setActivities(allActivities);
   };
   const filterInstructorActivities = (
@@ -854,7 +866,10 @@ const InstructorActivityScreen = ({}) => {
         <InstructorActivitiesModal
           getActivities={getActivities}
           row={row}
-          item={selectedActivity}
+          item={{
+            ...selectedActivity,
+            ...activitiesCount[selectedActivity.activityId],
+          }}
           visible={visible}
           hide={() => setVisible(false)}
           showCancelModal={() => setCancelModal(true)}

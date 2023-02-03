@@ -140,7 +140,9 @@ const InstructorActivityModal = ({
             onPress={() => {
               console.log(item, buses);
               const bus = buses.find((b) => b?.activityId === item?.activityId);
-              // console.log(bus);
+              // / // console.log();
+              console.log("item-------", item);
+
               if (
                 item?.countApprovedInstructors ||
                 item?.countApprovedStudents

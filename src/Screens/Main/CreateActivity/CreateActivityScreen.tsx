@@ -158,7 +158,10 @@ const CreateActivityScreen = ({ route }) => {
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
+  console.log("currentUser", currentUser);
+  const [orgId, setOrgId] = useState({});
   const [hideForm, setHideForm] = useState(true);
+
   const [{ selectedActivity: activity }, _dispatch] = useStateValue();
   const isEdit = route?.params?.isEdit || false;
   const dispatch = useDispatch();
@@ -225,12 +228,14 @@ const CreateActivityScreen = ({ route }) => {
 
   const findInstructorBySchoolId = async (res: any) => {
     try {
+      setInstructorInfo(res);
       let instructors = await FindInstructorBySchoolOrg({
         schoolId: res?.schoolId,
         // 2198,
         // res?.schoolId,
         orgId: res?.orgId || null,
       });
+      setOrgId({ schoolId: res?.schoolId || null, orgId: res?.orgId || null });
       setUser(res);
       console.log("onBhelaf of", instructors);
       if (activity) {
@@ -256,7 +261,13 @@ const CreateActivityScreen = ({ route }) => {
     try {
       if (!currentUser) {
         let res = await GetInstructor(userId);
-        dispatch(ChangeUserState.action({ item: res }));
+        console.log("res", res);
+        dispatch(
+          ChangeUserState.action({
+            item: res,
+            fetchOne: { loading: false, error: null },
+          })
+        );
         _dispatch({
           type: actions.INSTRUCTOR_DETAIL,
           payload: res,
@@ -265,7 +276,9 @@ const CreateActivityScreen = ({ route }) => {
 
         findInstructorBySchoolId(res);
       } else {
+        setInstructorInfo(currentUser);
         findInstructorBySchoolId(currentUser);
+
         setUser(currentUser);
       }
     } catch (err) {
@@ -303,7 +316,7 @@ const CreateActivityScreen = ({ route }) => {
     }
     setInstructorList(data);
   };
-
+  console.log("deleted students", deletedStudents);
   const handleRemoveGroup = (item) => {
     let data = [...groups];
     data = data.filter((d) => d.groupName !== item.groupName);
@@ -384,22 +397,25 @@ const CreateActivityScreen = ({ route }) => {
   const getActivityOptInDetail = async () => {
     try {
       let res = await GetOptIn(activity?.activityId);
-
+      setOptIn({ ...infomation, ...res });
       setInformation({ ...infomation, ...res });
     } catch (err) {
       setHideForm(true);
       console.log("err", err);
     }
   };
+
   // console.log("venue state------------", currentUser?.state);
   useEffect(() => {
     // loadUserDetails();
-    getInstructors();
-    handleStudentAutoSelect();
-    if (route?.params?.groupId) {
-      getGroupDetail();
+    if (isFocused) {
+      getInstructors();
+      handleStudentAutoSelect();
+      if (route?.params?.groupId) {
+        getGroupDetail();
+      }
     }
-  }, []);
+  }, [isFocused]);
   useEffect(() => {
     if (!isFocused) {
       // setStudents([]);
@@ -414,6 +430,8 @@ const CreateActivityScreen = ({ route }) => {
       setStudents([]);
       setInstructorList([]);
       setHideForm(false);
+      setDeletedStudents([]);
+      setDeletedInstructors([]);
     } else {
       if (isFocused && !route?.params) {
         setHideForm(true);
@@ -423,6 +441,7 @@ const CreateActivityScreen = ({ route }) => {
       }
     }
   }, [isFocused]);
+  console.log("values", instructorInfo);
 
   useEffect(() => {
     if (isFocused && route?.params && !route?.params?.groupId) {
@@ -430,8 +449,10 @@ const CreateActivityScreen = ({ route }) => {
       getActivityDetail();
     }
   }, [isFocused]);
+
   useEffect(() => {
     if (isFocused) {
+      console.log("instructor", infomation);
       setInitialValues({
         orgId: instructorInfo?.orgId,
         schoolId: instructorInfo?.schoolId,
@@ -483,9 +504,9 @@ const CreateActivityScreen = ({ route }) => {
           ? currentUser?.state
           : "",
         zipCode: activity?.venueToZip || "",
-        instructions: infomation?.instructions || "",
-        disclaimer: infomation?.disclaimer || "",
-        agreement: infomation?.agreement || "",
+        instructions: optIn?.instructions || "",
+        disclaimer: optIn?.disclaimer || "",
+        agreement: optIn?.agreement || "",
         starting: new Date(),
         startingFrom: "",
         startingTo: "",
@@ -494,7 +515,8 @@ const CreateActivityScreen = ({ route }) => {
         onBehalfOf: onBehalf,
       });
     }
-  }, [isFocused, activity, infomation, user]);
+  }, [isFocused, activity, infomation, user, optIn]);
+  console.log("orgId9009909090909090909090", instructors);
   // console.log("format date0000000000000000000000", activity);
   return (
     <>
@@ -510,9 +532,12 @@ const CreateActivityScreen = ({ route }) => {
       />
       <AddIndividialMembersModal
         individuals={students}
+        // individual={(item)=>{
+        //   setStudents([...students, item]);
+        // }}
         setIndividuals={(item) => {
           console.log("item---", item);
-          setStudents([...students, item[0]]);
+          setStudents([...item]);
         }}
       />
       <AppHeader
@@ -578,10 +603,10 @@ const CreateActivityScreen = ({ route }) => {
                 venueFromCity: values.fromCity,
                 venueFromState: values.fromState,
                 venueFromZip: values.fromZipCode,
-                schoolId: values?.schoolId || null,
+                schoolId: currentUser?.schoolId || null,
                 venueToCountry: selectedIndex == 0 ? values.country : "",
                 venueFromCountry: selectedIndex != 0 ? values.country : "",
-                orgId: values?.orgId || null,
+                orgId: currentUser?.orgId || null,
                 onBehalfOf: values.onBehalfOf ? _instructor : 0,
                 students: [],
                 instructors: [],
@@ -625,7 +650,7 @@ const CreateActivityScreen = ({ route }) => {
                 if (!item?.isEdit) {
                   _students.push({
                     firstName: item?.name?.split(" ")[0],
-                    email: "",
+
                     parentEmail1: item.parent1_email,
                     parentEmail12: item.parent2_email,
                     lastName: item?.name?.split(" ")[1] || "",
@@ -706,7 +731,14 @@ const CreateActivityScreen = ({ route }) => {
                       setDeletedInstructors([]);
                       setInstructorList([]);
                       setInformation({});
-                      navigation.goBack();
+                      navigation.reset({
+                        index: 0,
+                        routes: [
+                          {
+                            name: "InstructorActivity",
+                          },
+                        ],
+                      });
                       // CreateMultipleInstructor(_individuals).then(res => {
                       //   console.log(res)
                       // }).catch(err => console.log('CreateMultipleInstructor', err))
@@ -747,19 +779,20 @@ const CreateActivityScreen = ({ route }) => {
                       deletedStudent.push(item?.id);
                     });
                     if (
-                      deletedInstructor.length > 0 &&
+                      deletedInstructor.length > 0 ||
                       deletedStudent.length > 0
                     ) {
                       await DeleteActivityParticipants({
                         studentId:
-                          deletedStudent.length == 0 ? [0] : deletedStudent,
+                          deletedStudent.length == 0 ? [] : deletedStudent,
                         instructorId:
                           deletedInstructor.length == 0
-                            ? [0]
+                            ? []
                             : deletedInstructor,
                         activityId: activity?.activityId,
                       });
                     }
+
                     let notifyToParents = true;
                     if (_students && _students?.length > 0) {
                       notifyToParents = false;
@@ -806,8 +839,17 @@ const CreateActivityScreen = ({ route }) => {
                       setDeletedStudents([]);
                       setDeletedInstructors([]);
                       setInstructorList([]);
+                      setDeletedStudents([]);
+                      setDeletedInstructors([]);
                       setInformation({});
-                      navigation.goBack();
+                      navigation.reset({
+                        index: 0,
+                        routes: [
+                          {
+                            name: "InstructorActivity",
+                          },
+                        ],
+                      });
 
                       setGroups([]);
                       setInformation({});

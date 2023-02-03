@@ -82,9 +82,9 @@ const ParentPendingScreen = ({ route }) => {
         console.log("res", res);
 
         if (refreshing) {
-          setActivities([...activities, ...res]);
+          setActivities([...activities, ...res.result]);
         } else {
-          setActivities(res);
+          setActivities(res.result);
         }
       })
       .catch((err) => {
@@ -112,9 +112,9 @@ const ParentPendingScreen = ({ route }) => {
         pageNumberGroup(refreshing ? pageGroup + 1 : 1);
         console.log("res", res);
         if (refreshing) {
-          setGroups([...groups, ...res]);
+          setGroups([...groups, ...res?.result]);
         } else {
-          setGroups(res);
+          setGroups(res.result);
         }
         // setGroups(res);
       })
@@ -287,116 +287,142 @@ const ParentPendingScreen = ({ route }) => {
       )}
 
       <View style={styles.layout}>
-        <FlatList
-          data={activities}
-          style={{ padding: 10, width: "100%" }}
-          renderItem={({ item, index }) => (
-            <Swipeable
-              ref={swipeableRef}
-              renderRightActions={(e) => RightActions(e, item)}
-            >
-              <View
-                style={[
-                  styles.item,
-                  {
-                    backgroundColor: !item.status
-                      ? "#fff"
-                      : index % 3 === 0
-                      ? "lightgreen"
-                      : index % 2 === 0
-                      ? "#F6DDCC"
-                      : "#fff",
-                  },
-                ]}
-              >
-                <Text
-                  style={styles.text}
-                >{` Activity Name: ${item?.activity?.activityName}`}</Text>
-                <Text style={styles.text}>{` Date: ${
-                  item?.activity?.scheduler?.toDate.split(" ")[0]
-                }`}</Text>
-                <Text style={styles.text}>{` Time: ${
-                  item?.activity?.scheduler?.toDate.split(" ")[2] +
-                  " " +
-                  item?.activity?.scheduler?.toDate.split(" ")[3]
-                }`}</Text>
-                <Text
-                  style={styles.text}
-                >{` ${item?.firstName} ${item?.lastName}`}</Text>
-                <Text style={styles.text}>{`Status: ${item?.status}`}</Text>
-                <Text
-                  style={styles.text}
-                >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
-              </View>
-            </Swipeable>
-          )}
-          onEndReached={async () => {
-            if (totalRecordsActivity > activities.length) {
-              console.log("logs");
+        {activities.length > 0 && (
+          <View style={{ flex: 1 }}>
+            <FlatList
+              data={activities}
+              style={{ padding: 20, width: "100%" }}
+              renderItem={({ item, index }) => {
+                let date = item?.activity?.fromDate;
+                return (
+                  <Swipeable
+                    ref={swipeableRef}
+                    renderRightActions={(e) => RightActions(e, item)}
+                  >
+                    <View
+                      style={[
+                        styles.item,
+                        {
+                          backgroundColor: !item.status
+                            ? "#fff"
+                            : index % 3 === 0
+                            ? "lightgreen"
+                            : index % 2 === 0
+                            ? "#F6DDCC"
+                            : "#fff",
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={styles.text}
+                      >{` Activity Name: ${item?.activity?.activityName}`}</Text>
+                      {/* 
+                      <Text style={styles.text}>{`Date: ${moment(
+                        date == "string" ? new Date() : date[0]
+                      ).format("YYYY-MM-DD")}`}</Text>
+                      {!date[1] ? (
+                        <Text style={styles.text}>{`Time: ${moment(
+                          date == "string" ? new Date() : date
+                        )
+                          .subtract("hours", 5)
+                          .format("hh:mm a")}`}</Text>
+                      ) : (
+                        <Text style={styles.text}>{`Time: ${
+                          date[2] + " " + date[3]
+                        }`}</Text>
+                      )} */}
 
-              getActivities(true);
+                      <Text style={styles.text}>{` Date: ${moment(date).format(
+                        "YYYY-MM-DD"
+                      )}`}</Text>
+                      <Text style={styles.text}>{` Time: ${moment(date).format(
+                        "hh:mm A"
+                      )}`}</Text>
+                      <Text
+                        style={styles.text}
+                      >{` ${item?.firstName} ${item?.lastName}`}</Text>
+                      <Text
+                        style={styles.text}
+                      >{`Status: ${item?.status}`}</Text>
+                      <Text
+                        style={styles.text}
+                      >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
+                    </View>
+                  </Swipeable>
+                );
+              }}
+              // onEndReached={async () => {
+              //   if (totalRecordsActivity > activities.length) {
+              //     console.log("logs");
 
-              if (totalRecordsGroup > groups.length) {
-                getGroups(true);
-              }
-            }
-          }}
-          refreshing={false}
-          onRefresh={() => null}
-        />
+              //     getActivities(true);
 
-        <FlatList
-          data={groups}
-          style={{ padding: 10, width: "100%" }}
-          renderItem={({ item, index }) => (
-            <Swipeable
-              ref={swipeableRef}
-              renderRightActions={(e) => RightActions(e, item)}
-            >
-              <View
-                style={[
-                  styles.item,
-                  {
-                    backgroundColor: !item.status
-                      ? "#fff"
-                      : index % 3 === 0
-                      ? "lightgreen"
-                      : index % 2 === 0
-                      ? "#F6DDCC"
-                      : "#fff",
-                  },
-                ]}
-              >
-                <Text
-                  style={styles.text}
-                >{` Group Name: ${item?.group?.groupName}`}</Text>
-                <Text style={styles.text}>{` Date: ${moment(
-                  item?.activity?.scheduler?.fromDate
-                ).format("YYYY-MM-DD")}`}</Text>
-                <Text
-                  style={styles.text}
-                >{` ${item?.firstName} ${item?.lastName}`}</Text>
-                <Text style={styles.text}>{`Status: ${item?.status}`}</Text>
-                <Text
-                  style={styles.text}
-                >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
-              </View>
-            </Swipeable>
-          )}
-          onEndReached={async () => {
-            if (totalRecordsActivity > activities.length) {
-              console.log("logs");
+              //     if (totalRecordsGroup > groups.length) {
+              //       getGroups(true);
+              //     }
+              //   }
+              // }}
+              refreshing={false}
+              onRefresh={() => null}
+            />
+          </View>
+        )}
+        {activities.length > 0 && (
+          <View style={{ flex: 1 }}>
+            <FlatList
+              data={groups}
+              style={{ padding: 10, width: "100%" }}
+              renderItem={({ item, index }) => (
+                <Swipeable
+                  ref={swipeableRef}
+                  renderRightActions={(e) => RightActions(e, item)}
+                >
+                  <View
+                    style={[
+                      styles.item,
+                      {
+                        backgroundColor: !item.status
+                          ? "#fff"
+                          : index % 3 === 0
+                          ? "lightgreen"
+                          : index % 2 === 0
+                          ? "#F6DDCC"
+                          : "#fff",
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={styles.text}
+                    >{` Group Name: ${item?.group?.groupName}`}</Text>
+                    <Text style={styles.text}>{` Date: ${moment(
+                      item?.activity?.scheduler?.fromDate
+                    ).format("YYYY-MM-DD")}`}</Text>
+                    <Text
+                      style={styles.text}
+                    >{` ${item?.firstName} ${item?.lastName}`}</Text>
+                    <Text style={styles.text}>{`Status: ${item?.status}`}</Text>
+                    <Text
+                      style={styles.text}
+                    >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
+                  </View>
+                </Swipeable>
+              )}
+              // onEndReached={async () => {
+              //   if (totalRecordsActivity > activities.length) {
+              //     console.log("logs");
 
-              getActivities(true);
+              //     getActivities(true);
 
-              if (totalRecordsGroup > groups.length) {
-                getGroups(true);
-              }
-            }
-          }}
-          refreshing={false}
-          onRefresh={() => null}
-        />
+              //     if (totalRecordsGroup > groups.length) {
+              //       getGroups(true);
+              //     }
+              //   }
+              // }}
+              refreshing={false}
+              onRefresh={() => null}
+            />
+          </View>
+        )}
         {refreshing && (
           <ActivityIndicator size="large" color={Colors.primary} />
         )}
@@ -409,7 +435,7 @@ export default ParentPendingScreen;
 
 const styles = StyleSheet.create({
   layout: {
-    // flex: 1,
+    flex: 1,
     // flexDirection: "column",
   },
   item: {

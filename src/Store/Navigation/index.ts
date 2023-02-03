@@ -1,14 +1,16 @@
-import { buildSlice } from '@thecodingmachine/redux-toolkit-wrapper'
-import ChangeNavigationCustomState from '@/Store/Navigation/ChangeNavigationCustomState'
+import { buildSlice } from "@thecodingmachine/redux-toolkit-wrapper";
+import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
 
-export default buildSlice('navigation', [ChangeNavigationCustomState], {
+export default buildSlice("navigation", [ChangeNavigationCustomState], {
   navigationLeftDrawer: null,
   navigationRightDrawer: null,
-  navigationFeaturedPage: null
-}).reducer
+  navigationFeaturedPage: null,
+  activeNav: null,
+}).reducer;
 
 export interface NavigationCustomState {
-  navigationLeftDrawer: any | null
-  navigationRightDrawer: any | null
-  navigationFeaturedPage: any | null
+  navigationLeftDrawer: any | null;
+  navigationRightDrawer: any | null;
+  navigationFeaturedPage: any | null;
+  activeNav: any | null;
 }

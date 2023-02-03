@@ -26,7 +26,7 @@ import Swipeable from "react-native-gesture-handler/Swipeable";
 import Colors from "@/Theme/Colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { LinearGradientButton } from "@/Components";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import { ParticipantLocation } from "@/Services/Activity";
 const ActivityDetailsScreen = () => {
   const ref = useRef();
@@ -40,12 +40,14 @@ const ActivityDetailsScreen = () => {
   const [thumbnail, setThumbnail] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [selectedDependent, setSelectedDependent] = useState(null);
+  const [participantsEmail, setParticipantsEmail] = useState([]);
   const [partcipants, setParticipants] = useState([]);
   const isFocused = useIsFocused();
   console.log("acitvity", activity);
   const getParticipantLocation = async () => {
     try {
       let res = await ParticipantLocation(activity?.activityId);
+      console.log("res", res);
       setParticipants(res);
     } catch (err) {
       console.log("err", err);
@@ -115,17 +117,17 @@ const ActivityDetailsScreen = () => {
             //   latitudeDelta: 0.0922 + width / height,
             //   longitudeDelta: 0.0421,
             // }}
-            onLayout={() => {
-              ref?.current?.fitToCoordinates(studentsEmails, {
-                edgePadding: {
-                  top: 10,
-                  right: 10,
-                  bottom: 10,
-                  left: 10,
-                },
-                animated: true,
-              });
-            }}
+            // onLayout={() => {
+            //   ref?.current?.fitToCoordinates(studentsEmails, {
+            //     edgePadding: {
+            //       top: 10,
+            //       right: 10,
+            //       bottom: 10,
+            //       left: 10,
+            //     },
+            //     animated: true,
+            //   });
+            // }}
             style={{ flex: 1 }}
           >
             {partcipants.map((item, index) => {

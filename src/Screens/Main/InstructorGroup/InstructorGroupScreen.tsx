@@ -22,6 +22,7 @@ import fetchOneUserService from "@/Services/User/FetchOne";
 import ChangeUserState from "@/Store/User/FetchOne";
 import { actions } from "@/Context/state/Reducer";
 import { InstructionsModal, RequestPermissionModalGroups } from "@/Modals";
+import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {
   DeleteGroup,
@@ -214,11 +215,16 @@ const InstructorGroupScreen = ({ route }) => {
     const userId = await loadUserId();
     console.log("instructor------------------", userId);
     try {
-      if (!currentUser) {
+      if (Object.keys(currentUser).length == 0) {
         let res = await GetInstructor(userId, {
           cancelToken: source.token,
         });
-        dispatch(ChangeUserState.action({ item: res }));
+        dispatch(
+          ChangeUserState.action({
+            item: res,
+            fetchOne: { loading: false, error: null },
+          })
+        );
         _dispatch({
           type: actions.INSTRUCTOR_DETAIL,
           payload: res,
@@ -387,7 +393,7 @@ const InstructorGroupScreen = ({ route }) => {
                 justifyContent: "center",
               }}
               onPress={() =>
-                DeleteGroup(item.id)
+                DeleteGroup(item.groupId)
                   .then((res) => {
                     getGroups();
                   })
@@ -415,6 +421,11 @@ const InstructorGroupScreen = ({ route }) => {
     }
   };
   useEffect(() => {
+    dispatch(
+      ChangeNavigationCustomState.action({
+        navigationLeftDrawer: null,
+      })
+    );
     setInitialize(true);
     getCacheGroups();
   }, []);

@@ -84,17 +84,31 @@ const CancelActivityModal = ({
                     instructorId: res?.instructorId,
                   };
                   console.log("body", body);
-                  CancelOngoingActivity(body)
-                    .then((res) => {
-                      console.log(res);
-                      Toast.show({
-                        type: "success",
-                        text2: "Activity has been cancelled successfully ",
-                      });
-                      getActivities();
-                      hide();
-                    })
-                    .catch((err) => console.log(err));
+                  if (item.status != "cancel") {
+                    CancelOngoingActivity(body)
+                      .then((res) => {
+                        console.log(res);
+                        Toast.show({
+                          type: "success",
+                          text2: "Activity has been cancelled successfully ",
+                        });
+                        getActivities();
+                        hide();
+                      })
+                      .catch((err) => console.log(err));
+                  } else {
+                    DeleteActivity(item.activityId)
+                      .then((res) => {
+                        console.log(res);
+                        Toast.show({
+                          type: "success",
+                          text2: "Activity has been deleted successfully ",
+                        });
+                        getActivities();
+                        hide();
+                      })
+                      .catch((err) => console.log(err));
+                  }
                 })
                 .catch((err) => {
                   console.log("err", err);
@@ -112,7 +126,9 @@ const CancelActivityModal = ({
             }}
           >
             {/* <Entypo size={25} color={Colors.primary} name="clock" /> */}
-            <Text style={styles.textStyle}>Cancel Activity</Text>
+            <Text style={styles.textStyle}>
+              {item.status == "cancel" ? "Delete Activity" : "Cancel Activity"}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[

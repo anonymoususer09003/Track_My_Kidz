@@ -62,7 +62,7 @@ const ContactUsScreen = () => {
               console.log("objectToPass", objectToPass);
               ContactUs(objectToPass)
                 .then((response: any) => {
-                  if (response.status == 201) {
+                  if (response.status == 200) {
                     setisSent(true);
                     setTimeout(() => {
                       setisSent(false);

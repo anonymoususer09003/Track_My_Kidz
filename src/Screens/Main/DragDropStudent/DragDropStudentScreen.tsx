@@ -7,6 +7,7 @@ import {
   Alert,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { DraxProvider, DraxView, DraxList } from "react-native-drax";
@@ -49,6 +50,7 @@ export default function App({ route }: any) {
   ];
   console.log("route", route.params);
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const [{ selectedActivity }] = useStateValue();
@@ -77,27 +79,29 @@ export default function App({ route }: any) {
   const [thumbnail, setThumbnail] = useState(true);
   const [receivingItemList, setReceivedItemList] = useState([]);
   const [dragItemMiddleList, setDragItemListMiddle] = useState([
-    { name: "mm", background_color: "#fff", id: 1 },
-    { name: "nm", background_color: "#fff", id: 2 },
+    // { name: "mm", background_color: "#fff", id: 1 },
+    // { name: "nm", background_color: "#fff", id: 2 },
   ]);
-  const [originaldragItemMiddleList, setOriginalDragItemListMiddle] = useState([
-    { name: "mm", background_color: "#fff", id: 1 },
-    { name: "nm", background_color: "#fff", id: 2 },
-  ]);
+  const [originaldragItemMiddleList, setOriginalDragItemListMiddle] = useState(
+    []
+  );
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
 
   const [rearSeats, setRearSeats] = useState([]);
   const [seats, setSeats] = useState([]);
-  console.log("rearsetas", route?.params.bus);
+  console.log("rearsetas", dragItemMiddleList);
+  console.log("rearsetas", receivingItemList);
 
-  const getBusbyId = async (bus: any) => {
+  const getBusbyId = async (bus: any, busDetail: any) => {
     try {
-      let res = await GetBusByID(route?.params?.bus?.busId);
+      let res = await GetBusByID(
+        route?.params?.bus?.busId || route?.params?.bus
+      );
       console.log("res0999", res);
       if (res.data.length > 0) {
-        getSeatsList(res.data, bus);
+        getSeatsList(res.data, busDetail);
       }
       return res;
     } catch (err) {
@@ -106,11 +110,11 @@ export default function App({ route }: any) {
   };
   const getBuses = async () => {
     // currentUser?.instructorId
-
+    setLoading(true);
     FindAllBus(currentUser?.instructorId, 0, 100)
       .then(async (res) => {
         console.log("00000000000000res", res);
-        let response = await getBusbyId(res);
+
         // console.log("88989389398938", res?.data);
         // setBus(
         //   {
@@ -132,6 +136,8 @@ export default function App({ route }: any) {
           (b) => b?.busId === route?.params.bus?.busId
         );
         setBus(bus);
+        let response = await getBusbyId(res, bus);
+        setLoading(false);
         console.log("bus---", bus);
       })
       .catch((err) => {
@@ -150,24 +156,71 @@ export default function App({ route }: any) {
       //   [null, null, null, null],
       //   [null, null, null, null],
       // ];
+      let obj = {};
+      seats.map((item) => {
+        obj[item[1] + "_" + item[2]] = item;
+      });
+
       console.log("seats", seats);
+      console.log("obj00", obj);
       let data = [];
       const temp = [];
       let users = [...dragItemMiddleList];
 
-      let longSeat = true;
-      for (let i = 0; i < seats.length; i++) {
-        let item = seats[i];
+      let longSeat = false;
 
-        for (let j = 0; j < item.length; j++) {
-          if (i == 0 && longSeat) {
-            if (item[j]) {
+      if (busInfo.longSeat) {
+        for (let j = 0; j < busInfo?.numberOfKidsOnLongSeat; j++) {
+          let lgValue =
+            JSON.stringify(busInfo?.numberOfRows + 1) +
+            "_" +
+            JSON.stringify(j + 1);
+          if (obj[lgValue]) {
+            let personObj = dragItemMiddleList.find(
+              (person) => person.id == obj[lgValue][0]
+            );
+            console.log("0000", dragItemMiddleList);
+            console.log("000082828", obj[lgValue]);
+            console.log("personob99j", personObj);
+            users = users.filter((per) => per.id != obj[lgValue][0]);
+            console.log("user", users);
+
+            rearSeats.push({
+              id: personObj?.id,
+              name: personObj?.name,
+              background_color: personObj?.background_color,
+            });
+          } else {
+            rearSeats.push({
+              id: parseInt(`${j}` + 1, 0),
+              name: "-",
+              background_color: "#fff",
+            });
+          }
+        }
+      }
+
+      for (let i = 0; i < busInfo?.numberOfRows; i++) {
+        let item = seats[i];
+        let comparisonValue = longSeat
+          ? busInfo?.numberOfKidsOnLongSeat
+          : busInfo?.numberOfSeatsPerRow;
+        for (let j = 0; j < comparisonValue; j++) {
+          let k = JSON.stringify(i + 1) + "_" + JSON.stringify(j + 1);
+          console.log("00000---k", k);
+          console.log("los-000-0--0-0", obj[k]);
+          if (false) {
+            let lgValue =
+              JSON.stringify(busInfo?.numberOfRows.length) +
+              "_" +
+              JSON.stringify(j);
+            if (obj[lgValue]) {
               let personObj = dragItemMiddleList.find(
-                (person) => person.id == item[j]
+                (person) => person.id == obj[lgValue][0]
               );
               console.log("draglist", dragItemMiddleList);
               console.log("personobj", item[j]);
-              users = users.filter((per) => per.id != item[j]);
+              users = users.filter((per) => per.id != obj[lgValue][0]);
               console.log("users", users);
               rearSeats.push({
                 id: personObj?.id,
@@ -182,14 +235,15 @@ export default function App({ route }: any) {
               });
             }
           } else {
-            if (item[j]) {
+            console.log("909090909090", obj[k]);
+            if (obj[k]) {
               let personObj = dragItemMiddleList.find(
-                (person) => person.id == item[j]
+                (person) => person.id == obj[k][0]
               );
               console.log("0000", dragItemMiddleList);
-              console.log("000082828", item[j]);
+              console.log("000082828", obj[k]);
               console.log("personob99j", personObj);
-              users = users.filter((per) => per.id != item[j]);
+              users = users.filter((per) => per.id != obj[k][0]);
               console.log("user", users);
 
               data.push({
@@ -218,7 +272,13 @@ export default function App({ route }: any) {
       console.log("middle", users);
       console.log("rear seats", rearSeats);
       console.log("data", temp);
-      setDragItemListMiddle(users);
+
+      let temp1 = seats.map((item, index) => ({
+        name: "-",
+        background_color: "#fff",
+        id: index,
+      }));
+      setDragItemListMiddle([...users, ...temp1]);
       setRearSeats(rearSeats);
       setReceivedItemList(temp);
       // if (longSeat) {
@@ -237,17 +297,29 @@ export default function App({ route }: any) {
   };
   useEffect(() => {
     if (isFocused) {
-      console.log("if9999999999999999999999");
-      getBuses();
       if (route?.params?.students) {
-        console.log("if9999999999999999999999");
-        const temp = route?.params?.students.map((item) => ({
-          name: item?.firstName + item?.lastName,
-          background_color: "#fff",
-          id: item.studentId,
-        }));
-        setDragItemListMiddle(temp);
-        setOriginalDragItemListMiddle(temp);
+        if (route.params?.attendanceMark) {
+          const temp = route?.params?.students.map((item) => ({
+            name: item?.firstName || item?.firstname,
+            background_color: "#fff",
+            id: item?.id || item?.studentId,
+          }));
+
+          setDragItemListMiddle(temp);
+          setOriginalDragItemListMiddle(temp);
+        } else {
+          const temp = route?.params?.students.map((item) => ({
+            name:
+              item?.firstName ||
+              item?.firstname + item?.lastName ||
+              item?.lastname,
+            background_color: "#fff",
+            id: item?.studentId || item?.id,
+          }));
+          console.log("if88888888888", temp);
+          setDragItemListMiddle(temp);
+          setOriginalDragItemListMiddle(temp);
+        }
       } else {
         console.log("else000000000000000000");
 
@@ -255,6 +327,11 @@ export default function App({ route }: any) {
       }
     }
   }, [isFocused]);
+  useEffect(() => {
+    if (originaldragItemMiddleList.length > 0) {
+      getBuses();
+    }
+  }, [originaldragItemMiddleList]);
 
   const DragUIComponent = ({ item, index }) => {
     return (
@@ -425,12 +502,14 @@ export default function App({ route }: any) {
     setRearSeats(data);
   };
 
-  useEffect(() => {
-    if (bus) {
-      getSeats();
-      getRearSeats();
-    }
-  }, [bus]);
+  // useEffect(() => {
+  //   if (bus) {
+  //     setLoading(true)
+  //     getSeats();
+  //     getRearSeats();
+  //   }
+  // }, [bus]);
+  console.log("rearseats", rearSeats);
   // console.log("acitivtyId", route.params.activity);
   const allocateSeats = async () => {
     try {
@@ -458,7 +537,10 @@ export default function App({ route }: any) {
       }
       console.log("busId", route?.params.bus);
       console.log("temp", temp);
-      let res = await SaveStudentSeats(route?.params?.bus?.busId, temp);
+      let res = await SaveStudentSeats(
+        route?.params?.bus?.busId || route?.params?.bus,
+        temp
+      );
       console.log("res--------------8", res);
       // getSeats();
       console.log("temp", temp);
@@ -470,118 +552,130 @@ export default function App({ route }: any) {
   return (
     <GestureHandlerRootView style={gestureRootViewStyle}>
       <AppHeader title="Roll Call" />
-      <ScrollView>
+      {loading ? (
         <View
-          style={{
-            justifyContent: "flex-end",
-            alignItems: "flex-end",
-            marginTop: 10,
-          }}
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Switch
-            style={{ marginLeft: 20 }}
-            trackColor={{ false: "#767577", true: "#50CBC7" }}
-            thumbColor={Colors.white}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={() => {
-              setThumbnail(!thumbnail);
-              navigation.goBack();
-              dispatch(
-                ChangeModalState.action({ rollCallModalVisibility: true })
-              );
+          <ActivityIndicator size={"large"} color={Colors.primary} />
+        </View>
+      ) : (
+        <ScrollView>
+          <View
+            style={{
+              justifyContent: "flex-end",
+              alignItems: "flex-end",
+              marginTop: 10,
             }}
-            value={thumbnail}
-          />
-        </View>
-        <View>
-          <Text style={styles.headerStyle}>
-            {"Drag drop students on seats"}
-          </Text>
-        </View>
-        <DraxProvider>
-          <View style={styles.container}>
-            <View style={styles.draxListContainer}>
-              <DraxList
-                data={dragItemMiddleList}
-                renderItemContent={DragUIComponent}
-                keyExtractor={(item, index) => index.toString()}
-                numColumns={2}
-                ItemSeparatorComponent={FlatListItemSeparator}
-                scrollEnabled={true}
-              />
-            </View>
-            <View style={[styles?.receivingContainer, { marginTop: 10 }]}>
-              {/* {console.log("rearSeats", rearSeats)} */}
-              {rearSeats &&
-                rearSeats?.map((item, index) =>
-                  ReceivingZoneUIComponent({
-                    item,
-                    index,
-                    isRear: true,
-                    parentIndex: -1,
-                  })
-                )}
-            </View>
-            <View style={styles.receivingContainer}>
-              {/* {console.log(
+          >
+            <Switch
+              style={{ marginLeft: 20 }}
+              trackColor={{ false: "#767577", true: "#50CBC7" }}
+              thumbColor={Colors.white}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={() => {
+                setThumbnail(!thumbnail);
+                navigation.goBack();
+                dispatch(
+                  ChangeModalState.action({ rollCallModalVisibility: true })
+                );
+              }}
+              value={thumbnail}
+            />
+          </View>
+          <View>
+            <Text style={styles.headerStyle}>
+              {"Drag drop students on seats"}
+            </Text>
+          </View>
+          <DraxProvider>
+            <View style={styles.container}>
+              <View style={styles.draxListContainer}>
+                <DraxList
+                  data={dragItemMiddleList}
+                  renderItemContent={DragUIComponent}
+                  keyExtractor={(item, index) => index.toString()}
+                  numColumns={2}
+                  ItemSeparatorComponent={FlatListItemSeparator}
+                  scrollEnabled={true}
+                />
+              </View>
+              <View style={[styles?.receivingContainer, { marginTop: 10 }]}>
+                {/* {console.log("rearSeats", rearSeats)} */}
+                {rearSeats &&
+                  rearSeats?.map((item, index) =>
+                    ReceivingZoneUIComponent({
+                      item,
+                      index,
+                      isRear: true,
+                      parentIndex: -1,
+                    })
+                  )}
+              </View>
+              <View style={styles.receivingContainer}>
+                {/* {console.log(
                 "receivingItemList",
                 receivingItemList,
                 FirstReceivingItemList
               )} */}
-              {/* {receivingItemList.map((item, index) =>
+                {/* {receivingItemList.map((item, index) =>
               ReceivingZoneUIComponent({ item, index })
             )} */}
-              {/* {console.log("receivingItemList", receivingItemList?.length)} */}
-              <View
+                {/* {console.log("receivingItemList", receivingItemList?.length)} */}
+                <View
+                  style={{
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {receivingItemList &&
+                    receivingItemList?.map((i, parentIndex: number) => (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-evenly",
+                          width: "100%",
+                        }}
+                      >
+                        {i &&
+                          i?.map((item, index: number) =>
+                            ReceivingZoneUIComponent({
+                              item,
+                              index,
+                              parentIndex,
+                            })
+                          )}
+                      </View>
+                    ))}
+                </View>
+              </View>
+              <Text
                 style={{
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  fontWeight: "bold",
+                  fontSize: 16,
+                  marginTop: 20,
+                  textAlign: "center",
                 }}
               >
-                {receivingItemList &&
-                  receivingItemList?.map((i, parentIndex: number) => (
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-evenly",
-                        width: "100%",
-                      }}
-                    >
-                      {i &&
-                        i?.map((item, index: number) =>
-                          ReceivingZoneUIComponent({ item, index, parentIndex })
-                        )}
-                    </View>
-                  ))}
-              </View>
+                Bus Front
+              </Text>
             </View>
-            <Text
-              style={{
-                fontWeight: "bold",
-                fontSize: 16,
-                marginTop: 20,
-                textAlign: "center",
+          </DraxProvider>
+
+          <View style={styles.bottomButton}>
+            <TouchableOpacity
+              style={styles.bottomButton}
+              onPress={() => {
+                allocateSeats();
+                // getSeatsList();
               }}
             >
-              Bus Front
-            </Text>
+              <Text style={styles.button}>Save</Text>
+            </TouchableOpacity>
           </View>
-        </DraxProvider>
-
-        <View style={styles.bottomButton}>
-          <TouchableOpacity
-            style={styles.bottomButton}
-            onPress={() => {
-              allocateSeats();
-              // getSeatsList();
-            }}
-          >
-            <Text style={styles.button}>Save</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
     </GestureHandlerRootView>
   );
 }

@@ -21,6 +21,7 @@ import {
 // @ts-ignore
 import { useSelector, useDispatch } from "react-redux";
 import { UserState } from "@/Store/User";
+import ChangeUserState from "@/Store/UserType/ChangeUserTypeState";
 import { StripeModal, FlagBlogModal, DonationModal } from "@/Modals";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import ChangeLoginState from "@/Store/Authentication/ChangeLoginState";
@@ -277,7 +278,15 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
               <View style={styles.background}>
                 <TouchableOpacity
                   style={styles.background}
-                  onPress={() => dispatch(LogoutStore.action())}
+                  onPress={() => {
+                    dispatch(
+                      ChangeUserState.action({
+                        userType: "",
+                      })
+                    );
+
+                    dispatch(LogoutStore.action());
+                  }}
                 >
                   <Text style={styles.button}>Log out</Text>
                 </TouchableOpacity>

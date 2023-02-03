@@ -37,6 +37,7 @@ export default {
       await dispatch(LogoutStore.action());
     }
     // dispatch(FetchCountries.action())
+
     await dispatch(ChangeStartUpState.action({ loadingInitialData: false }));
   }),
   reducers: buildAsyncReducers({ itemKey: null }), // We do not want to modify some item by default

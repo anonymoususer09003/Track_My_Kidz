@@ -7,6 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 // import axios from "axios";
@@ -61,14 +62,23 @@ const InstructorGroupPendingScreen = ({ route }) => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const swipeableRef = useRef(null);
-  const [pageGroup, pageNumberGroup] = useState(0);
-  const [pageSizeGroup, setPageSizeGroup] = useState(15);
-  const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
+  const isVisible = useSelector(
+    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
+  );
+  let prevOpenedRow: any;
+  let row: Array<any> = [];
+  const [refreshing, setRefreshing] = useState(false);
   const dispatch = useDispatch();
   const [students, setStudents] = useState(_students);
   const approveActivityModalVisibility = useSelector(
     (state: { modal: any }) => state.modal.approveActivityModalVisibility
   );
+  const [pageActivity, pageNumberActivity] = useState(0);
+  const [pageSizeActivity, setPageSizeActivity] = useState(10);
+  const [totalRecordsActivity, setTotalRecordsActivity] = useState(0);
+  const [pageGroup, pageNumberGroup] = useState(0);
+  const [pageSizeGroup, setPageSizeGroup] = useState(10);
+  const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
   const [selectAll, setSelectAll] = useState(false);
   const [activities, setActivities] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -100,44 +110,89 @@ const InstructorGroupPendingScreen = ({ route }) => {
       setStudents(_data);
     }
   };
+  const closeRow = (index) => {
+    console.log(index);
+    if (prevOpenedRow && prevOpenedRow !== row[index]) {
+      prevOpenedRow.close();
+    }
+    prevOpenedRow = row[index];
+  };
   // console.log("instructorDetail", instructorDetail);
-  const getActivities = async () => {
+  const getActivities = async (refreshing: any) => {
+    if (refreshing) {
+      setRefreshing(true);
+    }
     const userId = await loadUserId();
     console.log("userId", userId);
+    let pageNumberActivityCount = refreshing ? pageActivity : 0;
 
-    GetActivitiesByInsructorId(userId, "pending")
+    GetActivitiesByInsructorId(
+      userId,
+      "pending",
+      pageNumberActivityCount,
+      pageSizeActivity
+    )
       .then((res) => {
         console.log("res", res.data);
-        const data =
-          res.data &&
-          res.data.map((item) => ({
-            ...item,
-            // scheduler: {
-            //   fromDate: new Date(item.scheduler.fromDate),
-            // },
-          }));
+        setTotalRecordsActivity(res.data.totalRecords);
+        setRefreshing(false);
+        setPageSizeActivity(10);
+
+        pageNumberActivity(refreshing ? pageActivity + 1 : 1);
+        // const data =
+        //   res.data &&
+        //   res.data.map((item) => ({
+        //     ...item,
+        //     // scheduler: {
+        //     //   fromDate: new Date(item.scheduler.fromDate),
+        //     // },
+        //   }));
         // .sort((a, b) => b?.scheduler.date - a?..date);
-        setActivities({
-          result: data,
-        });
+        if (refreshing) {
+          setActivities([...activities, ...res.data.result]);
+        } else {
+          setActivities(res.data.result);
+        }
       })
       .catch((err) => {
+        setRefreshing(false);
+        setPageSizeActivity(10);
+
+        pageNumberActivity(pageActivity);
         console.log("getActivities Error:", err);
       });
   };
-  const getGroup = async () => {
-    GetGroupByInstructorId(instructorDetail?.instructorId, "pending")
+  const getGroup = async (refreshing: any) => {
+    if (refreshing) {
+      setRefreshing(true);
+    }
+    let pageNumberGroupCount = refreshing ? pageGroup : 0;
+    GetGroupByInstructorId(
+      instructorDetail?.instructorId,
+      "pending",
+      pageNumberGroupCount,
+      pageSizeGroup
+    )
       .then((res) => {
-        const data =
-          res &&
-          res.map((item) => ({
-            ...item,
-            // scheduler: {
-            //   fromDate: new Date(item.scheduler.fromDate),
-            // },
-          }));
+        setTotalRecordsGroup(res.totalRecords);
+        setRefreshing(false);
+        setPageSizeGroup(10);
+
+        pageNumberGroup(refreshing ? pageGroup + 1 : 1);
+        // const data =
+        //   res &&
+        //   res.map((item) => ({
+        //     ...item,
+        //     // scheduler: {
+        //     //   fromDate: new Date(item.scheduler.fromDate),
+        //     // },
+        //   }));
         // .sort((a, b) => b?.date - a?.date);
-        setGroups(data);
+        if (refreshing) {
+          setGroups([...groups, ...res?.result]);
+        } else {
+          setGroups(res.result);
+        }
       })
       .catch((err) => {
         console.log("getActivities Error:", err);
@@ -220,15 +275,17 @@ const InstructorGroupPendingScreen = ({ route }) => {
       </View>
     );
   };
-  // console.log("acitivties--------", activities);
+  console.log("acitivties--------", activities);
   return (
     <>
       <View style={styles.layout}>
-        <InstructionsModal
-          selectedInstructions={selectedInstructions}
-          setSelectedInstructions={setSelectedInstructions}
-        />
-
+        {isVisible && selectedInstructions && (
+          <InstructionsModal
+            selectedInstructions={selectedInstructions}
+            setSelectedInstructions={setSelectedInstructions}
+            activity={selectedInstructions}
+          />
+        )}
         {approveActivityModalVisibility && (
           <ApproveActivityModal
             fromParent={false}
@@ -240,11 +297,11 @@ const InstructorGroupPendingScreen = ({ route }) => {
                 console.log("declinedactivity", activity);
 
                 console.log("activites", activities);
-                let filter = activities?.result?.filter(
+                let filter = activities?.filter(
                   (item) => item?.activityId != id
                 );
 
-                setActivities({ result: filter });
+                setActivities(filter);
               } else {
                 let filter = groups?.filter((item) => item?.groupId != id);
                 setGroups(filter);
@@ -261,11 +318,11 @@ const InstructorGroupPendingScreen = ({ route }) => {
                 console.log("declinedactivity", declineActivity);
 
                 console.log("activites", activities);
-                let filter = activities?.result.filter(
+                let filter = activities?.filter(
                   (item) => item?.activityId != id
                 );
                 setDeclineActivity(false);
-                setActivities({ result: filter });
+                setActivities(filter);
               } else {
                 let filter = groups?.filter((item) => item?.groupId != id);
                 setGroups(filter);
@@ -276,13 +333,16 @@ const InstructorGroupPendingScreen = ({ route }) => {
 
         <View style={{ flex: 1 }}>
           <FlatList
-            data={(activities && activities?.result) || []}
+            data={(activities && activities) || []}
+            keyExtractor={(item, index) => index}
             style={{ padding: 10, width: "100%", marginTop: 10 }}
             renderItem={({ item, index }) => {
-              let date = item?.scheduler?.fromDate.split(" ");
+              let date = item?.date || "date";
               return (
                 <Swipeable
-                  ref={swipeableRef}
+                  // ref={swipeableRef}
+                  ref={(ref) => (row[index] = ref)}
+                  onSwipeableOpen={() => closeRow(item?.activityId)}
                   renderRightActions={(e) => RightActions(e, item)}
                 >
                   <TouchableOpacity
@@ -302,10 +362,11 @@ const InstructorGroupPendingScreen = ({ route }) => {
                       },
                     ]}
                   >
-                    <Text style={styles.text}>{`Date: ${date[0]} `}</Text>
-                    <Text style={styles.text}>{`Time: ${
-                      date[2] + " " + date[3]
-                    }`}</Text>
+                    <Text style={styles.text}>{`Date: ${date} `}</Text>
+                    <Text style={styles.text}>{`Time: ${moment().format(
+                      "hh:mm a"
+                    )}
+                    `}</Text>
                     <Text style={styles.text}>{`${
                       item?.activityType?.toLowerCase() === "activity"
                         ? "Activity"
@@ -325,7 +386,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
                           instructionsModalVisibility: true,
                         })
                       );
-                      setSelectedInstructions(item?.optin);
+                      setSelectedInstructions(item);
                     }}
                     style={[
                       styles.footer,
@@ -347,18 +408,31 @@ const InstructorGroupPendingScreen = ({ route }) => {
                 </Swipeable>
               );
             }}
+            onEndReached={async () => {
+              if (totalRecordsActivity > activities.length) {
+                console.log("logs");
+
+                getActivities(true);
+              }
+            }}
+            refreshing={false}
+            onRefresh={() => null}
+
             // onEndReached={() => Alert.alert("kk")}
           />
+
           {/* {groups.length > 0 && (
             <Text style={{ marginVertical: 10, mar }}>Groups</Text>
           )} */}
           <FlatList
             data={groups}
+            keyExtractor={(item, index) => index}
             style={{ padding: 10, width: "100%" }}
             renderItem={({ item, index }) => (
               <Swipeable
-                ref={swipeableRef}
+                ref={(ref) => (row[index] = ref)}
                 renderRightActions={(e) => RightActions(e, item)}
+                onSwipeableOpen={() => closeRow(item?.groupId)}
               >
                 <View style={[styles.item, { backgroundColor: "#fff" }]}>
                   <Text
@@ -384,7 +458,18 @@ const InstructorGroupPendingScreen = ({ route }) => {
                 </TouchableOpacity>
               </Swipeable>
             )}
+            onEndReached={async () => {
+              if (totalRecordsGroup > groups.length) {
+                getGroup(true);
+              }
+            }}
+            refreshing={false}
+            onRefresh={() => null}
           />
+
+          {refreshing && (
+            <ActivityIndicator size="large" color={Colors.primary} />
+          )}
         </View>
       </View>
     </>

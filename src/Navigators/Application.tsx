@@ -12,6 +12,13 @@ import {
   StatusBar,
   View,
 } from "react-native";
+import {
+  GetAllInstructors,
+  GetInstructor,
+  FindInstructorBySchoolOrg,
+} from "@/Services/Instructor";
+import { loadUserId, loadUserType } from "@/Storage/MainAppStorage";
+import ChangeUserState from "@/Store/User/FetchOne";
 import ChangeCountryState from "@/Store/Places/FetchCountries";
 import axios from "axios";
 import { actions } from "@/Context/state/Reducer";
@@ -121,6 +128,19 @@ const Application = () => {
           ChangeCountryState.action({ countries: JSON.parse(countiresList) })
         );
       }
+      const userType = await loadUserType();
+      const userId = await loadUserId();
+      // if (userType == "instructor") {
+      //   let response = await GetInstructor(userId);
+      //   console.log("response099090090990099009xw", response);
+      //   dispatch(
+      //     ChangeUserState.action({
+      //       item: response,
+      //       fetchOne: { loading: false, error: null },
+      //     })
+      //   );
+
+      // }
     } catch (err) {
       console.log("err fetch coutnries", err);
     }

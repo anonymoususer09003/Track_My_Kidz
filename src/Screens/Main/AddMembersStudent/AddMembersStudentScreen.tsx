@@ -113,7 +113,7 @@ const AddMembersStudentScreen = ({ route }) => {
         }
       });
     }
-    addStudents = temp;
+    addStudents = group?.isEdit ? temp : [...students];
     let filter = addStudents.filter((s) => s?.firstName !== "");
     console.log("deletedstudent", deletedStudents);
     console.log("students---", filter);

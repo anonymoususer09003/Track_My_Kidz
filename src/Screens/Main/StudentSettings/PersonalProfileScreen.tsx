@@ -65,7 +65,7 @@ const PersonalProfileScreen = () => {
   const getUserId = async () => {
     const id: any = await loadUserId();
     setuserId(id);
-    dispatch(FetchOne.action(id));
+    // dispatch(FetchOne.action(id));
   };
 
   useEffect(() => {
@@ -260,7 +260,7 @@ const PersonalProfileScreen = () => {
                             onChangeText={handleChange("school")}
                           />
                         )}
-                        {!isEditMode ? (
+                        {/* {!isEditMode ? (
                           <View style={{ flexDirection: "column" }}>
                             <Text style={styles.editLabel}>Grade</Text>
                             <Text style={styles.editField}>{values.grade}</Text>
@@ -275,7 +275,7 @@ const PersonalProfileScreen = () => {
                             value={values.grade}
                             onChangeText={handleChange("grade")}
                           />
-                        )}
+                        )} */}
                         <View style={{ flexDirection: "column" }}>
                           <Text style={styles.editLabel}>
                             Parent 1/Guardian 1 Email

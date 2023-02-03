@@ -92,7 +92,7 @@ const PersonalProfileScreen = () => {
     };
   }, []);
   useEffect(() => {
-    getUserId();
+    // getUserId();
 
     GetAllStates(currentUser?.country.trim()).then((res) => {
       setStates(res.data);

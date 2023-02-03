@@ -89,29 +89,7 @@ const RollCallModal = ({ activity, setSelectedActivity, buses, setBuses }) => {
   const [isToggle, setIsToggle] = useState({});
 
   const [isAttendance, setisAttendance] = useState(false);
-  const list = [
-    {
-      id: 1,
-      journeyStartToOrigin: false,
-      journeyStartToDestination: false,
-      firstName: "nouman",
-      lastName: "saeed",
-    },
-    {
-      id: 2,
-      journeyStartToOrigin: false,
-      journeyStartToDestination: false,
-      firstName: "nouman",
-      lastName: "saeed",
-    },
-    {
-      id: 3,
-      journeyStartToOrigin: false,
-      journeyStartToDestination: false,
-      firstName: "nouman",
-      lastName: "saeed",
-    },
-  ];
+  const list = [];
   const [rollCall, setRollCall] = useState(false);
   const [attendanceDetail, setAttendanceDetail] = useState({});
   const [saved, setSaved] = useState(false);
@@ -410,6 +388,7 @@ const RollCallModal = ({ activity, setSelectedActivity, buses, setBuses }) => {
                             bus: { busId: attendanceDetail[0]?.buses[0] },
                             students: students,
                             activity: activity,
+                            attendanceMark: true,
                           });
                         } else {
                           dispatch(
@@ -467,9 +446,9 @@ const RollCallModal = ({ activity, setSelectedActivity, buses, setBuses }) => {
                                 style={{ marginHorizontal: 5 }}
                               />
                             )}
-                            <Text
-                              style={{ marginLeft: 10 }}
-                            >{`${item.firstName} ${item.lastName}`}</Text>
+                            <Text style={{ marginLeft: 10 }}>{`${
+                              item?.firstName || item?.firstname
+                            } ${item?.lastName || item?.lastname}`}</Text>
                           </View>
                           {(rollCall || saved) && (
                             <View

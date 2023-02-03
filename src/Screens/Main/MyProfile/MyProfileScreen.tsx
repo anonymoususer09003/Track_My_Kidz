@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 const MyProfileScreen = () => {
   const navigation = useNavigation();
   const user = useSelector((state: { user: UserState }) => state.user.item);
+  console.log("user---", user);
   const styles = useStyleSheet(themedStyles);
 
   const changeUrl = (e: any) => {
