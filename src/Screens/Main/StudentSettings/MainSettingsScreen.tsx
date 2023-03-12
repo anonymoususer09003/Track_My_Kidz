@@ -12,7 +12,7 @@ const SettingsScreen = ({ navigation }) => {
   const { Layout } = useTheme();
   return (
     <>
-      <AppHeader title="Settings" />
+      <AppHeader title="Settings" hideCalendar={true} />
       <View style={styles.layout}>
         <View style={styles.mainLayout}>
           <View style={[[Layout.colCenter]]}>

@@ -7,6 +7,7 @@ import {
   SelectItem,
   Autocomplete,
   AutocompleteItem,
+  CheckBox,
 } from "@ui-kitten/components";
 import * as yup from "yup";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
@@ -70,7 +71,7 @@ const EditDependentModal = ({
   const [states, setStates] = useState<Array<any>>([]);
   const [cities, setCities] = useState<Array<any>>([]);
   // const [dependents, setCities] = useState<Array<any>>([]);
-
+  const [checkBox, setCheckBox] = useState(false);
   const [schoolsData, setSchoolsData] = React.useState(schools);
   const isVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.editDependentModalVisibility
@@ -286,6 +287,54 @@ const EditDependentModal = ({
             }) => (
               <>
                 <View style={{ marginTop: 30, padding: 20 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text style={{ marginRight: 20, marginTop: 10 }}>
+                      Use my address
+                    </Text>
+                    <CheckBox
+                      style={[{ flex: 1, marginTop: 13 }]}
+                      checked={checkBox}
+                      onChange={(checked) => {
+                        if (checked) {
+                          setCheckBox(checked);
+                          setFieldValue("country", currentUser?.country || "");
+                          setFieldValue(
+                            "selectedCountry",
+                            currentUser?.country || ""
+                          );
+                          setFieldValue("state", currentUser?.state || "");
+                          setFieldValue(
+                            "selectedState",
+                            currentUser?.state || ""
+                          );
+                          setFieldValue("city", currentUser?.city || "");
+                          setFieldValue(
+                            "selectedCity",
+                            currentUser?.city || ""
+                          );
+                        } else {
+                          setCheckBox(checked);
+                          setFieldValue("country", "");
+                          setFieldValue("selectedCountry", "");
+                          setFieldValue("selectedCity", "");
+                          setFieldValue("selectedState", "");
+                          setFieldValue("state", "");
+                          setFieldValue("city", "");
+                        }
+                        // if (checked) {
+                        //   Alert.alert(checked);
+                        // } else {
+                        //   Alert.alert(checked);
+                        // }
+                      }}
+                    ></CheckBox>
+                  </View>
                   <Input
                     style={styles.inputSettings}
                     autoCapitalize="none"
@@ -579,6 +628,7 @@ const EditDependentModal = ({
                         )}
                     </>
                   )}
+
                   {/* <Select
                     value={student?.school}
                     placeholder="School"

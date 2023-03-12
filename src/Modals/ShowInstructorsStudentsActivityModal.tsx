@@ -162,7 +162,7 @@ const InstructorsStudentsModal = ({
                   textAlign: "center",
                 }}
               >
-                {type == "students" ? "Students List" : "Instructors List"}
+                {type == "student" ? "Students List" : "Instructors List"}
               </Text>
             )}
             appearance="control"

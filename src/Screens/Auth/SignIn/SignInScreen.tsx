@@ -7,6 +7,7 @@ import {
   View,
   Dimensions,
   ScrollView,
+  Alert,
 } from "react-native";
 import {
   Button,
@@ -21,6 +22,7 @@ import {
   CheckBox,
 } from "@ui-kitten/components";
 import { Formik } from "formik";
+import { useIsFocused } from "@react-navigation/native";
 import * as yup from "yup";
 import { Login } from "@/Services/LoginServices";
 import { Normalize } from "../../../Utils/Shared/NormalizeDisplay";
@@ -44,6 +46,7 @@ import { useSelector, useDispatch } from "react-redux";
 import ChangeCountryState from "@/Store/Places/FetchCountries";
 import FetchCountries from "@/Store/Places/FetchCountries";
 import { GetAllCountries } from "@/Services/PlaceServices";
+
 const user_type = [
   { id: 1, label: "Parent", value: "Parent" },
   { id: 2, label: "Instructor", value: "Instructor" },
@@ -53,10 +56,18 @@ const screenHeight = Dimensions.get("screen").height;
 // @ts-ignore
 const SignInScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+  const isFocuesed = useIsFocused();
   // const dispatch = useDispatch();
   const countries = useSelector(
     (state: { state: any }) => state.places.countries
   );
+  let values = { email: "", password: "", user_type: "", is_default: false };
+  const [intitialValues, setInitialValues] = useState({
+    email: "",
+    password: "",
+    user_type: "",
+    is_default: false,
+  });
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const { login, register } = useContext(AuthContext);
   const fetchCountries = async () => {
@@ -72,11 +83,15 @@ const SignInScreen = ({ navigation }) => {
   };
   useEffect(() => {
     fetchCountries();
+    // return () => setInitialValues(intitialValues);
+    if (!isFocuesed) {
+      setInitialValues(values);
+    }
     // dispatch(FetchCountries.action());
     // console.log("alert");
     // Alert.alert("kk");
     // MainNavigator = null;
-  }, []);
+  }, [isFocuesed]);
 
   // useEffect(() => {
   //   loadBiometricToken().then((token) => {
@@ -101,8 +116,9 @@ const SignInScreen = ({ navigation }) => {
     //   email: 'test@test.com'
     // })
   };
-  const onResendActivationButtonPress = (): void => {
-    navigation && navigation.navigate("ResendConfirmation");
+  const onResendActivationButtonPress = (value: boolean): void => {
+    navigation &&
+      navigation.navigate("ResendConfirmation", { resendCode: value });
   };
   const onReactivateButtonPress = (): void => {
     navigation && navigation.navigate("ReactivateAccount");
@@ -163,157 +179,153 @@ const SignInScreen = ({ navigation }) => {
             resizeMode="contain"
           />
         </View>
-
-        <Formik
-          validationSchema={loginValidationSchema}
-          validateOnMount={true}
-          initialValues={{
-            email: "",
-            password: "",
-            user_type: "",
-            is_default: false,
-          }}
-          onSubmit={(values) => {
-            let objectToPass = {
-              email: values.email,
-              password: values.password,
-            };
-            console.log("usertype", values.user_type);
-            dispatch(ChangeModalState.action({ loading: true }));
-            Login(objectToPass, values.user_type.toLowerCase())
-              .then((res) => {
-                // console.log('res',res.data);
-                const obj = {
-                  token: res.data?.token,
-                  userType: values.user_type.toLowerCase(),
-                  id: res.data.userTypeId,
-                  mainId: res.data?.userId,
-                  ...((res.data?.isSubscribed ||
-                    res.data?.isSubscribed == false) && {
-                    isSubscribed: res.data?.isSubscribed,
-                  }),
-                };
-                console.log(obj);
-                dispatch(LoginStore.action(obj));
-                dispatch(ChangeModalState.action({ loading: false }));
-              })
-              .catch((err) => {
-                console.log("err", err);
-                dispatch(ChangeModalState.action({ loading: false }));
-                if (
-                  err?.data &&
-                  err?.data?.detail === "Account is not active."
-                ) {
-                  Toast.show({
-                    type: "info",
-                    position: "top",
-                    text1: "Info",
-                    text2:
-                      "This account was temporarily deactivated. Reactivate below",
-                    visibilityTime: 4000,
-                    autoHide: true,
-                    topOffset: 30,
-                    bottomOffset: 40,
-                    onShow: () => {},
-                    onHide: () => {},
-                    onPress: () => {},
-                  });
-                } else {
-                  Toast.show({
-                    type: "info",
-                    position: "top",
-                    text1: "Info",
-                    text2:
-                      "Please check your email address or password and try again",
-                    visibilityTime: 4000,
-                    autoHide: true,
-                    topOffset: 30,
-                    bottomOffset: 40,
-                    onShow: () => {},
-                    onHide: () => {},
-                    onPress: () => {},
-                  });
-                }
-              });
-          }}
-        >
-          {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            setFieldValue,
-            values,
-            errors,
-            touched,
-            isValid,
-          }) => (
-            <>
-              <Layout style={styles.formContainer}>
-                <View style={[styles.row]}>
-                  <Select
-                    style={{ width: "100%" }}
-                    value={values.user_type}
-                    placeholder="Select User"
-                    onSelect={(index: any) =>
-                      setFieldValue("user_type", user_type[index.row].value)
-                    }
-                    label={(evaProps: any) => <Text {...evaProps}></Text>}
-                  >
-                    {user_type.map((type, index) => {
-                      return <SelectItem key={index} title={type?.label} />;
-                    })}
-                  </Select>
-                </View>
-                <Input
-                  placeholder="Email"
-                  style={styles.selectSettings}
-                  accessoryRight={renderPersonIcon}
-                  onChangeText={handleChange("email")}
-                  onBlur={handleBlur("email")}
-                  value={values.email}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-                {errors.email && touched.email && (
-                  <Text style={styles.errorText}>{errors.email}</Text>
-                )}
-                <Input
-                  autoCapitalize="none"
-                  style={styles.passwordInput}
-                  placeholder="Password"
-                  accessoryRight={renderPasswordIcon}
-                  onChangeText={handleChange("password")}
-                  onBlur={handleBlur("password")}
-                  value={values.password}
-                  secureTextEntry={!passwordVisible}
-                />
-                {errors.password && touched.password && (
-                  <Text style={styles.errorText}>{errors.password}</Text>
-                )}
-                <Layout style={styles.buttonSettings}>
-                  <LinearGradientButton
-                    style={styles.signInButton}
-                    size="medium"
-                    onPress={handleSubmit}
-                    disabled={!isValid}
-                  >
-                    Login
-                  </LinearGradientButton>
-                  <View style={{ marginTop: 20 }}>
-                    <LinearGradientButton
-                      style={styles.registerButton}
-                      size="medium"
-                      onPress={OnRegisterButtonPress}
+        {isFocuesed && (
+          <Formik
+            validationSchema={loginValidationSchema}
+            validateOnMount={true}
+            initialValues={intitialValues}
+            onSubmit={(values) => {
+              let objectToPass = {
+                email: values.email,
+                password: values.password,
+              };
+              console.log("usertype", values.user_type);
+              dispatch(ChangeModalState.action({ loading: true }));
+              Login(objectToPass, values.user_type.toLowerCase())
+                .then((res) => {
+                  // console.log('res',res.data);
+                  const obj = {
+                    token: res.data?.token,
+                    userType: values.user_type.toLowerCase(),
+                    id: res.data.userTypeId,
+                    mainId: res.data?.userId,
+                    ...((res.data?.isSubscribed ||
+                      res.data?.isSubscribed == false) && {
+                      isSubscribed: res.data?.isSubscribed,
+                    }),
+                  };
+                  console.log(obj);
+                  dispatch(LoginStore.action(obj));
+                  dispatch(ChangeModalState.action({ loading: false }));
+                })
+                .catch((err) => {
+                  console.log("err", err);
+                  dispatch(ChangeModalState.action({ loading: false }));
+                  if (
+                    err?.data &&
+                    err?.data?.detail === "Account is not active."
+                  ) {
+                    Toast.show({
+                      type: "info",
+                      position: "top",
+                      text1: "Info",
+                      text2:
+                        "This account was temporarily deactivated. Reactivate below",
+                      visibilityTime: 4000,
+                      autoHide: true,
+                      topOffset: 30,
+                      bottomOffset: 40,
+                      onShow: () => {},
+                      onHide: () => {},
+                      onPress: () => {},
+                    });
+                  } else {
+                    Toast.show({
+                      type: "info",
+                      position: "top",
+                      text1: "Info",
+                      text2:
+                        "Please check your email address or password and try again",
+                      visibilityTime: 4000,
+                      autoHide: true,
+                      topOffset: 30,
+                      bottomOffset: 40,
+                      onShow: () => {},
+                      onHide: () => {},
+                      onPress: () => {},
+                    });
+                  }
+                });
+            }}
+          >
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              setFieldValue,
+              values,
+              errors,
+              touched,
+              isValid,
+            }) => (
+              <>
+                <Layout style={styles.formContainer}>
+                  <View style={[styles.row]}>
+                    <Select
+                      style={{ width: "100%" }}
+                      value={values.user_type}
+                      placeholder="Select User"
+                      onSelect={(index: any) =>
+                        setFieldValue("user_type", user_type[index.row].value)
+                      }
+                      label={(evaProps: any) => <Text {...evaProps}></Text>}
                     >
-                      Sign Up
-                    </LinearGradientButton>
+                      {user_type.map((type, index) => {
+                        return <SelectItem key={index} title={type?.label} />;
+                      })}
+                    </Select>
                   </View>
+                  <Input
+                    placeholder="Email"
+                    style={styles.selectSettings}
+                    accessoryRight={renderPersonIcon}
+                    onChangeText={handleChange("email")}
+                    onBlur={handleBlur("email")}
+                    value={values.email}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  {errors.email && touched.email && (
+                    <Text style={styles.errorText}>{errors.email}</Text>
+                  )}
+                  <Input
+                    autoCapitalize="none"
+                    style={styles.passwordInput}
+                    placeholder="Password"
+                    accessoryRight={renderPasswordIcon}
+                    onChangeText={handleChange("password")}
+                    onBlur={handleBlur("password")}
+                    value={values.password}
+                    secureTextEntry={!passwordVisible}
+                  />
+                  {errors.password && touched.password && (
+                    <Text style={styles.errorText}>{errors.password}</Text>
+                  )}
+                  <Layout style={styles.buttonSettings}>
+                    <LinearGradientButton
+                      style={styles.signInButton}
+                      size="medium"
+                      onPress={handleSubmit}
+                      disabled={!isValid}
+                    >
+                      Login
+                    </LinearGradientButton>
+                    <View style={{ marginTop: 20 }}>
+                      <LinearGradientButton
+                        style={styles.registerButton}
+                        size="medium"
+                        onPress={OnRegisterButtonPress}
+                      >
+                        Create Account
+                      </LinearGradientButton>
+                    </View>
+                  </Layout>
                 </Layout>
-              </Layout>
-            </>
-          )}
-        </Formik>
+              </>
+            )}
+          </Formik>
+        )}
         <View style={styles.bottomView}>
           <Button
             appearance="ghost"
@@ -327,12 +339,22 @@ const SignInScreen = ({ navigation }) => {
             appearance="ghost"
             status="basic"
             size="small"
-            onPress={onResendActivationButtonPress}
+            onPress={() => onResendActivationButtonPress(true)}
           >
             {() => (
               <Text style={styles.buttonMessage}> Resend Activation Code </Text>
             )}
           </Button>
+          {/* <Button
+            appearance="ghost"
+            status="basic"
+            size="small"
+            onPress={() => onResendActivationButtonPress(false)}
+          >
+            {() => (
+              <Text style={styles.buttonMessage}> Enter Activation Code </Text>
+            )}
+          </Button> */}
         </View>
       </View>
     </KeyboardAwareScrollView>

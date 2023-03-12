@@ -21,7 +21,11 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import fetchOneUserService from "@/Services/User/FetchOne";
 import ChangeUserState from "@/Store/User/FetchOne";
 import { actions } from "@/Context/state/Reducer";
-import { InstructionsModal, RequestPermissionModalGroups } from "@/Modals";
+import {
+  InstructionsModal,
+  RequestPermissionModalGroups,
+  ShowStudentsInstructorsGroupModal,
+} from "@/Modals";
 import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {
@@ -84,6 +88,13 @@ const InstructorGroupScreen = ({ route }) => {
   const [totalRecords, setTotalRecords] = useState(0);
   const previousSearchParam = usePrevious(searchParam);
   const [groupCount, setGroupCount] = useState({});
+  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
+    useState(false);
+  const [selectionData, setSelectionData] = useState({
+    type: "student",
+    status: "pending",
+    group: null,
+  });
   const isVisible = useSelector(
     (state: { modal: ModalState }) =>
       state.modal.requestPermissionModalGroupVisibility
@@ -549,6 +560,7 @@ const InstructorGroupScreen = ({ route }) => {
     return () => source.cancel("axios request cancelled");
     //  abortControllerRef.current.abort();
   }, [isFocused]);
+  console.log("selecetd activitye", selectedActivity);
   return (
     <>
       {isVisible && (
@@ -557,13 +569,24 @@ const InstructorGroupScreen = ({ route }) => {
           setSelectedActivity={setSelectedActivity}
         />
       )}
-      {selectedInstructions && (
+      {selectedInstructions && selectedActivity && (
         <InstructionsModal
           selectedInstructions={selectedInstructions}
           setSelectedInstructions={setSelectedInstructions}
+          group={selectedActivity}
         />
       )}
-
+      {showStudentsInstructorsModal && (
+        <ShowStudentsInstructorsGroupModal
+          isVisible={showStudentsInstructorsModal}
+          setIsVisible={() => {
+            setShowStudentsInstructorsModal(false);
+          }}
+          status={selectionData.status}
+          type={selectionData.type}
+          group={selectionData.group}
+        />
+      )}
       <View style={styles.layout}>
         <View
           style={{
@@ -651,74 +674,163 @@ const InstructorGroupScreen = ({ route }) => {
                     style={styles.text}
                   >{`Instructors: ${temp.toString()}`}</Text>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text style={styles.text}>{`Approval: ${
-                      groupCount[item.groupId]?.countApprovedStudents || "0"
-                    }`}</Text>
-                    <Entypo
-                      name="book"
-                      color={Colors.primary}
-                      size={20}
-                      style={{ marginHorizontal: 5 }}
-                    />
-                    <Text style={styles.text}>
+                    <TouchableOpacity
+                      style={styles.horizontal}
+                      onPress={() => {
+                        setSelectionData({
+                          status: "approved",
+                          type: "student",
+                          group: item,
+                        });
+                        setShowStudentsInstructorsModal(true);
+                      }}
+                    >
+                      <Text style={styles.text}>{`Approval: ${
+                        groupCount[item.groupId]?.countApprovedStudents || "0"
+                      }`}</Text>
+                      <Entypo
+                        name="book"
+                        color={Colors.primary}
+                        size={20}
+                        style={{ marginHorizontal: 5 }}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.horizontal}
+                      onPress={() => {
+                        setSelectionData({
+                          status: "approved",
+                          type: "instructor",
+                          group: item,
+                        });
+                        setShowStudentsInstructorsModal(true);
+                      }}
+                    >
                       <Text style={styles.text}>
-                        {groupCount[item.groupId]?.countApprovedInstructors ||
+                        <Text style={styles.text}>
+                          {groupCount[item.groupId]?.countApprovedInstructors ||
+                            "0"}
+                        </Text>
+                      </Text>
+                      <Ionicons
+                        name="person"
+                        color={Colors.primary}
+                        size={20}
+                        style={{ marginHorizontal: 5 }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <TouchableOpacity
+                      style={styles.horizontal}
+                      onPress={() => {
+                        setSelectionData({
+                          status: "declined",
+                          type: "student",
+                          group: item,
+                        });
+                        setShowStudentsInstructorsModal(true);
+                      }}
+                    >
+                      <Text style={styles.text}>{`Declined: ${
+                        groupCount[item.groupId]?.countDeclinedStudents || "0"
+                      }`}</Text>
+                      <Entypo
+                        name="book"
+                        color={Colors.primary}
+                        size={20}
+                        style={{ marginHorizontal: 5 }}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.horizontal}
+                      onPress={() => {
+                        setSelectionData({
+                          status: "declined",
+                          type: "instructor",
+                          group: item,
+                        });
+                        setShowStudentsInstructorsModal(true);
+                      }}
+                    >
+                      <Text style={styles.text}>
+                        {groupCount[item.groupId]?.countDeclinedInstructors ||
                           "0"}
                       </Text>
-                    </Text>
-                    <Ionicons
-                      name="person"
-                      color={Colors.primary}
-                      size={20}
-                      style={{ marginHorizontal: 5 }}
-                    />
+                      <Ionicons
+                        name="person"
+                        color={Colors.primary}
+                        size={20}
+                        style={{ marginHorizontal: 5 }}
+                      />
+                    </TouchableOpacity>
                   </View>
 
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text style={styles.text}>{`Declined: ${
-                      groupCount[item.groupId]?.countDeclinedStudents || "0"
-                    }`}</Text>
-                    <Entypo
-                      name="book"
-                      color={Colors.primary}
-                      size={20}
-                      style={{ marginHorizontal: 5 }}
-                    />
-                    <Text style={styles.text}>
-                      {groupCount[item.groupId]?.countDeclinedInstructors ||
-                        "0"}
-                    </Text>
-                    <Ionicons
-                      name="person"
-                      color={Colors.primary}
-                      size={20}
-                      style={{ marginHorizontal: 5 }}
-                    />
+                    <TouchableOpacity
+                      style={styles.horizontal}
+                      onPress={() => {
+                        setSelectionData({
+                          status: "pending",
+                          type: "student",
+                          group: item,
+                        });
+                        setShowStudentsInstructorsModal(true);
+                      }}
+                    >
+                      <Text style={styles.text}>
+                        {`Pending:  ${
+                          groupCount[item.groupId]?.countPendingStudents || "0"
+                        }`}
+                      </Text>
+                      <Entypo
+                        name="book"
+                        color={Colors.primary}
+                        size={20}
+                        style={{ marginHorizontal: 5 }}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.horizontal}
+                      onPress={() => {
+                        setSelectionData({
+                          status: "pending",
+                          type: "instructor",
+                          group: item,
+                        });
+                        setShowStudentsInstructorsModal(true);
+                      }}
+                    >
+                      <Text style={styles.text}>
+                        {groupCount[item.groupId]?.countPendingInstructors ||
+                          "0"}
+                        {/* {item.countPendingInstructors || `0`} */}
+                      </Text>
+                      <Ionicons
+                        name="person"
+                        color={Colors.primary}
+                        size={20}
+                        style={{ marginHorizontal: 5 }}
+                      />
+                    </TouchableOpacity>
                   </View>
-
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text style={styles.text}>
-                      {`Pending:  ${
-                        groupCount[item.groupId]?.countPendingStudents || "0"
-                      }`}
-                    </Text>
-                    <Entypo
-                      name="book"
-                      color={Colors.primary}
-                      size={20}
-                      style={{ marginHorizontal: 5 }}
-                    />
-                    <Text style={styles.text}>
-                      {groupCount[item.groupId]?.countPendingInstructors || "0"}
-                      {/* {item.countPendingInstructors || `0`} */}
-                    </Text>
-                    <Ionicons
-                      name="person"
-                      color={Colors.primary}
-                      size={20}
-                      style={{ marginHorizontal: 5 }}
-                    />
-                  </View>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedActivity(item);
+                      setSelectedInstructions(true);
+                      dispatch(
+                        ChangeModalState.action({
+                          instructionsModalVisibility: true,
+                        })
+                      );
+                    }}
+                    style={styles.horizontal}
+                  >
+                    <Text
+                      style={styles.text}
+                    >{`Instructions / Disclaimer / Agreement`}</Text>
+                  </TouchableOpacity>
                 </View>
               </Swipeable>
             );
@@ -797,5 +909,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.9,
     shadowRadius: 50,
     elevation: 5,
+  },
+  horizontal: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });

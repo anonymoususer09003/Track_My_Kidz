@@ -9,6 +9,7 @@ import {
   Modal,
   Autocomplete,
   AutocompleteItem,
+  CheckBox,
 } from "@ui-kitten/components";
 import { PersonIcon, PhoneIcon } from "@/Components/SignUp/icons";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
@@ -55,6 +56,7 @@ const AddStudentModal = () => {
   const countries = useSelector(
     (state: { places: PlaceState }) => state.places.countries
   );
+  const [checkBox, setCheckBox] = useState(false);
   const [countriesData, setCountriesData] = React.useState(countries);
   const [statesData, setStatesData] = React.useState<Array<any>>([]);
   const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
@@ -237,6 +239,57 @@ const AddStudentModal = () => {
                 }) => (
                   <>
                     <Layout style={styles.formContainer} level="1">
+                      <View
+                        style={{
+                          flexDirection: "row",
+
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text style={{ marginRight: 20, marginTop: 10 }}>
+                          Use My address
+                        </Text>
+                        <CheckBox
+                          style={[{ flex: 1, marginTop: 13 }]}
+                          checked={checkBox}
+                          onChange={(checked) => {
+                            if (checked) {
+                              setCheckBox(checked);
+                              setFieldValue(
+                                "country",
+                                currentUser?.country || ""
+                              );
+                              setFieldValue(
+                                "selectedCountry",
+                                currentUser?.country || ""
+                              );
+                              setFieldValue("state", currentUser?.state || "");
+                              setFieldValue(
+                                "selectedState",
+                                currentUser?.state || ""
+                              );
+                              setFieldValue("city", currentUser?.city || "");
+                              setFieldValue(
+                                "selectedCity",
+                                currentUser?.city || ""
+                              );
+                            } else {
+                              setCheckBox(checked);
+                              setFieldValue("country", "");
+                              setFieldValue("selectedCountry", "");
+                              setFieldValue("selectedCity", "");
+                              setFieldValue("selectedState", "");
+                              setFieldValue("state", "");
+                              setFieldValue("city", "");
+                            }
+                            // if (checked) {
+                            //   Alert.alert(checked);
+                            // } else {
+                            //   Alert.alert(checked);
+                            // }
+                          }}
+                        ></CheckBox>
+                      </View>
                       <Input
                         style={styles.inputSettings}
                         autoCapitalize="words"

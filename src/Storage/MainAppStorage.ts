@@ -19,6 +19,32 @@ export const storeToken = async (value: string) => {
     return false;
   }
 };
+export const storeInstructors = async (instructors: any) => {
+  try {
+    await AsyncStorage.setItem("instructors", instructors);
+
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+export const getOrgInstructors = async (instructors: any) => {
+  try {
+  let res=  await AsyncStorage.getItem("instructors");
+
+    return res;
+  } catch (e) {
+    return false;
+  }
+};
+export const removeInstructors = async () => {
+  try {
+    await AsyncStorage.removeItem("instructors");
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
 export const clearToken = async () => {
   await AsyncStorage.removeItem("login_token");
   await AsyncStorage.removeItem("instructor_groups");

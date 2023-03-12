@@ -36,3 +36,4 @@ export { default as DistanceAlert } from "./DistanceAlert";
 export { default as UpdatePaymentModal } from "./UpdatePaymentModal";
 export { default as MarkAllRollCallModal } from "./MarkAllRollCallModal";
 export { default as ShowInstructorsStudentsModal } from "./ShowInstructorsStudentsActivityModal";
+export { default as ShowStudentsInstructorsGroupModal } from "./ShowStudentsInstructorsGroupModal";

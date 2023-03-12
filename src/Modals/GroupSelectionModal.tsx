@@ -170,7 +170,7 @@ const GroupSelectionModal = ({
             </Text>
           </View>
         </View>
-        <View style={{ marginTop: 30, padding: 20 }}>
+        <View style={{}}>
           <FlatList
             data={groups || []}
             style={{ padding: 10, width: "100%" }}

@@ -72,6 +72,9 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
     return item?.toLowerCase().includes(query.toLowerCase());
   };
   const filterCities = (item: string, query: string) => {
+    console.log("item", item);
+    console.log("query", query);
+    console.log("log---", item?.toLowerCase().includes(query.toLowerCase()));
     return item?.toLowerCase().includes(query.toLowerCase());
   };
   const [selectedAmountIndex, setSelectedAmountIndex] =
@@ -331,7 +334,7 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
       <KeyboardAwareScrollView style={{ height: 300 }}>
         <Card style={[styles.modal]} disabled={true}>
           <View style={styles.body}>
-            <View style={{ paddingBottom: 10, paddingTop: 10 }}>
+            <View style={{ paddingBottom: 10, paddingTop: 30 }}>
               <Text
                 textBreakStrategy={"highQuality"}
                 style={{
@@ -498,7 +501,7 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
           </Text>
           {selectedFromLocation == 2 && (
             <RadioGroup
-              selectedIndex={selectedFromLocation}
+              selectedIndex={selectedToLocation}
               onChange={(index) => setSelectedToLocation(index)}
             >
               <Radio>School Address</Radio>
@@ -510,7 +513,7 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
           )}
           {selectedFromLocation == 0 && (
             <RadioGroup
-              selectedIndex={selectedFromLocation}
+              selectedIndex={selectedToLocation}
               onChange={(index) => setSelectedToLocation(index)}
             >
               <Radio>Activity Address</Radio>
@@ -527,119 +530,119 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
               <Radio>Other</Radio>
             </RadioGroup>
           )}
-          {(selectedFromLocation == 2 && selectedToLocation == 2) ||
-            (selectedFromLocation != 2 && selectedToLocation == 1 && (
-              <View>
-                <Autocomplete
-                  placeholder="Country*"
-                  value={toOthersLocation.country}
-                  placement="bottom"
-                  style={{ marginVertical: 5 }}
-                  // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                  onChangeText={(query) => {
-                    setToOthersLocation({
-                      ...toOthersLocation,
-                      country: query,
-                    });
-                    setCountriesToData(
-                      countries.filter((item) => filterCountries(item, query))
-                    );
-                  }}
-                  onSelect={(query) => {
-                    const selectedCountry = countriesToData[query];
+          {((selectedFromLocation == 2 && selectedToLocation == 2) ||
+            (selectedFromLocation != 2 && selectedToLocation == 1)) && (
+            <View>
+              <Autocomplete
+                placeholder="Country*"
+                value={toOthersLocation.country}
+                placement="bottom"
+                style={{ marginVertical: 5 }}
+                // label={evaProps => <Text {...evaProps}>Country*</Text>}
+                onChangeText={(query) => {
+                  setToOthersLocation({
+                    ...toOthersLocation,
+                    country: query,
+                  });
+                  setCountriesToData(
+                    countries.filter((item) => filterCountries(item, query))
+                  );
+                }}
+                onSelect={(query) => {
+                  const selectedCountry = countriesToData[query];
 
-                    setToOthersLocation({
-                      ...toOthersLocation,
-                      state: "",
-                      country: selectedCountry.name,
-                    });
-                    setToStates([]);
-                    GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
-                      (res) => {
-                        setToStates(res.data);
-                        setStatesToData(tostates);
-                      }
-                    );
-                  }}
-                >
-                  {countriesToData.map((item, index) => {
-                    return <AutocompleteItem key={index} title={item.name} />;
-                  })}
-                </Autocomplete>
-                <Autocomplete
-                  placeholder="State"
-                  value={toOthersLocation.state}
-                  placement="bottom"
-                  style={{ marginVertical: 5 }}
-                  // label={evaProps => <Text {...evaProps}>State</Text>}
-                  onChangeText={(query) => {
-                    setToOthersLocation({ ...toOthersLocation, state: query });
-                    setStatesToData(
-                      tostates.filter((item) => filterStates(item, query))
-                    );
-                  }}
-                  onSelect={(query) => {
-                    const selectedState = statesToData[query];
-                    // setToOthersLocation({
-                    //   ...toOthersLocation,
-                    //   state: selectedState,
-                    // });
-                    setToOthersLocation({
-                      ...toOthersLocation,
-                      state: selectedState,
-                      city: "",
-                    });
+                  setToOthersLocation({
+                    ...toOthersLocation,
+                    state: "",
+                    country: selectedCountry.name,
+                  });
+                  setToStates([]);
+                  GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
+                    (res) => {
+                      setToStates(res.data);
+                      setStatesToData(tostates);
+                    }
+                  );
+                }}
+              >
+                {countriesToData.map((item, index) => {
+                  return <AutocompleteItem key={index} title={item.name} />;
+                })}
+              </Autocomplete>
+              <Autocomplete
+                placeholder="State"
+                value={toOthersLocation.state}
+                placement="bottom"
+                style={{ marginVertical: 5 }}
+                // label={evaProps => <Text {...evaProps}>State</Text>}
+                onChangeText={(query) => {
+                  setToOthersLocation({ ...toOthersLocation, state: query });
+                  setStatesToData(
+                    tostates.filter((item) => filterStates(item, query))
+                  );
+                }}
+                onSelect={(query) => {
+                  const selectedState = statesToData[query];
+                  // setToOthersLocation({
+                  //   ...toOthersLocation,
+                  //   state: selectedState,
+                  // });
+                  setToOthersLocation({
+                    ...toOthersLocation,
+                    state: selectedState,
+                    city: "",
+                  });
 
-                    setToCities([]);
-                    GetAllCities(toOthersLocation.country, selectedState).then(
-                      (res) => {
-                        setToCities(res.data);
-                      }
-                    );
-                  }}
-                >
-                  {statesToData.map((item, index) => {
-                    return <AutocompleteItem key={index} title={item} />;
-                  })}
-                </Autocomplete>
-                <Autocomplete
-                  placeholder="City"
-                  value={toOthersLocation.city}
-                  placement="bottom"
-                  style={{ marginVertical: 5 }}
-                  // label={evaProps => <Text {...evaProps}>City</Text>}
-                  onChangeText={(query) => {
-                    console.log("query", query);
-                    setToOthersLocation({ ...toOthersLocation, city: query });
-                    // setFieldValue("fromCity", query);
-                    setCitiesToData(
-                      toCities.filter((item) => filterCities(item, query))
-                    );
-                  }}
-                  onSelect={(query) => {
-                    const selectedCity = toCities[query];
-                    setToOthersLocation({
-                      ...toOthersLocation,
-                      city: selectedCity,
-                    });
-                    // setFieldValue("fromCity", citiesData[query]);
-                    // setFieldValue("fromSelectedCity", citiesData[query]);
-                  }}
-                >
-                  {citiesToData.map((item, index) => {
-                    return <AutocompleteItem key={index} title={item} />;
-                  })}
-                </Autocomplete>
-                <Input
-                  style={{ width: "100%" }}
-                  placeholder="Address"
-                  onChangeText={(text) =>
-                    setToOthersLocation({ ...toOthersLocation, address: text })
-                  }
-                  value={toOthersLocation.address}
-                />
-              </View>
-            ))}
+                  setToCities([]);
+                  GetAllCities(toOthersLocation.country, selectedState).then(
+                    (res) => {
+                      setToCities(res.data);
+                    }
+                  );
+                }}
+              >
+                {statesToData.map((item, index) => {
+                  return <AutocompleteItem key={index} title={item} />;
+                })}
+              </Autocomplete>
+              <Autocomplete
+                placeholder="City"
+                value={toOthersLocation.city}
+                placement="bottom"
+                style={{ marginVertical: 5 }}
+                // label={evaProps => <Text {...evaProps}>City</Text>}
+                onChangeText={(query) => {
+                  console.log("query", query);
+                  setToOthersLocation({ ...toOthersLocation, city: query });
+                  // setFieldValue("fromCity", query);
+                  setCitiesToData(
+                    toCities.filter((item) => filterCities(item, query))
+                  );
+                }}
+                onSelect={(query) => {
+                  const selectedCity = toCities[query];
+                  setToOthersLocation({
+                    ...toOthersLocation,
+                    city: selectedCity,
+                  });
+                  // setFieldValue("fromCity", citiesData[query]);
+                  // setFieldValue("fromSelectedCity", citiesData[query]);
+                }}
+              >
+                {citiesToData.map((item, index) => {
+                  return <AutocompleteItem key={index} title={item} />;
+                })}
+              </Autocomplete>
+              <Input
+                style={{ width: "100%" }}
+                placeholder="Address"
+                onChangeText={(text) =>
+                  setToOthersLocation({ ...toOthersLocation, address: text })
+                }
+                value={toOthersLocation.address}
+              />
+            </View>
+          )}
 
           {/* <View style={[styles.buttonText, { marginVertical: 10 }]}>
           <LinearGradientButton
@@ -712,6 +715,7 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
               Cancel
             </LinearGradientButton>
           </View>
+          <View style={{ marginTop: 200 }} />
         </Card>
       </KeyboardAwareScrollView>
     </Modal>

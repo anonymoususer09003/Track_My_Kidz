@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Text, Input, TopNavigationAction, Icon } from "@ui-kitten/components";
-import { StyleSheet, View, TouchableOpacity, ScrollView } from "react-native";
+import { StyleSheet, View, TouchableOpacity, ScrollView,Dimensions } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Colors from "@/Theme/Colors";
 import { ModalState } from "@/Store/Modal";
@@ -46,6 +46,7 @@ const PreviewBusInformation = ({
   activity?: any;
   selectedItem: any;
 }) => {
+  const deviceWidth = Dimensions.get("screen").width
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [rearSeats, setRearSeats] = useState([]);
@@ -127,13 +128,14 @@ const PreviewBusInformation = ({
           }}
         >
           <View style={styles.layout}>
-            <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>
-              <ScrollView horizontal style={{ flex: 1, paddingBottom: 5 }}>
+            <ScrollView style={{ flex: 1}}>
+              <View horizontal style={{ flex: 1, paddingBottom: 5 }}>
                 <View
                   style={{
-                    width: "80%",
+                    width: "100%",
                     alignSelf: "center",
                     flexDirection: "row",
+                    justifyContent:"space-between"
                   }}
                 >
                   {isLongSeat &&
@@ -141,28 +143,31 @@ const PreviewBusInformation = ({
                       <View
                         style={{
                           flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          marginRight: 10,
+                          // alignItems: "center",
+                          // justifyContent: "space-between",
+                          // marginRight: 10,
+                        
                         }}
                       >
-                        <Input
-                          style={{
-                            margin: 5,
+                        <View style={{margin: 5,
+                        height:40,width:'12%',
+                        borderWidth:1,
+                        borderRadius:10,
                             borderColor: "#000",
-                            width: 60,
-                          }}
-                          autoCapitalize="none"
-                          value={item}
-                        />
+                            padding:20,
+                            backgroundColor:Colors.textInputBackgroundColor
+                            }}/>
+                    
                       </View>
                     ))}
                 </View>
-              </ScrollView>
+              </View>
 
-              <ScrollView horizontal style={{ flex: 1, paddingBottom: 5 }}>
-                <View style={{ width: "80%", alignSelf: "center" }}>
-                  {seats.map((item) => (
+              <View horizontal style={{ flex: 1, paddingBottom: 5 }}>
+                <View style={{ width: "100%"}}>
+                  {seats.map((item,index) => {
+                   let width='10%'
+                    return(
                     <View
                       style={{
                         flexDirection: "row",
@@ -172,27 +177,28 @@ const PreviewBusInformation = ({
                     >
                       {item &&
                         item?.length > 0 &&
-                        item.map((innerItem) => (
-                          <Input
-                            style={{ margin: 5 }}
-                            autoCapitalize="none"
-                            value={innerItem}
-                          />
+                        item.map((innerItem,index) => (
+                          
+                          <View style={{borderWidth:1,margin:3,width:width,height:40,borderRadius:10,
+                          backgroundColor:Colors.textInputBackgroundColor}}  >
+                            </View>
                         ))}
                     </View>
-                  ))}
+                  )})}
                 </View>
-              </ScrollView>
+              </View>
               <Text
                 style={{
                   marginVertical: 10,
                   fontWeight: "bold",
                   fontSize: 24,
                   alignSelf: "center",
+                  
                 }}
               >
                 Front
               </Text>
+              <View style={{height:70}}/>
             </ScrollView>
             <View
               style={{
@@ -273,10 +279,10 @@ const PreviewBusInformation = ({
                         numberOfKidsPerSeat: numberOfKidsInRow,
                         longSeat: isLongSeat,
                         studentsOnLongSeat: numberOfKidsLongSeat,
-                        activityId: activity?.activityId || null,
-                        schoolId: currentUser?.schoolId || null,
-                        orgId: currentUser?.orgId || null,
-                        instructorId: currentUser?.instructorId || null,
+                        activityId: activity?.activityId || 0,
+                        schoolId: currentUser?.schoolId || 0,
+                        orgId: currentUser?.orgId || 0,
+                        instructorId: currentUser?.instructorId || 0,
                       })
                         .then((res) => {
                           console.log(res.data);

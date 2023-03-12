@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { Linking } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
 import {
   Autocomplete,
   AutocompleteItem,
@@ -49,7 +50,7 @@ import * as yup from "yup";
 import { Props } from "@ui-kitten/components/devsupport/services/props/props.service";
 import { CompleteRegistration, Register } from "@//Services/SignUpServices";
 import { UserRegistrationDTO, RegisterDTO } from "@/Models/UserDTOs";
-import { UserType } from "@/Enums";
+
 import Moment from "moment";
 import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
 import {
@@ -103,6 +104,9 @@ const organisations = [
 ];
 
 const FinalRegistrationScreen = ({ navigation, route }: Props) => {
+  const [unmount, setUnmount] = useState(false);
+  const [reRender, setRerender] = useState(false);
+  const isFocuesed = useIsFocused();
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] =
     React.useState<boolean>(false);
@@ -140,7 +144,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
 
   const styles = useStyleSheet(themedStyles);
   const { emailAddress, user_type, student, activation_code } = route.params;
-  console.log("ss", student);
+
   const [visible, setVisible] = React.useState(false);
   const dispatch = useDispatch();
   const [loginObj, setLoginObj] = useState(null);
@@ -151,7 +155,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
     lastName: yup.string().required("Last name is required"),
     address: yup.string(),
     apartment: yup.string(),
-    // zipcode: yup.string(),
+    zipcode: yup.string().required("Zip code is required"),
     country: yup.string().required("Country is required"),
     selectedCountry: yup.string(),
     selectedState: yup.string(),
@@ -319,6 +323,14 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
 
   const maxDateOfBirth = moment(new Date()).subtract("years", 13);
 
+  useEffect(() => {
+    if (!isFocuesed) {
+      setRerender(false);
+    } else {
+      setRerender(true);
+    }
+  }, [isFocuesed]);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -379,8 +391,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               dispatch(ChangeModalState.action({ loading: true }));
               console.log("userobject", userObject);
               Register(registerObject, "parent")
-                .then(async (response) => {
-                  const _token = response.data.token;
+                .then(async (res) => {
+                  const _token = res.data.token;
                   await storeToken(_token);
                   await storeUserType("parent");
                   console.log("userobject", userObject);
@@ -389,8 +401,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       const obj = {
                         token: _token,
                         userType: "parent",
-                        id: response.data.userId,
-                        mainId: response.data.id,
+                        id: response.data.parentId,
+                        mainId: res.data.userId,
                       };
                       setLoginObj(obj);
                       if (response.status == 201) {
@@ -415,7 +427,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         type: "info",
                         position: "top",
                         text1: error.title,
-                        text2: error.message,
+                        text2: error?.data?.statusDescription,
                         visibilityTime: 4000,
                         autoHide: true,
                         topOffset: 30,
@@ -431,6 +443,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                     });
                 })
                 .catch((err) => {
+                  Alert.alert(err?.data?.statusDescription);
+                  dispatch(ChangeModalState.action({ loading: false }));
                   console.log(err);
                 });
             }}
@@ -595,18 +609,18 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   {errors.city && touched.city && (
                     <Text style={styles.errorText}>{errors.city}</Text>
                   )}
-                  {/* <Input
-                                    style={styles.inputSettings}
-                                    autoCapitalize='none'
-                                    autoCorrect={false}
-                                    placeholder={`Zip code`}
-                                    value={values.zipcode}
-                                    onChangeText={handleChange('zipcode')}
-                                    onBlur={handleBlur('zipcode')}
-                                />
-                                {(errors.zipcode && touched.zipcode) &&
-                                    <Text style={styles.errorText}>{errors.zipcode}</Text>
-                                } */}
+                  <Input
+                    style={styles.inputSettings}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholder={`Zip code*`}
+                    value={values.zipcode}
+                    onChangeText={handleChange("zipcode")}
+                    onBlur={handleBlur("zipcode")}
+                  />
+                  {errors.zipcode && touched.zipcode && (
+                    <Text style={styles.errorText}>{errors.zipcode}</Text>
+                  )}
                   <View style={styles.phoneNumber}>
                     <Input
                       style={styles.prefixStyle}
@@ -692,6 +706,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               firstName: "",
               lastName: "",
               schoolName: "",
+
               organizationName: "",
               schoolAddress: "",
               country: "",
@@ -708,6 +723,9 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               school: "",
               organization: "",
               selected_entity: null,
+              schoolId: null,
+
+              orgId: null,
             }}
             onSubmit={(values, { resetForm }) => {
               dispatch(ChangeModalState.action({ loading: true }));
@@ -741,14 +759,14 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   },
                 ],
                 isAdmin: false,
-                schoolId: 63,
+                schoolId: values.schoolId,
 
-                orgId: null,
+                orgId: values.orgId,
               };
               Register(registerObject, "instructor")
-                .then(async (response) => {
-                  console.log("response---", response.data);
-                  await storeToken(response.data.token);
+                .then(async (res) => {
+                  console.log("res---", res.data);
+                  await storeToken(res.data.token);
                   console.log("userobject", userObject);
                   CompleteRegistration(userObject, "instructor")
                     .then((response: any) => {
@@ -758,6 +776,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                           token: response.data.token,
                           userType: "instructor",
                           id: response.data.instructorId,
+                          mainId: res.data?.userId,
                         })
                       );
                       if (response.status == 201) {
@@ -775,7 +794,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         type: "info",
                         position: "top",
                         text1: error.data.title,
-                        text2: error.data.detail,
+                        text2: error?.data?.statusDescription,
                         visibilityTime: 4000,
                         autoHide: true,
                         topOffset: 30,
@@ -971,6 +990,15 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       return <AutocompleteItem key={index} title={item} />;
                     })}
                   </Autocomplete>
+                  <Input
+                    style={styles.inputSettings}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholder={`Zip code*`}
+                    value={values.zipcode}
+                    onChangeText={handleChange("zipcode")}
+                    onBlur={handleBlur("zipcode")}
+                  />
                   {values.selected_entity === "School" ? (
                     <Autocomplete
                       placeholder="School Name"
@@ -978,16 +1006,18 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placement={placement}
                       style={{ marginVertical: 5 }}
                       onChangeText={(query) => {
+                        console.log("schools", schools);
                         setFieldValue("school", query);
                         setSchoolsData(
                           schools.filter((item) =>
-                            filterSchools(item.label, query)
+                            filterSchools(item.name, query)
                           )
                         );
                       }}
                       onSelect={(query) => {
                         const selectedSchool = schoolsData[query];
                         setFieldValue("school", selectedSchool.name);
+                        setFieldValue("schoolId", selectedSchool.schoolId);
                         setFieldValue("schoolName", selectedSchool.name);
                         setFieldValue("schoolAddress", "School Address");
                         setFieldValue("schoolAddress", "School Address");
@@ -1017,11 +1047,17 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       }}
                       onSelect={(query) => {
                         const selectedOrg = orgData[query];
+
+                        setFieldValue(
+                          "organizationId",
+                          selectedSchool.organizationId
+                        );
                         setFieldValue("organization", selectedOrg.name);
                         setFieldValue("organizationName", selectedOrg.name);
                       }}
                     ></Autocomplete>
                   )}
+                  {console.log("values", values.school)}
                   <View
                     style={{
                       marginTop: 10,
@@ -1188,7 +1224,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                     type: "info",
                     position: "top",
                     text1: error.data.title,
-                    text2: error.data.detail,
+                    text2: error?.data?.statusDescription,
                     visibilityTime: 4000,
                     autoHide: true,
                     topOffset: 30,

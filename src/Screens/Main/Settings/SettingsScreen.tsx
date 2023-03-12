@@ -6,8 +6,8 @@ import {
   Switch,
   TouchableOpacity,
   Alert,
-  Share,
 } from "react-native";
+import Share from "react-native-share";
 import { useTheme } from "@/Theme";
 import {
   Icon,
@@ -65,12 +65,11 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
   }, [verifyType]);
 
   const onShare = async () => {
-    try {
-      const result = await Share.share({
-        url: "",
-        message: `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link - https://trackmykidz.com/apps/ `,
-      });
-      if (result.action === Share.sharedAction) {
+    Share.open({
+      message: `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`,
+      url: "https://trackmykidz.com/apps/",
+    })
+      .then((res) => {
         Toast.show({
           type: "success",
           position: "top",
@@ -84,12 +83,11 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
           onHide: () => {},
           onPress: () => {},
         });
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
-      }
-    } catch (error) {
-      error.message;
-    }
+        console.log(res);
+      })
+      .catch((err) => {
+        err && console.log(err);
+      });
   };
 
   useEffect(() => {
@@ -98,7 +96,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
 
   return (
     <>
-      <AppHeader title="Settings" />
+      <AppHeader title="Settings" hideCalendar={true} />
       <TwoFactorAuthenticationModal />
       <VerifyYourselfModal
         isActivationCode={verifyType === "activation-code"}

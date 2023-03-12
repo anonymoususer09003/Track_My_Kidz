@@ -23,6 +23,8 @@ import {
 } from "react-native";
 import fetchOneUserService from "@/Services/User/FetchOne";
 import ChangeUserState from "@/Store/User/FetchOne";
+import { GetSchool, UpdateSchool } from "@/Services/School";
+import { GetOrg } from "@/Services/Org";
 import { GetGroup } from "@/Services/Group";
 import { useDispatch, useSelector } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
@@ -193,8 +195,10 @@ const CreateActivityScreen = ({ route }) => {
   const [initialValues, setInitialValues] = useState({});
   const [instructorInfo, setInstructorInfo] = useState({});
   const [deletedInstructors, setDeletedInstructors] = useState([]);
-
+  const [fromCheckBox, setFromCheckBox] = useState(false);
+  const [toCheckBox, setToCheckBox] = useState(false);
   const [deletedStudents, setDeletedStudents] = useState([]);
+  const [orgSchoolInfo, setOrgSchoolInfo] = useState();
   // console.log(user);
 
   // const getInstructors = async () => {
@@ -225,6 +229,22 @@ const CreateActivityScreen = ({ route }) => {
   //       .catch((err) => console.log(err));
   //   });
   // }
+  const getSchoolInfo = async (id: any) => {
+    try {
+      let res = await GetSchool(id);
+      setOrgSchoolInfo(res);
+    } catch (err) {
+      console.log("err school", err);
+    }
+  };
+  const getOrgInfo = async (id: any) => {
+    try {
+      let res = await GetOrg(id);
+      setOrgSchoolInfo(res);
+    } catch (err) {
+      console.log("err org", err);
+    }
+  };
 
   const findInstructorBySchoolId = async (res: any) => {
     try {
@@ -238,13 +258,11 @@ const CreateActivityScreen = ({ route }) => {
       setOrgId({ schoolId: res?.schoolId || null, orgId: res?.orgId || null });
       setUser(res);
       console.log("onBhelaf of", instructors);
-      if (activity) {
-        let _ins = instructors?.find(
-          (i) => i?.instructorId == activity.onBehalfOf
-        );
-        // console.log("_ins====================", _ins);
-        setOnBehalf(_ins ? _ins?.firstname + " " + _ins?.lastname : "");
-      }
+      // if (activity) {
+      let _ins = instructors?.find((i) => i?.email == currentUser.email);
+      // console.log("_ins====================", _ins);
+      setOnBehalf(_ins ? _ins?.firstname + " " + _ins?.lastname : "");
+      // }
 
       setInstructors({ result: instructors });
 
@@ -275,9 +293,13 @@ const CreateActivityScreen = ({ route }) => {
         setUser(res);
 
         findInstructorBySchoolId(res);
+        res?.orgId ? getOrgInfo(res?.orgId) : getSchoolInfo(res?.schoolId);
       } else {
         setInstructorInfo(currentUser);
         findInstructorBySchoolId(currentUser);
+        currentUser?.orgId
+          ? getOrgInfo(currentUser?.orgId)
+          : getSchoolInfo(currentUser?.schoolId);
 
         setUser(currentUser);
       }
@@ -371,13 +393,13 @@ const CreateActivityScreen = ({ route }) => {
       .then((res) => {
         console.log("groupinfo", res);
 
-        let students = res?.studentsGroup?.map((item) => ({
+        let students = res?.studentsGroupList?.map((item) => ({
           name: item?.firstName + " " + item.lastName,
 
           parent1_email: item.parentEmail1,
           parent2_email: item.parentEmail2,
         }));
-        let instructors = res?.instructorsGroup?.map((item, index) => ({
+        let instructors = res?.instructorsGroupList?.map((item, index) => ({
           firstname: item?.firstName,
           lastname: item?.lastName,
           email: item?.email,
@@ -432,6 +454,11 @@ const CreateActivityScreen = ({ route }) => {
       setHideForm(false);
       setDeletedStudents([]);
       setDeletedInstructors([]);
+      setFromCheckBox(false);
+      setToCheckBox(false);
+      setSelectedIndex(0);
+      setSelectedDay("");
+      setInitialValues({});
     } else {
       if (isFocused && !route?.params) {
         setHideForm(true);
@@ -440,6 +467,12 @@ const CreateActivityScreen = ({ route }) => {
         setInitialValues();
       }
     }
+    return () => {
+      setFromCheckBox(false);
+      setToCheckBox(false);
+      setSelectedIndex(0);
+      setSelectedDay("");
+    };
   }, [isFocused]);
   console.log("values", instructorInfo);
 
@@ -481,7 +514,7 @@ const CreateActivityScreen = ({ route }) => {
               .format("hh:mm a")
           : timeStamp[3],
         // activity && activity?.date.split(" ")[2],
-
+        fromCountry: activity?.venueFromCountry || "",
         fromVenueName: activity?.venueFromName || "",
         fromAddress: activity?.venueFromAddress || "",
         fromCity: activity?.venueFromCity || currentUser?.city || "",
@@ -513,10 +546,11 @@ const CreateActivityScreen = ({ route }) => {
         selectedCountry: "",
         country: currentUser?.country || "",
         onBehalfOf: onBehalf,
+        noEnd: false,
       });
     }
-  }, [isFocused, activity, infomation, user, optIn]);
-  console.log("orgId9009909090909090909090", instructors);
+  }, [isFocused, activity, infomation, user, optIn, groupInfo, onBehalf]);
+  console.log("orgId9009909090909090909090", orgSchoolInfo);
   // console.log("format date0000000000000000000000", activity);
   return (
     <>
@@ -540,11 +574,7 @@ const CreateActivityScreen = ({ route }) => {
           setStudents([...item]);
         }}
       />
-      <AppHeader
-        title="Create Activity"
-        hideCalendar={true}
-        hideApproval={true}
-      />
+      <AppHeader title="Create Event" hideCalendar={true} hideApproval={true} />
       <ScrollView style={styles.layout}>
         {/* <Text
           textBreakStrategy={"highQuality"}
@@ -557,7 +587,7 @@ const CreateActivityScreen = ({ route }) => {
           Create a name for your Activity / Trip
         </Text> */}
 
-        {true && (
+        {isFocused && (
           <Formik
             // validateOnMount={true}
             enableReinitialize
@@ -605,7 +635,7 @@ const CreateActivityScreen = ({ route }) => {
                 venueFromZip: values.fromZipCode,
                 schoolId: currentUser?.schoolId || null,
                 venueToCountry: selectedIndex == 0 ? values.country : "",
-                venueFromCountry: selectedIndex != 0 ? values.country : "",
+                venueFromCountry: selectedIndex != 0 ? values.fromCountry : "",
                 orgId: currentUser?.orgId || null,
                 onBehalfOf: values.onBehalfOf ? _instructor : 0,
                 students: [],
@@ -620,7 +650,9 @@ const CreateActivityScreen = ({ route }) => {
                   // `${moment(values.from).format(
                   //   "YYYY-MM-DD hh:mm:ss"
                   // )} ${values.fromTime}`,
-                  toDate: todate + "T" + totime + ":00.000Z",
+                  toDate: values.noEnd
+                    ? "9999-12-31T12:00.000Z"
+                    : todate + "T" + totime + ":00.000Z",
                   //  `${moment(values.to).format("YYYY-MM-DD hh:mm:ss")} ${
                   //   values.toTime
                   // }`,,
@@ -949,7 +981,11 @@ const CreateActivityScreen = ({ route }) => {
                         alignItems: "center",
                         width: "50%",
                       }}
-                      onChange={(index) => setSelectedIndex(index)}
+                      onChange={(index) => {
+                        setSelectedIndex(index);
+                        setToCheckBox(false);
+                        setFromCheckBox(false);
+                      }}
                     >
                       <Radio style={{ flexDirection: "row", width: "50%" }}>
                         {(evaProps) => (
@@ -1029,6 +1065,7 @@ const CreateActivityScreen = ({ route }) => {
                           date={values.from}
                           onSelect={(date: Date | null) => {
                             setFieldValue("from", date);
+                            setFieldValue("to", date);
                           }}
                         />
                         <Select
@@ -1096,7 +1133,7 @@ const CreateActivityScreen = ({ route }) => {
                   )}
                   {timeSelectedIndex === 2 && (
                     <>
-                      <Datepicker
+                      {/* <Datepicker
                         min={new Date(1900, 0, 0)}
                         style={[styles.selectSettings, { width: "90%" }]}
                         label="Starting*"
@@ -1105,8 +1142,8 @@ const CreateActivityScreen = ({ route }) => {
                         onSelect={(date: Date | null) => {
                           setFieldValue("from", date);
                         }}
-                      />
-                      <View
+                      /> */}
+                      {/* <View
                         style={{
                           flexDirection: "row",
                           alignItems: "center",
@@ -1123,12 +1160,138 @@ const CreateActivityScreen = ({ route }) => {
                         />
                         <Text style={{ marginLeft: 10 }}>To</Text>
                         <Input
+                          disabled={values?.noEnd}
                           placeholder="00:00 AM"
                           onChangeText={handleChange("startingTo")}
                           value={values.startingTo}
                           style={{ marginLeft: 10 }}
                         />
+                      </View> */}
+                      <>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            width: "90%",
+                          }}
+                        >
+                          <Datepicker
+                            min={new Date(1900, 0, 0)}
+                            style={[styles.selectSettings, { width: "60%" }]}
+                            label="From*"
+                            placeholder="From"
+                            date={values.from}
+                            onSelect={(date: Date | null) => {
+                              setFieldValue("from", date);
+                              setFieldValue("to", date);
+                            }}
+                          />
+                          <Select
+                            value={values.fromTime}
+                            style={{
+                              marginTop: 5,
+                              marginLeft: 5,
+                              width: "45%",
+                            }}
+                            placeholder="From"
+                            onSelect={(index: any) => {
+                              setFieldValue("fromTime", timeStamp[index.row]);
+                            }}
+                            label={(evaProps: any) => (
+                              <Text {...evaProps}></Text>
+                            )}
+                          >
+                            {timeStamp &&
+                              timeStamp.length > 0 &&
+                              timeStamp.map((_timeStamp, index) => {
+                                return (
+                                  <SelectItem
+                                    key={index}
+                                    title={_timeStamp || ""}
+                                  />
+                                );
+                              })}
+                          </Select>
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            width: "90%",
+                          }}
+                        >
+                          <Datepicker
+                            disabled={values?.noEnd}
+                            min={new Date(1900, 0, 0)}
+                            style={[styles.selectSettings, { width: "60%" }]}
+                            label="To*"
+                            placeholder="To"
+                            date={values.to}
+                            onSelect={(date: Date | null) => {
+                              setFieldValue("to", date);
+                            }}
+                          />
+                          {/* {console.log("values", values.toTime)} */}
+                          <Select
+                            disabled={values?.noEnd}
+                            value={values.toTime}
+                            style={{
+                              marginTop: 5,
+                              marginLeft: 5,
+                              width: "45%",
+                            }}
+                            placeholder="To"
+                            onSelect={(index: any) => {
+                              setFieldValue("toTime", timeStamp[index.row]);
+                            }}
+                            label={(evaProps: any) => (
+                              <Text {...evaProps}></Text>
+                            )}
+                          >
+                            {timeStamp &&
+                              timeStamp.length > 0 &&
+                              timeStamp.map((_timeStamp, index) => {
+                                return (
+                                  <SelectItem
+                                    key={index}
+                                    title={_timeStamp || ""}
+                                  />
+                                );
+                              })}
+                          </Select>
+                        </View>
+                      </>
+
+                      <View
+                        style={{
+                          flexDirection: "row",
+
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text style={{ marginHorizontal: 15, marginTop: 10 }}>
+                          No end
+                        </Text>
+                        <CheckBox
+                          style={[{ flex: 1, marginTop: 15 }]}
+                          checked={values?.noEnd}
+                          onChange={(checked) => {
+                            setFieldValue("noEnd", checked);
+
+                            console.log("checked", checked);
+                            // if (checked) {
+                            //   Alert.alert(checked);
+                            // } else {
+                            //   Alert.alert(checked);
+                            // }
+                          }}
+                        >
+                          {""}
+                        </CheckBox>
                       </View>
+
                       <Text
                         style={{
                           color: "#000",
@@ -1171,18 +1334,81 @@ const CreateActivityScreen = ({ route }) => {
                       </ScrollView>
                     </>
                   )}
-                  <Text
+                  <View
                     style={{
-                      color: Colors.primary,
-                      fontSize: 18,
-                      fontWeight: "700",
-                      marginVertical: 10,
-                      alignSelf: "flex-start",
-                      marginLeft: "5%",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      width: "100%",
                     }}
                   >
-                    {selectedIndex === 0 ? "At*" : "From*"}
-                  </Text>
+                    <Text
+                      style={{
+                        color: Colors.primary,
+                        fontSize: 18,
+                        fontWeight: "700",
+                        marginVertical: 10,
+                        alignSelf: "flex-start",
+                        marginLeft: "5%",
+                      }}
+                    >
+                      {selectedIndex === 0 ? "At*" : "From*"}
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ marginRight: 20, marginTop: 10 }}>
+                        school/org
+                      </Text>
+                      <CheckBox
+                        disabled={toCheckBox}
+                        style={[{ flex: 1, marginTop: 15 }]}
+                        checked={fromCheckBox}
+                        onChange={(checked) => {
+                          setFromCheckBox(checked);
+                          if (!fromCheckBox) {
+                            setFieldValue("fromVenueName", orgSchoolInfo?.name);
+                            setFieldValue(
+                              "fromAddress",
+                              orgSchoolInfo?.address
+                            );
+
+                            setFieldValue("fromState", orgSchoolInfo?.state);
+
+                            setFieldValue(
+                              "fromCountry",
+                              orgSchoolInfo?.country
+                            );
+                            setFieldValue("fromCity", orgSchoolInfo?.city);
+                            setFieldValue(
+                              "fromZipCode",
+                              orgSchoolInfo?.zipcode
+                            );
+                          } else {
+                            setFieldValue("fromVenueName", "");
+                            setFieldValue("fromAddress", "");
+
+                            setFieldValue("fromState", "");
+
+                            setFieldValue("fromCountry", "");
+                            setFieldValue("fromCity", "");
+                            setFieldValue("fromZipCode", "");
+                          }
+                          console.log("checked", checked);
+                          // if (checked) {
+                          //   Alert.alert(checked);
+                          // } else {
+                          //   Alert.alert(checked);
+                          // }
+                        }}
+                      >
+                        {""}
+                      </CheckBox>
+                    </View>
+                  </View>
                   {/* {console.log("errors", errors)} */}
                   <View
                     style={{
@@ -1228,12 +1454,12 @@ const CreateActivityScreen = ({ route }) => {
                   /> */}
                     <Autocomplete
                       placeholder="Country*"
-                      value={values.country}
+                      value={values?.fromCountry}
                       placement="bottom"
                       style={{ marginVertical: 5 }}
                       // label={evaProps => <Text {...evaProps}>Country*</Text>}
                       onChangeText={(query) => {
-                        setFieldValue("country", query);
+                        setFieldValue("fromCountry", query);
                         setCountriesData(
                           countries.filter((item) =>
                             filterCountries(item, query)
@@ -1243,10 +1469,10 @@ const CreateActivityScreen = ({ route }) => {
                       onSelect={(query) => {
                         const selectedCountry = countriesData[query];
                         console.log("000000", selectedCountry.name);
-                        setFieldValue("country", selectedCountry.name);
+                        setFieldValue("fromCountry", selectedCountry.name);
                         setFieldValue("selectedCountry", selectedCountry.name);
                         setFieldValue("fromSelectedState", "");
-                        setFieldValue("state", "");
+                        setFieldValue("fromState", "");
                         setStates([]);
                         GetAllStates(
                           selectedCountry.name.replace(/ /g, "")
@@ -1279,7 +1505,7 @@ const CreateActivityScreen = ({ route }) => {
                         setFieldValue("fromState", selectedState);
                         setFieldValue("fromSelectedState", selectedState);
                         setFieldValue("fromSelectedCity", "");
-                        setFieldValue("city", "");
+                        setFieldValue("fromCity", "");
                         setCities([]);
                         GetAllCities(
                           values.selectedCountry,
@@ -1323,18 +1549,82 @@ const CreateActivityScreen = ({ route }) => {
                   </View>
                   {selectedIndex === 2 && (
                     <>
-                      <Text
+                      <View
                         style={{
-                          color: Colors.primary,
-                          fontSize: 18,
-                          fontWeight: "700",
-                          marginVertical: 10,
-                          alignSelf: "flex-start",
-                          marginLeft: "5%",
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          width: "100%",
                         }}
                       >
-                        To*
-                      </Text>
+                        <Text
+                          style={{
+                            color: Colors.primary,
+                            fontSize: 18,
+                            fontWeight: "700",
+                            marginVertical: 10,
+                            alignSelf: "flex-start",
+                            marginLeft: "5%",
+                          }}
+                        >
+                          To*
+                        </Text>
+
+                        <View
+                          style={{
+                            flexDirection: "row",
+
+                            alignItems: "center",
+                          }}
+                        >
+                          <Text style={{ marginRight: 20, marginTop: 10 }}>
+                            school/org
+                          </Text>
+                          <CheckBox
+                            disabled={fromCheckBox}
+                            style={[{ flex: 1, marginTop: 15 }]}
+                            checked={toCheckBox}
+                            onChange={(checked) => {
+                              setToCheckBox(checked);
+                              if (!toCheckBox) {
+                                setFieldValue("venueName", orgSchoolInfo?.name);
+                                setFieldValue(
+                                  "address",
+                                  orgSchoolInfo?.address
+                                );
+
+                                setFieldValue("state", orgSchoolInfo?.state);
+
+                                setFieldValue(
+                                  "country",
+                                  orgSchoolInfo?.country
+                                );
+                                setFieldValue("city", orgSchoolInfo?.city);
+                                setFieldValue(
+                                  "zipCode",
+                                  orgSchoolInfo?.zipcode
+                                );
+                              } else {
+                                setFieldValue("venueName", "");
+                                setFieldValue("address", "");
+
+                                setFieldValue("state", "");
+
+                                setFieldValue("country", "");
+                                setFieldValue("city", "");
+                                setFieldValue("zipCode", "");
+                              }
+                              console.log("checked", checked);
+                              // if (checked) {
+                              //   Alert.alert(checked);
+                              // } else {
+                              //   Alert.alert(checked);
+                              // }
+                            }}
+                          >
+                            {""}
+                          </CheckBox>
+                        </View>
+                      </View>
                       <View
                         style={{
                           padding: 15,
@@ -1362,28 +1652,103 @@ const CreateActivityScreen = ({ route }) => {
                           onChangeText={handleChange("address")}
                           value={values.address}
                         />
-                        <Select
-                          style={[styles.selectSettings, { marginVertical: 5 }]}
-                          value={values.state}
-                          placeholder="State"
-                          onSelect={(query) => {}}
-                        >
-                          {/* {
-                                        states?.map((state, index) => {
-                                            return <SelectItem key={index} title={state} />
-                                        })
-                                    } */}
-                        </Select>
-                        <Input
-                          style={{
-                            marginRight: 20,
-                            marginTop: 10,
-                            width: "100%",
+
+                        <Autocomplete
+                          placeholder="Country*"
+                          value={values.country}
+                          placement="bottom"
+                          style={{ marginVertical: 5 }}
+                          // label={evaProps => <Text {...evaProps}>Country*</Text>}
+                          onChangeText={(query) => {
+                            setFieldValue("country", query);
+                            setCountriesData(
+                              countries.filter((item) =>
+                                filterCountries(item, query)
+                              )
+                            );
                           }}
+                          onSelect={(query) => {
+                            const selectedCountry = countriesData[query];
+                            console.log("000000", selectedCountry.name);
+                            setFieldValue("country", selectedCountry.name);
+                            setFieldValue(
+                              "selectedCountry",
+                              selectedCountry.name
+                            );
+                            setFieldValue("toSelectedState", "");
+                            setFieldValue("state", "");
+                            setStates([]);
+                            GetAllStates(
+                              selectedCountry.name.replace(/ /g, "")
+                            ).then((res) => {
+                              setStates(res.data);
+                              setStatesData(states);
+                            });
+                          }}
+                        >
+                          {countriesData?.map((item, index) => {
+                            return (
+                              <AutocompleteItem key={index} title={item.name} />
+                            );
+                          })}
+                        </Autocomplete>
+                        <Autocomplete
+                          placeholder="State"
+                          value={values.state}
+                          placement="bottom"
+                          style={{ marginVertical: 5 }}
+                          // label={evaProps => <Text {...evaProps}>State</Text>}
+                          onChangeText={(query) => {
+                            setFieldValue("state", query);
+                            setStatesData(
+                              states.filter((item) => filterStates(item, query))
+                            );
+                          }}
+                          onSelect={(query) => {
+                            const selectedState = statesData[query];
+                            setFieldValue("state", selectedState);
+                            setFieldValue("toSelectedState", selectedState);
+                            setFieldValue("toSelectedCity", "");
+                            setFieldValue("city", "");
+                            setCities([]);
+                            GetAllCities(
+                              values.selectedCountry,
+                              selectedState
+                            ).then((res) => {
+                              setCities(res.data);
+                            });
+                          }}
+                        >
+                          {statesData.map((item, index) => {
+                            return (
+                              <AutocompleteItem key={index} title={item} />
+                            );
+                          })}
+                        </Autocomplete>
+                        <Autocomplete
                           placeholder="City"
-                          onChangeText={handleChange("city")}
                           value={values.city}
-                        />
+                          placement="bottom"
+                          style={{ marginVertical: 5 }}
+                          // label={evaProps => <Text {...evaProps}>City</Text>}
+                          onChangeText={(query) => {
+                            setFieldValue("city", query);
+                            setCitiesData(
+                              cities.filter((item) => filterCities(item, query))
+                            );
+                          }}
+                          onSelect={(query) => {
+                            setFieldValue("city", citiesData[query]);
+                            setFieldValue("toSelectedCity", citiesData[query]);
+                          }}
+                        >
+                          {citiesData.map((item, index) => {
+                            return (
+                              <AutocompleteItem key={index} title={item} />
+                            );
+                          })}
+                        </Autocomplete>
+
                         <Input
                           style={{ width: "100%" }}
                           placeholder="Zip code"

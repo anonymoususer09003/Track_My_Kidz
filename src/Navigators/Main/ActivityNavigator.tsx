@@ -1,7 +1,7 @@
 import React from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { Button, TabBar } from "@ui-kitten/components";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { ActivityScreen, GroupScreen } from "@/Screens";
 import { AppHeader } from "@/Components";
@@ -9,9 +9,10 @@ import Colors from "@/Theme/Colors";
 import { useStateValue } from "@/Context/state/State";
 
 // @refresh reset
-const ActivityNavigator = () => {
+const ActivityNavigator = ({ route }) => {
   const TabNavigator = createMaterialTopTabNavigator();
   const tabNames = ["Activity", "Group"];
+
   const [{ childName }] = useStateValue();
   //@ts-ignore
   const TopTabBar = ({ navigation, state }) => (
@@ -58,7 +59,7 @@ const ActivityNavigator = () => {
   );
   return (
     <>
-      <AppHeader title={`${childName} Events`} />
+      <AppHeader title={`${route.params.dependent.firstname}'s Events`} />
       <TabNavigator.Navigator
         screenOptions={{ lazy: true, swipeEnabled: false }}
         tabBar={(props) => <TopTabBar {...props} />}

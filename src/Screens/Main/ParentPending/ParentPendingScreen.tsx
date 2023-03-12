@@ -29,6 +29,8 @@ import { GetChildrenGroups } from "@/Services/Group";
 import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
 const ParentPendingScreen = ({ route }) => {
   const swipeableRef = useRef(null);
+  let prevOpenedRow: any;
+  let row: Array<any> = [];
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
@@ -49,7 +51,14 @@ const ParentPendingScreen = ({ route }) => {
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
-
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const closeRow = (index) => {
+    console.log(index);
+    if (prevOpenedRow && prevOpenedRow !== row[index]) {
+      prevOpenedRow.close();
+    }
+    prevOpenedRow = row[index];
+  };
   const loadUserDetails = async () => {
     GetParentChildrens(currentUser?.referenceCode)
       .then((res) => {
@@ -135,6 +144,7 @@ const ParentPendingScreen = ({ route }) => {
     if (isFocused) {
       getActivities();
       getGroups();
+    } else {
     }
   }, [isFocused]);
 
@@ -178,6 +188,7 @@ const ParentPendingScreen = ({ route }) => {
                     childrenSelectionModalVisibility: true,
                   })
                 );
+                setShowAcceptModal(true);
                 setActivity(item);
               }}
             >
@@ -233,12 +244,14 @@ const ParentPendingScreen = ({ route }) => {
         />
       )}
       {/* {approveActivityModalVisibility && !!selectedChild && ( */}
-      {approveActivityModalVisibility && !!selectedChild && (
+      {showAcceptModal && !!selectedChild && (
         <ApproveActivityModal
+          visible={showAcceptModal}
+          onClose={() => setShowAcceptModal(false)}
           fromParent={true}
           selectedChild={selectedChild}
           setSelectedChild={setSelectedChild}
-          activity={activity}
+          activity={{ ...activity, studentId: selectedChild.studentId }}
           setActivity={(id) => {
             if (activity?.activity) {
               console.log("declinedactivity", activity);
@@ -278,7 +291,7 @@ const ParentPendingScreen = ({ route }) => {
         />
       )}
 
-      {activities.length === 0 && (
+      {activities.length === 0 && groups.length === 0 && (
         <View style={{ margin: 10 }}>
           <Text style={[styles.text, { textAlign: "center" }]}>
             You do not have any pending activities or groups to approve
@@ -286,17 +299,18 @@ const ParentPendingScreen = ({ route }) => {
         </View>
       )}
 
-      <View style={styles.layout}>
-        {activities.length > 0 && (
-          <View style={{ flex: 1 }}>
-            <FlatList
-              data={activities}
-              style={{ padding: 20, width: "100%" }}
-              renderItem={({ item, index }) => {
+      {isFocused && (
+        <View style={styles.layout}>
+          <FlatList
+            data={[...activities, ...groups]}
+            // style={{ padding: 20, width: "100%" }}
+            renderItem={({ item, index }) => {
+              if (item?.activity?.activityId) {
                 let date = item?.activity?.fromDate;
                 return (
                   <Swipeable
-                    ref={swipeableRef}
+                    ref={(ref) => (row[index] = ref)}
+                    onSwipeableOpen={() => closeRow(item?.activityId)}
                     renderRightActions={(e) => RightActions(e, item)}
                   >
                     <View
@@ -350,32 +364,71 @@ const ParentPendingScreen = ({ route }) => {
                     </View>
                   </Swipeable>
                 );
-              }}
-              // onEndReached={async () => {
-              //   if (totalRecordsActivity > activities.length) {
-              //     console.log("logs");
+              } else {
+                return (
+                  <Swipeable
+                    ref={(ref) => (row[index] = ref)}
+                    renderRightActions={(e) => RightActions(e, item)}
+                    onSwipeableOpen={() => closeRow(item?.groupId)}
+                  >
+                    <View
+                      style={[
+                        styles.item,
+                        {
+                          backgroundColor: !item.status
+                            ? "#fff"
+                            : index % 3 === 0
+                            ? "lightgreen"
+                            : index % 2 === 0
+                            ? "#F6DDCC"
+                            : "#fff",
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={styles.text}
+                      >{` Group Name: ${item?.group?.groupName}`}</Text>
+                      <Text style={styles.text}>{` Date: ${moment(
+                        item?.activity?.scheduler?.fromDate
+                      ).format("YYYY-MM-DD")}`}</Text>
+                      <Text
+                        style={styles.text}
+                      >{` ${item?.firstName} ${item?.lastName}`}</Text>
+                      <Text
+                        style={styles.text}
+                      >{`Status: ${item?.status}`}</Text>
+                      <Text
+                        style={styles.text}
+                      >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
+                    </View>
+                  </Swipeable>
+                );
+              }
+            }}
+            onEndReached={async () => {
+              if (totalRecordsActivity > activities.length) {
+                console.log("logs");
 
-              //     getActivities(true);
+                getActivities(true);
 
-              //     if (totalRecordsGroup > groups.length) {
-              //       getGroups(true);
-              //     }
-              //   }
-              // }}
-              refreshing={false}
-              onRefresh={() => null}
-            />
-          </View>
-        )}
-        {activities.length > 0 && (
-          <View style={{ flex: 1 }}>
+                if (totalRecordsGroup > groups.length) {
+                  getGroups(true);
+                }
+              }
+            }}
+            refreshing={false}
+            onRefresh={() => null}
+          />
+
+          {/* {groups.length > 0 && (
             <FlatList
               data={groups}
               style={{ padding: 10, width: "100%" }}
               renderItem={({ item, index }) => (
                 <Swipeable
-                  ref={swipeableRef}
+                  ref={(ref) => (row[index] = ref)}
                   renderRightActions={(e) => RightActions(e, item)}
+                  onSwipeableOpen={() => closeRow(item?.groupId)}
                 >
                   <View
                     style={[
@@ -421,12 +474,12 @@ const ParentPendingScreen = ({ route }) => {
               refreshing={false}
               onRefresh={() => null}
             />
-          </View>
-        )}
-        {refreshing && (
-          <ActivityIndicator size="large" color={Colors.primary} />
-        )}
-      </View>
+          )} */}
+          {refreshing && (
+            <ActivityIndicator size="large" color={Colors.primary} />
+          )}
+        </View>
+      )}
     </>
   );
 };

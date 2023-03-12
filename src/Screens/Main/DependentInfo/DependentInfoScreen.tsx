@@ -23,12 +23,12 @@ import {
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import Colors from "@/Theme/Colors";
 import Entypo from "react-native-vector-icons/Entypo";
-import AntDesign from "react-native-vector-icons/AntDesign";
+
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 import FetchOne from "@/Services/User/FetchOne";
-
+import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
 // import FetchOne from "@/Services/Parent/GetParentChildrens";
 import { GetParent } from "@/Services/Parent";
 import { loadUserId } from "@/Storage/MainAppStorage";
@@ -39,6 +39,7 @@ import TrackHistory from "@/Services/Parent/TrackHistory";
 import moment from "moment";
 import TrackStudent from "@/Services/Parent/TrackStudent";
 import Geolocation from "@react-native-community/geolocation";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const DependentInfoScreen = () => {
   const navigation = useNavigation();
@@ -58,15 +59,11 @@ const DependentInfoScreen = () => {
   const [user, setUser] = useState(null);
   let prevOpenedRow: any;
   let row: Array<any> = [];
-  const [position, setPosition] = useState({
-    latitude: 0.0421,
-    longitude: 0.001,
-    latitudeDelta: 0.001,
-    longitudeDelta: 0.001,
-  });
+  const [position, setPosition] = useState({});
 
   useEffect(() => {
     Geolocation.getCurrentPosition((pos) => {
+      console.log("-------00000", pos);
       const crd = pos.coords;
       setPosition({
         latitude: crd.latitude,
@@ -75,7 +72,7 @@ const DependentInfoScreen = () => {
         longitudeDelta: 0.0421,
       });
     });
-  }, []);
+  }, [focused]);
 
   // const loadUserDetails = async () => {
   //   const id = await loadUserId();
@@ -174,7 +171,7 @@ const DependentInfoScreen = () => {
             prevOpenedRow?.close();
           }}
         >
-          <Ionicons size={23} color={Colors.primary} name="person" />
+          <MaterialIcon size={23} color={Colors.primary} name="qrcode-scan" />
         </TouchableOpacity>
         {false && (
           <TouchableOpacity
@@ -216,6 +213,7 @@ const DependentInfoScreen = () => {
             padding: 5,
             alignItems: "center",
             justifyContent: "center",
+            marginVertical: 12,
           }}
         >
           <Icon
@@ -257,13 +255,17 @@ const DependentInfoScreen = () => {
   const handleTrackHistory = async (
     status: boolean,
     id: any,
-    index: number
+    index: number,
+    coordinates: any
   ) => {
     try {
       const _date = moment(new Date()).format("YYYY-MM-DD");
-
+      console.log("coordinates", coordinates);
       const _data = [...children];
+      console.log("0000_data", _data);
+      console.log("index", index);
       const item = _data[index];
+
       item.childTrackHistory = status ? true : false;
       _data[index] = item;
       setChildren(_data);
@@ -271,8 +273,8 @@ const DependentInfoScreen = () => {
         status,
         id,
         _date,
-        position.latitude,
-        position.longitude
+        coordinates.latitude,
+        coordinates.longitude
       );
       console.log("res", res);
       if (res && status) {
@@ -305,15 +307,28 @@ const DependentInfoScreen = () => {
     item.toggleAlert = status ? true : false;
     _data[index] = item;
     setChildren(_data);
+
+    console.log("coordinates", coordinates);
     try {
-      const res = await TrackStudent(
-        id,
-        coordinates?.latitude || position?.latitude,
-        coordinates?.logitude || position?.longitude,
-        status,
-        distanceAllowed,
-        kilometers
+      let res = await fetch(
+        "https://live-api.trackmykidz.com/user/parent/alert/trackStudent?studentId=2610&parentLatitude=36.7009541&parentLongitude=-122.0840217&toggleAlert=true&distanceAllowed=10&kilometers=false",
+        {
+          method: "POST",
+          headers: {
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjpbIlJPTEVfUEFSRU5UIl0sImlkIjoyMzcsInN1YiI6Im5vLnVtYW5zYWVlZDU0QGdtYWlsLmNvbSIsImlhdCI6MTY3NzUxODc0NywiZXhwIjoxNzA5MDc1Njk5fQ.u0HJP5zNTvk3DEQa12rk0Q5cbY5fslrGEB5dyzas-9hJYNYEuD1B4a0a0RkFg1CRLi-1_F2SJnoomp7nPw1Lng",
+          },
+        }
       );
+      // const res = await TrackStudent(
+      //   id,
+      //   coordinates?.latitude || position?.latitude,
+      //   coordinates?.logitude || position?.longitude,
+      //   status,
+      //   distanceAllowed,
+      //   kilometers
+      // );
       if (res && status) {
         Toast.show({
           type: "success",
@@ -353,12 +368,13 @@ const DependentInfoScreen = () => {
       values?.distance,
       values?.distanceinkm,
       values?.student?.index,
-      values?.coordinates
+      values?.location
     );
     handleTrackHistory(
       values?.student?.isToggle,
       values?.student?.studentId,
-      values?.student?.index
+      values?.student?.index,
+      values?.location
     );
     console.log("values----", values);
   };
@@ -487,7 +503,7 @@ const DependentInfoScreen = () => {
                 <Text style={styles.text}>{`${
                   (!!item.school && item.school) || ""
                 }`}</Text>
-                <Text style={styles.text}>{`${item.grade}`}</Text>
+
                 {item?.status && (
                   <Text style={styles.text}>{`Status: ${item.status}`}</Text>
                 )}
@@ -513,7 +529,12 @@ const DependentInfoScreen = () => {
                       checked={item.childTrackHistory}
                       onChange={(value) => {
                         console.log("values---", value);
-                        handleTrackHistory(value, item?.studentId, index);
+                        handleTrackHistory(
+                          value,
+                          item?.studentId,
+                          index,
+                          position
+                        );
                       }}
                     />
                   </View>
@@ -525,7 +546,7 @@ const DependentInfoScreen = () => {
                     }}
                   >
                     <Text style={{ color: Colors.primary, fontSize: 16 }}>
-                      Distance Alert?
+                      Set Boundary
                     </Text>
 
                     <Toggle

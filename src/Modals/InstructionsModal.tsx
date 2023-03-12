@@ -18,15 +18,17 @@ import { DeclineToGift } from "@/Services/GiftService";
 import Colors from "@/Theme/Colors";
 import EvilIcons from "react-native-vector-icons/EvilIcons";
 import { GetOptIn } from "@/Services/Activity";
-
+import { GetOptInGroup } from "@/Services/Group";
 const InstructionsModal = ({
   selectedInstructions,
   setSelectedInstructions,
   activity,
+  group,
 }: {
   selectedInstructions: any;
   setSelectedInstructions: any;
   activity: any;
+  group: any;
 }) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);
   const amountValues = [
@@ -69,11 +71,14 @@ const InstructionsModal = ({
     setIsValid(false);
     setSelectedAmountIndex(null);
     if (isVisible) {
-      getActivityOptInDetail();
+      if (group) {
+        getGroupsOptInDetail();
+      } else if (activity) getActivityOptInDetail();
     }
   }, [isVisible]);
   const getActivityOptInDetail = async () => {
     try {
+      console.log("activity99", activity?.activityId);
       let res = await GetOptIn(activity?.activityId);
 
       setInformation({ ...infomation, ...res });
@@ -81,6 +86,17 @@ const InstructionsModal = ({
       console.log("err", err);
     }
   };
+
+  const getGroupsOptInDetail = async () => {
+    try {
+      console.log("group------990909090099090", group);
+      let res = await GetOptInGroup(group?.groupId || group?.id);
+      setInformation({ ...infomation, ...res });
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
   // @ts-ignore
   return (
     <Modal

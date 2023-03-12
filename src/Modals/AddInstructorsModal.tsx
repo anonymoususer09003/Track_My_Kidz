@@ -96,7 +96,7 @@ const AddInstructorsModal = ({
                 }}
               >
                 <View style={{ width: "93%" }}>
-                  <Text>{`Import from CSV or click the Plus button to add instructors`}</Text>
+                  <Text>{`Click the Plus button to add instructors. (Or use webapp for bulk import after registration)`}</Text>
                 </View>
                 <AntDesign
                   name="pluscircle"

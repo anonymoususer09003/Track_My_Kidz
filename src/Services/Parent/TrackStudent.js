@@ -13,8 +13,7 @@ export default async (
     `/user/parent/alert/trackStudent?studentId=${studentId}&parentLatitude=${parentLatitude}&parentLongitude=${parentLongititude}&toggleAlert=${toggleAlert}&distanceAllowed=${distanceAllowed}&kilometers=${kilometers}`
   );
   const response = await api.post(
-    `/user/parent/alert/trackStudent?studentId=${studentId}&parentLatitude=${parentLatitude}&parentLongitude=${parentLongititude}&toggleAlert=${toggleAlert}&distanceAllowed=${distanceAllowed}&kilometers=${kilometers}`,
-    {}
+    `/user/parent/alert/trackStudent?studentId=${studentId}&parentLatitude=${parentLatitude}&parentLongitude=${parentLongititude}&toggleAlert=${toggleAlert}&distanceAllowed=${distanceAllowed}&kilometers=${kilometers}`
   );
   return response.data;
 };

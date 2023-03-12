@@ -48,10 +48,14 @@ import {
 } from "@/Services/Instructor";
 import {
   loadUserId,
+  getOrgInstructors,
+  removeInstructors,
+  storeInstructors,
   loadUserType,
   storeHomeScreenCacheInfo,
   getHomeScreenCacheInfo,
 } from "@/Storage/MainAppStorage";
+import CreateMultipleInstructor from "@/Services/Instructor/CreateMultipleInstructor";
 import moment from "moment";
 import api from "@/Services";
 import { UserState } from "@/Store/User";
@@ -144,7 +148,19 @@ const InstructorActivityScreen = ({}) => {
       state.instructorsActivity
   );
   // console.log("filterday and month", filterDayAndMonth);
+  const setOrgInstructors = async () => {
+    try {
+      let res = await getOrgInstructors();
+      if (res) {
+        const userId = await loadId();
+        await CreateMultipleInstructor(JSON.parse(res), userId);
+        removeInstructors();
+      }
+    } catch (err) {}
+  };
   useEffect(() => {
+    
+
     dispatch(
       ChangeNavigationCustomState.action({
         navigationLeftDrawer: "activity",
@@ -467,6 +483,7 @@ const InstructorActivityScreen = ({}) => {
   };
   useEffect(() => {
     if (isFocused) {
+      setOrgInstructors();
       getCacheActivites();
     }
   }, [isFocused]);

@@ -46,6 +46,7 @@ const ParentDeclineScreen = ({ route }) => {
   const [pageSizeActivity, setPageSizeActivity] = useState(10);
   const [totalRecordsActivity, setTotalRecordsActivity] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
   const getActivities = async (refreshing: any) => {
     if (refreshing) {
       setRefreshing(true);
@@ -150,6 +151,7 @@ const ParentDeclineScreen = ({ route }) => {
             dispatch(
               ChangeModalState.action({ approveActivityModalVisibility: true })
             );
+            setShowAcceptModal(true);
             setActivity(item);
           }}
         >
@@ -173,8 +175,13 @@ const ParentDeclineScreen = ({ route }) => {
         selectedInstructions={selectedInstructions}
         setSelectedInstructions={setSelectedInstructions}
       />
-      {activity && (
-        <ApproveActivityModal activity={activity} setActivity={setActivity} />
+      {showAcceptModal && activity && isFocused && (
+        <ApproveActivityModal
+          visible={showAcceptModal}
+          onClose={() => setShowAcceptModal(false)}
+          activity={activity}
+          setActivity={setActivity}
+        />
       )}
       {activities.length === 0 && (
         <View style={{ margin: 10 }}>
@@ -185,33 +192,31 @@ const ParentDeclineScreen = ({ route }) => {
       )}
       <View style={styles.layout}>
         <FlatList
-          data={activities}
-          style={{ padding: 20, width: "100%" }}
+          data={[...activities, ...groups]}
+          // style={{ padding: 20, width: "100%" }}
           renderItem={({ item, index }) => {
-            let date = item?.activity?.fromDate;
-            return (
-              <Swipeable
-                ref={swipeableRef}
-                renderRightActions={(e) => RightActions(e, item)}
-              >
-                <View
-                  style={[
-                    styles.item,
-                    {
-                      backgroundColor: !item.status
-                        ? "#fff"
-                        : index % 3 === 0
-                        ? "lightgreen"
-                        : index % 2 === 0
-                        ? "#F6DDCC"
-                        : "#fff",
-                    },
-                  ]}
-                >
-                  <Text
-                    style={styles.text}
-                  >{` Activity Name: ${item?.activity?.activityName}`}</Text>
-                  {/* 
+            if (item?.activity?.activityId) {
+              let date = item?.activity?.fromDate;
+              return (
+                <>
+                  <View
+                    style={[
+                      styles.item,
+                      {
+                        backgroundColor: !item.status
+                          ? "#fff"
+                          : index % 3 === 0
+                          ? "lightgreen"
+                          : index % 2 === 0
+                          ? "#F6DDCC"
+                          : "#fff",
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={styles.text}
+                    >{` Activity Name: ${item?.activity?.activityName}`}</Text>
+                    {/* 
                       <Text style={styles.text}>{`Date: ${moment(
                         date == "string" ? new Date() : date[0]
                       ).format("YYYY-MM-DD")}`}</Text>
@@ -227,76 +232,57 @@ const ParentDeclineScreen = ({ route }) => {
                         }`}</Text>
                       )} */}
 
-                  <Text style={styles.text}>{` Date: ${moment(date).format(
-                    "YYYY-MM-DD"
-                  )}`}</Text>
-                  <Text style={styles.text}>{` Time: ${moment(date).format(
-                    "hh:mm A"
-                  )}`}</Text>
-                  <Text
-                    style={styles.text}
-                  >{` ${item?.firstName} ${item?.lastName}`}</Text>
-                  <Text style={styles.text}>{`Status: ${item?.status}`}</Text>
-                  <Text
-                    style={styles.text}
-                  >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
-                </View>
-              </Swipeable>
-            );
+                    <Text style={styles.text}>{` Date: ${moment(date).format(
+                      "YYYY-MM-DD"
+                    )}`}</Text>
+                    <Text style={styles.text}>{` Time: ${moment(date).format(
+                      "hh:mm A"
+                    )}`}</Text>
+                    <Text
+                      style={styles.text}
+                    >{` ${item?.firstName} ${item?.lastName}`}</Text>
+                    <Text style={styles.text}>{`Status: ${item?.status}`}</Text>
+                    <Text
+                      style={styles.text}
+                    >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
+                  </View>
+                </>
+              );
+            } else {
+              return (
+                <>
+                  <View
+                    style={[
+                      styles.item,
+                      {
+                        backgroundColor: !item.status
+                          ? "#fff"
+                          : index % 3 === 0
+                          ? "lightgreen"
+                          : index % 2 === 0
+                          ? "#F6DDCC"
+                          : "#fff",
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={styles.text}
+                    >{` Group Name: ${item?.group?.groupName}`}</Text>
+                    <Text style={styles.text}>{` Date: ${moment(
+                      item?.activity?.scheduler?.fromDate
+                    ).format("YYYY-MM-DD")}`}</Text>
+                    <Text
+                      style={styles.text}
+                    >{` ${item?.firstName} ${item?.lastName}`}</Text>
+                    <Text style={styles.text}>{`Status: ${item?.status}`}</Text>
+                    <Text
+                      style={styles.text}
+                    >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
+                  </View>
+                </>
+              );
+            }
           }}
-          // onEndReached={async () => {
-          //   if (totalRecordsActivity > activities.length) {
-          //     console.log("logs");
-
-          //     getActivities(true);
-
-          //     if (totalRecordsGroup > groups.length) {
-          //       getGroups(true);
-          //     }
-          //   }
-          // }}
-          refreshing={false}
-          onRefresh={() => null}
-        />
-
-        <FlatList
-          data={groups}
-          style={{ padding: 10, width: "100%" }}
-          renderItem={({ item, index }) => (
-            <Swipeable
-              ref={swipeableRef}
-              renderRightActions={(e) => RightActions(e, item)}
-            >
-              <View
-                style={[
-                  styles.item,
-                  {
-                    backgroundColor: !item.status
-                      ? "#fff"
-                      : index % 3 === 0
-                      ? "lightgreen"
-                      : index % 2 === 0
-                      ? "#F6DDCC"
-                      : "#fff",
-                  },
-                ]}
-              >
-                <Text
-                  style={styles.text}
-                >{` Group Name: ${item?.group?.groupName}`}</Text>
-                <Text style={styles.text}>{` Date: ${moment(
-                  item?.activity?.scheduler?.fromDate
-                ).format("YYYY-MM-DD")}`}</Text>
-                <Text
-                  style={styles.text}
-                >{` ${item?.firstName} ${item?.lastName}`}</Text>
-                <Text style={styles.text}>{`Status: ${item?.status}`}</Text>
-                <Text
-                  style={styles.text}
-                >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
-              </View>
-            </Swipeable>
-          )}
           onEndReached={async () => {
             if (totalRecordsActivity > activities.length) {
               console.log("logs");

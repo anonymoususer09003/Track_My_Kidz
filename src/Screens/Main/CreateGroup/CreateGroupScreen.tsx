@@ -42,14 +42,14 @@ const CreateGroupScreen = ({ route }) => {
       .then((res) => {
         console.log("groupinfo", res);
 
-        let students = res?.studentsGroup?.map((item) => ({
+        let students = res?.studentsGroupList?.map((item) => ({
           name: item?.firstName + " " + item.lastName,
 
           parent1_email: item.parentEmail1,
           parent2_email: item.parentEmail2,
           studentId: item?.studentsGroupId,
         }));
-        let instructors = res?.instructorsGroup?.map((item, index) => ({
+        let instructors = res?.instructorsGroupList?.map((item, index) => ({
           firstname: item?.firstName,
           lastname: item?.lastName,
           email: item?.email,
@@ -146,8 +146,8 @@ const CreateGroupScreen = ({ route }) => {
               <View style={styles.formContainer}>
                 <Input
                   style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                  textStyle={{ minHeight: 120, textAlignVertical: "top" }}
-                  placeholder="Group name"
+                  textStyle={{ minHeight: 30, textAlignVertical: "center" }}
+                  placeholder="Group name*"
                   onBlur={handleBlur("name")}
                   onChangeText={handleChange("name")}
                   value={values.name}

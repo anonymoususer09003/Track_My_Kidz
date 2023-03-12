@@ -2,7 +2,7 @@ import { Card, Modal, CheckBox, Text } from "@ui-kitten/components";
 import { useDispatch, useSelector } from "react-redux";
 import { ModalState } from "@/Store/Modal";
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, ScrollView } from "react-native";
+import { StyleSheet, View, ScrollView, Alert } from "react-native";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { LinearGradientButton } from "@/Components";
 import Colors from "@/Theme/Colors";
@@ -10,6 +10,7 @@ import UpdateActivityStatus from "@/Services/Activity/UpdateActivityStatus";
 import { UpdateActivityByStatus } from "@/Services/Activity";
 import { UpdateGroupByStatus } from "@/Services/Group";
 import { useStateValue } from "@/Context/state/State";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import {
   GetAllActivity,
   GetActivitiesByInsructorId,
@@ -27,12 +28,16 @@ const ApproveActivityModal = ({
   activity,
   setActivity,
   fromParent,
+  visible,
+  onClose,
 }: {
   selectedChild: any;
   setSelectedChild: (item: any) => void;
   activity: any;
   setActivity: Function;
   fromParent: any;
+  visible: any;
+  oClose: any;
 }) => {
   const [{ instructorDetail: instructorDetail }, _dispatch] = useStateValue();
   const isVisible = useSelector(
@@ -58,6 +63,7 @@ const ApproveActivityModal = ({
     }
   };
   const [terms, setTerms] = useState(false);
+  const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const parentApproval = () => {
     if (activity && activity?.activity) {
@@ -75,6 +81,8 @@ const ApproveActivityModal = ({
               approveActivityModalVisibility: false,
             })
           );
+          onClose();
+          setSelectedChild();
           setActivity(activity?.activity?.activityId);
           setSelectedChild(null);
         })
@@ -93,6 +101,8 @@ const ApproveActivityModal = ({
               approveActivityModalVisibility: false,
             })
           );
+          onClose();
+          setSelectedChild();
           setActivity(activity?.group?.groupId);
           setSelectedChild(null);
         })
@@ -101,8 +111,8 @@ const ApproveActivityModal = ({
   };
 
   const instructorApproval = () => {
-    console.log("acitivyt", activity.activityId);
-    if (activity.activityId) {
+    console.log("activity0000888", activity);
+    if (activity?.activityId) {
       const data = {
         activityId: activity?.activityId,
         status: "approved",
@@ -116,13 +126,15 @@ const ApproveActivityModal = ({
               approveActivityModalVisibility: false,
             })
           );
+          onClose();
+          setSelectedChild();
           setActivity(activity?.activityId);
           setSelectedChild(null);
 
           // setSelectedChild(null);
         })
         .catch((err) => console.log(err));
-    } else {
+    } else if (activity?.groupId) {
       const data = {
         groupyId: activity?.groupId,
         status: "approved",
@@ -136,7 +148,8 @@ const ApproveActivityModal = ({
               approveActivityModalVisibility: false,
             })
           );
-
+          onClose();
+          setSelectedChild();
           setActivity(activity?.groupId);
           setSelectedChild(null);
           // setActivities(filter);
@@ -145,140 +158,154 @@ const ApproveActivityModal = ({
         .catch((err) => console.log(err));
     }
   };
-  console.log("activity0000", activity);
+
   useEffect(() => {
     if (fromParent) {
       if (activity?.activity) {
         getActivityOptInDetail(activity?.activity?.activityId);
-      } else {
+      } else if (activity?.group?.groupId) {
         getGroupOptInDetail(activity?.group?.groupId);
       }
     } else {
+      // Alert.alert(activity?.activityId || activity?.groupId);
       if (activity?.activityId) {
         getActivityOptInDetail(activity?.activityId);
-      } else {
+      } else if (activity?.groupId) {
         getGroupOptInDetail(activity?.groupId);
       }
     }
-  }, []);
+  }, [activity, isFocused]);
+
   // @ts-ignore
   return (
     <Modal
       style={styles.container}
-      visible={isVisible}
+      visible={visible}
       backdropStyle={styles.backdrop}
       onBackdropPress={() => {
+        setSelectedChild();
         dispatch(
           ChangeModalState.action({ approveActivityModalVisibility: false })
         );
-        setActivity(null);
+        onClose();
+        // setActivity(null);
       }}
     >
-      <Card style={styles.modal} disabled={true}>
-        <View style={{ flex: 1 }}>
-          <View style={styles.body}>
-            <View style={{ paddingBottom: 10, paddingTop: 10 }}>
-              <Text
-                textBreakStrategy={"highQuality"}
+      {true && (
+        <Card style={styles.modal} disabled={true}>
+          <View style={{ flex: 1 }}>
+            <View style={styles.body}>
+              <View style={{ paddingBottom: 10, paddingTop: 10 }}>
+                <Text
+                  textBreakStrategy={"highQuality"}
+                  style={{
+                    textAlign: "center",
+                    color: "#606060",
+                    fontSize: 18,
+                  }}
+                >
+                  You have opted to approve
+                </Text>
+              </View>
+            </View>
+            {
+              <View style={{ marginTop: 20, paddingHorizontal: 10 }}>
+                <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                  Instructions
+                </Text>
+                <View style={{ maxHeight: 100 }}>
+                  <ScrollView nestedScrollEnabled>
+                    <Text style={{ fontSize: 15, marginTop: 10 }}>
+                      {infomation?.instructions}
+                    </Text>
+                  </ScrollView>
+                </View>
+                <Text
+                  style={{ fontWeight: "600", fontSize: 16, marginTop: 20 }}
+                >
+                  Disclaimer
+                </Text>
+                <View style={{ maxHeight: 100 }}>
+                  <ScrollView nestedScrollEnabled>
+                    <Text style={{ fontSize: 15, marginTop: 10 }}>
+                      {infomation?.disclaimer}
+                    </Text>
+                  </ScrollView>
+                </View>
+                <Text
+                  style={{ fontWeight: "600", fontSize: 16, marginTop: 20 }}
+                >
+                  Agreement
+                </Text>
+                <View style={{ maxHeight: 100 }}>
+                  <ScrollView nestedScrollEnabled>
+                    <Text style={{ fontSize: 15, marginTop: 10 }}>
+                      {infomation?.agreement}
+                    </Text>
+                  </ScrollView>
+                </View>
+              </View>
+            }
+            <View style={{ flexDirection: "row" }}>
+              <CheckBox
+                style={[styles.termsCheckBox, { flex: 1, marginRight: 18 }]}
+                checked={terms}
+                onChange={() => setTerms(!terms)}
+              >
+                {""}
+              </CheckBox>
+              <View style={[styles.termsCheckBox, { flex: 15 }]}>
+                <Text>By checking the box, you agree to all of the above</Text>
+              </View>
+            </View>
+            <View
+              style={[
+                styles.buttonText,
+                { backgroundColor: terms ? Colors.primary : Colors.gray },
+              ]}
+            >
+              <LinearGradientButton
                 style={{
-                  textAlign: "center",
-                  color: "#606060",
-                  fontSize: 18,
+                  borderRadius: 25,
+                  flex: 1,
+                }}
+                appearance="ghost"
+                size="medium"
+                disabled={!terms}
+                status="control"
+                onPress={() => {
+                  fromParent ? parentApproval() : instructorApproval();
                 }}
               >
-                You have opted to approve
-              </Text>
+                Confirm
+              </LinearGradientButton>
+            </View>
+            <View style={styles.buttonText}>
+              <LinearGradientButton
+                style={{
+                  borderRadius: 25,
+                  flex: 1,
+                }}
+                appearance="ghost"
+                size="medium"
+                status="control"
+                onPress={() => {
+                  dispatch(
+                    ChangeModalState.action({
+                      approveActivityModalVisibility: false,
+                    })
+                  );
+                  onClose();
+                  setSelectedChild();
+                  // setActivity(null);
+                }}
+              >
+                Cancel
+              </LinearGradientButton>
             </View>
           </View>
-          <View style={{ marginTop: 20, paddingHorizontal: 10 }}>
-            <Text style={{ fontWeight: "600", fontSize: 16 }}>
-              Instructions
-            </Text>
-            <View style={{ maxHeight: 100 }}>
-              <ScrollView nestedScrollEnabled>
-                <Text style={{ fontSize: 15, marginTop: 10 }}>
-                  {infomation?.instructions}
-                </Text>
-              </ScrollView>
-            </View>
-            <Text style={{ fontWeight: "600", fontSize: 16, marginTop: 20 }}>
-              Disclaimer
-            </Text>
-            <View style={{ maxHeight: 100 }}>
-              <ScrollView nestedScrollEnabled>
-                <Text style={{ fontSize: 15, marginTop: 10 }}>
-                  {infomation?.disclaimer}
-                </Text>
-              </ScrollView>
-            </View>
-            <Text style={{ fontWeight: "600", fontSize: 16, marginTop: 20 }}>
-              Agreement
-            </Text>
-            <View style={{ maxHeight: 100 }}>
-              <ScrollView nestedScrollEnabled>
-                <Text style={{ fontSize: 15, marginTop: 10 }}>
-                  {infomation?.agreement}
-                </Text>
-              </ScrollView>
-            </View>
-          </View>
-          <View style={{ flexDirection: "row" }}>
-            <CheckBox
-              style={[styles.termsCheckBox, { flex: 1, marginRight: 18 }]}
-              checked={terms}
-              onChange={() => setTerms(!terms)}
-            >
-              {""}
-            </CheckBox>
-            <View style={[styles.termsCheckBox, { flex: 15 }]}>
-              <Text>By checking the box, you agree to all of the above</Text>
-            </View>
-          </View>
-          <View
-            style={[
-              styles.buttonText,
-              { backgroundColor: terms ? Colors.primary : Colors.gray },
-            ]}
-          >
-            <LinearGradientButton
-              style={{
-                borderRadius: 25,
-                flex: 1,
-              }}
-              appearance="ghost"
-              size="medium"
-              disabled={!terms}
-              status="control"
-              onPress={() => {
-                fromParent ? parentApproval() : instructorApproval();
-              }}
-            >
-              Confirm
-            </LinearGradientButton>
-          </View>
-          <View style={styles.buttonText}>
-            <LinearGradientButton
-              style={{
-                borderRadius: 25,
-                flex: 1,
-              }}
-              appearance="ghost"
-              size="medium"
-              status="control"
-              onPress={() => {
-                dispatch(
-                  ChangeModalState.action({
-                    approveActivityModalVisibility: false,
-                  })
-                );
-                setActivity(null);
-              }}
-            >
-              Cancel
-            </LinearGradientButton>
-          </View>
-        </View>
-      </Card>
+        </Card>
+      )}
     </Modal>
   );
 };

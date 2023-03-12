@@ -104,12 +104,12 @@ const PreviewInstructorsModal = ({
                         justifyContent: "space-between",
                       }}
                     >
-                      <View style={{ width: "50%" }}>
+                      <View style={{ width: "30%" }}>
                         <Text
                           style={{ fontSize: 14 }}
                         >{`${item?.firstName} ${item?.lastName}`}</Text>
                       </View>
-                      <View style={{ width: "35%" }}>
+                      <View style={{ width: "55%" }}>
                         <Text style={{ fontSize: 14 }}>{`${item?.email}`}</Text>
                       </View>
                       <View
@@ -120,7 +120,7 @@ const PreviewInstructorsModal = ({
                           justifyContent: "space-evenly",
                         }}
                       >
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                           onPress={() => handleEdit(item, index)}
                         >
                           <Feather
@@ -128,7 +128,7 @@ const PreviewInstructorsModal = ({
                             color={Colors.primary}
                             size={20}
                           />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <TouchableOpacity onPress={() => handleDelete(index)}>
                           <AntDesign
                             name="delete"
@@ -160,10 +160,17 @@ const PreviewInstructorsModal = ({
                       ChangeModalState.action({
                         addInstructorModalVisibility: false,
                         previewInstructorModalVisibility: false,
-
-                        addButInformationModalVisibility: true,
                       })
                     );
+                    setTimeout(() => {
+                      dispatch(
+                        ChangeModalState.action({
+                          addButInformationModalVisibility: true,
+                          // addInstructorModalVisibility: false,
+                          // previewInstructorModalVisibility: false,
+                        })
+                      );
+                    }, 200);
                   }}
                 >
                   <Text style={styles.button}>Add Bus Information</Text>

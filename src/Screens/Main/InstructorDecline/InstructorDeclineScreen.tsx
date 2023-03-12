@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { Text } from "@ui-kitten/components";
+import { Text, Icon } from "@ui-kitten/components";
 
 import {
   StyleSheet,
@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { useDispatch } from "react-redux";
+
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Colors from "@/Theme/Colors";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -20,14 +20,20 @@ import {
   GetAllActivity,
   GetActivitiesByInsructorId,
 } from "@/Services/Activity";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { ApproveActivityModal } from "@/Modals";
 import { GetGroupByInstructorId } from "@/Services/Group";
 import { loadUserId } from "@/Storage/MainAppStorage";
+import { useSelector, useDispatch } from "react-redux";
 const InstructorGroupPendingScreen = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
+  const [activity, setActivity] = useState(null);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [activities, setActivities] = useState([]);
+  const [declineActivity, setDeclineActivity] = useState(null);
   const [selectedInstructions, setSelectedInstructions] = useState(null);
   const [groups, setGroups] = useState([]);
   const [pageActivity, pageNumberActivity] = useState(0);
@@ -36,6 +42,15 @@ const InstructorGroupPendingScreen = ({ route }) => {
   const [pageGroup, pageNumberGroup] = useState(0);
   const [pageSizeGroup, setPageSizeGroup] = useState(10);
   const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
+  const isVisible = useSelector(
+    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
+  );
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const approveActivityModalVisibility = useSelector(
+    (state: { modal: any }) => state.modal.approveActivityModalVisibility
+  );
+  let prevOpenedRow: any;
+  let row: Array<any> = [];
   const getActivities = async (refreshing: any) => {
     if (refreshing) {
       setRefreshing(true);
@@ -117,6 +132,60 @@ const InstructorGroupPendingScreen = ({ route }) => {
         console.log("getActivities Error:", err);
       });
   };
+  const closeRow = (index) => {
+    if (prevOpenedRow && prevOpenedRow !== row[index]) {
+      prevOpenedRow.close();
+    }
+    prevOpenedRow = row[index];
+  };
+  const RightActions = (dragX: any, item: any) => {
+    const scale = dragX.interpolate({
+      inputRange: [-100, 0],
+      outputRange: [1, 0],
+      extrapolate: "clamp",
+    });
+    return (
+      <View
+        style={{
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {item.status && (
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onPress={() => {
+                setActivity(item);
+                setShowAcceptModal(true);
+                // closeRow();
+              }}
+            >
+              <AntDesign size={30} name="like1" color={Colors.primary} />
+            </TouchableOpacity>
+          </View>
+        )}
+        {!item.status && (
+          <Icon
+            style={{ width: 30, height: 30 }}
+            fill={Colors.primary}
+            name="trash"
+          />
+        )}
+      </View>
+    );
+  };
 
   useEffect(() => {
     // Alert.alert("kk");
@@ -125,137 +194,211 @@ const InstructorGroupPendingScreen = ({ route }) => {
       getGroup();
     }
   }, [isFocused]);
-
+  // useEffect(() => {
+  //   if (activity) {
+  //     dispatch(
+  //       ChangeModalState.action({
+  //         approveActivityModalVisibility: true,
+  //       })
+  //     );
+  //   }
+  // }, [activity]);
+  console.log("activity000", activity);
   return (
     <>
       <View style={styles.layout}>
-        <InstructionsModal
-          selectedInstructions={selectedInstructions}
-          setSelectedInstructions={setSelectedInstructions}
-          activity={selectedInstructions}
-        />
-        <View style={{ flex: 1 }}>
-          <FlatList
-            data={(activities && activities) || []}
-            style={{ padding: 10, width: "100%", marginTop: 10 }}
-            keyExtractor={(item, index) => index}
-            renderItem={({ item, index }) => {
-              let date = item?.date || "date";
-              return (
-                <>
-                  <TouchableOpacity
-                    onPress={() => {
-                      // navigation.navigate('InstructorGroupApproval')
-                    }}
-                    style={[
-                      styles.item,
-                      {
-                        backgroundColor: !item?.status
-                          ? "#fff"
-                          : index % 3 === 0
-                          ? "lightgreen"
-                          : index % 2 === 0
-                          ? "#F6DDCC"
-                          : "#fff",
-                      },
-                    ]}
-                  >
-                    <Text style={styles.text}>{`Date: ${date} `}</Text>
-                    <Text style={styles.text}>{`Time: ${date}`}</Text>
-                    <Text style={styles.text}>{`${
-                      item?.activityType?.toLowerCase() === "activity"
-                        ? "Activity"
-                        : "Trip"
-                    }: ${item?.activityName}`}</Text>
-                    <Text
-                      style={styles.text}
-                    >{`Where: ${item?.venueFromName}`}</Text>
-                    <Text
-                      style={styles.text}
-                    >{`Address: ${item?.venueFromAddress}`}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      dispatch(
-                        ChangeModalState.action({
-                          instructionsModalVisibility: true,
-                        })
-                      );
-                      setSelectedInstructions(item);
-                    }}
-                    style={[
-                      styles.footer,
-                      {
-                        backgroundColor: !item?.status
-                          ? "#fff"
-                          : index % 3 === 0
-                          ? "lightgreen"
-                          : index % 2 === 0
-                          ? "#F6DDCC"
-                          : "#fff",
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={styles.text}
-                    >{`Instructions / Disclaimer / Agreement`}</Text>
-                  </TouchableOpacity>
-                </>
-              );
-            }}
-            onEndReached={async () => {
-              if (totalRecordsActivity > activities.length) {
-                console.log("logs");
+        {isVisible && selectedInstructions && (
+          <InstructionsModal
+            selectedInstructions={selectedInstructions}
+            setSelectedInstructions={setSelectedInstructions}
+            activity={selectedInstructions}
+          />
+        )}
+        {showAcceptModal && (
+          <ApproveActivityModal
+            fromParent={false}
+            visible={showAcceptModal}
+            selectedChild={{}}
+            setSelectedChild={() => setActivity(null)}
+            onClose={() => setShowAcceptModal(false)}
+            activity={activity}
+            setActivity={(id) => {
+              if (activity?.activityId) {
+                console.log("declinedactivity", activity);
+                closeRow();
+                console.log("activites", activities);
+                let filter = activities?.filter(
+                  (item) => item?.activityId != id
+                );
 
-                getActivities(true);
+                setActivities(filter);
+              } else {
+                let filter = groups?.filter((item) => item?.groupId != id);
+                setGroups(filter);
               }
             }}
-            refreshing={false}
-            onRefresh={() => null}
           />
+        )}
 
-          <FlatList
-            data={groups}
-            keyExtractor={(item, index) => index}
-            style={{ padding: 10, width: "100%" }}
-            renderItem={({ item, index }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  // navigation.navigate('InstructorGroupApproval')
-                }}
-              >
-                <View style={[styles.item, { backgroundColor: "#fff" }]}>
-                  <Text
-                    style={styles.text}
-                  >{`Group Name: ${item?.groupName}`}</Text>
-                  <Text style={styles.text}>{`Status: ${
-                    item?.status ? "Active" : "Inactive"
-                  }`}</Text>
-                  {/* <Text style={styles.text}>{`${
+        {/* {approveActivityModalVisibility && (
+          <ApproveActivityModal
+            fromParent={false}
+            selectedChild={{}}
+            setSelectedChild={() => null}
+            activity={activity}
+            setActivity={(id) => {
+              if (activity?.activityId) {
+                console.log("declinedactivity", activity);
+
+                console.log("activites", activities);
+                let filter = activities?.filter(
+                  (item) => item?.activityId != id
+                );
+
+                setActivities(filter);
+              } else {
+                let filter = groups?.filter((item) => item?.groupId != id);
+                setGroups(filter);
+              }
+            }}
+          />
+        )} */}
+        <View style={{ flex: 1 }}>
+          {isFocused && (
+            <FlatList
+              data={[...activities, ...groups]}
+              style={{ padding: 10, width: "100%", marginTop: 10 }}
+              keyExtractor={(item, index) => index}
+              renderItem={({ item, index }) => {
+                if (item?.activityId) {
+                  let date = item?.date || "date";
+                  return (
+                    <Swipeable
+                      // ref={swipeableRef}
+                      key={item?.activityId}
+                      ref={(ref) => (row[item?.activityId] = ref)}
+                      onSwipeableOpen={() => closeRow(item?.activityId)}
+                      renderRightActions={(e) => RightActions(e, item)}
+                    >
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => {
+                          // navigation.navigate('InstructorGroupApproval')
+                        }}
+                        style={[
+                          styles.item,
+                          {
+                            backgroundColor: !item?.status
+                              ? "#fff"
+                              : index % 3 === 0
+                              ? "lightgreen"
+                              : index % 2 === 0
+                              ? "#F6DDCC"
+                              : "#fff",
+                          },
+                        ]}
+                      >
+                        <Text style={styles.text}>{`Date: ${date} `}</Text>
+                        <Text style={styles.text}>{`Time: ${date}`}</Text>
+                        <Text style={styles.text}>{`${
+                          item?.activityType?.toLowerCase() === "activity"
+                            ? "Activity"
+                            : "Trip"
+                        }: ${item?.activityName}`}</Text>
+                        <Text
+                          style={styles.text}
+                        >{`Where: ${item?.venueFromName}`}</Text>
+                        <Text
+                          style={styles.text}
+                        >{`Address: ${item?.venueFromAddress}`}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          dispatch(
+                            ChangeModalState.action({
+                              instructionsModalVisibility: true,
+                            })
+                          );
+                          setSelectedInstructions(item);
+                        }}
+                        style={[
+                          styles.footer,
+                          {
+                            backgroundColor: !item?.status
+                              ? "#fff"
+                              : index % 3 === 0
+                              ? "lightgreen"
+                              : index % 2 === 0
+                              ? "#F6DDCC"
+                              : "#fff",
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={styles.text}
+                        >{`Instructions / Disclaimer / Agreement`}</Text>
+                      </TouchableOpacity>
+                    </Swipeable>
+                  );
+                } else {
+                  return (
+                    <Swipeable
+                      // ref={swipeableRef}
+                      key={item?.groupId}
+                      ref={(ref) => (row[item?.groupId] = ref)}
+                      onSwipeableOpen={() => closeRow(item?.groupId)}
+                      renderRightActions={(e) => RightActions(e, item)}
+                    >
+                      <TouchableOpacity
+                        key={item?.groupId}
+                        onPress={() => {
+                          // navigation.navigate('InstructorGroupApproval')
+                        }}
+                      >
+                        <View
+                          style={[styles.item, { backgroundColor: "#fff" }]}
+                        >
+                          <Text
+                            style={styles.text}
+                          >{`Group Name: ${item?.groupName}`}</Text>
+                          <Text style={styles.text}>{`Status: ${
+                            item?.status ? "Active" : "Inactive"
+                          }`}</Text>
+                          {/* <Text style={styles.text}>{`${
                     item?.students && item?.students?.length
                   } Students`}</Text>
                   <Text style={styles.text}>{`Instructors: ${
                     (item?.instructors && item?.instructors?.length) || 0
                   }`}</Text> */}
-                </View>
-                <TouchableOpacity
-                  onPress={() => setSelectedInstructions(item?.optin)}
-                  style={[styles.footer, { backgroundColor: "#fff" }]}
-                >
-                  <Text
-                    style={styles.text}
-                  >{`Instructions / Disclaimer / Agreement`}</Text>
-                </TouchableOpacity>
-              </TouchableOpacity>
-            )}
-            onEndReached={async () => {
-              if (totalRecordsGroup > groups.length) {
-                getGroup(true);
-              }
-            }}
-            refreshing={false}
-            onRefresh={() => null}
-          />
+                        </View>
+                        <TouchableOpacity
+                          onPress={() => setSelectedInstructions(item?.optin)}
+                          style={[styles.footer, { backgroundColor: "#fff" }]}
+                        >
+                          <Text
+                            style={styles.text}
+                          >{`Instructions / Disclaimer / Agreement`}</Text>
+                        </TouchableOpacity>
+                      </TouchableOpacity>
+                    </Swipeable>
+                  );
+                }
+              }}
+              onEndReached={async () => {
+                if (totalRecordsActivity > activities.length) {
+                  console.log("logs");
+
+                  getActivities(true);
+                }
+                if (totalRecordsGroup > groups.length) {
+                  getGroup(true);
+                }
+              }}
+              refreshing={false}
+              onRefresh={() => null}
+            />
+          )}
+
           {refreshing && (
             <ActivityIndicator size="large" color={Colors.primary} />
           )}

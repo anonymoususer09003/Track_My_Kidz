@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { Text, Icon } from "@ui-kitten/components";
+import { useIsFocused } from "@react-navigation/native";
 import { StyleSheet, View, FlatList, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
@@ -15,6 +16,7 @@ import { useStateValue } from "@/Context/state/State";
 import moment from "moment";
 
 const ActivityScreen = ({ route }) => {
+  const isFocused = useIsFocused();
   const navigation = useNavigation();
   const dependent = route && route.params && route.params.dependent;
   const [{ selectedDependentActivity, child }] = useStateValue();
@@ -66,9 +68,10 @@ const ActivityScreen = ({ route }) => {
       });
   };
   useEffect(() => {
-    getActivities();
-    dispatch(ChangeModalState.action({ instructionsModalVisibility: true }));
-  }, [child]);
+    if (isFocused) {
+      getActivities();
+    }
+  }, [child, isFocused]);
 
   return (
     <>

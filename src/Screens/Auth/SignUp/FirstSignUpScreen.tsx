@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -19,6 +19,7 @@ import {
   CheckBox,
 } from "@ui-kitten/components";
 import { Formik } from "formik";
+import { useIsFocused } from "@react-navigation/native";
 import * as yup from "yup";
 import { StartRegistration } from "@//Services/SignUpServices";
 import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
@@ -50,6 +51,9 @@ const screenHeight = Dimensions.get("screen").height;
 const FirstSignUpScreen = ({ navigation }) => {
   const styles = useStyleSheet(themedStyles);
   const dispatch = useDispatch();
+  const isFocuesed = useIsFocused();
+  let values = { email: "", user_type: "" };
+  const [initialValues, setInitialValues] = useState({ ...values });
   const [showQR, setShowQR] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState("");
   const [isDesignatedAdmin, setIsDesignatedAdmin] = useState(false);
@@ -91,6 +95,16 @@ const FirstSignUpScreen = ({ navigation }) => {
         dispatch(ChangeModalState.action({ loading: false }));
       });
   };
+  useEffect(() => {
+    // return () => setInitialValues(intitialValues);
+    if (!isFocuesed) {
+      setInitialValues(values);
+    }
+    // dispatch(FetchCountries.action());
+    // console.log("alert");
+    // Alert.alert("kk");
+    // MainNavigator = null;
+  }, [isFocuesed]);
   return (
     <KeyboardAvoidingView style={styles.container}>
       {!showQR ? (
@@ -114,7 +128,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                 ? activationCodeValidationSchema
                 : emailValidationSchema
             }
-            initialValues={{ email: "", user_type: "" }}
+            initialValues={initialValues}
             validateOnMount={true}
             onSubmit={(values, { resetForm }) => {
               // navigation && navigation.navigate('EmailConfirmation', { emailAddress: values.email, user_type: values.user_type, activation_code: '' })
@@ -206,6 +220,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                     dispatch(ChangeModalState.action({ loading: false }));
                   });
               }
+              resetForm();
             }}
           >
             {({

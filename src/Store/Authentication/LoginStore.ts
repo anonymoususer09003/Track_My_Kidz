@@ -11,6 +11,7 @@ import {
   storeId,
   storeIsSubscribed,
 } from "@/Storage/MainAppStorage";
+import BackgroundService from "react-native-background-actions";
 import ChangeStartUpState from "@/Store/Startup/ChangeStartUpState";
 import ChangeUserState from "@/Store/User/FetchOne";
 import ChangeLoginState from "@/Store/Authentication/ChangeLoginState";
@@ -48,6 +49,10 @@ export default {
 
       let res = await fetchOneUserService();
       console.log("res", res);
+      // if (!res?.childTrackHistory) {
+      //   // await BackgroundService.stop();
+      // }
+      // await BackgroundService.stop();
       await dispatch(
         ChangeUserState.action({
           item: res,

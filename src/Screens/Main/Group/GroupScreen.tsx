@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { Text, Icon } from "@ui-kitten/components";
 import {
   StyleSheet,
@@ -15,6 +15,12 @@ import Colors from "@/Theme/Colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { LinearGradientButton } from "@/Components";
 import { InstructionsModal } from "@/Modals";
+import { useStateValue } from "@/Context/state/State";
+import {
+  DeleteGroup,
+  GetAllGroup,
+  GetGroupByStudentId,
+} from "@/Services/Group";
 const children = [
   {
     id: 1,
@@ -34,15 +40,32 @@ const children = [
 
 const GroupScreen = ({ route }) => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+  const [selectedInstructions, setSelectedInstructions] = useState(null);
   const dependent = route && route.params && route.params.dependent;
   const swipeableRef = useRef(null);
   const dispatch = useDispatch();
+  const [{ selectedDependentActivity, child }] = useStateValue();
   const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
   const [loading, setLoading] = useState(true);
   const [thumbnail, setThumbnail] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [selectedDependent, setSelectedDependent] = useState(null);
-
+  const [groups, setGroups] = useState([]);
+  const getGroups = async () => {
+    GetGroupByStudentId(child?.studentId)
+      .then((res) => {
+        setGroups(res);
+      })
+      .catch((err) => {
+        console.log("Error:", err);
+      });
+  };
+  useEffect(() => {
+    if (isFocused) {
+      getGroups();
+    }
+  }, [isFocused]);
   useEffect(() => {
     if (selectedDependent) {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
@@ -82,48 +105,54 @@ const GroupScreen = ({ route }) => {
       </View>
     );
   };
-
+  const isVisible = useSelector(
+    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
+  );
   return (
     <>
-      <InstructionsModal />
-      <View style={styles.layout}>
-        <FlatList
-          data={children}
-          style={{ padding: 10, width: "100%" }}
-          renderItem={({ item, index }) => (
-            <Swipeable
-              ref={swipeableRef}
-              renderRightActions={(e) => RightActions(e, item)}
-            >
-              <View style={[styles.item, { backgroundColor: "#fff" }]}>
-                <Text style={styles.text}>{`Group Name: ${item?.name}`}</Text>
-                <Text style={styles.text}>{`Status: ${
-                  item?.status ? "Active" : "Inactive"
-                }`}</Text>
-                <Text
-                  style={styles.text}
-                >{`Group Count: ${item?.students}`}</Text>
-                <Text
-                  style={styles.text}
-                >{`Instructors: ${item?.instructors}`}</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() =>
-                  dispatch(
-                    ChangeModalState.action({
-                      instructionsModalVisibility: true,
-                    })
-                  )
-                }
-                style={[styles.footer, { backgroundColor: "#fff" }]}
-              >
-                <Text
-                  style={styles.text}
-                >{`Instructions / Disclaimer / Agreement`}</Text>
-              </TouchableOpacity>
-            </Swipeable>
-          )}
+      {isVisible && (
+        <InstructionsModal
+          group={selectedInstructions}
+          selectedInstructions={selectedInstructions}
+          setSelectedInstructions={setSelectedInstructions}
         />
+      )}
+      <View style={styles.layout}>
+        {groups.length > 0 && (
+          <FlatList
+            data={groups}
+            style={{ padding: 10, width: "100%" }}
+            renderItem={({ item, index }) => (
+              <Swipeable
+                ref={swipeableRef}
+                renderRightActions={(e) => RightActions(e, item)}
+              >
+                <View style={[styles.item, { backgroundColor: "#fff" }]}>
+                  <Text
+                    style={styles.text}
+                  >{`Group Name: ${item?.groupName}`}</Text>
+                  <Text style={styles.text}>{`Status: ${
+                    item?.status ? "Active" : "Inactive"
+                  }`}</Text>
+                  <Text style={styles.text}>{`${
+                    item?.students && item?.students?.length
+                  } Students`}</Text>
+                  <Text style={styles.text}>{`Instructors: ${
+                    (item?.instructors && item?.instructors?.length) || 0
+                  }`}</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => setSelectedInstructions(item?.optin)}
+                  style={[styles.footer, { backgroundColor: "#fff" }]}
+                >
+                  <Text
+                    style={styles.text}
+                  >{`Instructions / Disclaimer / Agreement`}</Text>
+                </TouchableOpacity>
+              </Swipeable>
+            )}
+          />
+        )}
       </View>
     </>
   );

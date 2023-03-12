@@ -10,6 +10,7 @@ import {
   Toggle,
   Radio,
   RadioGroup,
+  CheckBox,
 } from "@ui-kitten/components";
 import Geocoder from "react-native-geocoding";
 import * as yup from "yup";
@@ -35,6 +36,8 @@ import { PlaceState } from "@/Store/Places";
 import { CountryDTO } from "@/Models/CountryDTOs";
 import { useIsFocused } from "@react-navigation/native";
 import { UserState } from "@/Store/User";
+import { PermissionsAndroid, Platform } from "react-native";
+import axios from "axios";
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -44,6 +47,7 @@ const filterStates = (item: string, query: string) => {
 const filterCities = (item: string, query: string) => {
   return item?.toLowerCase().includes(query.toLowerCase());
 };
+
 Geocoder.init("AIzaSyBBDJwlh5Mnc6Aa1l371eEOZ9G6Uc0ByWA");
 const DistanceAlerttModal = ({
   selectedDependent,
@@ -59,6 +63,7 @@ const DistanceAlerttModal = ({
   onSubmit: any;
 }) => {
   const isFocused = useIsFocused();
+  const [checkBox, setCheckBox] = useState(false);
   const [student, setStudent] = useState(null);
   const [schools, setSchools] = useState([]);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -107,7 +112,7 @@ const DistanceAlerttModal = ({
       })
       .catch((err) => {});
   };
-  const getCoordinates = ({
+  const getCoordinates = async ({
     address,
     selectedCity,
     selectedState,
@@ -130,24 +135,44 @@ const DistanceAlerttModal = ({
       selectedState +
       " " +
       selectedCountry;
-    let coordinates = Geocoder.from(location)
-      .then((json) => {
-        var location = json.results[0].geometry.location;
-        console.log("location------------------------------", location);
-        onSubmit({
-          address,
-          selectedCity,
-          selectedState,
-          selectedCountry,
-          distanceinkm,
-          location,
-          student,
-          distance,
-        });
+    let res = await axios.get(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${location}&key=AIzaSyBBDJwlh5Mnc6Aa1l371eEOZ9G6Uc0ByWA`
+    );
+    console.log("res", res.data.results[0].geometry.location);
+    let coord = res.data.results[0].geometry.location;
+    onSubmit({
+      address,
+      selectedCity,
+      selectedState,
+      selectedCountry,
+      distanceinkm,
+      location: {
+        latitude: coord.lat,
+        longitude: coord.lng,
+      },
+      student,
+      distance,
+    });
 
-        return location;
-      })
-      .catch((error) => console.warn(error));
+    return location;
+    // let coordinates = Geocoder.from(location)
+    //   .then((json) => {
+    //     var location = json.results[0].geometry.location;
+    //     console.log("location------------------------------", location);
+    //     onSubmit({
+    //       address,
+    //       selectedCity,
+    //       selectedState,
+    //       selectedCountry,
+    //       distanceinkm,
+    //       location,
+    //       student,
+    //       distance,
+    //     });
+
+    //     return location;
+    // })
+    // .catch((error) => console.warn(error));
   };
   useEffect(() => {
     // getCoordinates("ajja");
@@ -212,8 +237,19 @@ const DistanceAlerttModal = ({
               distanceinkm: false,
             }}
             onSubmit={async (values, { resetForm }) => {
+              // if (Platform.OS === "android") {
+              //   const granted = await PermissionsAndroid.request(
+              //     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+              //   );
+              //   // const granted = await PermissionsAndroid.request(
+              //   //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+              //   // );
+              //   if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+              //     let coordinates = getCoordinates(values);
+              //   }
+              // }
               let coordinates = getCoordinates(values);
-              console.log("coordinates", coordinates);
+              // console.log("coordinates", coordinates);
             }}
           >
             {({
@@ -228,6 +264,56 @@ const DistanceAlerttModal = ({
             }) => (
               <>
                 <View style={{ marginTop: 30, padding: 20 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text style={{ marginRight: 20, marginTop: 10 }}>
+                      Use my address
+                    </Text>
+                    <CheckBox
+                      style={[{ flex: 1, marginTop: 13 }]}
+                      checked={checkBox}
+                      onChange={(checked) => {
+                        if (checked) {
+                          setCheckBox(checked);
+                          setFieldValue("address", currentUser?.address || "");
+                          setFieldValue("country", currentUser?.country || "");
+                          setFieldValue(
+                            "selectedCountry",
+                            currentUser?.country || ""
+                          );
+                          setFieldValue("state", currentUser?.state || "");
+                          setFieldValue(
+                            "selectedState",
+                            currentUser?.state || ""
+                          );
+                          setFieldValue("city", currentUser?.city || "");
+                          setFieldValue(
+                            "selectedCity",
+                            currentUser?.city || ""
+                          );
+                        } else {
+                          setCheckBox(checked);
+                          setFieldValue("address", "");
+                          setFieldValue("country", "");
+                          setFieldValue("selectedCountry", "");
+                          setFieldValue("selectedCity", "");
+                          setFieldValue("selectedState", "");
+                          setFieldValue("state", "");
+                          setFieldValue("city", "");
+                        }
+                        // if (checked) {
+                        //   Alert.alert(checked);
+                        // } else {
+                        //   Alert.alert(checked);
+                        // }
+                      }}
+                    ></CheckBox>
+                  </View>
                   <Input
                     style={styles.inputSettings}
                     autoCapitalize="none"

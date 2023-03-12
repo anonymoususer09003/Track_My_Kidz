@@ -233,7 +233,7 @@ const StudentLocationScreen = () => {
             }}
             style={{ width: "100%", height: "100%" }}
           >
-            <View style={{ flex: 1 }}>
+            <>
               {true && (
                 <Circle
                   center={{
@@ -262,7 +262,7 @@ const StudentLocationScreen = () => {
                   <Fontisto name="map-marker-alt" size={25} color="red" />
                 </View>
               </Marker>
-            </View>
+            </>
           </MapView>
         )}
       </View>

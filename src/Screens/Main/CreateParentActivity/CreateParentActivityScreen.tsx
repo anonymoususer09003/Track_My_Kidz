@@ -10,9 +10,11 @@ import {
   SelectItem,
   Datepicker,
   CheckBox,
+  Autocomplete,
+  AutocompleteItem,
 } from "@ui-kitten/components";
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Colors from "@/Theme/Colors";
 import { AddIndividialMembersModal, GroupSelectionModal } from "@/Modals";
 import { Formik } from "formik";
@@ -22,6 +24,7 @@ import { CreateActivity } from "@/Services/Activity";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import moment from "moment";
 import { GetAllStudents } from "@/Services/Student";
+import { useIsFocused } from "@react-navigation/native";
 
 const _days = [
   {
@@ -60,9 +63,21 @@ const _days = [
     selected: false,
   },
 ];
+const filterCountries = (item: CountryDTO, query: string) => {
+  return item.name.toLowerCase().includes(query.toLowerCase());
+};
+const filterStates = (item: string, query: string) => {
+  return item?.toLowerCase().includes(query.toLowerCase());
+};
+const filterCities = (item: string, query: string) => {
+  return item?.toLowerCase().includes(query.toLowerCase());
+};
 
 const CreateParentActivityScreen = ({ route }) => {
+  const isFocused = useIsFocused();
   const navigation = useNavigation();
+  const currentUser = useSelector((state) => state.user.item);
+  console.log("current User", currentUser);
   const dispatch = useDispatch();
   const [days, setDays] = useState(_days);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -72,10 +87,55 @@ const CreateParentActivityScreen = ({ route }) => {
   const [groups, setGroups] = useState([]);
   const [students, setStudents] = useState([]);
   const [studentsData, setStudentsData] = useState([]);
+  const countries = useSelector(
+    (state: { places: PlaceState }) => state.places.countries
+  );
+  const [statesData, setStatesData] = React.useState<Array<any>>([]);
+  const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
+  const [countriesData, setCountriesData] = React.useState(countries);
+  const [states, setStates] = useState<Array<any>>([]);
+  const [cities, setCities] = useState<Array<any>>([]);
   const [selectedStudentIndexNew, setSelectedStudentIndex] = useState([]);
-  const states = [];
-  let selectedStudentIndex: any[] = [];
+  const timeStamp = [
+    "7:00 AM",
+    "7:30 AM",
+    "8:00 AM",
+    "8:30 AM",
+    "9:00 AM",
+    "9:30 AM",
+    "10:00 AM",
+    "10:30 AM",
+    "11:00 AM",
+    "11:30 AM",
+    "01:00 PM",
+    "01:30 PM",
+    "02:00 PM",
+    "02:30 PM",
+    "03:00 PM",
+    "03:30 PM",
+    "04:00 PM",
+    "04:30 PM",
+    "05:00 PM",
+    "05:30 PM",
+    "06:00 PM",
+    "06:30 PM",
+    "07:00 PM",
+    "07:30 PM",
+    "08:00 PM",
+    "08:30 PM",
+    "09:00 PM",
+    "09:30 PM",
+    "10:00 PM",
+    "10:30 PM",
+    "11:00 PM",
+    "11:30 PM",
+    "12:00 AM",
+    "12:30 AM",
+  ];
 
+  let selectedStudentIndex: any[] = [];
+  const [fromCheckBox, setFromCheckBox] = useState(false);
+  const [toCheckBox, setToCheckBox] = useState(false);
   const handleRemoveStudent = (item) => {
     let data = [...students];
     data = data.filter((d) => d.parent1_email !== item.parent1_email);
@@ -99,9 +159,16 @@ const CreateParentActivityScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    handleGetStudents();
-  }, []);
+    if (isFocused) {
+      handleGetStudents();
+    } else {
+      setToCheckBox(false);
+      setFromCheckBox(false);
+      setSelectedIndex(0);
+    }
+  }, [isFocused]);
 
+  console.log("currentUser29992929292929", currentUser);
   return (
     <>
       <GroupSelectionModal individuals={groups} setIndividuals={setGroups} />
@@ -109,18 +176,8 @@ const CreateParentActivityScreen = ({ route }) => {
         individuals={students}
         setIndividuals={setStudents}
       />
-      <AppHeader title="Create Activity" />
+      <AppHeader hideCalendar={true} title="Create Event" />
       <ScrollView style={styles.layout}>
-        <Text
-          textBreakStrategy={"highQuality"}
-          style={{
-            textAlign: "center",
-            color: "#606060",
-            fontSize: 18,
-          }}
-        >
-          Create a name for your Activity
-        </Text>
         <Formik
           validateOnMount={true}
           initialValues={{
@@ -151,6 +208,7 @@ const CreateParentActivityScreen = ({ route }) => {
             startingFrom: "",
             startingTo: "",
             students: "",
+            noEnd: false,
           }}
           onSubmit={async (values, { resetForm }) => {
             const fromTime =
@@ -210,7 +268,7 @@ const CreateParentActivityScreen = ({ route }) => {
                 id: 0,
                 recurrence: timeSelectedIndex === 2 ? 1 : 0,
                 fromDate: unixFrom,
-                toDate: unixTo,
+                toDate: values.noEnd ? "9999-12-31T12:00.000Z" : unixTo,
                 days:
                   timeSelectedIndex === 2
                     ? days.map((d) => (d.selected ? 1 : 0)).join("")
@@ -240,7 +298,10 @@ const CreateParentActivityScreen = ({ route }) => {
                 setGroups([]);
                 setStudents([]);
                 setAskPermission(false);
-                navigation.navigate("InstructorActivity");
+                setToCheckBox(false);
+                setFromCheckBox(false);
+                setSelectedIndex(0);
+                navigation.goBack();
               })
               .catch((err) => {
                 Toast.show({
@@ -262,7 +323,7 @@ const CreateParentActivityScreen = ({ route }) => {
               <View style={styles.formContainer}>
                 <Input
                   style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                  placeholder="Schedule name*"
+                  placeholder="Event Name*"
                   onChangeText={handleChange("name")}
                   value={values.name}
                 />
@@ -285,7 +346,11 @@ const CreateParentActivityScreen = ({ route }) => {
                       alignItems: "center",
                       width: "50%",
                     }}
-                    onChange={(index) => setSelectedIndex(index)}
+                    onChange={(index) => {
+                      setSelectedIndex(index);
+                      setToCheckBox(false);
+                      setFromCheckBox(false);
+                    }}
                   >
                     <Radio style={{ flexDirection: "row", width: "50%" }}>
                       {(evaProps) => (
@@ -347,7 +412,7 @@ const CreateParentActivityScreen = ({ route }) => {
                     <Divider />
                   </RadioGroup>
                 </View>
-                {timeSelectedIndex !== 2 && (
+                {/* {timeSelectedIndex !== 2 && (
                   <>
                     <View
                       style={{
@@ -400,42 +465,215 @@ const CreateParentActivityScreen = ({ route }) => {
                       />
                     </View>
                   </>
-                )}
-                {timeSelectedIndex === 2 && (
+                )} */}
+
+                {timeSelectedIndex !== 2 && (
                   <>
-                    <Datepicker
-                      min={new Date(1900, 0, 0)}
-                      style={[styles.selectSettings, { width: "90%" }]}
-                      label="Starting*"
-                      placeholder="Starting"
-                      date={values.from}
-                      onSelect={(date: Date | null) => {
-                        setFieldValue("from", date);
-                      }}
-                    />
                     <View
                       style={{
                         flexDirection: "row",
                         alignItems: "center",
+                        justifyContent: "space-between",
                         width: "90%",
-                        marginTop: 10,
                       }}
                     >
-                      <Text>From</Text>
-                      <Input
-                        placeholder="00:00 AM"
-                        onChangeText={handleChange("toTime")}
-                        value={values.startingFrom}
-                        style={{ marginLeft: 10 }}
+                      <Datepicker
+                        min={new Date(1900, 0, 0)}
+                        style={[styles.selectSettings, { width: "60%" }]}
+                        label="From*"
+                        placeholder="From"
+                        date={values.from}
+                        onSelect={(date: Date | null) => {
+                          setFieldValue("from", date);
+                          setFieldValue("to", date);
+                        }}
                       />
-                      <Text style={{ marginLeft: 10 }}>To</Text>
-                      <Input
-                        placeholder="00:00 AM"
-                        onChangeText={handleChange("startingTo")}
-                        value={values.startingTo}
-                        style={{ marginLeft: 10 }}
-                      />
+                      <Select
+                        value={values.fromTime}
+                        style={{ marginTop: 5, marginLeft: 5, width: "45%" }}
+                        placeholder="From"
+                        onSelect={(index: any) => {
+                          setFieldValue("fromTime", timeStamp[index.row]);
+                        }}
+                        label={(evaProps: any) => <Text {...evaProps}></Text>}
+                      >
+                        {timeStamp &&
+                          timeStamp.length > 0 &&
+                          timeStamp.map((_timeStamp, index) => {
+                            return (
+                              <SelectItem
+                                key={index}
+                                title={_timeStamp || ""}
+                              />
+                            );
+                          })}
+                      </Select>
                     </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        width: "90%",
+                      }}
+                    >
+                      <Datepicker
+                        min={new Date(1900, 0, 0)}
+                        style={[styles.selectSettings, { width: "60%" }]}
+                        label="To*"
+                        placeholder="To"
+                        date={values.to}
+                        onSelect={(date: Date | null) => {
+                          setFieldValue("to", date);
+                        }}
+                      />
+                      {/* {console.log("values", values.toTime)} */}
+                      <Select
+                        value={values.toTime}
+                        style={{ marginTop: 5, marginLeft: 5, width: "45%" }}
+                        placeholder="To"
+                        onSelect={(index: any) => {
+                          setFieldValue("toTime", timeStamp[index.row]);
+                        }}
+                        label={(evaProps: any) => <Text {...evaProps}></Text>}
+                      >
+                        {timeStamp &&
+                          timeStamp.length > 0 &&
+                          timeStamp.map((_timeStamp, index) => {
+                            return (
+                              <SelectItem
+                                key={index}
+                                title={_timeStamp || ""}
+                              />
+                            );
+                          })}
+                      </Select>
+                    </View>
+                  </>
+                )}
+                {timeSelectedIndex === 2 && (
+                  <>
+                    <>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          width: "90%",
+                        }}
+                      >
+                        <Datepicker
+                          min={new Date(1900, 0, 0)}
+                          style={[styles.selectSettings, { width: "60%" }]}
+                          label="From*"
+                          placeholder="From"
+                          date={values.from}
+                          onSelect={(date: Date | null) => {
+                            setFieldValue("from", date);
+                            setFieldValue("to", date);
+                          }}
+                        />
+                        <Select
+                          value={values.fromTime}
+                          style={{
+                            marginTop: 5,
+                            marginLeft: 5,
+                            width: "45%",
+                          }}
+                          placeholder="From"
+                          onSelect={(index: any) => {
+                            setFieldValue("fromTime", timeStamp[index.row]);
+                          }}
+                          label={(evaProps: any) => <Text {...evaProps}></Text>}
+                        >
+                          {timeStamp &&
+                            timeStamp.length > 0 &&
+                            timeStamp.map((_timeStamp, index) => {
+                              return (
+                                <SelectItem
+                                  key={index}
+                                  title={_timeStamp || ""}
+                                />
+                              );
+                            })}
+                        </Select>
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          width: "90%",
+                        }}
+                      >
+                        <Datepicker
+                          disabled={values?.noEnd}
+                          min={new Date(1900, 0, 0)}
+                          style={[styles.selectSettings, { width: "60%" }]}
+                          label="To*"
+                          placeholder="To"
+                          date={values.to}
+                          onSelect={(date: Date | null) => {
+                            setFieldValue("to", date);
+                          }}
+                        />
+                        {/* {console.log("values", values.toTime)} */}
+                        <Select
+                          disabled={values?.noEnd}
+                          value={values.toTime}
+                          style={{
+                            marginTop: 5,
+                            marginLeft: 5,
+                            width: "45%",
+                          }}
+                          placeholder="To"
+                          onSelect={(index: any) => {
+                            setFieldValue("toTime", timeStamp[index.row]);
+                          }}
+                          label={(evaProps: any) => <Text {...evaProps}></Text>}
+                        >
+                          {timeStamp &&
+                            timeStamp.length > 0 &&
+                            timeStamp.map((_timeStamp, index) => {
+                              return (
+                                <SelectItem
+                                  key={index}
+                                  title={_timeStamp || ""}
+                                />
+                              );
+                            })}
+                        </Select>
+                      </View>
+                    </>
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ marginHorizontal: 15, marginTop: 10 }}>
+                        No end
+                      </Text>
+                      <CheckBox
+                        style={[{ flex: 1, marginTop: 15 }]}
+                        checked={values?.noEnd}
+                        onChange={(checked) => {
+                          setFieldValue("noEnd", checked);
+
+                          console.log("checked", checked);
+                          // if (checked) {
+                          //   Alert.alert(checked);
+                          // } else {
+                          //   Alert.alert(checked);
+                          // }
+                        }}
+                      >
+                        {""}
+                      </CheckBox>
+                    </View>
+
                     <Text
                       style={{
                         color: "#000",
@@ -467,7 +705,9 @@ const CreateParentActivityScreen = ({ route }) => {
                             }}
                           >
                             <Text
-                              style={{ color: day.selected ? "#fff" : "#000" }}
+                              style={{
+                                color: day.selected ? "#fff" : "#000",
+                              }}
                             >
                               {day.name}
                             </Text>
@@ -476,18 +716,73 @@ const CreateParentActivityScreen = ({ route }) => {
                     </ScrollView>
                   </>
                 )}
-                <Text
+                <View
                   style={{
-                    color: Colors.primary,
-                    fontSize: 18,
-                    fontWeight: "700",
-                    marginVertical: 10,
-                    alignSelf: "flex-start",
-                    marginLeft: "5%",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    width: "100%",
                   }}
                 >
-                  {selectedIndex === 0 ? "At*" : "From*"}
-                </Text>
+                  <Text
+                    style={{
+                      color: Colors.primary,
+                      fontSize: 18,
+                      fontWeight: "700",
+                      marginVertical: 10,
+                      alignSelf: "flex-start",
+                      marginLeft: "5%",
+                    }}
+                  >
+                    {selectedIndex === 0 ? "At*" : "From*"}
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text style={{ marginRight: 20, marginTop: 10 }}>
+                      Use my address
+                    </Text>
+                    <CheckBox
+                      disabled={toCheckBox}
+                      style={[{ flex: 1, marginTop: 15 }]}
+                      checked={fromCheckBox}
+                      onChange={(checked) => {
+                        setFromCheckBox(checked);
+                        if (!fromCheckBox) {
+                          setFieldValue("fromVenueName", currentUser?.name);
+                          setFieldValue("fromAddress", currentUser?.address);
+
+                          setFieldValue("fromState", currentUser?.state);
+
+                          setFieldValue("fromCountry", currentUser?.country);
+                          setFieldValue("fromCity", currentUser?.city);
+                          setFieldValue("fromZipCode", currentUser?.zipcode);
+                        } else {
+                          setFieldValue("fromVenueName", "");
+                          setFieldValue("fromAddress", "");
+
+                          setFieldValue("fromState", "");
+
+                          setFieldValue("fromCountry", "");
+                          setFieldValue("fromCity", "");
+                          setFieldValue("fromZipCode", "");
+                        }
+                        console.log("checked", checked);
+                        // if (checked) {
+                        //   Alert.alert(checked);
+                        // } else {
+                        //   Alert.alert(checked);
+                        // }
+                      }}
+                    >
+                      {""}
+                    </CheckBox>
+                  </View>
+                </View>
+
                 <View
                   style={{
                     padding: 15,
@@ -501,28 +796,118 @@ const CreateParentActivityScreen = ({ route }) => {
                 >
                   <Input
                     style={{ marginRight: 20, width: "100%" }}
-                    placeholder="Venue name"
+                    placeholder="Venue name*"
                     onChangeText={handleChange("fromVenueName")}
                     value={values.fromVenueName}
                   />
+                  {errors.venueName && touched.venueName && (
+                    <Text style={styles.errorText}>{errors.venueName}</Text>
+                  )}
                   <Input
                     style={{ marginRight: 20, marginTop: 10, width: "100%" }}
-                    placeholder="Address"
+                    placeholder="Address*"
                     onChangeText={handleChange("fromAddress")}
                     value={values.fromAddress}
                   />
-                  <Select
+                  {errors.address && touched.address && (
+                    <Text style={styles.errorText}>{errors.address}</Text>
+                  )}
+                  {/* <Select
                     style={[styles.selectSettings, { marginVertical: 5 }]}
                     value={values.fromState}
                     placeholder="State"
-                    onSelect={(query) => {}}
-                  ></Select>
+                    onSelect={(query) => { }}
+                  >
+                  </Select>
                   <Input
                     style={{ marginRight: 20, marginTop: 10, width: "100%" }}
                     placeholder="City"
                     onChangeText={handleChange("fromCity")}
                     value={values.fromCity}
-                  />
+                  /> */}
+                  <Autocomplete
+                    placeholder="Country*"
+                    value={values?.fromCountry}
+                    placement="bottom"
+                    style={{ marginVertical: 5 }}
+                    // label={evaProps => <Text {...evaProps}>Country*</Text>}
+                    onChangeText={(query) => {
+                      setFieldValue("fromCountry", query);
+                      setCountriesData(
+                        countries.filter((item) => filterCountries(item, query))
+                      );
+                    }}
+                    onSelect={(query) => {
+                      const selectedCountry = countriesData[query];
+                      console.log("000000", selectedCountry.name);
+                      setFieldValue("fromCountry", selectedCountry.name);
+                      setFieldValue("selectedCountry", selectedCountry.name);
+                      setFieldValue("fromSelectedState", "");
+                      setFieldValue("fromState", "");
+                      setStates([]);
+                      GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
+                        (res) => {
+                          setStates(res.data);
+                          setStatesData(states);
+                        }
+                      );
+                    }}
+                  >
+                    {countriesData?.map((item, index) => {
+                      return <AutocompleteItem key={index} title={item.name} />;
+                    })}
+                  </Autocomplete>
+                  <Autocomplete
+                    placeholder="State"
+                    value={values.fromState}
+                    placement="bottom"
+                    style={{ marginVertical: 5 }}
+                    // label={evaProps => <Text {...evaProps}>State</Text>}
+                    onChangeText={(query) => {
+                      setFieldValue("fromState", query);
+                      setStatesData(
+                        states.filter((item) => filterStates(item, query))
+                      );
+                    }}
+                    onSelect={(query) => {
+                      const selectedState = statesData[query];
+                      setFieldValue("fromState", selectedState);
+                      setFieldValue("fromSelectedState", selectedState);
+                      setFieldValue("fromSelectedCity", "");
+                      setFieldValue("fromCity", "");
+                      setCities([]);
+                      GetAllCities(values.selectedCountry, selectedState).then(
+                        (res) => {
+                          setCities(res.data);
+                        }
+                      );
+                    }}
+                  >
+                    {statesData.map((item, index) => {
+                      return <AutocompleteItem key={index} title={item} />;
+                    })}
+                  </Autocomplete>
+                  <Autocomplete
+                    placeholder="City"
+                    value={values.fromCity}
+                    placement="bottom"
+                    style={{ marginVertical: 5 }}
+                    // label={evaProps => <Text {...evaProps}>City</Text>}
+                    onChangeText={(query) => {
+                      setFieldValue("fromCity", query);
+                      setCitiesData(
+                        cities.filter((item) => filterCities(item, query))
+                      );
+                    }}
+                    onSelect={(query) => {
+                      setFieldValue("fromCity", citiesData[query]);
+                      setFieldValue("fromSelectedCity", citiesData[query]);
+                    }}
+                  >
+                    {citiesData.map((item, index) => {
+                      return <AutocompleteItem key={index} title={item} />;
+                    })}
+                  </Autocomplete>
                   <Input
                     style={{ width: "100%" }}
                     placeholder="Zip code"
@@ -532,18 +917,73 @@ const CreateParentActivityScreen = ({ route }) => {
                 </View>
                 {selectedIndex === 2 && (
                   <>
-                    <Text
+                    <View
                       style={{
-                        color: Colors.primary,
-                        fontSize: 18,
-                        fontWeight: "700",
-                        marginVertical: 10,
-                        alignSelf: "flex-start",
-                        marginLeft: "5%",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        width: "100%",
                       }}
                     >
-                      To*
-                    </Text>
+                      <Text
+                        style={{
+                          color: Colors.primary,
+                          fontSize: 18,
+                          fontWeight: "700",
+                          marginVertical: 10,
+                          alignSelf: "flex-start",
+                          marginLeft: "5%",
+                        }}
+                      >
+                        To*
+                      </Text>
+
+                      <View
+                        style={{
+                          flexDirection: "row",
+
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text style={{ marginRight: 20, marginTop: 10 }}>
+                          Use my address
+                        </Text>
+                        <CheckBox
+                          disabled={fromCheckBox}
+                          style={[{ flex: 1, marginTop: 15 }]}
+                          checked={toCheckBox}
+                          onChange={(checked) => {
+                            setToCheckBox(checked);
+                            if (!toCheckBox) {
+                              setFieldValue("venueName", currentUser?.name);
+                              setFieldValue("address", currentUser?.address);
+
+                              setFieldValue("state", currentUser?.state);
+
+                              setFieldValue("country", currentUser?.country);
+                              setFieldValue("city", currentUser?.city);
+                              setFieldValue("zipCode", currentUser?.zipcode);
+                            } else {
+                              setFieldValue("venueName", "");
+                              setFieldValue("address", "");
+
+                              setFieldValue("state", "");
+
+                              setFieldValue("country", "");
+                              setFieldValue("city", "");
+                              setFieldValue("zipCode", "");
+                            }
+                            console.log("checked", checked);
+                            // if (checked) {
+                            //   Alert.alert(checked);
+                            // } else {
+                            //   Alert.alert(checked);
+                            // }
+                          }}
+                        >
+                          {""}
+                        </CheckBox>
+                      </View>
+                    </View>
                     <View
                       style={{
                         padding: 15,
@@ -571,22 +1011,99 @@ const CreateParentActivityScreen = ({ route }) => {
                         onChangeText={handleChange("address")}
                         value={values.address}
                       />
-                      <Select
-                        style={[styles.selectSettings, { marginVertical: 5 }]}
-                        value={values.state}
-                        placeholder="State"
-                        onSelect={(query) => {}}
-                      ></Select>
-                      <Input
-                        style={{
-                          marginRight: 20,
-                          marginTop: 10,
-                          width: "100%",
+
+                      <Autocomplete
+                        placeholder="Country*"
+                        value={values.country}
+                        placement="bottom"
+                        style={{ marginVertical: 5 }}
+                        // label={evaProps => <Text {...evaProps}>Country*</Text>}
+                        onChangeText={(query) => {
+                          setFieldValue("country", query);
+                          setCountriesData(
+                            countries.filter((item) =>
+                              filterCountries(item, query)
+                            )
+                          );
                         }}
+                        onSelect={(query) => {
+                          const selectedCountry = countriesData[query];
+                          console.log("000000", selectedCountry.name);
+                          setFieldValue("country", selectedCountry.name);
+                          setFieldValue(
+                            "selectedCountry",
+                            selectedCountry.name
+                          );
+                          setFieldValue("toSelectedState", "");
+                          setFieldValue("state", "");
+                          setStates([]);
+                          GetAllStates(
+                            selectedCountry.name.replace(/ /g, "")
+                          ).then((res) => {
+                            setStates(res.data);
+                            setStatesData(states);
+                          });
+                        }}
+                      >
+                        {countriesData?.map((item, index) => {
+                          return (
+                            <AutocompleteItem key={index} title={item.name} />
+                          );
+                        })}
+                      </Autocomplete>
+                      <Autocomplete
+                        placeholder="State"
+                        value={values.state}
+                        placement="bottom"
+                        style={{ marginVertical: 5 }}
+                        // label={evaProps => <Text {...evaProps}>State</Text>}
+                        onChangeText={(query) => {
+                          setFieldValue("state", query);
+                          setStatesData(
+                            states.filter((item) => filterStates(item, query))
+                          );
+                        }}
+                        onSelect={(query) => {
+                          const selectedState = statesData[query];
+                          setFieldValue("state", selectedState);
+                          setFieldValue("toSelectedState", selectedState);
+                          setFieldValue("toSelectedCity", "");
+                          setFieldValue("city", "");
+                          setCities([]);
+                          GetAllCities(
+                            values.selectedCountry,
+                            selectedState
+                          ).then((res) => {
+                            setCities(res.data);
+                          });
+                        }}
+                      >
+                        {statesData.map((item, index) => {
+                          return <AutocompleteItem key={index} title={item} />;
+                        })}
+                      </Autocomplete>
+                      <Autocomplete
                         placeholder="City"
-                        onChangeText={handleChange("city")}
                         value={values.city}
-                      />
+                        placement="bottom"
+                        style={{ marginVertical: 5 }}
+                        // label={evaProps => <Text {...evaProps}>City</Text>}
+                        onChangeText={(query) => {
+                          setFieldValue("city", query);
+                          setCitiesData(
+                            cities.filter((item) => filterCities(item, query))
+                          );
+                        }}
+                        onSelect={(query) => {
+                          setFieldValue("city", citiesData[query]);
+                          setFieldValue("toSelectedCity", citiesData[query]);
+                        }}
+                      >
+                        {citiesData.map((item, index) => {
+                          return <AutocompleteItem key={index} title={item} />;
+                        })}
+                      </Autocomplete>
+
                       <Input
                         style={{ width: "100%" }}
                         placeholder="Zip code"

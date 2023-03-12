@@ -2213,7 +2213,7 @@
   "resolved" "https://registry.npmjs.org/@types/fbemitter/-/fbemitter-2.0.32.tgz"
   "version" "2.0.32"
 
-"@types/geojson@^7946.0.7":
+"@types/geojson@^7946.0.8":
   "integrity" "sha512-Nmh0K3iWQJzniTuPRcJn5hxXkfB1T1pgB89SBig5PlJQU5yocazeu4jATJlaA0GYFKWMqDdvYemoSnF2pXgLVA=="
   "resolved" "https://registry.npmjs.org/@types/geojson/-/geojson-7946.0.10.tgz"
   "version" "7946.0.10"
@@ -3887,7 +3887,7 @@
   "resolved" "https://registry.npmjs.org/depd/-/depd-2.0.0.tgz"
   "version" "2.0.0"
 
-"deprecated-react-native-prop-types@^2.2.0", "deprecated-react-native-prop-types@^2.3.0":
+"deprecated-react-native-prop-types@^2.2.0":
   "integrity" "sha512-pWD0voFtNYxrVqvBMYf5gq3NA2GCpfodS1yNynTPc93AYA/KEMGeWDqqeUB6R2Z9ZofVhks2aeJXiuQqKNpesA=="
   "resolved" "https://registry.npmjs.org/deprecated-react-native-prop-types/-/deprecated-react-native-prop-types-2.3.0.tgz"
   "version" "2.3.0"
@@ -4502,6 +4502,11 @@
   "integrity" "sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ=="
   "resolved" "https://registry.npmjs.org/event-target-shim/-/event-target-shim-5.0.1.tgz"
   "version" "5.0.1"
+
+"eventemitter3@^4.0.7":
+  "integrity" "sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw=="
+  "resolved" "https://registry.npmjs.org/eventemitter3/-/eventemitter3-4.0.7.tgz"
+  "version" "4.0.7"
 
 "events@1.1.1":
   "integrity" "sha512-kEcvvCBByWXGnZy6JUlgAp2gBIUjfCAV6P6TgT1/aaQKcmuAEC4OZTV1I4EWQLz2gxZw76atuVyvHhTxvi0Flw=="
@@ -8383,6 +8388,18 @@
     "buffer" "^4.5.1"
     "crypto-js" "^3.1.6"
 
+"react-native-background-actions@^3.0.0":
+  "integrity" "sha512-O/KFdetp8n9cwSfPJQ7hPywTaEHO1ui7ISxKTGkzHxs3IVgEV+QOvKKLxAkTcQs1w5f68KK/LoQsEVwMpbVqew=="
+  "resolved" "https://registry.npmjs.org/react-native-background-actions/-/react-native-background-actions-3.0.0.tgz"
+  "version" "3.0.0"
+  dependencies:
+    "eventemitter3" "^4.0.7"
+
+"react-native-background-fetch@^4.1.8":
+  "integrity" "sha512-/qe86laa0n4AbD6mrLL8SCGR+K5693URX95e02/bTJh3UkdS3+sU1Jyc/XTlz4MQwlquI929/lm5EZh8AOUqzQ=="
+  "resolved" "https://registry.npmjs.org/react-native-background-fetch/-/react-native-background-fetch-4.1.8.tgz"
+  "version" "4.1.8"
+
 "react-native-calendars@^1.1266.0":
   "version" "1.1291.0"
   dependencies:
@@ -8533,6 +8550,11 @@
   "resolved" "https://registry.npmjs.org/react-native-geocoding/-/react-native-geocoding-0.5.0.tgz"
   "version" "0.5.0"
 
+"react-native-geolocation-service@^5.3.1":
+  "integrity" "sha512-LTXPtPNmrdhx+yeWG47sAaCgQc3nG1z+HLLHlhK/5YfOgfLcAb9HAkhREPjQKPZOUx8pKZMIpdGFUGfJYtimXQ=="
+  "resolved" "https://registry.npmjs.org/react-native-geolocation-service/-/react-native-geolocation-service-5.3.1.tgz"
+  "version" "5.3.1"
+
 "react-native-gesture-handler@^2.6.0":
   "integrity" "sha512-poOSfz/w0IyD6Qwq7aaIRRfEaVTl1ecQFoyiIbpOpfNTjm2B1niY2FLrdVQIOtIOe+K9nH55Qal04nr4jGkHdQ=="
   "resolved" "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.8.0.tgz"
@@ -8611,13 +8633,12 @@
   "resolved" "https://registry.npmjs.org/react-native-linear-gradient/-/react-native-linear-gradient-2.6.2.tgz"
   "version" "2.6.2"
 
-"react-native-maps@^0.31.1":
-  "integrity" "sha512-vipeOPykqLRMCLcLUCZEB+cTdNSlq88NLb0jChY4UGTY5fgOS7GYWkfswy6bW1ayTRLxJS3zpMGFDUY59/ZrXA=="
-  "resolved" "https://registry.npmjs.org/react-native-maps/-/react-native-maps-0.31.1.tgz"
-  "version" "0.31.1"
+"react-native-maps@^1.4.0":
+  "integrity" "sha512-asP6oVx9uF4E9U22j40q0AcSJ4v3hPBPCg1kPdlbckGXGj+z8dwwdPkQi3hUpl94odlR//v60Sw6PAEYv8zSxw=="
+  "resolved" "https://registry.npmjs.org/react-native-maps/-/react-native-maps-1.4.0.tgz"
+  "version" "1.4.0"
   dependencies:
-    "@types/geojson" "^7946.0.7"
-    "deprecated-react-native-prop-types" "^2.3.0"
+    "@types/geojson" "^7946.0.8"
 
 "react-native-mask-input@^1.2.0":
   "integrity" "sha512-AJtyDzUgXAiUZWe6jtf4sl5FV5q603AUR71+ma2SqI2YOTQr9exOPn8ZowC/n5KE0aL/YB9dCKnf+qbd/a082w=="
@@ -8746,6 +8767,11 @@
   dependencies:
     "react-freeze" "^1.0.0"
     "warn-once" "^0.1.0"
+
+"react-native-share@^8.2.0":
+  "integrity" "sha512-0RHeU/yntMzFsPmdSTJH7W7Y3+Fsw7qR3ufBMxodHJKzK8tBv5ZTEst8XMjTzrBUpamMaj23HCBYl9eYqntxpA=="
+  "resolved" "https://registry.npmjs.org/react-native-share/-/react-native-share-8.2.0.tgz"
+  "version" "8.2.0"
 
 "react-native-smart-statusbar@^1.0.24":
   "integrity" "sha512-C9OyWgTcyx/cWAMxxfD5stWkp3FQ5Fi6ECbLgo+ZNlFsp+nrUbAFgIfa8ShnFnWeNFY8GrRxlKPVtlN8NL5xEQ=="

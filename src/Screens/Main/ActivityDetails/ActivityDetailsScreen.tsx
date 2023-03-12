@@ -137,7 +137,6 @@ const ActivityDetailsScreen = () => {
                   <Marker
                     onSelect={() => console.log("pressed")}
                     onPress={() => {
-                      console.log("ref", ref);
                       ref.current.fitToSuppliedMarkers(
                         [
                           {

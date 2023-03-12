@@ -6,7 +6,6 @@ import {
   Switch,
   TouchableOpacity,
   Alert,
-  Share,
 } from "react-native";
 import { useTheme } from "@/Theme";
 import {
@@ -18,6 +17,8 @@ import {
   Card,
   Spinner,
 } from "@ui-kitten/components";
+import Share from "react-native-share";
+import BackgroundService from "react-native-background-actions";
 // @ts-ignore
 import { useSelector, useDispatch } from "react-redux";
 import { UserState } from "@/Store/User";
@@ -54,34 +55,34 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
   }, [verifyType]);
 
   const onShare = async () => {
-    try {
-      const result = await Share.share({
-        url: "",
-        message: `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link - https://trackmykidz.com/apps/`,
+    Share.open({
+      message: `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`,
+      url: "https://trackmykidz.com/apps/",
+    })
+      .then((res) => {
+        Toast.show({
+          type: "success",
+          position: "top",
+          text1: "Invite",
+          text2: "Invitation has been sent.",
+          visibilityTime: 4000,
+          autoHide: true,
+          topOffset: 30,
+          bottomOffset: 40,
+          onShow: () => {},
+          onHide: () => {},
+          onPress: () => {},
+        });
+        console.log(res);
+      })
+      .catch((err) => {
+        err && console.log(err);
       });
-      // if (result.action === Share.sharedAction) {
-      //   Toast.show({
-      //     type: "success",
-      //     position: "top",
-      //     text1: "Invite",
-      //     text2: "Invitation has been sent.",
-      //     visibilityTime: 4000,
-      //     autoHide: true,
-      //     topOffset: 30,
-      //     bottomOffset: 40,
-      //     onShow: () => {},
-      //     onHide: () => {},
-      //     onPress: () => {},
-      //   });
-      // } else if (result.action === Share.dismissedAction) {
-      //   // dismissed
-      // }
-    } catch (error) {}
   };
 
   return (
     <>
-      <AppHeader title="Settings" />
+      <AppHeader title="Settings" hideCalendar={true} />
       <TwoFactorAuthenticationModal />
       <VerifyYourselfModal
         isActivationCode={verifyType === "activation-code"}
@@ -278,13 +279,13 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
               <View style={styles.background}>
                 <TouchableOpacity
                   style={styles.background}
-                  onPress={() => {
+                  onPress={async () => {
                     dispatch(
                       ChangeUserState.action({
                         userType: "",
                       })
                     );
-
+                    await BackgroundService.stop();
                     dispatch(LogoutStore.action());
                   }}
                 >

@@ -9,7 +9,7 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import Colors from "@/Theme/Colors";
 import { Instructor } from "@/Models/UserDTOs";
-
+import { SafeAreaView } from 'react-native'
 interface InstructorModal {
   instructors: Array<Instructor>;
   setInstructors: (data: Array<Instructor>) => {};
@@ -43,13 +43,15 @@ const EditInstructorFormModal = ({
         );
       }}
     >
-      <>
+ <View style={{height:'80%'}}>
         <ScrollView
           style={{
-            flex: 1,
+            height:'50%',
             backgroundColor: Colors.white,
-            paddingHorizontal: 10,
+            marginHorizontal:20,
+            padding: 20,
             borderRadius: 5,
+         
           }}
         >
           <Text style={[styles.heading, { textAlign: "center" }]}>
@@ -171,7 +173,8 @@ const EditInstructorFormModal = ({
             )}
           </Formik>
         </ScrollView>
-      </>
+        </View>
+     
     </Modal>
   );
 };
@@ -179,20 +182,23 @@ export default EditInstructorFormModal;
 
 const styles = StyleSheet.create({
   modal: {
-    width: "90%",
-    backgroundColor: Colors.white,
+    margin:0,
+    width: "100%",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    // height: 300,
     // elevation: 5,
-    shadowColor: Colors.primaryGray,
-    shadowOffset: {
-      height: 5,
-      width: 2,
-    },
-    borderRadius: 5,
-    shadowRadius: 5,
-    shadowOpacity: 0.3,
-    zIndex: 166,
+ 
+    // shadowColor: Colors.primaryGray,
+    // shadowOffset: {
+    //   height: 5,
+    //   width: 2,
+    // },
+    // borderRadius: 5,
+    // shadowRadius: 5,
+    // shadowOpacity: 0.3,
+    // zIndex: 166,
 
-    marginTop: "13%",
+    // marginTop: "13%",
   },
   background: {
     flex: 0,

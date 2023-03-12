@@ -1,5 +1,5 @@
 //Activiation code
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Alert, Image, KeyboardAvoidingView, View } from "react-native";
 import {
   Button,
@@ -42,8 +42,9 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
     student,
     isDesignatedAdmin,
   } = route.params;
+  const [activationCode, setActivationCode] = useState(activation_code);
   const { reactivate } = route.params;
-  console.log("activationcode", activation_code);
+
   const codeValidationSchema = yup.object().shape({
     code: yup
       .string()
@@ -59,9 +60,12 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
       .required("Code is required"),
   });
 
-  const onResendButtonPress = () => {
-    if (emailAddress)
-      GetActivationCode({ email: emailAddress }, user_type).then();
+  const onResendButtonPress = async () => {
+    if (emailAddress) {
+      let res = await GetActivationCode({ email: emailAddress }, user_type);
+      console.log("res----", res);
+      setActivationCode(res.activation_code);
+    }
   };
   const openLogin = () => {
     navigation && navigation.navigate("Login");
@@ -70,6 +74,13 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
   const openSignUp = () => {
     navigation && navigation.navigate("SignUp1");
   };
+
+  useEffect(() => {
+    return () => {
+      setActivationCode("");
+    };
+  }, []);
+
   return (
     <KeyboardAvoidingView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -92,25 +103,25 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
             : codeValidationSchema
         }
         initialValues={{
-          code:
-            user_type == "Student" && route?.params?.activation_code
-              ? route?.params?.activation_code
-              : "",
+          code: user_type == "Student" && activationCode ? activationCode : "",
         }}
         validateOnMount={true}
         onSubmit={(values, { resetForm }) => {
           console.log("isDesignatedAdmin", isDesignatedAdmin);
           if (isDesignatedAdmin) {
             console.log("isDesignatedAdmin console");
-            navigation.navigate("FinalOrgRegistrationScreen", {
-              emailAddress: emailAddress,
-              registrationId: "test",
-              user_type: user_type,
-              activation_code: activation_code,
-            });
+            if (activationCode == values.code) {
+              navigation.navigate("FinalOrgRegistrationScreen", {
+                emailAddress: emailAddress,
+                registrationId: "test",
+                user_type: user_type,
+                activation_code: activationCode,
+              });
+            }
+            resetForm();
           } else {
             if (!reactivate) {
-              if (activation_code == values.code) {
+              if (activationCode == values.code) {
                 navigation &&
                   navigation.navigate("FinalRegistrationScreen", {
                     emailAddress: emailAddress,
@@ -125,7 +136,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
                     emailAddress: emailAddress,
                     registrationId: "test",
                     user_type: user_type,
-                    activation_code: activation_code,
+                    activation_code: activationCode,
                     student: student,
                   });
               }
@@ -135,6 +146,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
                 email: emailAddress,
               };
             }
+            resetForm();
           }
         }}
       >

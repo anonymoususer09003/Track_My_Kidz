@@ -11,7 +11,7 @@ import {
   Alert,
   Dimensions,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import firestore from "@react-native-firebase/firestore";
 import Fontisto from "react-native-vector-icons/Fontisto";
 // import { LinearGradientButton } from "@/Components/LinearGradientButton/LinearGradientButton";
 import { AppHeader } from "@/Components";
@@ -83,8 +83,11 @@ const HomeScreen = () => {
       });
     });
   }, []);
-
+  useEffect(() => {
+    setThumbnail(false);
+  }, [focused]);
   const [children, setChildren] = useState([]);
+  const [originalChildren, setOriginalChildren] = useState([]);
   const [thumbnail, setThumbnail] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [selectedDependent, setSelectedDependent] = useState(null);
@@ -99,6 +102,7 @@ const HomeScreen = () => {
     longitudeDelta: 0.0421,
   });
   const [studentsEmails, setStudentsEmail] = useState([]);
+  const [originalStudentsEmails, setOriginalStudentsEmail] = useState([]);
   const [selectedDay, setSelectedDay] = useState(moment().format("D"));
   const [showChildFilter, setShowChildFilter] = useState(false);
   const [selectedChild, setSelectedChild] = useState("All");
@@ -131,6 +135,53 @@ const HomeScreen = () => {
       })
       .catch((err) => console.log("error", err));
   };
+
+  useEffect(() => {
+    let loop = ["KXx7HLpckEuYMiIPmX0T", "54V52gB9Bft15OUQ3A5G", "2313"];
+
+    let temp = [];
+    let promise = [];
+    loop.map(async (item) =>
+      promise.push(
+        await firestore()
+          .collection("students")
+          .doc(typeof item != "string" ? JSON.stringify(item) : item)
+          .onSnapshot((documentSnapshot) => {
+            temp.push(documentSnapshot.data());
+            console.log("User data: ", documentSnapshot.data());
+          })
+      )
+    );
+    // Promise.all(promise).then((res) => {
+    //   console.log("log100101011", res);
+    // });
+    // console.log("temp", temp);
+    // Stop listening for updates when no longer required
+    // return () => subscriber();
+
+    // try {
+    //   const colRef = firestore().collection("students");
+    //   //real time update
+    //   let temp = [];
+    //   const unsubscribe = colRef
+    //     .doc("54V52gB9Bft15OUQ3A5G")
+    //     .where("parentemail1", "==", currentUser.email)
+    //     .onSnapshot(async (snapshot) => {
+    //       snapshot.docs.forEach((doc) => {
+    //         temp.push(doc.data());
+    //         // setTestData((prev) => [...prev, doc.data()])
+    //         // console.log("onsnapshot", doc.data());
+    //       });
+    //     });
+    //   console.log("temp firestore", temp);
+    // } catch (err) {
+    //   console.log("err", err);
+    // }
+    //remember to unsubscribe from your realtime listener on unmount or you will create a memory leak
+    // return () => unsubscribe();
+  }, []);
+
+  console.log("current user", currentUser);
   useEffect(() => {
     getParentInfo();
     handleLoadSubscribed();
@@ -153,14 +204,14 @@ const HomeScreen = () => {
       let temp = [];
       res.map((item, index) => {
         temp.push({
-          latitude: item?.latitude
-            ? parseFloat(item?.latitude)
-            : parseFloat(10),
-          longitude: item?.longititude
-            ? parseFloat(item?.longititude)
-            : parseFloat(10),
+          latitude: item?.latitude ? parseFloat(item?.latitude) : null,
+
+          longitude: item?.longititude ? parseFloat(item?.longititude) : null,
         });
       });
+      setOriginalChildren(res);
+
+      setOriginalStudentsEmail(temp);
       setStudentsEmail(temp);
       setChildren(res);
     } catch (err) {
@@ -178,7 +229,14 @@ const HomeScreen = () => {
   useEffect(() => {
     if (focused) {
       loadUserDetails();
+    } else {
+      setSelectedChild("All");
+      setShowChildFilter(false);
     }
+    return () => {
+      setSelectedChild("All");
+      setShowChildFilter(false);
+    };
   }, [focused]);
 
   useEffect(() => {
@@ -389,7 +447,7 @@ const HomeScreen = () => {
           onCancel={() => dispatch(LogoutStore.action())}
         />
       )}
-      <AppHeader title="Home" />
+      <AppHeader title="Home" hideCalendar={thumbnail ? false : true} />
       {isCalendarVisible && (
         <Calendar
           selectedMonth={selectedMonth}
@@ -398,6 +456,7 @@ const HomeScreen = () => {
           setSelectedDay={setSelectedDay}
         />
       )}
+
       <SearchBar
         searchText={searchParam}
         onChangeText={(value) => setSearchParam(value)}
@@ -410,6 +469,7 @@ const HomeScreen = () => {
             })
           );
         }}
+        thumbnail={thumbnail}
         isThumbnail
         showFilter
         showDropdown={showChildFilter}
@@ -420,26 +480,43 @@ const HomeScreen = () => {
           setShowChildFilter(value);
         }}
       />
-      <View style={styles.layout}>
+
+      <View style={[styles.layout]}>
         {showChildFilter && (
           <Select
             style={{ width: "90%", marginHorizontal: "5%" }}
             value={selectedChild}
             placeholder="Select Child"
             onSelect={(index: any) => {
+              console.log("index", index.row);
+              let children = [...originalChildren];
+
               const child =
                 index.row === 0
                   ? "All"
                   : children[index.row - 1]?.firstname +
                     " " +
                     children[index.row - 1]?.lastname;
+              console.log("children", originalStudentsEmails);
+              if (index.row == 0) {
+                setChildren([...originalChildren]);
+                setOriginalStudentsEmail([...originalStudentsEmails]);
+              } else {
+                let res = children.filter(
+                  (item) => children[index.row - 1].studentId == item.studentId
+                );
+                setChildren(res);
+                let studentsMarker = [...originalStudentsEmails];
+                let markers = studentsMarker[index.row - 1];
+                setStudentsEmail(markers);
+              }
               setSelectedChild(child);
             }}
             label={(evaProps: any) => <Text {...evaProps}></Text>}
           >
             <SelectItem title="All" />
-            {children &&
-              children.map((item) => (
+            {originalChildren &&
+              originalChildren.map((item) => (
                 <SelectItem
                   key={item?.studentId}
                   title={item?.firstname + " " + item?.lastname}
@@ -585,55 +662,6 @@ const HomeScreen = () => {
               )}
 
               {/* {console.log(activities)} */}
-              {false && (
-                <FlatList
-                  data={activities}
-                  style={{ padding: 10, width: "100%" }}
-                  renderItem={({ item, index }) => (
-                    <Swipeable
-                      ref={swipeableRef}
-                      renderRightActions={(e) => RightActions(e, item)}
-                    >
-                      <TouchableOpacity
-                        style={[
-                          styles.item,
-                          {
-                            backgroundColor:
-                              index % 3 === 0
-                                ? "lightgreen"
-                                : index % 2 === 0
-                                ? "#F6DDCC"
-                                : "#fff",
-                          },
-                        ]}
-                        onPress={() =>
-                          navigation.navigate("Activity", {
-                            dependent: item,
-                          })
-                        }
-                      >
-                        <Text style={[styles.text, { fontWeight: "600" }]}>{`${
-                          item?.firstName || ""
-                        } ${item?.lastName || ""}`}</Text>
-                        <Text style={styles.text}>{`${
-                          (!!item?.activity && item?.activity?.venueFromName) ||
-                          ""
-                        }`}</Text>
-                        <Text style={styles.text}>{`${
-                          (!!item?.activity &&
-                            item?.activity?.venueFromAddress) ||
-                          ""
-                        }`}</Text>
-                        {item?.status && (
-                          <Text style={styles.text}>{`Status: ${
-                            item.status || ""
-                          }`}</Text>
-                        )}
-                      </TouchableOpacity>
-                    </Swipeable>
-                  )}
-                />
-              )}
             </>
           ) : (
             <MapView
@@ -652,7 +680,11 @@ const HomeScreen = () => {
               //   longitudeDelta: 0.0421,
               // }}
               onLayout={() => {
-                ref?.current?.fitToCoordinates(studentsEmails, {
+                let temp = studentsEmails.filter(
+                  (item) => item.latitude != null
+                );
+
+                ref?.current?.fitToCoordinates(temp, {
                   edgePadding: {
                     top: 10,
                     right: 10,
@@ -664,79 +696,89 @@ const HomeScreen = () => {
               }}
               style={{ flex: 1 }}
             >
-              {children.map((item, index) => {
-                // console.log("item", item);
-                return (
-                  <View style={{ flex: 1 }}>
-                    {true && (
-                      <Circle
+              {children
+                .filter(
+                  (item) =>
+                    item.latitude != "undefined" && item.latitude != null
+                )
+                .map((item, index) => {
+                  console.log("item", item);
+                  // console.log("item", item);
+                  return (
+                    <>
+                      {item?.childTrackHistory && (
+                        <Circle
+                          key={index}
+                          center={{
+                            latitude: item?.latitude
+                              ? parseFloat(item?.latitude)
+                              : parseFloat(10),
+                            longitude: item?.longititude
+                              ? parseFloat(item?.longititude)
+                              : parseFloat(10),
+                            // latitude: parentLatLong?.location[0]?.parentLat
+                            //   ? parseFloat(parentLatLong?.location[0]?.parentLat)
+                            //   : parseFloat(10),
+                            // longitude: parentLatLong?.location[0]?.parentLong
+                            //   ? parseFloat(parentLatLong?.location[0]?.parentLong)
+                            //   : parseFloat(10),
+                          }}
+                          radius={item?.allowedDistance || 50}
+                          strokeWidth={10}
+                          strokeColor={"red"}
+                          fillColor={"rgba(230,238,255,0.5)"}
+                        />
+                      )}
+
+                      <Marker
+                        onSelect={() => console.log("pressed")}
+                        onPress={() => {
+                          console.log("ref", ref);
+                          ref.current.fitToSuppliedMarkers(
+                            [
+                              {
+                                latitude: item?.latitude
+                                  ? parseFloat(item?.latitude)
+                                  : parseFloat(10),
+                                longitude: item?.longititude
+                                  ? parseFloat(item?.longititude)
+                                  : parseFloat(10),
+                              },
+                            ]
+                            // false, // not animated
+                          );
+                        }}
+                        identifier={item?.email}
                         key={index}
-                        center={{
+                        coordinate={{
                           latitude: item?.latitude
                             ? parseFloat(item?.latitude)
                             : parseFloat(10),
                           longitude: item?.longititude
                             ? parseFloat(item?.longititude)
                             : parseFloat(10),
-                          // latitude: parentLatLong?.location[0]?.parentLat
-                          //   ? parseFloat(parentLatLong?.location[0]?.parentLat)
-                          //   : parseFloat(10),
-                          // longitude: parentLatLong?.location[0]?.parentLong
-                          //   ? parseFloat(parentLatLong?.location[0]?.parentLong)
-                          //   : parseFloat(10),
                         }}
-                        radius={item?.allowedDistance || 50}
-                        strokeWidth={10}
-                        strokeColor={"red"}
-                        fillColor={"rgba(230,238,255,0.5)"}
-                      />
-                    )}
-
-                    <Marker
-                      onSelect={() => console.log("pressed")}
-                      onPress={() => {
-                        console.log("ref", ref);
-                        ref.current.fitToSuppliedMarkers(
-                          [
-                            {
-                              latitude: item?.latitude
-                                ? parseFloat(item?.latitude)
-                                : parseFloat(10),
-                              longitude: item?.longititude
-                                ? parseFloat(item?.longititude)
-                                : parseFloat(10),
-                            },
-                          ]
-                          // false, // not animated
-                        );
-                      }}
-                      identifier={item?.email}
-                      key={index}
-                      coordinate={{
-                        latitude: item?.latitude
-                          ? parseFloat(item?.latitude)
-                          : parseFloat(10),
-                        longitude: item?.longititude
-                          ? parseFloat(item?.longititude)
-                          : parseFloat(10),
-                      }}
-                    >
-                      <TouchableOpacity
-                        onPress={() => console.log("pressed")}
-                        style={{ alignItems: "center" }}
                       >
-                        <Text>{item?.firstname}</Text>
-                        <Text style={{ marginBottom: 2 }}>
-                          {item?.lastname}
-                        </Text>
-                        <Fontisto name="map-marker-alt" size={25} color="red" />
-                      </TouchableOpacity>
-                    </Marker>
-                  </View>
-                  // </>
-                  // </Circle>
-                );
-              })}
+                        <TouchableOpacity
+                          onPress={() => console.log("pressed")}
+                          style={{ alignItems: "center" }}
+                        >
+                          <Text>{item?.firstname}</Text>
+                          <Text style={{ marginBottom: 2 }}>
+                            {item?.lastname}
+                          </Text>
+                          <Fontisto
+                            name="map-marker-alt"
+                            size={25}
+                            color="red"
+                          />
+                        </TouchableOpacity>
+                      </Marker>
+                    </>
+                    // </>
+                    // </Circle>
+                  );
+                })}
             </MapView>
           )
           // ) : (

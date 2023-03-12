@@ -14,6 +14,7 @@ import { reducer } from "./Context/state/Reducer";
 import { initialState } from "./Context/state/InitialState";
 import { MenuProvider } from "react-native-popup-menu";
 import { LogBox } from "react-native";
+
 LogBox.ignoreLogs(["Reanimated 2"]);
 export default function App() {
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function App() {
       return response;
     });
   };
+
   return (
     <StripeProvider publishableKey={Config.STRIPE_PK}>
       <Provider store={store}>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { Text } from "@ui-kitten/components";
+import { Text, Icon } from "@ui-kitten/components";
 import {
   StyleSheet,
   View,
@@ -8,13 +8,15 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import { useDispatch } from "react-redux";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Colors from "@/Theme/Colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import moment from "moment";
-import { InstructionsModal } from "@/Modals";
+import { InstructionsModal, DeclineActivityModal } from "@/Modals";
 import {
   GetAllActivity,
   GetActivitiesByInsructorId,
@@ -22,6 +24,8 @@ import {
 import { GetGroupByInstructorId } from "@/Services/Group";
 import { loadUserId } from "@/Storage/MainAppStorage";
 const InstructorGroupPendingScreen = ({ route }) => {
+  let prevOpenedRow: any;
+  let row: Array<any> = [];
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
@@ -34,6 +38,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
   const [pageGroup, pageNumberGroup] = useState(0);
   const [pageSizeGroup, setPageSizeGroup] = useState(10);
   const [refreshing, setRefreshing] = useState(false);
+  const [declineActivity, setDeclineActivity] = useState(null);
   const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
   const getActivities = async (refreshing: any) => {
     if (refreshing) {
@@ -116,6 +121,57 @@ const InstructorGroupPendingScreen = ({ route }) => {
         console.log("getActivities Error:", err);
       });
   };
+  const closeRow = (index) => {
+    console.log(index);
+    if (prevOpenedRow && prevOpenedRow !== row[index]) {
+      prevOpenedRow.close();
+    }
+    prevOpenedRow = row[index];
+  };
+  const RightActions = (dragX: any, item: any) => {
+    const scale = dragX.interpolate({
+      inputRange: [-100, 0],
+      outputRange: [1, 0],
+      extrapolate: "clamp",
+    });
+    return (
+      <View
+        style={{
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {item.status && (
+          <TouchableOpacity
+            style={{
+              padding: 10,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onPress={() => {
+              dispatch(
+                ChangeModalState.action({
+                  declineActivityModalVisibility: true,
+                })
+              );
+              closeRow();
+              setDeclineActivity(item);
+            }}
+          >
+            <AntDesign size={30} name="dislike2" color={Colors.primary} />
+          </TouchableOpacity>
+        )}
+        {!item.status && (
+          <Icon
+            style={{ width: 30, height: 30 }}
+            fill={Colors.primary}
+            name="trash"
+          />
+        )}
+      </View>
+    );
+  };
 
   useEffect(() => {
     // Alert.alert("kk");
@@ -133,130 +189,159 @@ const InstructorGroupPendingScreen = ({ route }) => {
           setSelectedInstructions={setSelectedInstructions}
           activity={selectedInstructions}
         />
-        <View style={{ flex: 1 }}>
-          <FlatList
-            data={(activities && activities) || []}
-            keyExtractor={(item, index) => index}
-            style={{ padding: 10, width: "100%", marginTop: 10 }}
-            renderItem={({ item, index }) => {
-              let date = item?.date || "date";
-              return (
-                <>
-                  <TouchableOpacity
-                    onPress={() => {
-                      // navigation.navigate('InstructorGroupApproval')
-                    }}
-                    style={[
-                      styles.item,
-                      {
-                        backgroundColor: !item?.status
-                          ? "#fff"
-                          : index % 3 === 0
-                          ? "lightgreen"
-                          : index % 2 === 0
-                          ? "#F6DDCC"
-                          : "#fff",
-                      },
-                    ]}
-                  >
-                    <Text style={styles.text}>{`Date: ${date} `}</Text>
-                    <Text style={styles.text}>{`Time: ${date}`}</Text>
-                    <Text style={styles.text}>{`${
-                      item?.activityType?.toLowerCase() === "activity"
-                        ? "Activity"
-                        : "Trip"
-                    }: ${item?.activityName}`}</Text>
-                    <Text style={styles.text}>{`${
-                      item?.activityType?.toLowerCase() === "activity"
-                        ? "Activity"
-                        : "Trip"
-                    }: ${item?.activityName}`}</Text>
-                    <Text
-                      style={styles.text}
-                    >{`Where: ${item?.venueFromName}`}</Text>
-                    <Text
-                      style={styles.text}
-                    >{`Address: ${item?.venueFromAddress}`}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      dispatch(
-                        ChangeModalState.action({
-                          instructionsModalVisibility: true,
-                        })
-                      );
-                      setSelectedInstructions(item);
-                    }}
-                    style={[
-                      styles.footer,
-                      {
-                        backgroundColor: !item?.status
-                          ? "#fff"
-                          : index % 3 === 0
-                          ? "lightgreen"
-                          : index % 2 === 0
-                          ? "#F6DDCC"
-                          : "#fff",
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={styles.text}
-                    >{`Instructions / Disclaimer / Agreement`}</Text>
-                  </TouchableOpacity>
-                </>
-              );
-            }}
-            onEndReached={async () => {
-              if (totalRecordsActivity > activities.length) {
-                console.log("logs");
+        <DeclineActivityModal
+          fromParent={false}
+          activity={declineActivity}
+          setActivity={(id) => {
+            if (declineActivity?.activityId) {
+              console.log("declinedactivity", declineActivity);
 
-                getActivities(true);
-              }
-            }}
-            refreshing={false}
-            onRefresh={() => null}
-          />
-          <FlatList
-            data={groups}
-            keyExtractor={(item, index) => index}
-            style={{ padding: 10, width: "100%" }}
-            renderItem={({ item, index }) => (
-              <>
-                <TouchableOpacity>
-                  <View style={[styles.item, { backgroundColor: "#fff" }]}>
-                    <Text
-                      style={styles.text}
-                    >{`Group Name: ${item?.groupName}`}</Text>
-                    <Text style={styles.text}>{`Status: ${
-                      item?.status ? "Active" : "Inactive"
-                    }`}</Text>
-                    {/* <Text style={styles.text}>{`${
-                    item?.students && item?.students?.length
-                  } Students`}</Text>
-                  <Text style={styles.text}>{`Instructors: ${
-                    (item?.instructors && item?.instructors?.length) || 0
-                  }`}</Text> */}
-                  </View>
-                  <TouchableOpacity
-                    onPress={() => setSelectedInstructions(item?.optin)}
-                    style={[styles.footer, { backgroundColor: "#fff" }]}
-                  >
-                    <Text
-                      style={styles.text}
-                    >{`Instructions / Disclaimer / Agreement`}</Text>
-                  </TouchableOpacity>
-                </TouchableOpacity>
-              </>
-            )}
-            onEndReached={async () => {
-              if (totalRecordsGroup > groups.length) {
-                getGroup(true);
-              }
-            }}
-            refreshing={false}
-            onRefresh={() => null}
-          />
+              console.log("activites", activities);
+              let filter = activities?.filter((item) => item?.activityId != id);
+              setDeclineActivity(false);
+              setActivities(filter);
+            } else {
+              let filter = groups?.filter((item) => item?.groupId != id);
+              setGroups(filter);
+            }
+            closeRow();
+          }}
+        />
+
+        <View style={{ flex: 1 }}>
+          {isFocused && (
+            <FlatList
+              data={[...activities, ...groups]}
+              keyExtractor={(item, index) => index}
+              style={{ padding: 10, width: "100%", marginTop: 10 }}
+              renderItem={({ item, index }) => {
+                if (item?.activityId) {
+                  let date = item?.date || "date";
+                  return (
+                    <Swipeable
+                      key={item?.activityId}
+                      // ref={swipeableRef}
+                      ref={(ref) => (row[item?.activityId] = ref)}
+                      onSwipeableOpen={() => closeRow(item?.activityId)}
+                      renderRightActions={(e) => RightActions(e, item)}
+                    >
+                      <TouchableOpacity
+                        onPress={() => {
+                          // navigation.navigate('InstructorGroupApproval')
+                        }}
+                        style={[
+                          styles.item,
+                          {
+                            backgroundColor: !item?.status
+                              ? "#fff"
+                              : index % 3 === 0
+                              ? "lightgreen"
+                              : index % 2 === 0
+                              ? "#F6DDCC"
+                              : "#fff",
+                          },
+                        ]}
+                      >
+                        <Text style={styles.text}>{`Date: ${date} `}</Text>
+                        <Text style={styles.text}>{`Time: ${date}`}</Text>
+                        <Text style={styles.text}>{`${
+                          item?.activityType?.toLowerCase() === "activity"
+                            ? "Activity"
+                            : "Trip"
+                        }: ${item?.activityName}`}</Text>
+                        <Text style={styles.text}>{`${
+                          item?.activityType?.toLowerCase() === "activity"
+                            ? "Activity"
+                            : "Trip"
+                        }: ${item?.activityName}`}</Text>
+                        <Text
+                          style={styles.text}
+                        >{`Where: ${item?.venueFromName}`}</Text>
+                        <Text
+                          style={styles.text}
+                        >{`Address: ${item?.venueFromAddress}`}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          dispatch(
+                            ChangeModalState.action({
+                              instructionsModalVisibility: true,
+                            })
+                          );
+                          setSelectedInstructions(item);
+                        }}
+                        style={[
+                          styles.footer,
+                          {
+                            backgroundColor: !item?.status
+                              ? "#fff"
+                              : index % 3 === 0
+                              ? "lightgreen"
+                              : index % 2 === 0
+                              ? "#F6DDCC"
+                              : "#fff",
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={styles.text}
+                        >{`Instructions / Disclaimer / Agreement`}</Text>
+                      </TouchableOpacity>
+                    </Swipeable>
+                  );
+                } else {
+                  return (
+                    <Swipeable
+                      key={item?.groupId}
+                      // ref={swipeableRef}
+                      ref={(ref) => (row[item?.groupId] = ref)}
+                      onSwipeableOpen={() => closeRow(item?.groupId)}
+                      renderRightActions={(e) => RightActions(e, item)}
+                    >
+                      <TouchableOpacity>
+                        <View
+                          style={[styles.item, { backgroundColor: "#fff" }]}
+                        >
+                          <Text
+                            style={styles.text}
+                          >{`Group Name: ${item?.groupName}`}</Text>
+                          <Text style={styles.text}>{`Status: ${
+                            item?.status ? "Active" : "Inactive"
+                          }`}</Text>
+                          {/* <Text style={styles.text}>{`${
+                        item?.students && item?.students?.length
+                      } Students`}</Text>
+                      <Text style={styles.text}>{`Instructors: ${
+                        (item?.instructors && item?.instructors?.length) || 0
+                      }`}</Text> */}
+                        </View>
+                        <TouchableOpacity
+                          onPress={() => setSelectedInstructions(item?.optin)}
+                          style={[styles.footer, { backgroundColor: "#fff" }]}
+                        >
+                          <Text
+                            style={styles.text}
+                          >{`Instructions / Disclaimer / Agreement`}</Text>
+                        </TouchableOpacity>
+                      </TouchableOpacity>
+                    </Swipeable>
+                  );
+                }
+              }}
+              onEndReached={async () => {
+                if (totalRecordsActivity > activities.length) {
+                  console.log("logs");
+
+                  getActivities(true);
+                }
+                if (totalRecordsGroup > groups.length) {
+                  getGroup(true);
+                }
+              }}
+              refreshing={false}
+              onRefresh={() => null}
+            />
+          )}
           {refreshing && (
             <ActivityIndicator size="large" color={Colors.primary} />
           )}

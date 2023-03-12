@@ -12,6 +12,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   View,
+  TouchableOpacity,
 } from "react-native";
 import { Linking } from "react-native";
 import {
@@ -31,6 +32,7 @@ import {
   Text,
   useStyleSheet,
 } from "@ui-kitten/components";
+import CreateMultipleInstructor from "@/Services/Instructor/CreateMultipleInstructor";
 import ImagePicker from "react-native-image-crop-picker";
 import { ProfileAvatar } from "../../../Components/SignUp/profile-avatar.component";
 import {
@@ -57,6 +59,7 @@ import {
   launchCamera,
   launchImageLibrary,
 } from "react-native-image-picker";
+import { storeInstructors } from "@/Storage/MainAppStorage";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { useDispatch, useSelector } from "react-redux";
 import LoginStore from "@/Store/Authentication/LoginStore";
@@ -75,12 +78,14 @@ import {
   AddInstructorsModal,
   ParentPaymentModal,
   WelcomeMessageModal,
+  EditInstructorsModal,
 } from "@/Modals";
+import { useIsFocused } from "@react-navigation/native";
 import MultiSelect from "react-native-multiple-select";
 import AddBusInformation from "@/Modals/AddBusInformation";
 import { storeToken } from "@/Storage/MainAppStorage";
 import { GetAllSchools, GetSchoolByFilters } from "@/Services/School";
-import { GetOrgByFilters } from "@/Services/Org";
+import { GetOrgByFilters, GetAllOrg, CreateOrg } from "@/Services/Org";
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -122,6 +127,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   const [confirmPasswordVisible, setConfirmPasswordVisible] =
     React.useState<boolean>(false);
   const [languages, setLanguages] = useState<Array<ReactText>>(["English"]);
+  const isFocuesed = useIsFocused();
   const [genders, setGenders] = useState<Array<ReactText>>([
     "Female",
     "Male",
@@ -129,6 +135,9 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   ]);
   const countries = useSelector(
     (state: { places: PlaceState }) => state.places.countries
+  );
+  const isVisibleAddInstructor = useSelector(
+    (state: { modal: ModalState }) => state.modal.addInstructorModalVisibility
   );
   const [countriesData, setCountriesData] = React.useState(countries);
   const [schoolsData, setSchoolsData] = React.useState(schools);
@@ -145,14 +154,18 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   ]);
   const [selectedGrades, setSelectedGrades] = useState([]);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
-
+  const isVisible = useSelector(
+    (state: { modal: ModalState }) =>
+      state.modal.addButInformationModalVisibility
+  );
+  const [reRender, setRerender] = useState(false);
   const [states, setStates] = useState<Array<any>>([]);
   const [cities, setCities] = useState<Array<any>>([]);
   const [phoneCode, setPhoneCode] = useState<string>("");
   const [placement, setPlacement] = React.useState("bottom");
   const [instructors, setInstructors] = useState(_instructors);
   const [buses, setBuses] = useState([]);
-
+  const [selectedInstructor, setSelectedInstructor] = useState({});
   const { register } = useContext(AuthContext);
 
   const styles = useStyleSheet(themedStyles);
@@ -167,9 +180,10 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   const signUpValidationSchema = yup.object().shape({
     firstName: yup.string().required("First name is required"),
     lastName: yup.string().required("Last name is required"),
+    zipcode: yup.string().required("Zip code is required"),
     // schoolName: yup.string().required("School name is required"),
     address: yup.string(),
-    zipcode: yup.string(),
+
     country: yup.string(),
     schoolAddress: yup.string().required("School address is required"),
     selectedCountry: yup.string(),
@@ -217,6 +231,15 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
     </TouchableWithoutFeedback>
   );
 
+  useEffect(() => {
+    if (!isFocuesed) {
+      setInstructors([]);
+      setBuses([]);
+      setRerender(false);
+    } else {
+      setRerender(true);
+    }
+  }, [isFocuesed]);
   const CheckboxLabel = (evaProps: any) => {
     return (
       <Text {...evaProps} style={styles.termsCheckBoxText}>
@@ -224,9 +247,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
         <Text
           style={{ color: Colors.primary }}
           onPress={() => {
-            Linking.openURL("https://trackmykidz.com/terms-of-use").then(
-              (r) => {}
-            );
+            Linking.openURL("https://trackmykidz.com/terms/").then((r) => {});
           }}
         >
           {" "}
@@ -251,13 +272,13 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
 
   const handleDeleteInstructor = (instructor: any) => {
     let data = [...instructors];
-    data = data.filter((d) => d.id !== instructor.id);
+    data = data.filter((d) => d.email !== instructor.email);
     setInstructors(data);
   };
 
-  const handleDeleteBus = (bus: any) => {
+  const handleDeleteBus = (bus: any, index: any) => {
     let data = [...buses];
-    data = data.filter((d) => d.busName !== bus.busName);
+    data = data.filter((d, ind) => ind !== index);
     console.log(data);
     setBuses(data);
   };
@@ -285,9 +306,34 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
         setSchoolsData(data);
       });
   };
+  const getOrgs = () => {
+    GetAllOrg(0, 30)
+      .then((res) => {
+        const _data = {
+          orgId: 0,
+          name: "Other",
+        };
+        const _org = [...res.result];
+        _org.unshift(_data);
+        setOrg(_org);
+        setOrgData(_org);
+      })
+      .catch((err) => {
+        console.log(err);
+        const data = [
+          {
+            schoolId: 0,
+            name: "Other",
+          },
+        ];
+        setOrgData(data);
+        // setSchoolsData(data);
+      });
+  };
 
   useEffect(() => {
     getSchools();
+    getOrgs();
   }, []);
 
   const getSchoolsByFilter = (
@@ -324,13 +370,13 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
     country = "",
     state = "",
     city = "",
-    schoolName = ""
+    orgName = ""
   ) => {
     const query = {
       country: country,
       state: state,
       city: city,
-      schoolName: schoolName,
+      orgName: orgName,
     };
     GetOrgByFilters(query)
       .then((res) => {
@@ -347,144 +393,270 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
         console.log("GetOrgByFilters", err);
       });
   };
-
+  const handleInstructorEdit = (item: any, index: any) => {
+    setSelectedInstructor({ ...item, index });
+    dispatch(
+      ChangeModalState.action({
+        // previewInstructorModalVisibility: false,
+        editInstructorFormModalVisibility: true,
+      })
+    );
+    // );
+    // let temp = [...instructors];
+    // temp.splice(index, 1);
+    // setInstructors(temp);
+  };
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -150}
     >
-      <AddInstructorsModal
-        instructors={instructors}
-        setInstructors={setInstructors}
-      />
-      <AddBusInformation buses={buses} setBuses={setBuses} />
-      <ScrollView style={styles.container}>
-        <Formik
-          validationSchema={signUpValidationSchema}
-          validateOnMount={true}
-          initialValues={{
-            firstName: details && details.firstname ? details.firstname : "",
-            lastName: details && details.lastname ? details.lastname : "",
-            schoolName: "",
-            school_name: "",
-            schoolAddress: "",
-            country: "",
-            selectedCountry: "",
-            selectedState: "",
-            selectedCity: "",
-            city: "",
-            state: "",
-            zipcode: "",
-
-            phoneNumber:
-              details && details.phoneNumber ? details.phoneNumber : "",
-            password: "",
-            confirmPassword: "",
-            termsAccepted: false,
-            school: "",
-            organization: "",
-            selected_entity: "",
-            organizationName: "",
+      {selectedInstructor && (
+        <EditInstructorsModal
+          selectedInstructor={selectedInstructor}
+          instructors={instructors}
+          setInstructors={(item) => {
+            setInstructors(item);
           }}
-          onSubmit={(values, { resetForm }) => {
-            dispatch(ChangeModalState.action({ loading: true }));
-            const school_name =
-              values.schoolName === "Other"
-                ? values.school_name
-                : values.schoolName;
-            const schoolId =
-              values.schoolName === "Other"
-                ? 0
-                : schoolsData.find((s) => s.name === school_name)?.schoolId;
-            const org_name = values.organizationName;
-            const orgId =
-              values.schoolName === "Other"
-                ? null
-                : orgData.find((s) => s.name === org_name)?.orgId;
-            const registerObject: RegisterDTO = {
-              email: emailAddress,
-              password: values.password,
-              activationcode: activation_code,
-            };
-            const userObject: UserRegistrationDTO = {
-              firstname: values.firstName,
-              lastname: values.lastName,
-              address: values.schoolAddress || "",
-              email: emailAddress,
-              state: values.state,
-              city: values.city,
-              country: values.country,
-              zipcode: values.zipcode,
-              phone: values.phoneNumber,
-              password: values.password,
-              term: true,
-              isAdmin: true,
-              grades: [
-                {
-                  id: 0,
-                  name: "Test",
-                  subject: [
-                    {
-                      id: 0,
-                      name: "Test",
-                    },
-                  ],
-                },
-              ],
-              schoolId: schoolId,
-              orgId: orgId,
-            };
-            const schoolObject: UserRegistrationDTO = {
-              name:
+        />
+      )}
+      {isVisibleAddInstructor && (
+        <AddInstructorsModal
+          instructors={instructors}
+          setInstructors={setInstructors}
+        />
+      )}
+      {isVisible && <AddBusInformation buses={buses} setBuses={setBuses} />}
+      <ScrollView style={styles.container}>
+        {reRender && (
+          <Formik
+            validationSchema={signUpValidationSchema}
+            validateOnMount={true}
+            initialValues={{
+              firstName: details && details.firstname ? details.firstname : "",
+              lastName: details && details.lastname ? details.lastname : "",
+              schoolName: "",
+              school_name: "",
+              schoolAddress: "",
+              country: "",
+              selectedCountry: "",
+              selectedState: "",
+              selectedCity: "",
+              city: "",
+              state: "",
+              zipcode: "",
+
+              phoneNumber:
+                details && details.phoneNumber ? details.phoneNumber : "",
+              password: "",
+              confirmPassword: "",
+              termsAccepted: false,
+              school: "",
+              organization: "",
+              selected_entity: "",
+              organizationName: "",
+            }}
+            onSubmit={(values, { resetForm }) => {
+              dispatch(ChangeModalState.action({ loading: true }));
+              const school_name =
                 values.schoolName === "Other"
                   ? values.school_name
-                  : values.schoolName,
-              address: values.schoolAddress || "",
-              country: values.country,
-              zipcode: values.zipcode,
-              city: values.city,
-              state: values.state,
-              grades: null,
-              // representatives:
-              //   instructors && instructors.length > 0
-              //     ? instructors.map((i) => ({
-              //         email: i.email,
-              //         firstname: i.firstName,
-              //         lastname: i.lastName,
-              //         isnew: true,
-              //         type: values.selected_entity.toLowerCase(),
-              //       }))
-              //     : [],
-            };
+                  : values.schoolName;
+              console.log("schooldata", schoolsData);
+              let schoolId =
+                values.schoolName === "Other"
+                  ? { schoolId: 0 }
+                  : schoolsData.find((s) => s.name === school_name);
+              console.log("----school", schoolId);
+              schoolId = Array.isArray(schoolId)
+                ? schoolId[0].schoolId
+                : schoolId?.schoolId;
+              console.log("----888school", schoolId);
+              const org_name = values.schoolName;
+              const orgId =
+                values.schoolName === "Other"
+                  ? null
+                  : orgData.find((s) => s.name === org_name)?.orgId;
+              const registerObject: RegisterDTO = {
+                email: "noman13@gail.com" || emailAddress,
+                password: values.password,
+                activationcode: activation_code,
+              };
+              const userObject: UserRegistrationDTO = {
+                firstname: values.firstName,
+                lastname: values.lastName,
+                address: values.schoolAddress || "",
+                email: "noman13@gail.com" || emailAddress,
+                state: values.state,
+                city: values.city,
+                country: values.country,
+                zipcode: values.zipcode,
+                phone: values.phoneNumber,
+                password: values.password,
+                term: true,
+                isAdmin: true,
+                grades: [
+                  {
+                    id: 0,
+                    name: "Test",
+                    subject: [
+                      {
+                        id: 0,
+                        name: "Test",
+                      },
+                    ],
+                  },
+                ],
+                schoolId: schoolId,
+                orgId: orgId,
+              };
+              const schoolObject: UserRegistrationDTO = {
+                name:
+                  values.schoolName === "Other"
+                    ? values.school_name
+                    : values.schoolName,
+                address: values.schoolAddress || "",
+                country: values.country,
+                zipcode: values.zipcode,
+                city: values.city,
+                state: values.state,
+                grades: null,
+                // representatives:
+                //   instructors && instructors.length > 0
+                //     ? instructors.map((i) => ({
+                //         email: i.email,
+                //         firstname: i.firstName,
+                //         lastname: i.lastName,
+                //         isnew: true,
+                //         type: values.selected_entity.toLowerCase(),
+                //       }))
+                //     : [],
+              };
+              const orgObject: UserRegistrationDTO = {
+                name: values.organizationName,
+                address: values.schoolAddress,
+                country: values.country,
+                zipcode: values.zipcode,
+                city: values.city,
+                state: values.state,
+                grades: null,
+                representatives: [],
+              };
 
-            Register(registerObject, "instructor").then(async (response) => {
-              await storeToken(response.data.token);
-              console.log("schoolId", schoolId);
-              if (schoolId === 0) {
-                CompleteRegistration(schoolObject, "school")
-                  .then((_res) => {
-                    console.log({
-                      ...userObject,
-                      schoolId: _res.data.schoolId,
-                    });
+              Register(registerObject, "instructor")
+                .then(async (response) => {
+                  await storeToken(response.data.token);
+                  console.log("schoolId", schoolId);
+                  if (values.selected_entity == "School" && schoolId == 0) {
+                    CompleteRegistration(schoolObject, "school")
+                      .then((_res) => {
+                        console.log({
+                          ...userObject,
+                          schoolId: _res.data.schoolId,
+                        });
+                        CompleteRegistration(
+                          {
+                            ...userObject,
+                            schoolId: _res.data.schoolId,
+                          },
+                          "instructor"
+                        )
+                          .then(async (response: any) => {
+                            console.log("response2727878", response);
+                            let obj = {
+                              token: response.data.token,
+                              userType: "instructor",
+                              id: response.data.instructorId,
+                              mainId: _res.data?.userId,
+                            };
+                            let _instructors = instructors.map((item) => ({
+                              firstName: item?.firstName || "",
+                              lastName: item?.lastName || "",
+                              email: item?.email || "",
+                              phoneNumber: item?.phoneNumber || "",
+                              isAdmin: item?.isAdmin || false,
+                            }));
+
+                            await storeInstructors(
+                              JSON.stringify(_instructors)
+                            );
+                            dispatch(LoginStore.action(obj));
+
+                            console.log("_instructors", _instructors);
+                            console.log(
+                              "_instructors",
+                              response.data.instructorId
+                            );
+
+                            if (response.status == 201) {
+                              register(emailAddress, values.password);
+                              // dispatch(
+                              //   ChangeModalState.action({
+                              //     welcomeMessageModal: true,
+                              //   })
+                              // );
+                            }
+                          })
+                          .catch((error: any) => {
+                            console.log("error third", error);
+                            Toast.show({
+                              type: "info",
+                              position: "top",
+                              text1: error,
+                              text2: error?.data?.statusDescription,
+                              visibilityTime: 4000,
+                              autoHide: true,
+                              topOffset: 30,
+                              bottomOffset: 40,
+                              onShow: () => {},
+                              onHide: () => {},
+                              onPress: () => {},
+                            });
+                          })
+                          .finally(() => {
+                            dispatch(
+                              ChangeModalState.action({ loading: false })
+                            );
+                          });
+                      })
+                      .catch((err) => {
+                        console.log("err first", err);
+                      });
+                  } else if (
+                    values.selected_entity == "School" &&
+                    schoolId != 0
+                  ) {
                     CompleteRegistration(
                       {
                         ...userObject,
-                        schoolId: _res.data.schoolId,
+                        schoolId: schoolId,
                       },
                       "instructor"
                     )
-                      .then((response: any) => {
-                        console.log("response2727878", response);
-                        dispatch(
-                          LoginStore.action({
-                            token: response.data.token,
-                            userType: "instructor",
-                            id: response.data.userId,
-                            mainId: _res.data?.userId,
-                          })
-                        );
+                      .then(async (res: any) => {
+                        console.log("response2727878", res);
+                        let obj = {
+                          token: res.data.token,
+                          userType: "instructor",
+                          id: res.data.instructorId,
+                          mainId: response.data?.userId,
+                        };
+                        console.log("obj", obj);
+                        let _instructors = instructors.map((item) => ({
+                          firstName: item?.firstName || "",
+                          lastName: item?.lastName || "",
+                          email: item?.email || "",
+                          phoneNumber: item?.phoneNumber || "",
+                          isAdmin: item?.isAdmin || false,
+                        }));
+
+                        await storeInstructors(JSON.stringify(_instructors));
+                        dispatch(LoginStore.action(obj));
+
+                        console.log("_instructors", _instructors);
+                        console.log("_instructors", response.data.instructorId);
+
                         if (response.status == 201) {
                           register(emailAddress, values.password);
                           // dispatch(
@@ -500,7 +672,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           type: "info",
                           position: "top",
                           text1: error,
-                          text2: error?.message,
+                          text2: error?.data?.statusDescription,
                           visibilityTime: 4000,
                           autoHide: true,
                           topOffset: 30,
@@ -513,305 +685,427 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                       .finally(() => {
                         dispatch(ChangeModalState.action({ loading: false }));
                       });
-                  })
-                  .catch((err) => {
-                    console.log("err first", err);
-                  });
-              } else {
-                CompleteRegistration(
-                  {
-                    ...userObject,
-                    schoolId: schoolId,
-                  },
-                  "instructor"
-                )
-                  .then((res: any) => {
-                    dispatch(
-                      LoginStore.action({
-                        token: response.data.token,
-                        userType: "instructor",
-                        id: response.data.userId,
-                        mainId: response.data?.userId,
+                  } else if (values.selected_entity != "School" && !orgId) {
+                    CompleteRegistration(schoolObject, "org")
+                      .then((_res) => {
+                        console.log({
+                          ...userObject,
+                          orgId: _res.data.orgId,
+                        });
+                        CompleteRegistration(
+                          {
+                            ...userObject,
+                            orgId: _res.data.orgId,
+                            schoolId: null,
+                          },
+                          "instructor"
+                        )
+                          .then(async (response: any) => {
+                            console.log("response2727878", response);
+                            let obj = {
+                              token: response.data.token,
+                              userType: "instructor",
+                              id: response.data.instructorId,
+                              mainId: _res.data?.userId,
+                            };
+                            let _instructors = instructors.map((item) => ({
+                              firstName: item?.firstName || "",
+                              lastName: item?.lastName || "",
+                              email: item?.email || "",
+                              phoneNumber: item?.phoneNumber || "",
+                              isAdmin: item?.isAdmin || false,
+                            }));
+
+                            await storeInstructors(
+                              JSON.stringify(_instructors)
+                            );
+                            dispatch(LoginStore.action(obj));
+
+                            console.log("_instructors", _instructors);
+                            console.log(
+                              "_instructors",
+                              response.data.instructorId
+                            );
+
+                            if (response.status == 201) {
+                              register(emailAddress, values.password);
+                              // dispatch(
+                              //   ChangeModalState.action({
+                              //     welcomeMessageModal: true,
+                              //   })
+                              // );
+                            }
+                          })
+                          .catch((error: any) => {
+                            console.log("error third", error);
+                            Toast.show({
+                              type: "info",
+                              position: "top",
+                              text1: error,
+                              text2: error?.data?.statusDescription,
+                              visibilityTime: 4000,
+                              autoHide: true,
+                              topOffset: 30,
+                              bottomOffset: 40,
+                              onShow: () => {},
+                              onHide: () => {},
+                              onPress: () => {},
+                            });
+                          })
+                          .finally(() => {
+                            dispatch(
+                              ChangeModalState.action({ loading: false })
+                            );
+                          });
                       })
-                    );
-                    if (res.status == 201) {
-                      register(emailAddress, values.password);
-                      dispatch(
-                        ChangeModalState.action({
-                          welcomeMessageModal: true,
-                        })
-                      );
-                    }
-                  })
-                  .catch((error: any) => {
-                    console.log("error second", error);
-                    Toast.show({
-                      type: "info",
-                      position: "top",
-                      text1: error,
-                      text2: error?.message,
-                      visibilityTime: 4000,
-                      autoHide: true,
-                      topOffset: 30,
-                      bottomOffset: 40,
-                      onShow: () => {},
-                      onHide: () => {},
-                      onPress: () => {},
-                    });
-                  })
-                  .finally(() => {
-                    dispatch(ChangeModalState.action({ loading: false }));
+                      .catch((err) => {
+                        console.log("err first", err);
+                      });
+                  } else if (values.selected_entity != "School" && orgId) {
+                    CompleteRegistration(
+                      {
+                        ...userObject,
+                        orgId,
+                        schoolId: null,
+                      },
+                      "instructor"
+                    )
+                      .then(async (res: any) => {
+                        console.log("response2727878", res);
+                        let obj = {
+                          token: res.data.token,
+                          userType: "instructor",
+                          id: res.data.instructorId,
+                          mainId: response.data?.userId,
+                        };
+                        console.log("obj", obj);
+                        let _instructors = instructors.map((item) => ({
+                          firstName: item?.firstName || "",
+                          lastName: item?.lastName || "",
+                          email: item?.email || "",
+                          phoneNumber: item?.phoneNumber || "",
+                          isAdmin: item?.isAdmin || false,
+                        }));
+
+                        await storeInstructors(JSON.stringify(_instructors));
+                        dispatch(LoginStore.action(obj));
+
+                        console.log("_instructors", _instructors);
+                        console.log("_instructors", response.data.instructorId);
+
+                        if (response.status == 201) {
+                          register(emailAddress, values.password);
+                          // dispatch(
+                          //   ChangeModalState.action({
+                          //     welcomeMessageModal: true,
+                          //   })
+                          // );
+                        }
+                      })
+                      .catch((error: any) => {
+                        console.log("error third", error);
+                        Toast.show({
+                          type: "info",
+                          position: "top",
+                          text1: error,
+                          text2: error?.data?.statusDescription,
+                          visibilityTime: 4000,
+                          autoHide: true,
+                          topOffset: 30,
+                          bottomOffset: 40,
+                          onShow: () => {},
+                          onHide: () => {},
+                          onPress: () => {},
+                        });
+                      })
+                      .finally(() => {
+                        dispatch(ChangeModalState.action({ loading: false }));
+                      });
+                  }
+                })
+                .catch((error) => {
+                  dispatch(ChangeModalState.action({ loading: false }));
+                  Toast.show({
+                    type: "info",
+                    position: "top",
+                    text1: error,
+                    text2: error?.data?.statusDescription,
+                    visibilityTime: 4000,
+                    autoHide: true,
+                    topOffset: 30,
+                    bottomOffset: 40,
+                    onShow: () => {},
+                    onHide: () => {},
+                    onPress: () => {},
                   });
-              }
-            });
-          }}
-        >
-          {({
-            handleChange,
-            setFieldValue,
-            handleBlur,
-            handleSubmit,
-            values,
-            errors,
-            touched,
-            isValid,
-          }) => (
-            <>
-              <Layout style={styles.formContainer} level="1">
-                <Select
-                  style={{ marginVertical: 18 }}
-                  placeholder="Select Entity"
-                  value={values.selected_entity}
-                  // label={(evaProps: any) => <Text {...evaProps}>Entity</Text>}
-                  onSelect={(index: any) => {
-                    setFieldValue(
-                      "selected_entity",
-                      organisations[index.row].value
-                    );
-                  }}
-                >
-                  {organisations.map((item) => {
-                    return <SelectItem key={item.id} title={item.label} />;
-                  })}
-                </Select>
-                <Input
-                  style={styles.inputSettings}
-                  autoCapitalize="none"
-                  accessoryRight={PersonIcon}
-                  value={"Email: " + emailAddress}
-                  disabled={true}
-                />
-                <Input
-                  style={styles.inputSettings}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                  placeholder={`Instructor's First Name*`}
-                  accessoryRight={PersonIcon}
-                  value={values.firstName}
-                  onChangeText={handleChange("firstName")}
-                  onBlur={handleBlur("firstName")}
-                />
-                {errors.firstName && touched.firstName && (
-                  <Text style={styles.errorText}>{errors.firstName}</Text>
-                )}
-                <Input
-                  style={styles.inputSettings}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                  placeholder={`Instructor's Last Name*`}
-                  accessoryRight={PersonIcon}
-                  value={values.lastName}
-                  onChangeText={handleChange("lastName")}
-                  onBlur={handleBlur("lastName")}
-                />
-                {errors.lastName && touched.lastName && (
-                  <Text style={styles.errorText}>{errors.lastName}</Text>
-                )}
-                {values.selected_entity === "School" ? (
-                  <Text
-                    style={{
-                      color: Colors.primary,
-                      fontSize: 18,
-                      fontWeight: "700",
-                      marginTop: 5,
+                });
+            }}
+          >
+            {({
+              handleChange,
+              setFieldValue,
+              handleBlur,
+              handleSubmit,
+              resetForm,
+              values,
+              errors,
+              touched,
+              isValid,
+            }) => (
+              <>
+                <Layout style={styles.formContainer} level="1">
+                  <Select
+                    style={{ marginVertical: 18 }}
+                    placeholder="Select Entity*"
+                    value={values.selected_entity}
+                    // label={(evaProps: any) => <Text {...evaProps}>Entity</Text>}
+                    onSelect={(index: any) => {
+                      resetForm();
+                      setFieldValue(
+                        "selected_entity",
+                        organisations[index.row].value
+                      );
                     }}
                   >
-                    School Information
-                  </Text>
-                ) : (
-                  <Text
-                    style={{
-                      color: Colors.primary,
-                      fontSize: 18,
-                      fontWeight: "700",
-                      marginTop: 5,
-                    }}
-                  >
-                    Organisation Information
-                  </Text>
-                )}
-                <Autocomplete
-                  placeholder="Country*"
-                  value={values.country}
-                  placement={placement}
-                  style={{ marginVertical: 5 }}
-                  onChangeText={(query) => {
-                    setFieldValue("country", query);
-                    setCountriesData(
-                      countries.filter((item) => filterCountries(item, query))
-                    );
-                  }}
-                  onSelect={(query) => {
-                    const selectedCountry = countriesData[query];
-                    setFieldValue("country", selectedCountry.name);
-                    setFieldValue("selectedCountry", selectedCountry.name);
-                    setFieldValue("selectedState", "");
-                    setFieldValue("state", "");
-                    setStates([]);
-                    GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
-                      (res) => {
-                        setStates(res.data);
-                        setStatesData(states);
-                      }
-                    );
-                    selectedCountry.phone_code.toString().startsWith("+")
-                      ? setPhoneCode(selectedCountry.phone_code.toString())
-                      : setPhoneCode("+" + selectedCountry.phone_code);
-                    getSchoolsByFilter(selectedCountry.name);
-                    getOrgByFilter(selectedCountry.name);
-                  }}
-                >
-                  {countriesData.map((item, index) => {
-                    return <AutocompleteItem key={index} title={item.name} />;
-                  })}
-                </Autocomplete>
-                <Autocomplete
-                  placeholder="State*"
-                  value={values.state}
-                  placement={placement}
-                  style={{ marginVertical: 5 }}
-                  disabled={!values.selectedCountry}
-                  // label={evaProps => <Text {...evaProps}>State</Text>}
-                  onChangeText={(query) => {
-                    setFieldValue("state", query);
-                    setStatesData(
-                      states.filter((item) => filterStates(item, query))
-                    );
-                  }}
-                  onSelect={(query) => {
-                    const selectedState = statesData[query];
-                    setFieldValue("state", selectedState);
-                    setFieldValue("selectedState", selectedState);
-                    setFieldValue("selectedCity", "");
-                    setFieldValue("city", "");
-                    setCities([]);
-                    GetAllCities(values.selectedCountry, selectedState).then(
-                      (res) => {
-                        setCities(res.data);
-                      }
-                    );
-                    getSchoolsByFilter(values.selectedCountry, selectedState);
-                    getOrgByFilter("", selectedState);
-                  }}
-                >
-                  {statesData.map((item, index) => {
-                    return <AutocompleteItem key={index} title={item} />;
-                  })}
-                </Autocomplete>
-                <Autocomplete
-                  placeholder="City*"
-                  value={values.city}
-                  placement={placement}
-                  disabled={!values.selectedState}
-                  style={{ marginVertical: 5 }}
-                  // label={evaProps => <Text {...evaProps}>City</Text>}
-                  onChangeText={(query) => {
-                    setFieldValue("city", query);
-                    setCitiesData(
-                      cities.filter((item) => filterCities(item, query))
-                    );
-                  }}
-                  onSelect={(query) => {
-                    const selectedCity = citiesData[query];
-                    setFieldValue("city", selectedCity);
-                    setFieldValue("selectedCity", selectedCity);
-                    // getSchoolsByFilter('', '', selectedCity)
-                    // getOrgByFilter('', '', selectedCity)
-                  }}
-                >
-                  {citiesData.map((item, index) => {
-                    return <AutocompleteItem key={index} title={item} />;
-                  })}
-                </Autocomplete>
-                {values.selected_entity === "School" && (
-                  <>
-                    <Autocomplete
-                      placeholder="School Name*"
-                      value={values.school}
-                      placement={placement}
-                      style={{ marginVertical: 5 }}
-                      onChangeText={(query) => {
-                        setFieldValue("school", query);
-                        let filtersarray = schools.filter((item) =>
-                          item.name.toLowerCase().includes(query.toLowerCase())
-                        );
-                        setSchoolsData(filtersarray);
-                      }}
-                      onSelect={(query) => {
-                        const selectedSchool = schoolsData[query];
-                        setFieldValue("school", selectedSchool.name);
-                        setFieldValue("selectedSchool", selectedSchool.name);
-                        setFieldValue("schoolName", selectedSchool.name);
-                        setFieldValue(
-                          "schoolAddress",
-                          (selectedSchool && selectedSchool?.address) || ""
-                        );
-                        // setSchoolsData(schools);
-                        setSelectedGrades(["1st"]);
-                        setSelectedSubjects(["Maths"]);
+                    {organisations.map((item) => {
+                      return <SelectItem key={item.id} title={item.label} />;
+                    })}
+                  </Select>
+                  <Input
+                    style={styles.inputSettings}
+                    autoCapitalize="none"
+                    accessoryRight={PersonIcon}
+                    value={"Email: " + emailAddress}
+                    disabled={true}
+                  />
+                  <Input
+                    style={styles.inputSettings}
+                    autoCapitalize="words"
+                    autoCorrect={false}
+                    placeholder={`Instructor's First Name*`}
+                    accessoryRight={PersonIcon}
+                    value={values.firstName}
+                    onChangeText={handleChange("firstName")}
+                    onBlur={handleBlur("firstName")}
+                  />
+                  {errors.firstName && touched.firstName && (
+                    <Text style={styles.errorText}>{errors.firstName}</Text>
+                  )}
+                  <Input
+                    style={styles.inputSettings}
+                    autoCapitalize="words"
+                    autoCorrect={false}
+                    placeholder={`Instructor's Last Name*`}
+                    accessoryRight={PersonIcon}
+                    value={values.lastName}
+                    onChangeText={handleChange("lastName")}
+                    onBlur={handleBlur("lastName")}
+                  />
+                  {errors.lastName && touched.lastName && (
+                    <Text style={styles.errorText}>{errors.lastName}</Text>
+                  )}
+                  {values.selected_entity === "School" ? (
+                    <Text
+                      style={{
+                        color: Colors.primary,
+                        fontSize: 18,
+                        fontWeight: "700",
+                        marginTop: 5,
                       }}
                     >
-                      {schoolsData &&
-                        schoolsData.map((item, index) => {
-                          return (
-                            <AutocompleteItem key={index} title={item?.name} />
+                      School Information
+                    </Text>
+                  ) : (
+                    <Text
+                      style={{
+                        color: Colors.primary,
+                        fontSize: 18,
+                        fontWeight: "700",
+                        marginTop: 5,
+                      }}
+                    >
+                      Organisation Information
+                    </Text>
+                  )}
+                  <Autocomplete
+                    placeholder="Country*"
+                    value={values.country}
+                    placement={placement}
+                    style={{ marginVertical: 5 }}
+                    onChangeText={(query) => {
+                      setFieldValue("country", query);
+                      setCountriesData(
+                        countries.filter((item) => filterCountries(item, query))
+                      );
+                    }}
+                    onSelect={(query) => {
+                      const selectedCountry = countriesData[query];
+                      setFieldValue("country", selectedCountry.name);
+                      setFieldValue("selectedCountry", selectedCountry.name);
+                      setFieldValue("selectedState", "");
+                      setFieldValue("state", "");
+                      setStates([]);
+                      GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
+                        (res) => {
+                          setStates(res.data);
+                          setStatesData(states);
+                        }
+                      );
+                      selectedCountry.phone_code.toString().startsWith("+")
+                        ? setPhoneCode(selectedCountry.phone_code.toString())
+                        : setPhoneCode("+" + selectedCountry.phone_code);
+                      getSchoolsByFilter(selectedCountry.name);
+                      getOrgByFilter(selectedCountry.name);
+                    }}
+                  >
+                    {countriesData.map((item, index) => {
+                      return <AutocompleteItem key={index} title={item.name} />;
+                    })}
+                  </Autocomplete>
+                  <Autocomplete
+                    placeholder="State*"
+                    value={values.state}
+                    placement={placement}
+                    style={{ marginVertical: 5 }}
+                    disabled={!values.selectedCountry}
+                    // label={evaProps => <Text {...evaProps}>State</Text>}
+                    onChangeText={(query) => {
+                      setFieldValue("state", query);
+                      setStatesData(
+                        states.filter((item) => filterStates(item, query))
+                      );
+                    }}
+                    onSelect={(query) => {
+                      const selectedState = statesData[query];
+                      setFieldValue("state", selectedState);
+                      setFieldValue("selectedState", selectedState);
+                      setFieldValue("selectedCity", "");
+                      setFieldValue("city", "");
+                      setCities([]);
+                      GetAllCities(values.selectedCountry, selectedState).then(
+                        (res) => {
+                          setCities(res.data);
+                        }
+                      );
+                      getSchoolsByFilter(values.selectedCountry, selectedState);
+                      getOrgByFilter(values.selectedCountry, selectedState);
+                    }}
+                  >
+                    {statesData.map((item, index) => {
+                      return <AutocompleteItem key={index} title={item} />;
+                    })}
+                  </Autocomplete>
+                  <Autocomplete
+                    placeholder="City*"
+                    value={values.city}
+                    placement={placement}
+                    disabled={!values.selectedState}
+                    style={{ marginVertical: 5 }}
+                    // label={evaProps => <Text {...evaProps}>City</Text>}
+                    onChangeText={(query) => {
+                      setFieldValue("city", query);
+                      setCitiesData(
+                        cities.filter((item) => filterCities(item, query))
+                      );
+                    }}
+                    onSelect={(query) => {
+                      const selectedCity = citiesData[query];
+                      setFieldValue("city", selectedCity);
+                      setFieldValue("selectedCity", selectedCity);
+                      // getSchoolsByFilter('', '', selectedCity)
+                      // getOrgByFilter('', '', selectedCity)
+                    }}
+                  >
+                    {citiesData.map((item, index) => {
+                      return <AutocompleteItem key={index} title={item} />;
+                    })}
+                  </Autocomplete>
+                  <Input
+                    style={styles.inputSettings}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholder={`Zip code*`}
+                    value={values.zipcode}
+                    onChangeText={handleChange("zipcode")}
+                    onBlur={handleBlur("zipcode")}
+                  />
+                  {errors.zipcode && touched.zipcode && (
+                    <Text style={styles.errorText}>{errors.zipcode}</Text>
+                  )}
+                  {values.selected_entity === "School" && (
+                    <>
+                      <Autocomplete
+                        placeholder="School Name*"
+                        value={values.school}
+                        placement={placement}
+                        style={{ marginVertical: 5 }}
+                        onChangeText={(query) => {
+                          setFieldValue("school", query);
+                          let filtersarray = schools.filter((item) =>
+                            item.name
+                              .toLowerCase()
+                              .includes(query.toLowerCase())
                           );
-                        })}
-                    </Autocomplete>
-                    {(values.schoolName === "Other" ||
-                      values.school === "Other") && (
-                      <>
-                        <Input
-                          style={styles.inputSettings}
-                          autoCapitalize="none"
-                          autoCorrect={false}
-                          placeholder={`Enter School Name*`}
-                          value={values.school_name}
-                          onChangeText={handleChange("school_name")}
-                          onBlur={handleBlur("school_name")}
-                        />
-                        {errors.school_name && touched.school_name && (
-                          <Text style={styles.errorText}>
-                            {errors.school_name}
-                          </Text>
-                        )}
-                      </>
-                    )}
-                    <Input
-                      style={styles.inputSettings}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      placeholder={`School Street Address*`}
-                      value={values.schoolAddress}
-                      onChangeText={handleChange("schoolAddress")}
-                      onBlur={handleBlur("schoolAddress")}
-                    />
-                    {errors.schoolAddress && touched.schoolAddress && (
-                      <Text style={styles.errorText}>
-                        {errors.schoolAddress}
-                      </Text>
-                    )}
-                    {/* <Input
+                          setSchoolsData(filtersarray);
+                        }}
+                        onSelect={(query) => {
+                          const selectedSchool = schoolsData[query];
+                          setFieldValue("school", selectedSchool.name);
+                          setFieldValue("selectedSchool", selectedSchool.name);
+                          setFieldValue("schoolName", selectedSchool.name);
+                          setFieldValue(
+                            "schoolAddress",
+                            (selectedSchool && selectedSchool?.address) || ""
+                          );
+                          // setSchoolsData(schools);
+                          setSelectedGrades(["1st"]);
+                          setSelectedSubjects(["Maths"]);
+                        }}
+                      >
+                        {schoolsData &&
+                          schoolsData.map((item, index) => {
+                            return (
+                              <AutocompleteItem
+                                key={index}
+                                title={item?.name}
+                              />
+                            );
+                          })}
+                      </Autocomplete>
+                      {(values.schoolName === "Other" ||
+                        values.school === "Other") && (
+                        <>
+                          <Input
+                            style={styles.inputSettings}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder={`Enter School Name*`}
+                            value={values.school_name}
+                            onChangeText={handleChange("school_name")}
+                            onBlur={handleBlur("school_name")}
+                          />
+                          {errors.school_name && touched.school_name && (
+                            <Text style={styles.errorText}>
+                              {errors.school_name}
+                            </Text>
+                          )}
+                        </>
+                      )}
+                      <Input
+                        style={styles.inputSettings}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        placeholder={`School Street Address*`}
+                        value={values.schoolAddress}
+                        onChangeText={handleChange("schoolAddress")}
+                        onBlur={handleBlur("schoolAddress")}
+                      />
+                      {errors.schoolAddress && touched.schoolAddress && (
+                        <Text style={styles.errorText}>
+                          {errors.schoolAddress}
+                        </Text>
+                      )}
+                      {/* <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       autoCorrect={false}
@@ -823,144 +1117,175 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     {errors.zipcode && touched.zipcode && (
                       <Text style={styles.errorText}>{errors.zipcode}</Text>
                     )} */}
-                  </>
-                )}
-                {values.selected_entity === "Organisation" && (
-                  <>
-                    <Autocomplete
-                      placeholder="Select Organization"
-                      value={values.organization}
-                      placement={placement}
-                      label={(evaProps) => (
-                        <Text {...evaProps}>Organization*</Text>
+                    </>
+                  )}
+                  {values.selected_entity === "Organisation" && (
+                    <>
+                      <Autocomplete
+                        placeholder="Select Organization*"
+                        value={values.school}
+                        placement={placement}
+                        label={(evaProps) => (
+                          <Text {...evaProps}>Organization*</Text>
+                        )}
+                        onChangeText={(query) => {
+                          setFieldValue("school", query);
+                          setOrgData(
+                            org.filter((item) =>
+                              filterSchools(item.name, query)
+                            )
+                          );
+                        }}
+                        onSelect={(query) => {
+                          const selectedOrg = orgData[query];
+                          setFieldValue("school", selectedOrg.name);
+                          setFieldValue("selectedSchool", selectedOrg.name);
+                          if (selectedOrg.name != "Other") {
+                            setFieldValue("schoolName", selectedOrg.name);
+                            setFieldValue("schoolAddress", selectedOrg.address);
+                          } else {
+                            setFieldValue("schoolName", "");
+                            setFieldValue("schoolAdress", "");
+                          }
+                        }}
+                      >
+                        {orgData &&
+                          orgData.map((item, index) => {
+                            return (
+                              <AutocompleteItem
+                                key={index}
+                                title={item?.name}
+                              />
+                            );
+                          })}
+                      </Autocomplete>
+
+                      {values.school === "Other" && (
+                        <>
+                          <Input
+                            style={styles.inputSettings}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder={`Organisation Name*`}
+                            value={values.schoolName}
+                            onChangeText={handleChange("schoolName")}
+                            onBlur={handleBlur("schoolName")}
+                          />
+                          {errors.schoolName && touched.schoolName && (
+                            <Text style={styles.errorText}>
+                              {errors.schoolName}
+                            </Text>
+                          )}
+                          <Input
+                            style={styles.inputSettings}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder={`Organization Address*`}
+                            value={values.schoolAddress}
+                            onChangeText={handleChange("schoolAddress")}
+                            onBlur={handleBlur("schoolAddress")}
+                          />
+                          {errors.schoolAddress && touched.schoolAddress && (
+                            <Text style={styles.errorText}>
+                              {errors.schoolAddress}
+                            </Text>
+                          )}
+                        </>
                       )}
-                      onChangeText={(query) => {
-                        setFieldValue("organization", query);
-                        setOrgData(
-                          org.filter((item) => filterSchools(item.label, query))
-                        );
-                      }}
-                      onSelect={(query) => {
-                        const selectedOrg = orgData[query];
-                        setFieldValue("organization", selectedOrg.name);
-                        setFieldValue("organizationName", selectedOrg.name);
-                      }}
-                    ></Autocomplete>
-                    <Input
-                      style={styles.inputSettings}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      placeholder={`Organisation Name`}
-                      value={values.schoolName}
-                      onChangeText={handleChange("schoolName")}
-                      onBlur={handleBlur("schoolName")}
-                    />
-                    {errors.schoolName && touched.schoolName && (
-                      <Text style={styles.errorText}>{errors.schoolName}</Text>
-                    )}
-                    <Input
-                      style={styles.inputSettings}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      placeholder={`Organization Address`}
-                      value={values.schoolAddress}
-                      onChangeText={handleChange("schoolAddress")}
-                      onBlur={handleBlur("schoolAddress")}
-                    />
-                    {errors.schoolAddress && touched.schoolAddress && (
-                      <Text style={styles.errorText}>
-                        {errors.schoolAddress}
-                      </Text>
-                    )}
-                    <Autocomplete
-                      placeholder="Country*"
-                      value={values.country}
-                      placement={placement}
-                      style={{ marginVertical: 5 }}
-                      onChangeText={(query) => {
-                        setFieldValue("country", query);
-                        setCountriesData(
-                          countries.filter((item) =>
-                            filterCountries(item, query)
-                          )
-                        );
-                      }}
-                      onSelect={(query) => {
-                        const selectedCountry = countriesData[query];
-                        setFieldValue("country", selectedCountry.name);
-                        setFieldValue("selectedCountry", selectedCountry.name);
-                        setFieldValue("selectedState", "");
-                        setFieldValue("state", "");
-                        setStates([]);
-                        GetAllStates(
-                          selectedCountry.name.replace(/ /g, "")
-                        ).then((res) => {
-                          setStates(res.data);
-                          setStatesData(states);
-                        });
-                        selectedCountry.phone_code.toString().startsWith("+")
-                          ? setPhoneCode(selectedCountry.phone_code.toString())
-                          : setPhoneCode("+" + selectedCountry.phone_code);
-                      }}
-                    >
-                      {countriesData.map((item, index) => {
-                        return (
-                          <AutocompleteItem key={index} title={item.name} />
-                        );
-                      })}
-                    </Autocomplete>
-                    <Autocomplete
-                      placeholder="State*"
-                      value={values.state}
-                      placement={placement}
-                      style={{ marginVertical: 5 }}
-                      onChangeText={(query) => {
-                        setFieldValue("state", query);
-                        setStatesData(
-                          states.filter((item) => filterStates(item, query))
-                        );
-                      }}
-                      onSelect={(query) => {
-                        const selectedState = statesData[query];
-                        setFieldValue("state", selectedState);
-                        setFieldValue("selectedState", selectedState);
-                        setFieldValue("selectedCity", "");
-                        setFieldValue("city", "");
-                        setCities([]);
-                        GetAllCities(
-                          values.selectedCountry,
-                          selectedState
-                        ).then((res) => {
-                          setCities(res.data);
-                        });
-                      }}
-                    >
-                      {statesData.map((item, index) => {
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
-                    <Autocomplete
-                      placeholder="City"
-                      value={values.city}
-                      placement={placement}
-                      style={{ marginVertical: 5 }}
-                      // label={evaProps => <Text {...evaProps}>City</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue("city", query);
-                        setCitiesData(
-                          cities.filter((item) => filterCities(item, query))
-                        );
-                      }}
-                      onSelect={(query) => {
-                        setFieldValue("city", cities[query]);
-                        setFieldValue("selectedCity", cities[query]);
-                      }}
-                    >
-                      {citiesData.map((item, index) => {
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
-                    <View
+                      {/* <Autocomplete
+                        placeholder="Country*"
+                        value={values.country}
+                        placement={placement}
+                        style={{ marginVertical: 5 }}
+                        onChangeText={(query) => {
+                          setFieldValue("country", query);
+                          setCountriesData(
+                            countries.filter((item) =>
+                              filterCountries(item, query)
+                            )
+                          );
+                        }}
+                        onSelect={(query) => {
+                          const selectedCountry = countriesData[query];
+                          setFieldValue("country", selectedCountry.name);
+                          setFieldValue(
+                            "selectedCountry",
+                            selectedCountry.name
+                          );
+                          setFieldValue("selectedState", "");
+                          setFieldValue("state", "");
+                          setStates([]);
+                          GetAllStates(
+                            selectedCountry.name.replace(/ /g, "")
+                          ).then((res) => {
+                            setStates(res.data);
+                            setStatesData(states);
+                          });
+                          selectedCountry.phone_code.toString().startsWith("+")
+                            ? setPhoneCode(
+                                selectedCountry.phone_code.toString()
+                              )
+                            : setPhoneCode("+" + selectedCountry.phone_code);
+                        }}
+                      >
+                        {countriesData.map((item, index) => {
+                          return (
+                            <AutocompleteItem key={index} title={item.name} />
+                          );
+                        })}
+                      </Autocomplete>
+                      <Autocomplete
+                        placeholder="State*"
+                        value={values.state}
+                        placement={placement}
+                        style={{ marginVertical: 5 }}
+                        onChangeText={(query) => {
+                          setFieldValue("state", query);
+                          setStatesData(
+                            states.filter((item) => filterStates(item, query))
+                          );
+                        }}
+                        onSelect={(query) => {
+                          const selectedState = statesData[query];
+                          setFieldValue("state", selectedState);
+                          setFieldValue("selectedState", selectedState);
+                          setFieldValue("selectedCity", "");
+                          setFieldValue("city", "");
+                          setCities([]);
+                          GetAllCities(
+                            values.selectedCountry,
+                            selectedState
+                          ).then((res) => {
+                            setCities(res.data);
+                          });
+                        }}
+                      >
+                        {statesData.map((item, index) => {
+                          return <AutocompleteItem key={index} title={item} />;
+                        })}
+                      </Autocomplete>
+                      <Autocomplete
+                        placeholder="City"
+                        value={values.city}
+                        placement={placement}
+                        style={{ marginVertical: 5 }}
+                        // label={evaProps => <Text {...evaProps}>City</Text>}
+                        onChangeText={(query) => {
+                          setFieldValue("city", query);
+                          setCitiesData(
+                            cities.filter((item) => filterCities(item, query))
+                          );
+                        }}
+                        onSelect={(query) => {
+                          setFieldValue("city", cities[query]);
+                          setFieldValue("selectedCity", cities[query]);
+                        }}
+                      >
+                        {citiesData.map((item, index) => {
+                          return <AutocompleteItem key={index} title={item} />;
+                        })}
+                      </Autocomplete> */}
+                      {/* <View
                       style={{
                         marginVertical: 10,
                         flexDirection: "row",
@@ -999,242 +1324,268 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     />
                     {errors.schoolName && touched.schoolName && (
                       <Text style={styles.errorText}>{errors.schoolName}</Text>
-                    )}
-                  </>
-                )}
-                <View
-                  style={{
-                    marginVertical: 10,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text
-                      style={{
-                        color: Colors.primary,
-                        fontSize: 18,
-                        fontWeight: "700",
-                      }}
+                    )} */}
+                    </>
+                  )}
+                  <View
+                    style={{
+                      marginVertical: 10,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginTop: 20,
+                    }}
+                  >
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
                     >
-                      Add Instructors
-                    </Text>
+                      <Text
+                        style={{
+                          color: Colors.primary,
+                          fontSize: 18,
+                          fontWeight: "700",
+                        }}
+                      >
+                        Add Instructors (Optional)
+                      </Text>
+                      <AntDesign
+                        name="questioncircleo"
+                        style={{ marginLeft: 10 }}
+                        size={25}
+                        color={Colors.primary}
+                        onPress={() =>
+                          Alert.alert(
+                            "Why Add Instructors?",
+                            `(Suggested) As admin, you may wish to: 
+ (A) Create an activity or group on behalf of any instructor 
+(B) View each instructor's list of created activities and/or groups.`,
+                            [{ text: "OK" }]
+                          )
+                        }
+                      />
+                    </View>
                     <AntDesign
-                      name="questioncircleo"
-                      style={{ marginLeft: 10 }}
+                      name="pluscircle"
                       size={25}
                       color={Colors.primary}
                       onPress={() =>
-                        Alert.alert(
-                          "Instructor Listing",
-                          "Add instructor names and emails for easy account maintenance.",
-                          [{ text: "OK" }]
+                        dispatch(
+                          ChangeModalState.action({
+                            addInstructorModalVisibility: true,
+                          })
                         )
                       }
                     />
                   </View>
-                  <AntDesign
-                    name="pluscircle"
-                    size={25}
-                    color={Colors.primary}
-                    onPress={() =>
-                      dispatch(
-                        ChangeModalState.action({
-                          addInstructorModalVisibility: true,
-                        })
-                      )
-                    }
-                  />
-                </View>
-                {instructors && instructors.length > 0 && (
-                  <ScrollView
-                    style={{
-                      borderWidth: 1,
-                      borderColor: Colors.primary,
-                      maxHeight: 150,
-                    }}
-                  >
-                    {instructors &&
-                      instructors.map((instructor) => (
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            padding: 5,
-                          }}
-                        >
-                          <Text>{`${instructor.firstName} ${instructor.lastName}`}</Text>
-                          <View
-                            style={{
-                              width: "15%",
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent: "space-evenly",
-                            }}
-                          >
-                            <AntDesign
-                              name="delete"
-                              color={Colors.primary}
-                              size={20}
-                              onPress={() => handleDeleteInstructor(instructor)}
-                            />
-                          </View>
-                        </View>
-                      ))}
-                  </ScrollView>
-                )}
-                <View
-                  style={{
-                    marginVertical: 10,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text
+                  {instructors && instructors.length > 0 && (
+                    <ScrollView
                       style={{
-                        color: Colors.primary,
-                        fontSize: 18,
-                        fontWeight: "700",
+                        borderWidth: 1,
+                        borderColor: Colors.primary,
+                        maxHeight: 150,
+                        marginBottom: 20,
                       }}
                     >
-                      Add Bus Information
-                    </Text>
+                      {instructors &&
+                        instructors.map((instructor, index) => (
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              padding: 5,
+                            }}
+                          >
+                            <Text>{`${instructor.firstName} ${instructor.lastName}`}</Text>
+                            <View
+                              style={{
+                                width: "15%",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "space-evenly",
+                              }}
+                            >
+                              <TouchableOpacity
+                                onPress={() =>
+                                  handleInstructorEdit(instructor, index)
+                                }
+                              >
+                                <Feather
+                                  name="edit"
+                                  color={Colors.primary}
+                                  size={20}
+                                />
+                              </TouchableOpacity>
+                              <AntDesign
+                                name="delete"
+                                color={Colors.primary}
+                                size={20}
+                                style={{ marginHorizontal: 10, marginLeft: 20 }}
+                                onPress={() =>
+                                  handleDeleteInstructor(instructor)
+                                }
+                              />
+                            </View>
+                          </View>
+                        ))}
+                    </ScrollView>
+                  )}
+                  <View
+                    style={{
+                      marginVertical: 10,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Text
+                        style={{
+                          color: Colors.primary,
+                          fontSize: 18,
+                          fontWeight: "700",
+                        }}
+                      >
+                        Add Bus Information (Optional)
+                      </Text>
+                      <AntDesign
+                        name="questioncircleo"
+                        style={{ marginLeft: 10 }}
+                        size={25}
+                        color={Colors.primary}
+                        onPress={() =>
+                          Alert.alert(
+                            "Why Add Bus Information?",
+                            "Optional - some schools like to assign seats to students for trips to off-campus events",
+                            [{ text: "OK" }]
+                          )
+                        }
+                      />
+                    </View>
                     <AntDesign
-                      name="questioncircleo"
-                      style={{ marginLeft: 10 }}
+                      name="pluscircle"
                       size={25}
                       color={Colors.primary}
                       onPress={() =>
-                        Alert.alert(
-                          "Bus Information",
-                          "Configure bus sitting arrangements if you assign seats for trips.",
-                          [{ text: "OK" }]
+                        dispatch(
+                          ChangeModalState.action({
+                            addButInformationModalVisibility: true,
+                          })
                         )
                       }
                     />
                   </View>
-                  <AntDesign
-                    name="pluscircle"
-                    size={25}
-                    color={Colors.primary}
-                    onPress={() =>
-                      dispatch(
-                        ChangeModalState.action({
-                          addButInformationModalVisibility: true,
-                        })
-                      )
-                    }
-                  />
-                </View>
-                {console.log("buses", buses)}
-                {buses && buses.length > 0 && (
-                  <ScrollView
-                    style={{
-                      borderWidth: 1,
-                      borderColor: Colors.primary,
-                      maxHeight: 150,
-                    }}
-                  >
-                    {buses &&
-                      buses.map((bus) => (
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            padding: 5,
-                          }}
-                        >
-                          <Text>{`${bus?.busName}`}</Text>
+
+                  {buses && buses.length > 0 && (
+                    <ScrollView
+                      style={{
+                        borderWidth: 1,
+                        borderColor: Colors.primary,
+                        maxHeight: 150,
+                        marginBottom: 15,
+                      }}
+                    >
+                      {buses &&
+                        buses.map((bus, index) => (
                           <View
                             style={{
-                              width: "15%",
                               flexDirection: "row",
                               alignItems: "center",
-                              justifyContent: "space-evenly",
+                              justifyContent: "space-between",
+                              padding: 5,
                             }}
                           >
-                            <AntDesign
-                              name="delete"
-                              color={Colors.primary}
-                              size={20}
-                              onPress={() => handleDeleteBus(bus)}
-                            />
+                            <Text>{`${bus?.busName}`}</Text>
+                            <View
+                              style={{
+                                width: "15%",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "space-evenly",
+                              }}
+                            >
+                              <AntDesign
+                                name="delete"
+                                color={Colors.primary}
+                                size={20}
+                                onPress={() => handleDeleteBus(bus, index)}
+                              />
+                            </View>
                           </View>
-                        </View>
-                      ))}
-                  </ScrollView>
-                )}
-                <Input
-                  style={styles.inputSettings}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  placeholder="Phone Number"
-                  accessoryRight={PhoneIcon}
-                  value={values.phoneNumber}
-                  keyboardType="number-pad"
-                  onChangeText={handleChange("phoneNumber")}
-                />
-                <Input
-                  style={styles.inputSettings}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  secureTextEntry={!passwordVisible}
-                  placeholder="Password*"
-                  accessoryRight={renderPasswordIcon}
-                  value={values.password}
-                  onChangeText={handleChange("password")}
-                  onBlur={handleBlur("password")}
-                />
-                {errors.password && touched.password && (
-                  <Text style={styles.errorText}>{errors.password}</Text>
-                )}
-                <Input
-                  style={styles.inputSettings}
-                  autoCapitalize="none"
-                  secureTextEntry={!confirmPasswordVisible}
-                  placeholder="Confirm Password*"
-                  accessoryRight={renderConfirmPasswordIcon}
-                  value={values.confirmPassword}
-                  onChangeText={handleChange("confirmPassword")}
-                  onBlur={handleBlur("confirmPassword")}
-                />
-                {errors.confirmPassword && touched.confirmPassword && (
-                  <Text style={styles.errorText}>{errors.confirmPassword}</Text>
-                )}
-                <View style={{ flexDirection: "row" }}>
-                  <CheckBox
-                    style={[styles.termsCheckBox, { flex: 1 }]}
-                    checked={values.termsAccepted}
-                    onChange={() =>
-                      setFieldValue("termsAccepted", !values.termsAccepted)
-                    }
-                  >
-                    {""}
-                  </CheckBox>
-                  <View style={[styles.termsCheckBox, { flex: 15 }]}>
-                    <CheckboxLabel />
+                        ))}
+                    </ScrollView>
+                  )}
+                  <Input
+                    style={styles.inputSettings}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholder="Phone Number"
+                    accessoryRight={PhoneIcon}
+                    value={values.phoneNumber}
+                    keyboardType="number-pad"
+                    onChangeText={handleChange("phoneNumber")}
+                  />
+                  <Input
+                    style={styles.inputSettings}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    secureTextEntry={!passwordVisible}
+                    placeholder="Password*"
+                    accessoryRight={renderPasswordIcon}
+                    value={values.password}
+                    onChangeText={handleChange("password")}
+                    onBlur={handleBlur("password")}
+                  />
+                  {errors.password && touched.password && (
+                    <Text style={styles.errorText}>{errors.password}</Text>
+                  )}
+                  <Input
+                    style={styles.inputSettings}
+                    autoCapitalize="none"
+                    secureTextEntry={!confirmPasswordVisible}
+                    placeholder="Confirm Password*"
+                    accessoryRight={renderConfirmPasswordIcon}
+                    value={values.confirmPassword}
+                    onChangeText={handleChange("confirmPassword")}
+                    onBlur={handleBlur("confirmPassword")}
+                  />
+                  {errors.confirmPassword && touched.confirmPassword && (
+                    <Text style={styles.errorText}>
+                      {errors.confirmPassword}
+                    </Text>
+                  )}
+                  <View style={{ flexDirection: "row" }}>
+                    <CheckBox
+                      style={[styles.termsCheckBox, { flex: 1 }]}
+                      checked={values.termsAccepted}
+                      onChange={() =>
+                        setFieldValue("termsAccepted", !values.termsAccepted)
+                      }
+                    >
+                      {""}
+                    </CheckBox>
+                    <View style={[styles.termsCheckBox, { flex: 15 }]}>
+                      <CheckboxLabel />
+                    </View>
                   </View>
+                </Layout>
+                {console.log("error", errors)}
+                <View style={{ marginTop: 18, marginBottom: 20 }}>
+                  <LinearGradientButton
+                    style={styles.signUpButton}
+                    size="medium"
+                    onPress={handleSubmit}
+                    disabled={!isValid || !values.termsAccepted}
+                  >
+                    SIGN UP
+                  </LinearGradientButton>
                 </View>
-              </Layout>
-              {console.log("error", errors)}
-              <View style={{ marginTop: 18, marginBottom: 20 }}>
-                <LinearGradientButton
-                  style={styles.signUpButton}
-                  size="medium"
-                  onPress={handleSubmit}
-                  disabled={!isValid || !values.termsAccepted}
-                >
-                  SIGN UP
-                </LinearGradientButton>
-              </View>
-            </>
-          )}
-        </Formik>
+              </>
+            )}
+          </Formik>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
