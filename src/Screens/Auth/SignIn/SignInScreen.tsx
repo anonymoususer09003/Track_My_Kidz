@@ -22,6 +22,9 @@ import {
   CheckBox,
 } from "@ui-kitten/components";
 import { Formik } from "formik";
+
+import DeviceInfo from "react-native-device-info";
+import { getDeviceId } from "react-native-device-info";
 import { useIsFocused } from "@react-navigation/native";
 import * as yup from "yup";
 import { Login } from "@/Services/LoginServices";
@@ -68,6 +71,8 @@ const SignInScreen = ({ navigation }) => {
     user_type: "",
     is_default: false,
   });
+  // const deviceId = DeviceInfo.getUniqueID();
+  // console.log("------deviceId", deviceId);
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const { login, register } = useContext(AuthContext);
   const fetchCountries = async () => {
@@ -81,6 +86,7 @@ const SignInScreen = ({ navigation }) => {
       console.log("err fetch coutnries", err);
     }
   };
+  console.log("getniqueid", getDeviceId());
   useEffect(() => {
     fetchCountries();
     // return () => setInitialValues(intitialValues);

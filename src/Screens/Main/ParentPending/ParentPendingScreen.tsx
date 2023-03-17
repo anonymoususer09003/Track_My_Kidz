@@ -85,7 +85,7 @@ const ParentPendingScreen = ({ route }) => {
       .then((res) => {
         setTotalRecordsActivity(res.totalRecords);
         setRefreshing(false);
-        setPageSizeActivity(10);
+        setPageSizeActivity(20);
 
         pageNumberActivity(refreshing ? pageActivity + 1 : 1);
         console.log("res", res);
@@ -98,7 +98,7 @@ const ParentPendingScreen = ({ route }) => {
       })
       .catch((err) => {
         setRefreshing(false);
-        setPageSizeActivity(10);
+        setPageSizeActivity(20);
 
         pageNumberActivity(pageActivity);
         console.log("Error:", err);
@@ -116,7 +116,7 @@ const ParentPendingScreen = ({ route }) => {
         console.log("res", res);
         setTotalRecordsGroup(res.totalRecords);
         setRefreshing(false);
-        setPageSizeGroup(10);
+        setPageSizeGroup(20);
 
         pageNumberGroup(refreshing ? pageGroup + 1 : 1);
         console.log("res", res);
@@ -129,7 +129,7 @@ const ParentPendingScreen = ({ route }) => {
       })
       .catch((err) => {
         setRefreshing(false);
-        setPageSizeGroup(10);
+        setPageSizeGroup(20);
 
         pageNumberGroup(pageGroup);
         console.log("Error:", err);
@@ -309,8 +309,8 @@ const ParentPendingScreen = ({ route }) => {
                 let date = item?.activity?.fromDate;
                 return (
                   <Swipeable
-                    ref={(ref) => (row[index] = ref)}
-                    onSwipeableOpen={() => closeRow(item?.activityId)}
+                    ref={(ref) => (row[item?.activity?.activityId] = ref)}
+                    onSwipeableOpen={() => closeRow(item?.activity?.activityId)}
                     renderRightActions={(e) => RightActions(e, item)}
                   >
                     <View
@@ -367,7 +367,7 @@ const ParentPendingScreen = ({ route }) => {
               } else {
                 return (
                   <Swipeable
-                    ref={(ref) => (row[index] = ref)}
+                    ref={(ref) => (row[item?.groupId] = ref)}
                     renderRightActions={(e) => RightActions(e, item)}
                     onSwipeableOpen={() => closeRow(item?.groupId)}
                   >
@@ -406,15 +406,13 @@ const ParentPendingScreen = ({ route }) => {
               }
             }}
             onEndReached={async () => {
-              if (totalRecordsActivity > activities.length) {
-                console.log("logs");
-
-                getActivities(true);
-
-                if (totalRecordsGroup > groups.length) {
-                  getGroups(true);
-                }
-              }
+              // if (totalRecordsActivity > activities.length) {
+              //   console.log("logs");
+              //   getActivities(true);
+              //   if (totalRecordsGroup > groups.length) {
+              //     getGroups(true);
+              //   }
+              // }
             }}
             refreshing={false}
             onRefresh={() => null}

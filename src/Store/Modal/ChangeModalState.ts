@@ -12,6 +12,9 @@ export default {
     if (typeof payload.welcomeMessageModal !== "undefined") {
       state.welcomeMessageModal = payload.welcomeMessageModal;
     }
+    if (typeof payload.imagePickerModal !== "undefined") {
+      state.imagePickerModal = payload.imagePickerModal;
+    }
     if (typeof payload.dependentAddImport !== "undefined") {
       state.dependentAddImport = payload.dependentAddImport;
     }

@@ -37,3 +37,4 @@ export { default as UpdatePaymentModal } from "./UpdatePaymentModal";
 export { default as MarkAllRollCallModal } from "./MarkAllRollCallModal";
 export { default as ShowInstructorsStudentsModal } from "./ShowInstructorsStudentsActivityModal";
 export { default as ShowStudentsInstructorsGroupModal } from "./ShowStudentsInstructorsGroupModal";
+export { default as ImagePickerModal } from "./ImagePickerModal";

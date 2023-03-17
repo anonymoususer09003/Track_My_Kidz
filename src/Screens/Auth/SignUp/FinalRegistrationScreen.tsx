@@ -32,7 +32,8 @@ import {
   Text,
   useStyleSheet,
 } from "@ui-kitten/components";
-import ImagePicker from "react-native-image-crop-picker";
+import { AppHeader, ProfileAvatarPicker } from "@/Components";
+
 import { ProfileAvatar } from "../../../Components/SignUp/profile-avatar.component";
 import {
   CalendarIcon,
@@ -75,7 +76,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { storeToken, storeUserType } from "@/Storage/MainAppStorage";
 import { GetSchoolByFilters } from "@/Services/School";
 import { GetOrgByFilters } from "@/Services/Org";
-
+import ImagePicker from "react-native-image-crop-picker";
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -134,7 +135,11 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
   ]);
   const [selectedGrades, setSelectedGrades] = useState([]);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
+    undefined
+  );
 
+  const [uploadedImage, setUploadedImage] = React.useState();
   const [states, setStates] = useState<Array<any>>([]);
   const [cities, setCities] = useState<Array<any>>([]);
   const [phoneCode, setPhoneCode] = useState<string>("");
@@ -1254,6 +1259,34 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
             }) => (
               <>
                 <Layout style={styles.formContainer} level="1">
+                  <View style={{ width: "100%" }}>
+                    {student?.studentPhoto && (
+                      <ProfileAvatarPicker
+                        style={styles.profileImage}
+                        // resizeMode='center'
+                        source={{ uri: student?.studentPhoto }}
+                        editButton={false ? renderEditAvatarButton : null}
+                      />
+                    )}
+                    {!student?.studentPhoto && (
+                      <View
+                        style={[
+                          styles.profileImage,
+                          {
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: Colors.lightgray,
+                          },
+                        ]}
+                      >
+                        <Text style={{ fontSize: 30 }}>
+                          {student?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
+                          {student?.lastname?.substring(0, 1)?.toUpperCase()}
+                        </Text>
+                        {/* {true && renderEditButtonElement()} */}
+                      </View>
+                    )}
+                  </View>
                   <Input
                     textStyle={{ color: Colors.gray }}
                     style={styles.inputSettings}
@@ -1576,5 +1609,24 @@ const themedStyles = StyleService.create({
   },
   rowListStyle: {
     paddingVertical: 5,
+  },
+  profileAvatar: {
+    width: 116,
+    height: 116,
+    borderRadius: 58,
+    alignSelf: "center",
+    backgroundColor: "color-primary-default",
+    tintColor: "background-basic-color-1",
+  },
+  profileImage: {
+    width: 116,
+    height: 116,
+    borderRadius: 58,
+    alignSelf: "center",
+  },
+  editAvatarButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
 });

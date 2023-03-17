@@ -39,6 +39,8 @@ const ParentApprovalScreen = ({ route }) => {
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
+  let prevOpenedRow: any;
+  let row: Array<any> = [];
   const [groups, setGroups] = useState([]);
   const [pageGroup, pageNumberGroup] = useState(0);
   const [pageSizeGroup, setPageSizeGroup] = useState(10);
@@ -122,7 +124,13 @@ const ParentApprovalScreen = ({ route }) => {
       getGroups();
     }
   }, [isFocused, declineActivity]);
-
+  const closeRow = (index) => {
+    console.log(index);
+    if (prevOpenedRow && prevOpenedRow !== row[index]) {
+      prevOpenedRow.close();
+    }
+    prevOpenedRow = row[index];
+  };
   useEffect(() => {
     if (selectedInstructions) {
       dispatch(ChangeModalState.action({ instructionsModalVisibility: true }));
@@ -178,6 +186,7 @@ const ParentApprovalScreen = ({ route }) => {
       />
       {declineActivity && (
         <DeclineActivityModal
+          fromParent={true}
           activity={declineActivity}
           setActivity={setDeclineActivity}
         />
@@ -199,7 +208,11 @@ const ParentApprovalScreen = ({ route }) => {
               if (item?.activity?.activityId) {
                 let date = item?.activity?.fromDate;
                 return (
-                  <>
+                  <Swipeable
+                    ref={(ref) => (row[item?.activity?.activityId] = ref)}
+                    onSwipeableOpen={() => closeRow(item?.activity?.activityId)}
+                    renderRightActions={(e) => RightActions(e, item)}
+                  >
                     <View
                       style={[
                         styles.item,
@@ -249,11 +262,15 @@ const ParentApprovalScreen = ({ route }) => {
                         style={styles.text}
                       >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
                     </View>
-                  </>
+                  </Swipeable>
                 );
               } else {
                 return (
-                  <>
+                  <Swipeable
+                    ref={(ref) => (row[item?.groupId] = ref)}
+                    renderRightActions={(e) => RightActions(e, item)}
+                    onSwipeableOpen={() => closeRow(item?.groupId)}
+                  >
                     <View
                       style={[
                         styles.item,
@@ -284,7 +301,7 @@ const ParentApprovalScreen = ({ route }) => {
                         style={styles.text}
                       >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
                     </View>
-                  </>
+                  </Swipeable>
                 );
               }
             }}

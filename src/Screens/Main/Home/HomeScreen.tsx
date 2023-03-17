@@ -29,6 +29,7 @@ import {
   AddStudentModal,
   ParentPaymentModal,
 } from "@/Modals";
+import FA5 from "react-native-vector-icons/FontAwesome5";
 import SearchBar from "@/Components/SearchBar/SearchBar";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import Colors from "@/Theme/Colors";
@@ -759,7 +760,56 @@ const HomeScreen = () => {
                             : parseFloat(10),
                         }}
                       >
-                        <TouchableOpacity
+                        <View style={{}}>
+                          <View
+                            style={{
+                              height: 30,
+                              width: 30,
+                              borderRadius: 80,
+                              overflow: "hidden",
+                              // top: 33,
+                              // zIndex: 10,
+                            }}
+                          >
+                            {item?.studentImage == "" && (
+                              <View
+                                style={{
+                                  height: "100%",
+                                  width: "100%",
+                                  borderRadius: 80,
+                                  backgroundColor: Colors.primary,
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Text style={{ color: Colors.white }}>
+                                  {item?.firstname
+                                    ?.substring(0, 1)
+                                    ?.toUpperCase() || ""}
+                                  {item?.lastname
+                                    ?.substring(0, 1)
+                                    ?.toUpperCase() || ""}
+                                </Text>
+                              </View>
+                            )}
+                            {item?.studentImage != "" && (
+                              <Image
+                                source={{
+                                  uri: item?.studentImage,
+                                }}
+                                style={{
+                                  height: "100%",
+                                  width: "100%",
+                                  borderRadius: 80,
+                                  aspectRatio: 2,
+                                }}
+                                resizeMode="contain"
+                              />
+                            )}
+                          </View>
+                          {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+                        </View>
+                        {/* <TouchableOpacity
                           onPress={() => console.log("pressed")}
                           style={{ alignItems: "center" }}
                         >
@@ -772,7 +822,7 @@ const HomeScreen = () => {
                             size={25}
                             color="red"
                           />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                       </Marker>
                     </>
                     // </>

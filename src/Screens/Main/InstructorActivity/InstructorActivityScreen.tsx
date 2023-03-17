@@ -159,8 +159,6 @@ const InstructorActivityScreen = ({}) => {
     } catch (err) {}
   };
   useEffect(() => {
-    
-
     dispatch(
       ChangeNavigationCustomState.action({
         navigationLeftDrawer: "activity",
@@ -755,11 +753,13 @@ const InstructorActivityScreen = ({}) => {
     console.log("date", date);
     let temp = [];
     originalActivities?.result?.map((item, index) => {
-      let itemDate = item?.date.split("T");
-      console.log("dsate----", moment(date).format("YYYY-MM-DD"));
-      console.log("itemdate", itemDate[0]);
+      // let itemDate = item?.date.split("T");
+      console.log("dsate----", moment(item?.fromDate).format("YYYY-MM-DD")); // console.log("itemdate", itemDate[0]);
 
-      if (itemDate[0] == moment(date).format("YYYY-MM-DD")) {
+      if (
+        moment(item?.fromDate).format("YYYY-MM-DD") ==
+        moment(date).format("YYYY-MM-DD")
+      ) {
         temp.push(item);
       }
     });
@@ -1004,8 +1004,8 @@ const InstructorActivityScreen = ({}) => {
             marginBottom: 20,
           }}
           renderItem={({ item, index }) => {
-            let date = item?.date.split(" ");
-            console.log("date", date);
+            // let date = item?.date.split(" ");
+            // console.log("date", date);
             let temp = [];
             let instructor = item?.instructors?.map((item) =>
               temp.push(item?.firstName)
@@ -1042,10 +1042,21 @@ const InstructorActivityScreen = ({}) => {
                     },
                   ]}
                 >
-                  <Text style={styles.text}>{`Date: ${moment(
-                    date == "string" ? new Date() : date[0]
-                  ).format("YYYY-MM-DD")}`}</Text>
-                  {!date[1] ? (
+                  <Text style={styles.text}>{`FROM: ${moment(
+                    item?.fromDate == "string" ? new Date() : item?.fromDate
+                  ).format("YYYY-MM-DD")} at ${moment(
+                    item?.fromDate == "string" ? new Date() : item?.fromDate
+                  )
+                    .subtract("hours", 5)
+                    .format("hh:mm a")} `}</Text>
+                  <Text style={styles.text}>{`TO: ${moment(
+                    item?.toDate == "string" ? new Date() : item?.toDate
+                  ).format("YYYY-MM-DD")} at ${moment(
+                    item?.toDate == "string" ? new Date() : item?.toDate
+                  )
+                    .subtract("hours", 5)
+                    .format("hh:mm a")} `}</Text>
+                  {/* {!date[1] ? (
                     <Text style={styles.text}>{`Time: ${moment(
                       date == "string" ? new Date() : date
                     )
@@ -1055,7 +1066,7 @@ const InstructorActivityScreen = ({}) => {
                     <Text style={styles.text}>{`Time: ${
                       date[2] + " " + date[3]
                     }`}</Text>
-                  )}
+                  )} */}
                   <Text style={styles.text}>{`${
                     item?.activityType?.toLowerCase() === "activity"
                       ? "Activity"

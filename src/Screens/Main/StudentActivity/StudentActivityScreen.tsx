@@ -233,7 +233,7 @@ const StudentActivityScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    // locationPermission();
+    locationPermission();
     // return () => backgroundCall();
   }, []);
 

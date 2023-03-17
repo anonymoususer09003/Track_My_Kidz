@@ -5,6 +5,7 @@ import { PostGetDto } from "@/Models/PostDTOS/post.interface";
 
 export default buildSlice("modal", [ChangeModalState], {
   welcomeMessageModal: false,
+  imagePickerModal: false,
   dependentAddImport: false,
   parentPaymentModalVisibility: false,
   qrcodeModalVisibility: false,
@@ -68,4 +69,5 @@ export interface ModalState {
   addInstructorFormModalVisibility: boolean;
   editInstructorFormModalVisibility: boolean;
   studentVisibilityPermissionModal: boolean;
+  imagePickerModal: boolean;
 }

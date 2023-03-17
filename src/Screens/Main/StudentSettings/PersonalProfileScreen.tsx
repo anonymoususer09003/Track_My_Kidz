@@ -20,8 +20,12 @@ import {
   Spinner,
   Text,
 } from "@ui-kitten/components";
-import { AppHeader, ProfileAvatarPicker } from "@/Components";
+import { ImagePickerModal } from "@/Modals";
+
+import ProfileIcon from "react-native-vector-icons/EvilIcons";
 import ImagePicker from "react-native-image-crop-picker";
+import { AppHeader, ProfileAvatarPicker } from "@/Components";
+
 import {
   ImagePickerResponse,
   launchImageLibrary,
@@ -44,6 +48,8 @@ const PersonalProfileScreen = () => {
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
     undefined
   );
+
+  const [uploadedImage, setUploadedImage] = React.useState();
   const [languages, setLanguages] = useState<Array<ReactText>>(["English"]);
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const countries = useSelector(
@@ -53,6 +59,7 @@ const PersonalProfileScreen = () => {
   const [isSending, setisSending] = useState(false);
   const [isSent, setisSent] = useState(false);
   const [userId, setuserId] = useState(null);
+  const [visible, setVisible] = useState(false);
   const user = useSelector((state: { user: UserState }) => state.user.item);
   const isLoading = useSelector(
     (state: { user: UserState }) => state.user.fetchOne.loading
@@ -79,6 +86,23 @@ const PersonalProfileScreen = () => {
     setPasswordVisible(!passwordVisible);
   };
 
+  const imageCameraLaunch = () => {
+    ImagePicker.openCamera({
+      cropping: true,
+      cropperCircleOverlay: true,
+      width: 139,
+      height: 130,
+      compressImageQuality: 1,
+      loadingLabelText: "Loading image",
+    }).then((image) => {
+      if (image != null) {
+        const source = { uri: image?.path };
+        setUploadedImage(image);
+        setSelectedImage(source.uri);
+        // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
+      }
+    });
+  };
   const renderPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onPasswordIconPress}>
       <Icon {...props} name={passwordVisible ? "eye-off" : "eye"} />
@@ -90,7 +114,7 @@ const PersonalProfileScreen = () => {
       style={styles.editAvatarButton}
       status="basic"
       accessoryRight={<Icon name="plus" />}
-      onPress={imageGalleryLaunch}
+      onPress={() => setVisible(true)}
     />
   );
 
@@ -125,8 +149,27 @@ const PersonalProfileScreen = () => {
     }),
   });
 
+  function getUriSource(): any {
+    return { uri: selectedImage };
+  }
+  const renderEditButtonElement = (): ButtonElement => {
+    const buttonElement: React.ReactElement<ButtonProps> =
+      renderEditAvatarButton();
+
+    return React.cloneElement(buttonElement, {
+      style: [buttonElement.props.style, styles.editButton],
+    });
+  };
+
   return (
     <>
+      {visible && (
+        <ImagePickerModal
+          openCamera={imageCameraLaunch}
+          openGallery={imageGalleryLaunch}
+          close={() => setVisible(false)}
+        />
+      )}
       <AppHeader title="Profile" isBack />
       {isLoading ? (
         <View style={styles.sppinerContainer}>
@@ -138,6 +181,35 @@ const PersonalProfileScreen = () => {
         <KeyboardAwareScrollView style={{ flex: 1 }} extraScrollHeight={150}>
           <ScrollView style={styles.container}>
             <View style={[[Layout.column, Layout.justifyContentCenter]]}>
+              <View style={{ width: "100%" }}>
+                {user?.studentPhoto && (
+                  <ProfileAvatarPicker
+                    style={styles.profileImage}
+                    // resizeMode='center'
+                    source={{ uri: user?.studentPhoto }}
+                    editButton={false ? renderEditAvatarButton : null}
+                  />
+                )}
+                {!user?.studentPhoto && (
+                  <View
+                    style={[
+                      styles.profileImage,
+                      {
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: Colors.lightgray,
+                      },
+                    ]}
+                  >
+                    <Text style={{ fontSize: 30 }}>
+                      {user?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
+                      {user?.lastname?.substring(0, 1)?.toUpperCase()}
+                    </Text>
+                    {/* {true && renderEditButtonElement()} */}
+                  </View>
+                )}
+              </View>
+
               <Formik
                 validationSchema={personalProfileValidationSchema}
                 validateOnMount={true}
@@ -157,16 +229,34 @@ const PersonalProfileScreen = () => {
                   parentemail2: user?.parentemail2 || "",
                 }}
                 onSubmit={(values, { resetForm }) => {
+                  let formData = new FormData();
+                  formData.append(
+                    "image",
+                    uploadedImage
+                      ? {
+                          uri: uploadedImage?.path,
+                          name: uploadedImage.mime,
+                          type: uploadedImage.mime,
+                        }
+                      : ""
+                  );
+                  formData.append("parentId", parseInt(userId, 0));
+                  formData.append("firstName", values.firstName);
+                  formData.append("lastName", values.lastName);
+                  formData.append("country", values.country);
+                  formData.append("state", values.state);
+                  formData.append("city", values.city);
+                  formData.append("id", userId);
                   setisSending(true);
-                  let objectToPass = {
-                    firstName: values.firstName,
-                    lastName: values.lastName,
-                    id: userId,
-                    country: values.country,
-                    state: values.state,
-                    city: values.city,
-                  };
-                  UpdateUser(objectToPass)
+                  // let objectToPass = {
+                  //   firstName: values.firstName,
+                  //   lastName: values.lastName,
+                  //   id: userId,
+                  //   country: values.country,
+                  //   state: values.state,
+                  //   city: values.city,
+                  // };
+                  UpdateUser(formData)
                     .then((response: any) => {
                       if (response.status == 200) {
                         setisEditMode(false);
@@ -443,5 +533,29 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "bold",
     color: Colors.fieldLabel,
+  },
+  editButton: {
+    position: "absolute",
+    alignSelf: "flex-end",
+    bottom: 0,
+  },
+  profileAvatar: {
+    width: 116,
+    height: 116,
+    borderRadius: 58,
+    alignSelf: "center",
+    backgroundColor: "color-primary-default",
+    tintColor: "background-basic-color-1",
+  },
+  profileImage: {
+    width: 116,
+    height: 116,
+    borderRadius: 58,
+    alignSelf: "center",
+  },
+  editAvatarButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
 });

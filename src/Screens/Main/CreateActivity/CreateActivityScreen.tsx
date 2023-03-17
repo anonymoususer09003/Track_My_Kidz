@@ -574,7 +574,11 @@ const CreateActivityScreen = ({ route }) => {
           setStudents([...item]);
         }}
       />
-      <AppHeader title="Create Event" hideCalendar={true} hideApproval={true} />
+      <AppHeader
+        title={isEdit ? "Edit Event" : "Create Event"}
+        hideCalendar={true}
+        hideApproval={true}
+      />
       <ScrollView style={styles.layout}>
         {/* <Text
           textBreakStrategy={"highQuality"}
@@ -1361,7 +1365,7 @@ const CreateActivityScreen = ({ route }) => {
                       }}
                     >
                       <Text style={{ marginRight: 20, marginTop: 10 }}>
-                        school/org
+                        Use school/org
                       </Text>
                       <CheckBox
                         disabled={toCheckBox}
@@ -1577,7 +1581,7 @@ const CreateActivityScreen = ({ route }) => {
                           }}
                         >
                           <Text style={{ marginRight: 20, marginTop: 10 }}>
-                            school/org
+                            Use school/org
                           </Text>
                           <CheckBox
                             disabled={fromCheckBox}

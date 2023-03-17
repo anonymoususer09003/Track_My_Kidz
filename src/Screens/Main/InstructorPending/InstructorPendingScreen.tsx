@@ -75,10 +75,10 @@ const InstructorGroupPendingScreen = ({ route }) => {
   );
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [pageActivity, pageNumberActivity] = useState(0);
-  const [pageSizeActivity, setPageSizeActivity] = useState(10);
+  const [pageSizeActivity, setPageSizeActivity] = useState(20);
   const [totalRecordsActivity, setTotalRecordsActivity] = useState(0);
   const [pageGroup, pageNumberGroup] = useState(0);
-  const [pageSizeGroup, setPageSizeGroup] = useState(10);
+  const [pageSizeGroup, setPageSizeGroup] = useState(20);
   const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
   const [selectAll, setSelectAll] = useState(false);
   const [activities, setActivities] = useState([]);
@@ -137,7 +137,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
         console.log("res", res.data);
         setTotalRecordsActivity(res.data.totalRecords);
         setRefreshing(false);
-        setPageSizeActivity(10);
+        setPageSizeActivity(20);
 
         pageNumberActivity(refreshing ? pageActivity + 1 : 1);
         // const data =
@@ -157,7 +157,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
       })
       .catch((err) => {
         setRefreshing(false);
-        setPageSizeActivity(10);
+        setPageSizeActivity(20);
 
         pageNumberActivity(pageActivity);
         console.log("getActivities Error:", err);
@@ -177,7 +177,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
       .then((res) => {
         setTotalRecordsGroup(res.totalRecords);
         setRefreshing(false);
-        setPageSizeGroup(10);
+        setPageSizeGroup(20);
 
         pageNumberGroup(refreshing ? pageGroup + 1 : 1);
         // const data =
@@ -451,14 +451,13 @@ const InstructorGroupPendingScreen = ({ route }) => {
                 }
               }}
               onEndReached={async () => {
-                if (totalRecordsActivity > activities.length) {
-                  console.log("logs");
-
-                  getActivities(true);
-                }
-                if (totalRecordsGroup > groups.length) {
-                  getGroup(true);
-                }
+                // if (totalRecordsActivity > activities.length) {
+                //   console.log("logs");
+                //   getActivities(true);
+                // }
+                // if (totalRecordsGroup > groups.length) {
+                //   getGroup(true);
+                // }
               }}
               refreshing={false}
               onRefresh={() => null}

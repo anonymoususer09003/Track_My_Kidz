@@ -47,6 +47,8 @@ const ParentDeclineScreen = ({ route }) => {
   const [totalRecordsActivity, setTotalRecordsActivity] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
+  let prevOpenedRow: any;
+  let row: Array<any> = [];
   const getActivities = async (refreshing: any) => {
     if (refreshing) {
       setRefreshing(true);
@@ -114,6 +116,13 @@ const ParentDeclineScreen = ({ route }) => {
         console.log("Error:", err);
       });
   };
+  const closeRow = (index) => {
+    console.log(index);
+    if (prevOpenedRow && prevOpenedRow !== row[index]) {
+      prevOpenedRow.close();
+    }
+    prevOpenedRow = row[index];
+  };
   useEffect(() => {
     if (isFocused || activity) {
       getActivities();
@@ -175,12 +184,26 @@ const ParentDeclineScreen = ({ route }) => {
         selectedInstructions={selectedInstructions}
         setSelectedInstructions={setSelectedInstructions}
       />
-      {showAcceptModal && activity && isFocused && (
+      {showAcceptModal && (
         <ApproveActivityModal
+          fromParent={true}
           visible={showAcceptModal}
+          setSelectedChild={() => setActivity(null)}
           onClose={() => setShowAcceptModal(false)}
           activity={activity}
-          setActivity={setActivity}
+          setActivity={(id) => {
+            if (activity?.activityId) {
+              console.log("declinedactivity", activity);
+              closeRow();
+              console.log("activites", activities);
+              let filter = activities?.filter((item) => item?.activityId != id);
+
+              setActivities(filter);
+            } else {
+              let filter = groups?.filter((item) => item?.groupId != id);
+              setGroups(filter);
+            }
+          }}
         />
       )}
       {activities.length === 0 && (
@@ -198,7 +221,11 @@ const ParentDeclineScreen = ({ route }) => {
             if (item?.activity?.activityId) {
               let date = item?.activity?.fromDate;
               return (
-                <>
+                <Swipeable
+                  ref={(ref) => (row[item?.activity?.activityId] = ref)}
+                  onSwipeableOpen={() => closeRow(item?.activity?.activityId)}
+                  renderRightActions={(e) => RightActions(e, item)}
+                >
                   <View
                     style={[
                       styles.item,
@@ -246,11 +273,15 @@ const ParentDeclineScreen = ({ route }) => {
                       style={styles.text}
                     >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
                   </View>
-                </>
+                </Swipeable>
               );
             } else {
               return (
-                <>
+                <Swipeable
+                  ref={(ref) => (row[item?.groupId] = ref)}
+                  renderRightActions={(e) => RightActions(e, item)}
+                  onSwipeableOpen={() => closeRow(item?.groupId)}
+                >
                   <View
                     style={[
                       styles.item,
@@ -269,7 +300,7 @@ const ParentDeclineScreen = ({ route }) => {
                       style={styles.text}
                     >{` Group Name: ${item?.group?.groupName}`}</Text>
                     <Text style={styles.text}>{` Date: ${moment(
-                      item?.activity?.scheduler?.fromDate
+                      item?.group?.scheduler?.fromDate
                     ).format("YYYY-MM-DD")}`}</Text>
                     <Text
                       style={styles.text}
@@ -279,7 +310,7 @@ const ParentDeclineScreen = ({ route }) => {
                       style={styles.text}
                     >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
                   </View>
-                </>
+                </Swipeable>
               );
             }
           }}

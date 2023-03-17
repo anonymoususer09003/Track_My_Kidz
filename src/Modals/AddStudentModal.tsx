@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import {
   Input,
   Layout,
@@ -10,6 +10,9 @@ import {
   Autocomplete,
   AutocompleteItem,
   CheckBox,
+  Button,
+  Icon,
+  Card,
 } from "@ui-kitten/components";
 import { PersonIcon, PhoneIcon } from "@/Components/SignUp/icons";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
@@ -17,7 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Colors from "@/Theme/Colors";
 import { ModalState } from "@/Store/Modal";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
-
+import ImagePicker from "react-native-image-crop-picker";
 import { Formik } from "formik";
 import { CreateStudent } from "@/Services/Student";
 import { loadUserId } from "@/Storage/MainAppStorage";
@@ -27,7 +30,11 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { PlaceState } from "@/Store/Places";
 import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
 import { CountryDTO } from "@/Models/CountryDTOs";
+import { ImagePickerModal } from "@/Modals";
 import { UserState } from "@/Store/User";
+import { photoUpload } from "@/AWS/aws-upload-service";
+import ProfileAvatarPicker from "@/Components/ProfileAvatar";
+import ProfileIcon from "react-native-vector-icons/EvilIcons";
 import * as yup from "yup";
 
 const filterCountries = (item: CountryDTO, query: string) => {
@@ -46,7 +53,10 @@ const filterSchools = (item: string, query: string) => {
 
 const AddStudentModal = () => {
   const navigation = useNavigation();
-
+  const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
+    ""
+  );
+  const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const [schools, setSchools] = useState<[]>([]);
   const [grades, setGrades] = useState<string>("");
@@ -56,6 +66,7 @@ const AddStudentModal = () => {
   const countries = useSelector(
     (state: { places: PlaceState }) => state.places.countries
   );
+  const [visible, setVisible] = useState(false);
   const [checkBox, setCheckBox] = useState(false);
   const [countriesData, setCountriesData] = React.useState(countries);
   const [statesData, setStatesData] = React.useState<Array<any>>([]);
@@ -63,9 +74,50 @@ const AddStudentModal = () => {
   const [states, setStates] = useState<Array<any>>([]);
   const [cities, setCities] = useState<Array<any>>([]);
   const [schoolsData, setSchoolsData] = React.useState(schools);
+  const [uploadedImage, setUploadedImage] = React.useState(null);
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
+  function getUriSource(): any {
+    return { uri: selectedImage };
+  }
+  console.log("selectedimage", selectedImage);
+
+  const imageGalleryLaunch = () => {
+    ImagePicker.openPicker({
+      cropping: true,
+      cropperCircleOverlay: true,
+      width: 139,
+      height: 130,
+      compressImageQuality: 1,
+      loadingLabelText: "Loading image",
+    }).then((image) => {
+      if (image != null) {
+        const source = { uri: image?.path };
+        setUploadedImage(image);
+        setSelectedImage(source.uri);
+        // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
+      }
+    });
+  };
+  const imageCameraLaunch = () => {
+    ImagePicker.openCamera({
+      cropping: true,
+      cropperCircleOverlay: true,
+      width: 139,
+      height: 130,
+      compressImageQuality: 1,
+      loadingLabelText: "Loading image",
+    }).then((image) => {
+      if (image != null) {
+        const source = { uri: image?.path };
+        setUploadedImage(image);
+        setSelectedImage(source.uri);
+        // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
+      }
+    });
+  };
+  console.log("uploadimage--000", uploadedImage);
 
   const getSchoolsByFilter = (
     country = "",
@@ -127,6 +179,30 @@ const AddStudentModal = () => {
   // useEffect(() => {
   //   getSchools();
   // }, []);
+  const renderEditAvatarButton = (): React.ReactElement => (
+    <Button
+      style={styles.editAvatarButton}
+      status="basic"
+      accessoryRight={<Icon name="edit" />}
+      onPress={() => setVisible(true)}
+    />
+  );
+  const renderEditButtonElement = (): ButtonElement => {
+    const buttonElement: React.ReactElement<ButtonProps> =
+      renderEditAvatarButton();
+
+    return React.cloneElement(buttonElement, {
+      style: [buttonElement.props.style, styles.editButton],
+    });
+  };
+  useEffect(() => {
+    if (!isFocused) {
+      setSelectedImage("");
+      setCheckBox(false);
+
+      setUploadedImage(null);
+    }
+  }, [isFocused]);
   return (
     <Modal
       visible={isVisible}
@@ -140,6 +216,13 @@ const AddStudentModal = () => {
       }}
     >
       <>
+        {visible && (
+          <ImagePickerModal
+            openCamera={imageCameraLaunch}
+            openGallery={imageGalleryLaunch}
+            close={() => setVisible(false)}
+          />
+        )}
         <KeyboardAwareScrollView style={{ flex: 1 }}>
           <View
             style={{
@@ -177,25 +260,53 @@ const AddStudentModal = () => {
                 onSubmit={async (values, { resetForm }) => {
                   console.log("values", values);
                   const userId = await loadUserId();
-                  const data = {
-                    parentId: parseInt(userId, 0),
-                    firstname: values.firstName,
-                    lastname: values.lastName,
-                    phone: values.phoneNumber,
-                    email: values.email,
-                    school:
-                      values.selectedSchool != ""
-                        ? values.selectedSchool
-                        : values.school,
-                    // grade: values.grade,
-                    country: values.selectedCountry,
-                    state: values.state,
-                    city: values.city,
-                    parentemail1: currentUser.email,
-                    parentemail2: "",
-                  };
-                  console.log("data", data);
-                  CreateStudent(data)
+                  let formData = new FormData();
+                  formData.append(
+                    "image",
+                    uploadedImage
+                      ? {
+                          uri: uploadedImage?.path,
+                          name: uploadedImage.mime,
+                          type: uploadedImage.mime,
+                        }
+                      : ""
+                  );
+                  formData.append("parentId", parseInt(userId, 0));
+                  formData.append("firstname", values.firstName);
+                  formData.append("lastname", values.lastName);
+                  formData.append("phone", values.phoneNumber);
+                  formData.append("email", values?.email);
+                  formData.append(
+                    "school",
+                    values.selectedSchool != ""
+                      ? values.selectedSchool
+                      : values.school
+                  );
+                  formData.append("country", values.country);
+                  formData.append("state", values.state);
+                  formData.append("city", values.city);
+                  formData.append("parentemail1", currentUser.email);
+                  formData.append("parentemail2", "");
+                  // const data = {
+                  //   image: selectedImage || "",
+                  //   parentId: parseInt(userId, 0),
+                  //   firstname: values.firstName,
+                  //   lastname: values.lastName,
+                  //   phone: values.phoneNumber,
+                  //   email: values.email,
+                  //   school:
+                  //     values.selectedSchool != ""
+                  //       ? values.selectedSchool
+                  //       : values.school,
+                  //   // grade: values.grade,
+                  //   country: values.selectedCountry,
+                  //   state: values.state,
+                  //   city: values.city,
+                  //   parentemail1: currentUser.email,
+                  //   parentemail2: "",
+                  // };
+                  // console.log("data", data);
+                  CreateStudent(formData)
                     .then((response) => {
                       console.log("response", response);
                       Toast.show({
@@ -239,6 +350,43 @@ const AddStudentModal = () => {
                 }) => (
                   <>
                     <Layout style={styles.formContainer} level="1">
+                      <View style={{ width: "100%" }}>
+                        {selectedImage != "" && (
+                          <ProfileAvatarPicker
+                            style={styles.profileImage}
+                            // resizeMode='center'
+                            source={getUriSource()}
+                            editButton={false ? renderEditAvatarButton : null}
+                          />
+                        )}
+                        {!selectedImage && (
+                          <View
+                            style={[
+                              styles.profileImage,
+                              {
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: Colors.lightgray,
+                              },
+                            ]}
+                          >
+                            <ProfileIcon size={110} name="user" />
+                            {true && renderEditButtonElement()}
+                          </View>
+                        )}
+                        <Text
+                          style={[
+                            styles.errorText,
+                            {
+                              marginTop: 20,
+                              lineHeight: 17,
+                              textAlign: "center",
+                            },
+                          ]}
+                        >
+                          Headshots preffered
+                        </Text>
+                      </View>
                       <View
                         style={{
                           flexDirection: "row",
@@ -543,9 +691,10 @@ const AddStudentModal = () => {
                         style={[
                           styles.bottomButton,
                           {
-                            backgroundColor: isValid
-                              ? Colors.primary
-                              : Colors.gray,
+                            backgroundColor:
+                              isValid && selectedImage != ""
+                                ? Colors.primary
+                                : Colors.gray,
                           },
                         ]}
                       >
@@ -553,14 +702,17 @@ const AddStudentModal = () => {
                           style={[
                             styles.bottomButton,
                             {
-                              backgroundColor: isValid
-                                ? Colors.primary
-                                : Colors.gray,
+                              backgroundColor:
+                                isValid && selectedImage != ""
+                                  ? Colors.primary
+                                  : Colors.gray,
                             },
                           ]}
                           onPress={() => {
-                            setFieldValue("addMore", false);
-                            handleSubmit();
+                            if (selectedImage != "") {
+                              setFieldValue("addMore", false);
+                              handleSubmit();
+                            }
                           }}
                         >
                           <Text style={styles.button}>I'm done</Text>
@@ -570,9 +722,10 @@ const AddStudentModal = () => {
                         style={[
                           styles.bottomButton,
                           {
-                            backgroundColor: isValid
-                              ? Colors.primary
-                              : Colors.gray,
+                            backgroundColor:
+                              isValid && selectedImage != ""
+                                ? Colors.primary
+                                : Colors.gray,
                           },
                         ]}
                       >
@@ -580,14 +733,17 @@ const AddStudentModal = () => {
                           style={[
                             styles.bottomButton,
                             {
-                              backgroundColor: isValid
-                                ? Colors.primary
-                                : Colors.gray,
+                              backgroundColor:
+                                isValid && selectedImage != ""
+                                  ? Colors.primary
+                                  : Colors.gray,
                             },
                           ]}
                           onPress={() => {
-                            setFieldValue("addMore", true);
-                            handleSubmit(true);
+                            if (selectedImage != "") {
+                              setFieldValue("addMore", true);
+                              handleSubmit(true);
+                            }
                           }}
                         >
                           <Text style={styles.button}>Add one more</Text>
@@ -802,5 +958,10 @@ const styles = StyleSheet.create({
   },
   rowListStyle: {
     paddingVertical: 5,
+  },
+  editButton: {
+    position: "absolute",
+    alignSelf: "flex-end",
+    bottom: 0,
   },
 });

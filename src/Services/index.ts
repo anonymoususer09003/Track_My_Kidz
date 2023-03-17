@@ -25,6 +25,16 @@ instance.interceptors.request.use(async (request) => {
         };
 
         break;
+
+      case "/user/student/create":
+      case "/user/student/update":
+        request.headers = {
+          ...request.headers,
+
+          Authorization: "Bearer " + token,
+          "Content-Type": "multipart/form-data",
+        };
+
       default:
         request.headers.Authorization = "Bearer " + token;
     }

@@ -174,7 +174,7 @@ const ApproveActivityModal = ({
         getGroupOptInDetail(activity?.groupId);
       }
     }
-  }, [activity, isFocused]);
+  }, [activity, isFocused, fromParent]);
 
   // @ts-ignore
   return (
