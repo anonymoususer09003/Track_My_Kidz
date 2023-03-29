@@ -64,7 +64,7 @@ const ActivityDetailsScreen = () => {
 
   return (
     <>
-      <AppHeader title="" />
+      <AppHeader title="" hideCalendar={true} />
       <View
         style={{
           flexDirection: "row",

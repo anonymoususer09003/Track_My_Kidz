@@ -28,6 +28,7 @@ import notifications from "./Notifications";
 import selected from "./Selected";
 import appointments from "./Appointments";
 import instructorsActivity from "./InstructorsActivity";
+import studentActivity from "./StudentActivity";
 import ads from "./Ads";
 const reducers = combineReducers({
   startup,
@@ -47,6 +48,7 @@ const reducers = combineReducers({
   appointments,
   ads,
   instructorsActivity,
+  studentActivity,
 });
 
 const persistConfig = {

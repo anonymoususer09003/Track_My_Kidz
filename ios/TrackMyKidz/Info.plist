@@ -56,22 +56,18 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires to access bluetooth headphones during livestreaming</string>
 	<key>NSCalendarsUsageDescription</key>
-	<string>Optional for users to use calendar for scheduler in $(PRODUCT_NAME)</string>
+	<string>Custom In App Calendar to filter user events in $(PRODUCT_NAME)</string>
 	<key>NSCameraUsageDescription</key>
 	<string>$(PRODUCT_NAME) requires access to camera for uploading Posts, Blogs and Products</string>
 	<key>NSContactsUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires access to contacts for users to invite friends, share Posts, Blogs, and Products</string>
+	<string>$(PRODUCT_NAME) requires access to contacts for users to invite friends.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Optional for users to use Face ID to log into $(PRODUCT_NAME)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires location info to show you location of your dependents and instructors.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires access to microphone for livestreaming</string>
+	<string>$(PRODUCT_NAME) requires location info to show locations of dependents/students and instructors.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires access to photo library for uploading photos and videos for Posts, Blogs and Products</string>
+	<string>$(PRODUCT_NAME) requires access to photo library for uploading photos of users.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -114,8 +110,6 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
-		<string>remote-notification</string>
-		<string>voip</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

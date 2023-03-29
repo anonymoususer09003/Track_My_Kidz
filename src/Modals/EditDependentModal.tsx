@@ -312,7 +312,7 @@ const EditDependentModal = ({
               initialValues={{
                 firstName: student?.firstname,
                 lastName: student?.lastname,
-                school: student?.school,
+                school: student?.childSchool,
                 selectedSchool: "",
                 grade: "",
                 parentName: "",
@@ -320,8 +320,8 @@ const EditDependentModal = ({
                 password: "",
                 confirmPassword: "",
                 termsAccepted: false,
-                phoneNumber: student?.phone,
-                email: student?.email,
+                phoneNumber: student?.childPhone,
+                email: student?.childEmail,
                 country: student?.country || "",
                 state: student?.state || "",
                 city: student?.city || "",
@@ -369,7 +369,7 @@ const EditDependentModal = ({
                 formData.append("id", parseInt(student?.studentId));
                 formData.append("parentId", parseInt(userId, 0));
                 formData.append("firstname", values.firstName);
-                formData.append("lastname", values.Name);
+                formData.append("lastname", values.lastName);
                 formData.append("phone", values.phoneNumber);
                 formData.append("email", values?.email);
                 formData.append(

@@ -25,6 +25,7 @@ import { useDispatch } from "react-redux";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { LinearGradientButton } from "@/Components";
 import FastImage from "react-native-fast-image";
+import Colors from "@/Theme/Colors";
 
 const user_types = [
   { id: 1, label: "Parent", value: "Parent" },
@@ -35,6 +36,7 @@ const user_types = [
 const EmailConfirmationScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const styles = useStyleSheet(themedStyles);
+  const [resendCode, setResendCode] = useState(false);
   const {
     emailAddress,
     user_type,
@@ -63,6 +65,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
   const onResendButtonPress = async () => {
     if (emailAddress) {
       let res = await GetActivationCode({ email: emailAddress }, user_type);
+      setResendCode(true);
       console.log("res----", res);
       setActivationCode(res.activation_code);
     }
@@ -198,6 +201,15 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
           </>
         )}
       </Formik>
+
+      {resendCode && (
+        <Text
+          style={[styles.buttonMessage, { textAlign: "center", color: "red" }]}
+        >
+          {" "}
+          Check email for activation code*
+        </Text>
+      )}
       <View style={styles.bottomView}>
         <Button
           appearance="ghost"

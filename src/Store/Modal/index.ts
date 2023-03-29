@@ -35,6 +35,7 @@ export default buildSlice("modal", [ChangeModalState], {
   addInstructorFormModalVisibility: false,
   editInstructorFormModalVisibility: false,
   studentVisibilityPermissionModal: false,
+  viewBusInformationModal: false,
 }).reducer;
 
 export interface ModalState {
@@ -70,4 +71,5 @@ export interface ModalState {
   editInstructorFormModalVisibility: boolean;
   studentVisibilityPermissionModal: boolean;
   imagePickerModal: boolean;
+  viewBusInformationModal: boolean;
 }

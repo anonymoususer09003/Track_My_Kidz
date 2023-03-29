@@ -1,7 +1,7 @@
 import { UserRegistrationDTO } from "@/Models/UserDTOs";
 import api from "@/Services";
 
-export default async (userRegistration: UserRegistrationDTO, type: string) => {
+export default async (userRegistration: any, type: string) => {
   if (type === "parent") {
     return await api.post("/user/parent/create", userRegistration);
   } else if (type === "instructor") {

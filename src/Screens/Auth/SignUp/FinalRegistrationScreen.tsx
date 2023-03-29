@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { Linking } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
+import { ImagePickerModal } from "@/Modals";
 import {
   Autocomplete,
   AutocompleteItem,
@@ -127,6 +128,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
   const [org, setOrg] = useState([]);
   const [statesData, setStatesData] = React.useState<Array<any>>([]);
   const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
+  const [visibleImagePicker, setVisibleImagePicker] = useState(false);
   const [rows, setRows] = useState([
     {
       grade: "",
@@ -135,11 +137,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
   ]);
   const [selectedGrades, setSelectedGrades] = useState([]);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
-  const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
-    undefined
-  );
 
-  const [uploadedImage, setUploadedImage] = React.useState();
   const [states, setStates] = useState<Array<any>>([]);
   const [cities, setCities] = useState<Array<any>>([]);
   const [phoneCode, setPhoneCode] = useState<string>("");
@@ -149,7 +147,10 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
 
   const styles = useStyleSheet(themedStyles);
   const { emailAddress, user_type, student, activation_code } = route.params;
-
+  const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
+    ""
+  );
+  const [uploadedImage, setUploadedImage] = React.useState(null);
   const [visible, setVisible] = React.useState(false);
   const dispatch = useDispatch();
   const [loginObj, setLoginObj] = useState(null);
@@ -325,7 +326,57 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
         console.log("GetOrgByFilters", err);
       });
   };
+  const imageCameraLaunch = () => {
+    ImagePicker.openCamera({
+      cropping: true,
+      cropperCircleOverlay: true,
+      width: 139,
+      height: 130,
+      compressImageQuality: 1,
+      loadingLabelText: "Loading image",
+    }).then((image) => {
+      if (image != null) {
+        const source = { uri: image?.path };
+        setUploadedImage(image);
+        setSelectedImage(source.uri);
+        // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
+      }
+    });
+  };
+  const imageGalleryLaunch = () => {
+    ImagePicker.openPicker({
+      cropping: true,
+      cropperCircleOverlay: true,
+      width: 139,
+      height: 130,
+      compressImageQuality: 1,
+      loadingLabelText: "Loading image",
+    }).then((image) => {
+      if (image != null) {
+        const source = { uri: image?.path };
+        setUploadedImage(image);
+        setSelectedImage(source.uri);
+        // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
+      }
+    });
+  };
 
+  const renderEditAvatarButton = (): React.ReactElement => (
+    <Button
+      style={styles.editAvatarButton}
+      status="basic"
+      accessoryRight={<Icon name="edit" />}
+      onPress={() => setVisibleImagePicker(true)}
+    />
+  );
+  const renderEditButtonElement = (): ButtonElement => {
+    const buttonElement: React.ReactElement<ButtonProps> =
+      renderEditAvatarButton();
+
+    return React.cloneElement(buttonElement, {
+      style: [buttonElement.props.style, styles.editButton],
+    });
+  };
   const maxDateOfBirth = moment(new Date()).subtract("years", 13);
 
   useEffect(() => {
@@ -342,6 +393,13 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
       style={{ flex: 1 }}
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -150}
     >
+      {visibleImagePicker && (
+        <ImagePickerModal
+          openCamera={imageCameraLaunch}
+          openGallery={imageGalleryLaunch}
+          close={() => setVisibleImagePicker(false)}
+        />
+      )}
       <ParentPaymentModal
         onPay={() => {
           dispatch(LoginStore.action(loginObj));
@@ -353,6 +411,36 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
         }}
       />
       <ScrollView style={styles.container}>
+        {_user_type.id == 2 && (
+          <View style={{ width: "100%" }}>
+            {selectedImage != "" && (
+              <ProfileAvatarPicker
+                style={styles.profileImage}
+                // resizeMode='center'
+                source={{ uri: selectedImage }}
+                editButton={true ? renderEditAvatarButton : null}
+              />
+            )}
+            {selectedImage == "" && (
+              <View
+                style={[
+                  styles.profileImage,
+                  {
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: Colors.lightgray,
+                  },
+                ]}
+              >
+                {/* <Text style={{ fontSize: 30 }}>
+                      {user?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
+                      {user?.lastname?.substring(0, 1)?.toUpperCase()}
+                    </Text> */}
+                {true && renderEditButtonElement()}
+              </View>
+            )}
+          </View>
+        )}
         {_user_type.id === 1 ? (
           <Formik
             validationSchema={signUpValidationSchema}
@@ -618,7 +706,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                     style={styles.inputSettings}
                     autoCapitalize="none"
                     autoCorrect={false}
-                    placeholder={`Zip code*`}
+                    placeholder={`Zip/Post Code*`}
                     value={values.zipcode}
                     onChangeText={handleChange("zipcode")}
                     onBlur={handleBlur("zipcode")}
@@ -739,6 +827,46 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                 password: values.password,
                 activationcode: activation_code,
               };
+
+              let formData = new FormData();
+              formData.append(
+                "image",
+                uploadedImage
+                  ? {
+                      uri: uploadedImage?.path,
+                      name: uploadedImage.mime,
+                      type: uploadedImage.mime,
+                    }
+                  : ""
+              );
+              formData.append("firstname", values.firstName);
+              formData.append("lastname", values.lastName);
+
+              formData.append("address", values.schoolAddress || "");
+              formData.append("email", emailAddress);
+              formData.append("state", values.state);
+              formData.append("city", values.city);
+              formData.append("country", values.country);
+              formData.append("zipcode", values.zipcode);
+              formData.append("phone", values.phoneNumber);
+              formData.append("password", values.password);
+              formData.append("term", true);
+              formData.append("isAdmin", false);
+              formData.append("grades", [
+                {
+                  id: 0,
+                  name: "Test",
+                  subject: [
+                    {
+                      id: 0,
+                      name: "Test",
+                    },
+                  ],
+                },
+              ]);
+              formData.append("schoolId", values.schoolId);
+              formData.append("orgId", values.orgId);
+
               const userObject: UserRegistrationDTO = {
                 firstname: values.firstName,
                 lastname: values.lastName,
@@ -773,7 +901,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   console.log("res---", res.data);
                   await storeToken(res.data.token);
                   console.log("userobject", userObject);
-                  CompleteRegistration(userObject, "instructor")
+                  CompleteRegistration(formData, "instructor")
                     .then((response: any) => {
                       console.log("response", response);
                       dispatch(
@@ -818,7 +946,6 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   Toast.show({
                     type: "info",
                     position: "top",
-                    text1: err?.data?.statusDescription || "error",
 
                     visibilityTime: 4000,
                     autoHide: true,
@@ -999,7 +1126,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                     style={styles.inputSettings}
                     autoCapitalize="none"
                     autoCorrect={false}
-                    placeholder={`Zip code*`}
+                    placeholder={`Zip/Post Code*`}
                     value={values.zipcode}
                     onChangeText={handleChange("zipcode")}
                     onBlur={handleBlur("zipcode")}

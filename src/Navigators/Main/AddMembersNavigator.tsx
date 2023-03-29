@@ -77,7 +77,13 @@ const AddMembersNavigator = ({ route }) => {
         hideApproval={true}
         // hideCalendar={activeTab == 1 ? false : true}
         // hideApproval={activeTab == 1 ? false : true}
-        title={route?.params ? "Edit Group" : `Create Group`}
+        title={
+          route.name == "AddMembers"
+            ? "Add Group Members"
+            : route?.params
+            ? "Edit Group"
+            : `Create Group`
+        }
       />
       <TabNavigator.Navigator
         screenOptions={{ lazy: true, swipeEnabled: false }}

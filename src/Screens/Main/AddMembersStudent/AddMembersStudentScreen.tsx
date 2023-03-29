@@ -189,7 +189,6 @@ const AddMembersStudentScreen = ({ route }) => {
     setAskPermission(false);
     setStudents([]);
     if (isFocused && group?.isEdit) {
-      console.log("uuuuuu", group);
       setStudents(group?.isEdit?.students);
       // setSelectedStudents([...group?.isEdit?.students]);
     }

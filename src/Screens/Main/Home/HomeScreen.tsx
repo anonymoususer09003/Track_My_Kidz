@@ -17,6 +17,7 @@ import Fontisto from "react-native-vector-icons/Fontisto";
 import { AppHeader } from "@/Components";
 import TrackHistory from "@/Services/Parent/TrackHistory";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+4;
 import messaging from "@react-native-firebase/messaging";
 import { UpdateDeviceToken } from "@/Services/User";
 import { useDispatch, useSelector } from "react-redux";
@@ -182,7 +183,6 @@ const HomeScreen = () => {
     // return () => unsubscribe();
   }, []);
 
-  console.log("current user", currentUser);
   useEffect(() => {
     getParentInfo();
     handleLoadSubscribed();
@@ -448,7 +448,11 @@ const HomeScreen = () => {
           onCancel={() => dispatch(LogoutStore.action())}
         />
       )}
-      <AppHeader title="Home" hideCalendar={thumbnail ? false : true} />
+      <AppHeader
+        title="Home"
+        setThumbnail={() => setThumbnail(true)}
+        hideCalendar={thumbnail ? false : true}
+      />
       {isCalendarVisible && (
         <Calendar
           selectedMonth={selectedMonth}
@@ -624,9 +628,9 @@ const HomeScreen = () => {
                         >{`${item.firstname} ${item.lastname}`}</Text>
                       </View>
                       <Text style={styles.text}>{`${
-                        (!!item.school && item.school) || ""
+                        (!!item.chidlSchool && item.childSchool) || ""
                       }`}</Text>
-                      <Text style={styles.text}>{`${item.grade}`}</Text>
+
                       {item?.status ? (
                         <Text
                           style={styles.text}

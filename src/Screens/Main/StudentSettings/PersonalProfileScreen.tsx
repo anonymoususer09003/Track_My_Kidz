@@ -20,6 +20,8 @@ import {
   Spinner,
   Text,
 } from "@ui-kitten/components";
+import ChangeUserState from "@/Store/User/FetchOne";
+import fetchOneUserService from "@/Services/User/FetchOne";
 import { ImagePickerModal } from "@/Modals";
 
 import ProfileIcon from "react-native-vector-icons/EvilIcons";
@@ -45,9 +47,7 @@ import Colors from "@/Theme/Colors";
 
 const PersonalProfileScreen = () => {
   const { Layout } = useTheme();
-  const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
-    undefined
-  );
+  const [selectedImage, setSelectedImage] = React.useState("");
 
   const [uploadedImage, setUploadedImage] = React.useState();
   const [languages, setLanguages] = useState<Array<ReactText>>(["English"]);
@@ -108,12 +108,80 @@ const PersonalProfileScreen = () => {
       <Icon {...props} name={passwordVisible ? "eye-off" : "eye"} />
     </TouchableWithoutFeedback>
   );
+  const updateProfilePic = async () => {
+    let formData = new FormData();
+    formData.append(
+      "image",
+      uploadedImage
+        ? {
+            uri: uploadedImage?.path,
+            name: uploadedImage.mime,
+            type: uploadedImage.mime,
+          }
+        : ""
+    );
+    formData.append("id", user?.studentId);
+    formData.append("parentId", user?.parentId);
+    formData.append("firstname", user?.firstName);
+    formData.append("lastname", user?.lastName);
+    formData.append("phone", user?.phoneNumber);
+    formData.append("email", user?.email);
+    formData.append("school", user?.school);
+    formData.append("country", user.country);
+    formData.append("state", user.state);
+    formData.append("city", user.city);
+    formData.append("parentemail1", user?.parentemail1);
+    formData.append("parentemail2", user?.parentemail2);
+    console.log("formData", formData);
+    // setisSending(true);
+    // let objectToPass = {
+    //   firstName: values.firstName,
+    //   lastName: values.lastName,
+    //   id: userId,
+    //   country: values.country,
+    //   state: values.state,
+    //   city: values.city,
+    // };
+    UpdateUser(formData)
+      .then(async (response: any) => {
+        console.log("res", response);
+        if (response.status == 200) {
+          setisEditMode(false);
+          setisSending(false);
+          let res = await fetchOneUserService();
+          console.log("res", res);
+          // if (!res?.childTrackHistory) {
+          //   // await BackgroundService.stop();
+          // }
+          // await BackgroundService.stop();
+          dispatch(
+            ChangeUserState.action({
+              item: res,
+              fetchOne: { loading: false, error: null },
+            })
+          );
+        }
+      })
+      .catch((error: any) => {
+        console.log("err", error);
+        Alert.alert(error.response.data.title, error.response.data.detail, [
+          { text: "OK", style: "cancel" },
+        ]);
+        setisSending(false);
+        setisEditMode(!isEditMode);
+      });
+  };
 
+  useEffect(() => {
+    if (selectedImage) {
+      updateProfilePic();
+    }
+  }, [selectedImage]);
   const renderEditAvatarButton = (): React.ReactElement => (
     <Button
       style={styles.editAvatarButton}
       status="basic"
-      accessoryRight={<Icon name="plus" />}
+      accessoryRight={<Icon name="edit" />}
       onPress={() => setVisible(true)}
     />
   );
@@ -182,15 +250,15 @@ const PersonalProfileScreen = () => {
           <ScrollView style={styles.container}>
             <View style={[[Layout.column, Layout.justifyContentCenter]]}>
               <View style={{ width: "100%" }}>
-                {user?.studentPhoto && (
+                {(selectedImage != "" || user?.studentPhoto.length > 0) && (
                   <ProfileAvatarPicker
                     style={styles.profileImage}
                     // resizeMode='center'
-                    source={{ uri: user?.studentPhoto }}
-                    editButton={false ? renderEditAvatarButton : null}
+                    source={{ uri: selectedImage || user?.studentPhoto }}
+                    editButton={true ? renderEditAvatarButton : null}
                   />
                 )}
-                {!user?.studentPhoto && (
+                {user?.studentPhoto == null && selectedImage == "" && (
                   <View
                     style={[
                       styles.profileImage,
@@ -205,7 +273,7 @@ const PersonalProfileScreen = () => {
                       {user?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
                       {user?.lastname?.substring(0, 1)?.toUpperCase()}
                     </Text>
-                    {/* {true && renderEditButtonElement()} */}
+                    {true && renderEditButtonElement()}
                   </View>
                 )}
               </View>
@@ -240,13 +308,19 @@ const PersonalProfileScreen = () => {
                         }
                       : ""
                   );
-                  formData.append("parentId", parseInt(userId, 0));
-                  formData.append("firstName", values.firstName);
-                  formData.append("lastName", values.lastName);
-                  formData.append("country", values.country);
-                  formData.append("state", values.state);
-                  formData.append("city", values.city);
-                  formData.append("id", userId);
+                  formData.append("id", user?.studentId);
+                  formData.append("parentId", user?.parentId);
+                  formData.append("firstname", user?.firstname);
+                  formData.append("lastname", user?.lastname);
+                  formData.append("phone", user?.phoneNumber);
+                  formData.append("email", user?.email);
+                  formData.append("school", user?.school);
+                  formData.append("country", user.country);
+                  formData.append("state", user.state);
+                  formData.append("city", user.city);
+                  formData.append("parentemail1", user?.parentemail1);
+                  formData.append("parentemail2", user?.parentemail2);
+
                   setisSending(true);
                   // let objectToPass = {
                   //   firstName: values.firstName,

@@ -13,6 +13,7 @@ import LinearGradient from "react-native-linear-gradient";
 import { useDispatch, useSelector } from "react-redux";
 import { NavigationCustomState } from "@/Store/Navigation";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import ChangeStudentActivityState from "@/Store/StudentActivity/ChangeStudentActivityState";
 import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
 import { useNavigation } from "@react-navigation/native";
 import { navigateAndSimpleReset } from "@/Navigators/Functions";
@@ -21,8 +22,9 @@ import Colors from "@/Theme/Colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { UserTypeState } from "@/Store/UserType";
 import { ModalState } from "@/Store/Modal";
-
-const AppHeader = (props: any) => {
+import EntypoIcon from "react-native-vector-icons/Entypo";
+import { StudentState } from "@/Store/StudentActivity";
+const AppHeader = ({ showGlobe, ...props }) => {
   const user_type = useSelector(
     (state: { userType: UserTypeState }) => state.userType.userType
   );
@@ -32,11 +34,64 @@ const AppHeader = (props: any) => {
   const hideCalendar = props?.hideCalendar || false;
   const hideApproval = props?.hideApproval || false;
   const goBack = props.goBack;
+  const { showFamilyMap } = useSelector(
+    (state: { studentActivity: StudentState }) => state.studentActivity
+  );
+
   // const user_type = 'instructor';
   //@ts-ignore
-  const renderSettingIcon = (props) => (
-    <Icon {...props} name="settings" fill={Colors.white} />
-  );
+  const renderSettingIcon = (props) => {
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {props.showGlobe && user_type == "student" && (
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(
+                ChangeStudentActivityState.action({
+                  showFamilyMap: showFamilyMap ? false : true,
+                  hideCalendar: !showFamilyMap ? true : false,
+                  showParticipantMap: false,
+                })
+              );
+              dispatch(
+                ChangeModalState.action({
+                  showCalendar: false,
+                })
+              );
+            }}
+            style={{ marginRight: 10 }}
+          >
+            <Image
+              style={{ height: 22, width: 22, tintColor: Colors.white }}
+              source={require("../../Assets/Images/earth.png")}
+            />
+          </TouchableOpacity>
+
+          //  <EntypoIcon
+          //     onPress={() =>
+          //       dispatch(
+          //         ChangeStudentActivityState.action({
+          //           showFamilyMap: showFamilyMap ? false : true,
+          //           hideCalendar: !showFamilyMap ? true : false,
+          //         })
+          //       )
+          //     }
+          //     size={22}
+          //     style={{ marginRight: 10 }}
+          //     name="globe"
+          //     color={showFamilyMap ? Colors.green : Colors.white}
+          //   />
+        )}
+        <Icon {...props} name="settings" fill={Colors.white} />
+      </View>
+    );
+  };
 
   //@ts-ignore
   const renderHomeIcon = (props) => (
@@ -87,20 +142,34 @@ const AppHeader = (props: any) => {
       ) : (
         <TopNavigationAction
           icon={renderHomeIcon}
-          onPress={() =>
-            user_type === "instructor"
-              ? nav.reset({
-                  index: 0,
-                  routes: [
-                    {
-                      name: "InstructorActivity",
-                    },
-                  ],
+          onPress={() => {
+            if (user_type === "instructor") {
+              nav.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: "InstructorActivity",
+                  },
+                ],
+              });
+            } else if (user_type === "student") {
+              nav.navigate("StudentActivity");
+              dispatch(
+                ChangeStudentActivityState.action({
+                  showFamilyMap: false,
+                  hideCalendar: false,
                 })
-              : user_type === "student"
-              ? nav.navigate("StudentActivity")
-              : nav.navigate("Home")
-          }
+              );
+              dispatch(
+                ChangeModalState.action({
+                  showCalendar: false,
+                })
+              );
+            } else {
+              nav.navigate("Home");
+              props?.setThumbnail && props?.setThumbnail();
+            }
+          }}
         />
       )}
       {!hideCalendar && (
@@ -138,6 +207,7 @@ const AppHeader = (props: any) => {
       })
     );
   };
+
   const RightDrawerAction = () =>
     !isBack && (
       <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -157,7 +227,8 @@ const AppHeader = (props: any) => {
             </TouchableOpacity>
           )}
         <TopNavigationAction
-          icon={renderSettingIcon}
+          // showGlobe={props.showGlobe}
+          icon={(props) => renderSettingIcon({ ...props, showGlobe })}
           onPress={RightDrawerMenu}
         />
       </View>

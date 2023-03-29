@@ -14,6 +14,7 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
+import { ProfileAvatarPicker } from "@/Components";
 import { Linking } from "react-native";
 import {
   Autocomplete,
@@ -59,6 +60,7 @@ import {
   launchCamera,
   launchImageLibrary,
 } from "react-native-image-picker";
+import { ImagePickerModal } from "@/Modals";
 import { storeInstructors } from "@/Storage/MainAppStorage";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { useDispatch, useSelector } from "react-redux";
@@ -139,6 +141,9 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   const isVisibleAddInstructor = useSelector(
     (state: { modal: ModalState }) => state.modal.addInstructorModalVisibility
   );
+  const isVisible = useSelector(
+    (state: { modal: ModalState }) => state.modal.addStudentModal
+  );
   const [countriesData, setCountriesData] = React.useState(countries);
   const [schoolsData, setSchoolsData] = React.useState(schools);
   const [schools, setSchools] = useState([]);
@@ -154,17 +159,19 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   ]);
   const [selectedGrades, setSelectedGrades] = useState([]);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
-  const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.addButInformationModalVisibility
-  );
+
   const [reRender, setRerender] = useState(false);
   const [states, setStates] = useState<Array<any>>([]);
   const [cities, setCities] = useState<Array<any>>([]);
   const [phoneCode, setPhoneCode] = useState<string>("");
   const [placement, setPlacement] = React.useState("bottom");
   const [instructors, setInstructors] = useState(_instructors);
+  const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
+    ""
+  );
+  const [visibleImagePicker, setVisibleImagePicker] = useState(false);
   const [buses, setBuses] = useState([]);
+  const [uploadedImage, setUploadedImage] = React.useState(null);
   const [selectedInstructor, setSelectedInstructor] = useState({});
   const { register } = useContext(AuthContext);
 
@@ -230,6 +237,22 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
       <Icon {...props} name={confirmPasswordVisible ? "eye-off" : "eye"} />
     </TouchableWithoutFeedback>
   );
+  const renderEditAvatarButton = (): React.ReactElement => (
+    <Button
+      style={styles.editAvatarButton}
+      status="basic"
+      accessoryRight={<Icon name="edit" />}
+      onPress={() => setVisibleImagePicker(true)}
+    />
+  );
+  const renderEditButtonElement = (): ButtonElement => {
+    const buttonElement: React.ReactElement<ButtonProps> =
+      renderEditAvatarButton();
+
+    return React.cloneElement(buttonElement, {
+      style: [buttonElement.props.style, styles.editButton],
+    });
+  };
 
   useEffect(() => {
     if (!isFocuesed) {
@@ -406,12 +429,55 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
     // temp.splice(index, 1);
     // setInstructors(temp);
   };
+
+  const imageCameraLaunch = () => {
+    ImagePicker.openCamera({
+      cropping: true,
+      cropperCircleOverlay: true,
+      width: 139,
+      height: 130,
+      compressImageQuality: 1,
+      loadingLabelText: "Loading image",
+    }).then((image) => {
+      if (image != null) {
+        const source = { uri: image?.path };
+        setUploadedImage(image);
+        setSelectedImage(source.uri);
+        // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
+      }
+    });
+  };
+  const imageGalleryLaunch = () => {
+    ImagePicker.openPicker({
+      cropping: true,
+      cropperCircleOverlay: true,
+      width: 139,
+      height: 130,
+      compressImageQuality: 1,
+      loadingLabelText: "Loading image",
+    }).then((image) => {
+      if (image != null) {
+        const source = { uri: image?.path };
+        setUploadedImage(image);
+        setSelectedImage(source.uri);
+        // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
+      }
+    });
+  };
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -150}
     >
+      {visibleImagePicker && (
+        <ImagePickerModal
+          openCamera={imageCameraLaunch}
+          openGallery={imageGalleryLaunch}
+          close={() => setVisibleImagePicker(false)}
+        />
+      )}
+
       {selectedInstructor && (
         <EditInstructorsModal
           selectedInstructor={selectedInstructor}
@@ -479,15 +545,53 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                   ? null
                   : orgData.find((s) => s.name === org_name)?.orgId;
               const registerObject: RegisterDTO = {
-                email: "noman13@gail.com" || emailAddress,
+                email: emailAddress,
                 password: values.password,
                 activationcode: activation_code,
               };
+              let formData = new FormData();
+              formData.append(
+                "image",
+                uploadedImage
+                  ? {
+                      uri: uploadedImage?.path,
+                      name: uploadedImage.mime,
+                      type: uploadedImage.mime,
+                    }
+                  : ""
+              );
+              formData.append("firstname", values.firstName);
+              formData.append("lastname", values.lastName);
+
+              formData.append("address", values.schoolAddress || "");
+              formData.append("email", emailAddress);
+              formData.append("state", values.state);
+              formData.append("city", values.city);
+              formData.append("country", values.country);
+              formData.append("zipcode", values.zipcode);
+              formData.append("phone", values.phoneNumber);
+              formData.append("password", values.password);
+              formData.append("term", true);
+              formData.append("isAdmin", true);
+              formData.append("grades", [
+                {
+                  id: 0,
+                  name: "Test",
+                  subject: [
+                    {
+                      id: 0,
+                      name: "Test",
+                    },
+                  ],
+                },
+              ]);
+              formData.append("schoolId", schoolId);
+              formData.append("orgId", orgId);
               const userObject: UserRegistrationDTO = {
                 firstname: values.firstName,
                 lastname: values.lastName,
                 address: values.schoolAddress || "",
-                email: "noman13@gail.com" || emailAddress,
+                email: emailAddress,
                 state: values.state,
                 city: values.city,
                 country: values.country,
@@ -555,13 +659,13 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           ...userObject,
                           schoolId: _res.data.schoolId,
                         });
-                        CompleteRegistration(
-                          {
-                            ...userObject,
-                            schoolId: _res.data.schoolId,
-                          },
-                          "instructor"
-                        )
+
+                        formData.append("schoolId", _res.data.schoolId);
+                        // {
+                        //   ...userObject,
+                        //   schoolId: _res.data.schoolId,
+                        // }
+                        CompleteRegistration(formData, "instructor")
                           .then(async (response: any) => {
                             console.log("response2727878", response);
                             let obj = {
@@ -627,13 +731,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     values.selected_entity == "School" &&
                     schoolId != 0
                   ) {
-                    CompleteRegistration(
-                      {
-                        ...userObject,
-                        schoolId: schoolId,
-                      },
-                      "instructor"
-                    )
+                    CompleteRegistration(formData, "instructor")
                       .then(async (res: any) => {
                         console.log("response2727878", res);
                         let obj = {
@@ -692,14 +790,14 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           ...userObject,
                           orgId: _res.data.orgId,
                         });
-                        CompleteRegistration(
-                          {
-                            ...userObject,
-                            orgId: _res.data.orgId,
-                            schoolId: null,
-                          },
-                          "instructor"
-                        )
+                        formData.append("orgId", _res.data.orgId);
+                        formData.append("schoolId", null);
+                        // {
+                        //   ...userObject,
+                        //   orgId: _res.data.orgId,
+                        //   schoolId: null,
+                        // },
+                        CompleteRegistration(formData, "instructor")
                           .then(async (response: any) => {
                             console.log("response2727878", response);
                             let obj = {
@@ -762,14 +860,8 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                         console.log("err first", err);
                       });
                   } else if (values.selected_entity != "School" && orgId) {
-                    CompleteRegistration(
-                      {
-                        ...userObject,
-                        orgId,
-                        schoolId: null,
-                      },
-                      "instructor"
-                    )
+                    formData.append("schoolId", null);
+                    CompleteRegistration(formData, "instructor")
                       .then(async (res: any) => {
                         console.log("response2727878", res);
                         let obj = {
@@ -853,6 +945,34 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
               isValid,
             }) => (
               <>
+                <View style={{ width: "100%" }}>
+                  {selectedImage != "" && (
+                    <ProfileAvatarPicker
+                      style={styles.profileImage}
+                      // resizeMode='center'
+                      source={{ uri: selectedImage }}
+                      editButton={true ? renderEditAvatarButton : null}
+                    />
+                  )}
+                  {selectedImage == "" && (
+                    <View
+                      style={[
+                        styles.profileImage,
+                        {
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: Colors.lightgray,
+                        },
+                      ]}
+                    >
+                      {/* <Text style={{ fontSize: 30 }}>
+                      {user?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
+                      {user?.lastname?.substring(0, 1)?.toUpperCase()}
+                    </Text> */}
+                      {true && renderEditButtonElement()}
+                    </View>
+                  )}
+                </View>
                 <Layout style={styles.formContainer} level="1">
                   <Select
                     style={{ marginVertical: 18 }}
@@ -1024,7 +1144,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     style={styles.inputSettings}
                     autoCapitalize="none"
                     autoCorrect={false}
-                    placeholder={`Zip code*`}
+                    placeholder={`Zip/Post Code*`}
                     value={values.zipcode}
                     onChangeText={handleChange("zipcode")}
                     onBlur={handleBlur("zipcode")}
@@ -1034,7 +1154,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                   )}
                   {values.selected_entity === "School" && (
                     <>
-                      <Autocomplete
+                      {/* <Autocomplete
                         placeholder="School Name*"
                         value={values.school}
                         placement={placement}
@@ -1071,7 +1191,31 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                               />
                             );
                           })}
-                      </Autocomplete>
+                      </Autocomplete> */}
+
+                      <Select
+                        style={{ width: "100%" }}
+                        value={values.school}
+                        placeholder="Select School*"
+                        onSelect={(index: any) => {
+                          let school = schoolsData[index.row];
+                          setFieldValue("school", school.name);
+                          setFieldValue("selectedSchool", school.name);
+                          if (school.name != "Other") {
+                            setFieldValue("schoolName", school.name);
+                            setFieldValue("schoolAddress", school.address);
+                          } else {
+                            setFieldValue("schoolName", "");
+                            setFieldValue("schoolAdress", "");
+                          }
+                        }}
+                        label={(evaProps: any) => <Text {...evaProps}></Text>}
+                      >
+                        {schoolsData?.map((org, index) => {
+                          return <SelectItem key={index} title={org?.name} />;
+                        })}
+                      </Select>
+
                       {(values.schoolName === "Other" ||
                         values.school === "Other") && (
                         <>
@@ -1089,22 +1233,24 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                               {errors.school_name}
                             </Text>
                           )}
+
+                          <Input
+                            style={styles.inputSettings}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder={`School Street Address*`}
+                            value={values.schoolAddress}
+                            onChangeText={handleChange("schoolAddress")}
+                            onBlur={handleBlur("schoolAddress")}
+                          />
+                          {errors.schoolAddress && touched.schoolAddress && (
+                            <Text style={styles.errorText}>
+                              {errors.schoolAddress}
+                            </Text>
+                          )}
                         </>
                       )}
-                      <Input
-                        style={styles.inputSettings}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        placeholder={`School Street Address*`}
-                        value={values.schoolAddress}
-                        onChangeText={handleChange("schoolAddress")}
-                        onBlur={handleBlur("schoolAddress")}
-                      />
-                      {errors.schoolAddress && touched.schoolAddress && (
-                        <Text style={styles.errorText}>
-                          {errors.schoolAddress}
-                        </Text>
-                      )}
+
                       {/* <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"
@@ -1121,7 +1267,29 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                   )}
                   {values.selected_entity === "Organisation" && (
                     <>
-                      <Autocomplete
+                      <Select
+                        style={{ width: "100%" }}
+                        value={values.school}
+                        placeholder="Select Organization*"
+                        onSelect={(index: any) => {
+                          let org = orgData[index.row];
+                          setFieldValue("school", org.name);
+                          setFieldValue("selectedSchool", org.name);
+                          if (org.name != "Other") {
+                            setFieldValue("schoolName", org.name);
+                            setFieldValue("schoolAddress", org.address);
+                          } else {
+                            setFieldValue("schoolName", "");
+                            setFieldValue("schoolAdress", "");
+                          }
+                        }}
+                        label={(evaProps: any) => <Text {...evaProps}></Text>}
+                      >
+                        {orgData.map((org, index) => {
+                          return <SelectItem key={index} title={org?.name} />;
+                        })}
+                      </Select>
+                      {/* <Autocomplete
                         placeholder="Select Organization*"
                         value={values.school}
                         placement={placement}
@@ -1158,7 +1326,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                               />
                             );
                           })}
-                      </Autocomplete>
+                      </Autocomplete> */}
 
                       {values.school === "Other" && (
                         <>
@@ -1708,5 +1876,16 @@ const themedStyles = StyleService.create({
   },
   rowListStyle: {
     paddingVertical: 5,
+  },
+  profileImage: {
+    width: 126,
+    height: 126,
+    borderRadius: 63,
+    alignSelf: "center",
+  },
+  editAvatarButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
 });

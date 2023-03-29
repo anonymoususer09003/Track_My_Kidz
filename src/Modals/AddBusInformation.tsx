@@ -39,6 +39,7 @@ const AddBusInformation = ({
   const [saved, setSaved] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [busName, setBusName] = useState(selectedItem?.busName || "");
+
   const [numberOfRows, setNumberOfRows] = useState(
     selectedItem?.numberOfRows || ""
   );
@@ -56,7 +57,7 @@ const AddBusInformation = ({
     selectedItem?.numberOfKidsOnLongSeat || ""
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedItem && Object.keys(selectedItem).length > 0) {
       setBusName(selectedItem?.busName);
       setNumberOfRows(selectedItem?.numberOfRows?.toString());
@@ -69,12 +70,22 @@ const AddBusInformation = ({
           : ""
       );
     }
-  }, [selectedItem]);
+  }, [selectedItem, isVisible]);
+
   const isVisible = useSelector(
     (state: { modal: ModalState }) =>
       state.modal.addButInformationModalVisibility
   );
-
+  useEffect(() => {
+    if (!isVisible) {
+      setNumberOfKidsLongSeat("");
+      setIsLongSeat(false);
+      setNumberOfKidsPerSeat("");
+      setNumberOfRows("");
+      setNumberOfSeatsPerRow("");
+      setBusName("");
+    }
+  }, [isVisible]);
   // @ts-ignore
   return (
     <Modal

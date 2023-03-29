@@ -234,7 +234,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
                         />
                     </TouchableOpacity>)} */}
           <TouchableOpacity
-            onPress={() => setVerifyType("activation-code")}
+            onPress={() => navigation.navigate("ActivationCode")}
             style={[
               [
                 Layout.row,
@@ -252,7 +252,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setVerifyType("dependent-info")}
+            onPress={() => navigation.navigate("DependentInfo")}
             style={[
               [
                 Layout.row,

@@ -910,7 +910,7 @@ const CreateParentActivityScreen = ({ route }) => {
                   </Autocomplete>
                   <Input
                     style={{ width: "100%" }}
-                    placeholder="Zip code"
+                    placeholder="Zip/Post Code"
                     onChangeText={handleChange("fromZipCode")}
                     value={values.fromZipCode}
                   />
@@ -1106,7 +1106,7 @@ const CreateParentActivityScreen = ({ route }) => {
 
                       <Input
                         style={{ width: "100%" }}
-                        placeholder="Zip code"
+                        placeholder="Zip/Post Code"
                         onChangeText={handleChange("zipCode")}
                         value={values.zipCode}
                       />

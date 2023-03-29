@@ -464,6 +464,13 @@ const OrganizationInfoScreen = ({ navigation }) => {
                               value={values.address}
                               disabled={!isEditMode}
                             />
+                            <Input
+                              style={{ marginRight: 20, marginTop: 10 }}
+                              placeholder="Zip/Post Code"
+                              onChangeText={handleChange("zipcode")}
+                              value={values.zipcode}
+                              disabled={!isEditMode}
+                            />
                             <Autocomplete
                               placeholder="Select your country"
                               value={values.country}

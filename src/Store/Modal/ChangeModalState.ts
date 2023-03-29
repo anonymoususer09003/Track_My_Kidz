@@ -122,5 +122,8 @@ export default {
       state.studentVisibilityPermissionModal =
         payload.studentVisibilityPermissionModal;
     }
+    if (typeof payload.viewBusInformationModal !== "undefined") {
+      state.viewBusInformationModal = payload.viewBusInformationModal;
+    }
   },
 };

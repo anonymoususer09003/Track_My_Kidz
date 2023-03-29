@@ -57,6 +57,7 @@ const FirstSignUpScreen = ({ navigation }) => {
   const [showQR, setShowQR] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState("");
   const [isDesignatedAdmin, setIsDesignatedAdmin] = useState(false);
+
   // @ts-ignore
   const renderPersonIcon = (props: any) => (
     <Icon {...props} name="person-outline" />
@@ -203,11 +204,11 @@ const FirstSignUpScreen = ({ navigation }) => {
                     Toast.show({
                       type: "info",
                       position: "top",
-                      text1: err.data?.title ? err.data?.title : "Time out ",
-                      text2: err.data?.detail
-                        ? err.data?.detail
+
+                      text1: err.data?.message
+                        ? err.data?.message
                         : "Please try again later",
-                      visibilityTime: 4000,
+                      visibilityTime: 2000,
                       autoHide: true,
                       topOffset: 30,
                       bottomOffset: 40,

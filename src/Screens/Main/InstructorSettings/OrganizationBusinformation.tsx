@@ -32,6 +32,7 @@ import { loadUserId } from "@/Storage/MainAppStorage";
 import { GetSchool, UpdateSchool } from "@/Services/School";
 import { AppHeader } from "@/Components";
 import AddBusInformation from "@/Modals/AddBusInformation";
+import ViewBusInformation from "@/Modals/ViewBusInformation";
 import EditOrgInstructorsModal from "@/Modals/EditOrganizationInstructorModal";
 const height = Dimensions.get("screen").height;
 
@@ -41,6 +42,22 @@ const OrgBusDetail = ({ route }: any) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [visible, setVisible] = useState(false);
   const [buses, setBuses] = useState(route.params.data.buses);
+  const isVisibleViewBusInfo = useSelector(
+    (state: { modal: ModalState }) => state.modal.viewBusInformationModal
+  );
+  const showAddModal = useSelector(
+    (state: { modal: ModalState }) =>
+      state.modal.addButInformationModalVisibility
+  );
+  const [SelectedBusInfo, setSelectedBusInfo] = useState({
+    busName: "",
+    numberOfRows: "",
+    numberOfSeatsPerRow: "",
+    numberOfKidsPerSeat: "",
+    isLongSeat: "",
+    numberOfKidsLongSeat: "",
+  });
+
   const deleteBus = (id: any, index: any) => {
     DeleteBusById(id)
       .then((res) => {
@@ -51,16 +68,30 @@ const OrgBusDetail = ({ route }: any) => {
       })
       .catch((err) => console.log("err", err));
   };
+
   return (
     <View style={{ flex: 1 }}>
       <AppHeader isBack={true} goBack={true} title="Bus Information" />
       {/* {selectedItem && ( */}
-      <AddBusInformation
-        selectedItem={selectedItem}
-        activity={null}
-        buses={buses}
-        setBuses={(bus) => setBuses(bus)}
-      />
+      {showAddModal && (
+        <AddBusInformation
+          selectedItem={selectedItem}
+          activity={null}
+          buses={buses}
+          setBuses={(bus) => setBuses(bus)}
+        />
+      )}
+
+      {isVisibleViewBusInfo && (
+        <ViewBusInformation
+          numberOfRows={selectedItem?.numberOfRows}
+          numberOfKidsInRow={selectedItem?.numberOfKidsPerSeat}
+          isLongSeat={selectedItem?.longSeat}
+          numberOfKidsLongSeat={selectedItem?.numberOfKidsOnLongSeat}
+          busName={selectedItem?.busName}
+          numberOfSeatsPerRow={selectedItem?.numberOfSeatsPerRow}
+        />
+      )}
       {/* )} */}
       <ScrollView style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
@@ -90,9 +121,19 @@ const OrgBusDetail = ({ route }: any) => {
                   marginTop: 15,
                 }}
               >
-                <View style={{ width: "50%" }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedItem(item);
+                    dispatch(
+                      ChangeModalState.action({
+                        viewBusInformationModal: true,
+                      })
+                    );
+                  }}
+                  style={{ width: "50%" }}
+                >
                   <Text>{item.busName}</Text>
-                </View>
+                </TouchableOpacity>
                 <View style={{ flexDirection: "row" }}>
                   <TouchableOpacity
                     onPress={() => {

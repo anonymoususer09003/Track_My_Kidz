@@ -26,6 +26,7 @@ import {
   useConfirmPayment,
   useStripe,
 } from "@stripe/stripe-react-native";
+import { ActivityIndicator } from "react-native";
 import { fetchPaymentIntent } from "@/Services/StripeServices";
 import { loadUserId } from "@/Storage/MainAppStorage";
 import Toast from "react-native-toast-message";
@@ -44,6 +45,7 @@ const ParentPaymentModal = ({ onPay, onCancel }) => {
     useState<IndexPath | null>(null);
   const [cardData, setCardData] = useState({});
   const [isValid, setIsValid] = useState(false);
+
   const [payment, setPayment] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [parent, setParent] = useState(null);
@@ -254,44 +256,50 @@ const ParentPaymentModal = ({ onPay, onCancel }) => {
           />
         </View>
         <View style={styles.bottom}>
-          <View style={styles.buttonText}>
-            <LinearGradientButton
-              style={{
-                borderRadius: 25,
-                flex: 1,
-              }}
-              appearance="ghost"
-              size="medium"
-              status="control"
-              onPress={() => {
-                DeclineToGift().then();
-                dispatch(
-                  ChangeModalState.action({
-                    parentPaymentModalVisibility: false,
-                  })
-                );
-                onCancel();
-              }}
-            >
-              Cancel
-            </LinearGradientButton>
-          </View>
-          <View style={styles.buttonText}>
-            <LinearGradientButton
-              style={{
-                borderRadius: 25,
-                flex: 1,
-              }}
-              appearance="ghost"
-              size="medium"
-              status="control"
-              onPress={() => {
-                activateSubscription();
-              }}
-            >
-              Pay
-            </LinearGradientButton>
-          </View>
+          {!isLoading && (
+            <View style={styles.buttonText}>
+              <LinearGradientButton
+                style={{
+                  borderRadius: 25,
+                  flex: 1,
+                }}
+                appearance="ghost"
+                size="medium"
+                status="control"
+                onPress={() => {
+                  DeclineToGift().then();
+                  dispatch(
+                    ChangeModalState.action({
+                      parentPaymentModalVisibility: false,
+                    })
+                  );
+                  onCancel();
+                }}
+              >
+                Cancel
+              </LinearGradientButton>
+            </View>
+          )}
+          {!isLoading ? (
+            <View style={styles.buttonText}>
+              <LinearGradientButton
+                style={{
+                  borderRadius: 25,
+                  flex: 1,
+                }}
+                appearance="ghost"
+                size="medium"
+                status="control"
+                onPress={() => {
+                  activateSubscription();
+                }}
+              >
+                Pay
+              </LinearGradientButton>
+            </View>
+          ) : (
+            <ActivityIndicator size="large" color={Colors.primary} />
+          )}
         </View>
       </Card>
     </Modal>

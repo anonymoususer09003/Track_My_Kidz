@@ -1032,13 +1032,7 @@ const InstructorActivityScreen = ({}) => {
                   style={[
                     styles.item,
                     {
-                      backgroundColor: !item?.status
-                        ? "#fff"
-                        : index % 3 === 0
-                        ? "lightgreen"
-                        : index % 2 === 0
-                        ? "#F6DDCC"
-                        : "#fff",
+                      backgroundColor: "#fff",
                     },
                   ]}
                 >
@@ -1265,13 +1259,7 @@ const InstructorActivityScreen = ({}) => {
                   style={[
                     styles.footer,
                     {
-                      backgroundColor: !item?.status
-                        ? "#fff"
-                        : index % 3 === 0
-                        ? "lightgreen"
-                        : index % 2 === 0
-                        ? "#F6DDCC"
-                        : "#fff",
+                      backgroundColor: "#fff",
                     },
                   ]}
                 >

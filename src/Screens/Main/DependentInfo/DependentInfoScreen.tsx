@@ -458,9 +458,9 @@ const DependentInfoScreen = () => {
                 }
               >
                 <View style={[styles.row, { justifyContent: "space-between" }]}>
-                  <Text
-                    style={[styles.text, { fontWeight: "600" }]}
-                  >{`${item.firstname} ${item.lastname}`}</Text>
+                  <Text style={[styles.text, { fontWeight: "600" }]}>{`${
+                    item?.firstname || ""
+                  } ${item?.lastname || ""}`}</Text>
                   {false && (
                     <View style={styles.row}>
                       <TouchableOpacity
@@ -501,12 +501,12 @@ const DependentInfoScreen = () => {
                   )}
                 </View>
                 <Text style={styles.text}>{`${
-                  (!!item.school && item.school) || ""
+                  (item?.childSchool ? item.childSchool : "") || ""
                 }`}</Text>
 
-                {item?.status && (
+                {/* {item?.status && (
                   <Text style={styles.text}>{`Status: ${item.status}`}</Text>
-                )}
+                )} */}
                 <View
                   style={{
                     flexDirection: "row",
