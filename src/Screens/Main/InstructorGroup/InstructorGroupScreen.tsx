@@ -389,6 +389,23 @@ const InstructorGroupScreen = ({ route }) => {
             {/* </TouchableOpacity> */}
           </View>
         )}
+
+        <TouchableOpacity
+          onPress={() => {
+            prevOpenedRow?.close();
+            navigation.navigate("CreateGroup", {
+              data: item,
+            });
+          }}
+          style={{
+            padding: 5,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
+        </TouchableOpacity>
+
         {!item.status && (
           <View
             style={{
@@ -646,6 +663,11 @@ const InstructorGroupScreen = ({ route }) => {
             </Select>
           )}
         </View>
+        {groups.length == 0 && (
+          <Text style={{ textAlign: "center", marginTop: 5 }}>
+            You currently do not have any groups
+          </Text>
+        )}
         <FlatList
           data={
             selectedInstructorGroup ? selectedInstructorGroup : groups || []

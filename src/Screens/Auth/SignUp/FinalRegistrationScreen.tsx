@@ -13,6 +13,8 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { Login } from "@/Services/LoginServices";
+import { getDeviceId } from "react-native-device-info";
 import { Linking } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { ImagePickerModal } from "@/Modals";
@@ -417,7 +419,10 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               <ProfileAvatarPicker
                 style={styles.profileImage}
                 // resizeMode='center'
-                source={{ uri: selectedImage }}
+                source={{
+                  uri: selectedImage + "?time" + new Date().getTime(),
+                  headers: { Pragma: "no-cache" },
+                }}
                 editButton={true ? renderEditAvatarButton : null}
               />
             )}
@@ -426,8 +431,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                 style={[
                   styles.profileImage,
                   {
-                    alignItems: "center",
-                    justifyContent: "center",
+                    // alignItems: "center",
+                    // justifyContent: "center",
                     backgroundColor: Colors.lightgray,
                   },
                 ]}
@@ -436,7 +441,15 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       {user?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
                       {user?.lastname?.substring(0, 1)?.toUpperCase()}
                     </Text> */}
-                {true && renderEditButtonElement()}
+                <View
+                  style={{
+                    position: "absolute",
+                    marginTop: 70,
+                    marginLeft: 75,
+                  }}
+                >
+                  {true && renderEditButtonElement()}
+                </View>
               </View>
             )}
           </View>
@@ -468,7 +481,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                 password: values.password,
                 activationcode: activation_code,
               };
-              const userObject: UserRegistrationDTO = {
+              const userObject = {
                 email: emailAddress,
                 firstname: values.firstName,
                 lastname: values.lastName,
@@ -480,7 +493,9 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                 phone: values.phoneNumber,
                 status: "",
                 term: true,
+                deviceId: getDeviceId(),
               };
+
               dispatch(ChangeModalState.action({ loading: true }));
               console.log("userobject", userObject);
               Register(registerObject, "parent")
@@ -827,8 +842,13 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                 password: values.password,
                 activationcode: activation_code,
               };
+              const loginObject = {
+                email: emailAddress,
+                password: values.password,
+              };
 
               let formData = new FormData();
+
               formData.append(
                 "image",
                 uploadedImage
@@ -837,7 +857,11 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       name: uploadedImage.mime,
                       type: uploadedImage.mime,
                     }
-                  : ""
+                  : {
+                      uri: "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
+                      name: "avatar",
+                      type: "image/png",
+                    }
               );
               formData.append("firstname", values.firstName);
               formData.append("lastname", values.lastName);
@@ -852,20 +876,13 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               formData.append("password", values.password);
               formData.append("term", true);
               formData.append("isAdmin", false);
-              formData.append("grades", [
-                {
-                  id: 0,
-                  name: "Test",
-                  subject: [
-                    {
-                      id: 0,
-                      name: "Test",
-                    },
-                  ],
-                },
-              ]);
-              formData.append("schoolId", values.schoolId);
-              formData.append("orgId", values.orgId);
+              formData.append("deviceId", getDeviceId());
+              values.schoolId
+                ? formData.append("schoolId", values.schoolId)
+                : formData.append("schoolId", "");
+              values.orgId
+                ? formData.append("orgId", values.orgId)
+                : formData.append("orgId", "");
 
               const userObject: UserRegistrationDTO = {
                 firstname: values.firstName,
@@ -898,18 +915,19 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               };
               Register(registerObject, "instructor")
                 .then(async (res) => {
-                  console.log("res---", res.data);
-                  await storeToken(res.data.token);
-                  console.log("userobject", userObject);
+                  console.log("res---", res?.data);
+                  await storeToken(res?.data?.token);
+                  console.log("userobject", JSON.stringify(formData));
                   CompleteRegistration(formData, "instructor")
-                    .then((response: any) => {
+                    .then(async (response: any) => {
                       console.log("response", response);
+                      await Login(loginObject, user_type.toLowerCase());
                       dispatch(
                         LoginStore.action({
-                          token: response.data.token,
+                          token: response?.data?.token,
                           userType: "instructor",
-                          id: response.data.instructorId,
-                          mainId: res.data?.userId,
+                          id: response?.data.instructorId,
+                          mainId: res?.data?.userId,
                         })
                       );
                       if (response.status == 201) {
@@ -926,7 +944,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       Toast.show({
                         type: "info",
                         position: "top",
-                        text1: error.data.title,
+                        text1: error.data?.title,
                         text2: error?.data?.statusDescription,
                         visibilityTime: 4000,
                         autoHide: true,
@@ -1324,6 +1342,10 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                 password: values.password,
                 activationcode: activation_code,
               };
+              const loginObject = {
+                email: student.email,
+                password: values.password,
+              };
               console.log("response", registerObject);
               // const userObject: UserRegistrationDTO = {
               //   firstname: values.firstName,
@@ -1337,6 +1359,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               Register(registerObject, "student")
                 .then(async (response) => {
                   console.log("response--", response.data);
+                  await Login(loginObject, user_type.toLowerCase());
                   dispatch(
                     LoginStore.action({
                       token: response?.data?.token,
@@ -1391,7 +1414,13 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       <ProfileAvatarPicker
                         style={styles.profileImage}
                         // resizeMode='center'
-                        source={{ uri: student?.studentPhoto }}
+                        source={{
+                          uri:
+                            student?.studentPhotoe +
+                            "?time" +
+                            new Date().getTime(),
+                          headers: { Pragma: "no-cache" },
+                        }}
                         editButton={false ? renderEditAvatarButton : null}
                       />
                     )}

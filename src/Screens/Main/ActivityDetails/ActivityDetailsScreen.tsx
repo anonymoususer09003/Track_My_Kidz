@@ -28,6 +28,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { LinearGradientButton } from "@/Components";
 import MapView, { Marker } from "react-native-maps";
 import { ParticipantLocation } from "@/Services/Activity";
+import { AwsLocationTracker } from "@/Services/TrackController";
 const ActivityDetailsScreen = () => {
   const ref = useRef();
   const navigation = useNavigation();
@@ -42,13 +43,61 @@ const ActivityDetailsScreen = () => {
   const [selectedDependent, setSelectedDependent] = useState(null);
   const [participantsEmail, setParticipantsEmail] = useState([]);
   const [partcipants, setParticipants] = useState([]);
+  const [getParticipantsIds, setParticipantsIds] = useState([]);
+  const [trackingList, setTrackingList] = useState({});
   const isFocused = useIsFocused();
   console.log("acitvity", activity);
   const getParticipantLocation = async () => {
     try {
       let res = await ParticipantLocation(activity?.activityId);
+      let deviceIds = [];
+      res.map((item) => {
+        item.deviceId && deviceIds.push(item.deviceId);
+      });
+
+      setParticipantsIds(deviceIds);
+      turnOnTracker(activity?.activityId, deviceIds, "activity");
       console.log("res", res);
       setParticipants(res);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+  const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
+    try {
+      let body = {
+        deviceIds: deviceIds,
+        trackerName: id,
+        locationTrackerTrigger: true,
+      };
+
+      let res = await AwsLocationTracker(body);
+
+      let temp = {};
+      res.map((item) => {
+        temp = {
+          ...temp,
+          [temp.deviceId]: {
+            lat: item.position[0],
+            lang: item.position[1],
+          },
+        };
+      });
+      setTrackingList(temp);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
+  const turnOffTracker = async (id: any, deviceIds: any, from: any) => {
+    try {
+      let body = {
+        deviceIds: getParticipantsIds,
+        trackerName: selectedActivity?.activityId,
+        locationTrackerTrigger: false,
+      };
+
+      let res = await AwsLocationTracker(body);
     } catch (err) {
       console.log("err", err);
     }
@@ -56,6 +105,8 @@ const ActivityDetailsScreen = () => {
   useEffect(() => {
     if (isFocused) {
       getParticipantLocation();
+    } else {
+      turnOffTracker(currentUser.parentId, getChildrendeviceIds, "parent");
     }
     if (selectedDependent) {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
@@ -137,14 +188,16 @@ const ActivityDetailsScreen = () => {
                   <Marker
                     onSelect={() => console.log("pressed")}
                     onPress={() => {
+                      let latitude = trackingList[item.deviceId].lat;
+                      let longititude = trackingList[item.deviceId].lang;
                       ref.current.fitToSuppliedMarkers(
                         [
                           {
-                            latitude: item?.latitude
-                              ? parseFloat(item?.latitude)
+                            latitude: latitude
+                              ? parseFloat(latitude)
                               : parseFloat(10),
-                            longitude: item?.longititude
-                              ? parseFloat(item?.longititude)
+                            longitude: longititude
+                              ? parseFloat(longititude)
                               : parseFloat(10),
                           },
                         ]
@@ -154,11 +207,11 @@ const ActivityDetailsScreen = () => {
                     identifier={item?.email}
                     key={index}
                     coordinate={{
-                      latitude: item?.latitude
-                        ? parseFloat(item?.latitude)
+                      latitude: latitude
+                        ? parseFloat(latitude)
                         : parseFloat(10),
-                      longitude: item?.longititude
-                        ? parseFloat(item?.longititude)
+                      longitude: longititude
+                        ? parseFloat(longititude)
                         : parseFloat(10),
                     }}
                   >

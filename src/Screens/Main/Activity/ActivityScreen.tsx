@@ -11,19 +11,30 @@ import Entypo from "react-native-vector-icons/Entypo";
 import { LinearGradientButton } from "@/Components";
 import { InstructionsModal } from "@/Modals";
 import { GetActivityByStudentId, GetAllActivity } from "@/Services/Activity";
+import { ParticipantLocation } from "@/Services/Activity";
 import { Activity } from "@/Models/DTOs";
 import { useStateValue } from "@/Context/state/State";
+import { AwsLocationTracker } from "@/Services/TrackController";
 import moment from "moment";
 
 const ActivityScreen = ({ route }) => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
   const dependent = route && route.params && route.params.dependent;
+  const currentUser = useSelector(
+    (state: { user: UserState }) => state.user.item
+  );
+  const [getChildrendeviceIds, setChildrensDeviceIds] = useState([]);
   const [{ selectedDependentActivity, child }] = useStateValue();
   const swipeableRef = useRef(null);
   const dispatch = useDispatch();
+  const [trackingList, setTrackingList] = useState({});
   const [activities, setActivities] = useState(selectedDependentActivity);
   const [selectedInstructions, setSelectedInstructions] = useState<Optin>(null);
+  const [showParticipantMap, setParticipantMap] = useState(false);
+  const [getParticipantsIds, setParticipantsIds] = useState([]);
+  const [partcipants, setParticipants] = useState([]);
+  const [selectedActivity, setSelectedActivity] = useState();
   console.log("selected dependet", child);
   const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
@@ -54,8 +65,75 @@ const ActivityScreen = ({ route }) => {
             />
           </TouchableOpacity>
         )}
+        <TouchableOpacity
+          style={styles.buttonStyle}
+          onPress={() => {
+            setParticipantMap(true);
+            setSelectedActivity(item);
+            getParticipantLocation(item?.activityId);
+          }}
+        >
+          <Entypo size={25} color={Colors.primary} name="location-pin" />
+          <Text style={styles.textStyle}>View Attendees</Text>
+        </TouchableOpacity>
       </View>
     );
+  };
+  const getParticipantLocation = async (activityId: any) => {
+    try {
+      let res = await ParticipantLocation(activityId);
+      let deviceIds = [];
+      res.map((item) => {
+        item.deviceId && deviceIds.push(item.deviceId);
+      });
+
+      setParticipantsIds(deviceIds);
+      turnOnTracker(activityId, deviceIds, "activity");
+      console.log("res", res);
+      setParticipants(res);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
+  const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
+    try {
+      let body = {
+        deviceIds: deviceIds,
+        trackerName: id,
+        locationTrackerTrigger: true,
+      };
+
+      let res = await AwsLocationTracker(body);
+
+      let temp = {};
+      res.map((item) => {
+        temp = {
+          ...temp,
+          [temp.deviceId]: {
+            lat: item.position[0],
+            lang: item.position[1],
+          },
+        };
+      });
+      setTrackingList(temp);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
+  const turnOffTracker = async (id: any, deviceIds: any, from: any) => {
+    try {
+      let body = {
+        deviceIds: getParticipantsIds,
+        trackerName: selectedActivity?.activityId,
+        locationTrackerTrigger: false,
+      };
+
+      let res = await AwsLocationTracker(body);
+    } catch (err) {
+      console.log("err", err);
+    }
   };
   const getActivities = async () => {
     GetActivityByStudentId(child?.studentId)
@@ -69,7 +147,11 @@ const ActivityScreen = ({ route }) => {
   };
   useEffect(() => {
     if (isFocused) {
-      getActivities();
+      if (selectedActivity) {
+        getActivities();
+      }
+    } else {
+      turnOffTracker(currentUser.parentId, getChildrendeviceIds, "parent");
     }
   }, [child, isFocused]);
 
@@ -82,95 +164,148 @@ const ActivityScreen = ({ route }) => {
         />
       )}
       <View style={styles.layout}>
-        <FlatList
-          data={activities}
-          style={{ padding: 10, width: "100%" }}
-          renderItem={({ item, index }) => (
-            <Swipeable
-              ref={swipeableRef}
-              renderRightActions={(e) => RightActions(e, item)}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  // _dispatch({
-                  //     type: actions.SET_SELECTED_ACTIVITY,
-                  //     payload: item,
-                  // })
-                  // dispatch(
-                  //     ChangeModalState.action({ rollCallModalVisibility: true }),
-                  // )
-                  // navigation.navigate('InstructorGroupApproval')
-                }}
-                style={[
-                  styles.item,
-                  {
-                    backgroundColor: !item?.activity?.status
-                      ? "#fff"
-                      : index % 3 === 0
-                      ? "lightgreen"
-                      : index % 2 === 0
-                      ? "#F6DDCC"
-                      : "#fff",
-                  },
-                ]}
+        {!showParticipantMap ? (
+          <FlatList
+            data={activities}
+            style={{ padding: 10, width: "100%" }}
+            renderItem={({ item, index }) => (
+              <Swipeable
+                ref={swipeableRef}
+                renderRightActions={(e) => RightActions(e, item)}
               >
-                <Text style={styles.text}>{`Date: ${moment(
-                  item?.activity?.scheduler?.fromDate
-                ).format("YYYY-MM-DD hh:mm:ss")}`}</Text>
-                <Text style={styles.text}>{`${
-                  item?.activity?.activityType?.toLowerCase() === "activity"
-                    ? "Activity"
-                    : "Trip"
-                }: ${item?.activity?.activityName}`}</Text>
-                <Text
-                  style={styles.text}
-                >{`Where: ${item?.activity?.venueFromName}`}</Text>
-                <Text
-                  style={styles.text}
-                >{`Address: ${item?.activity?.venueFromAddress}`}</Text>
-                <Text style={styles.text}>{`Status: ${
-                  item?.activity?.status ? "Active" : "Inactive"
-                }`}</Text>
-                <Text style={styles.text}>{`Students: ${
-                  (item?.activity?.studentsActivity &&
-                    item?.activity?.studentsActivity?.length) ||
-                  0
-                }`}</Text>
-                <Text style={styles.text}>{`Instructors: ${
-                  (item?.activity?.instructors &&
-                    item?.activity?.instructors?.length) ||
-                  0
-                }`}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedInstructions(item?.activity?.optin);
-                  dispatch(
-                    ChangeModalState.action({
-                      instructionsModalVisibility: true,
-                    })
-                  );
-                }}
-                style={[
-                  styles.footer,
-                  {
-                    backgroundColor: !item?.activity?.status
-                      ? "#fff"
-                      : index % 3 === 0
-                      ? "lightgreen"
-                      : index % 2 === 0
-                      ? "#F6DDCC"
-                      : "#fff",
-                  },
-                ]}
-              >
-                <Text
-                  style={styles.text}
-                >{`Instructions / Disclaimer / Agreement`}</Text>
-              </TouchableOpacity>
-            </Swipeable>
-          )}
-        />
+                <TouchableOpacity
+                  onPress={() => {
+                    // _dispatch({
+                    //     type: actions.SET_SELECTED_ACTIVITY,
+                    //     payload: item,
+                    // })
+                    // dispatch(
+                    //     ChangeModalState.action({ rollCallModalVisibility: true }),
+                    // )
+                    // navigation.navigate('InstructorGroupApproval')
+                  }}
+                  style={[
+                    styles.item,
+                    {
+                      backgroundColor: !item?.activity?.status
+                        ? "#fff"
+                        : index % 3 === 0
+                        ? "lightgreen"
+                        : index % 2 === 0
+                        ? "#F6DDCC"
+                        : "#fff",
+                    },
+                  ]}
+                >
+                  <Text style={styles.text}>{`Date: ${moment(
+                    item?.activity?.scheduler?.fromDate
+                  ).format("YYYY-MM-DD hh:mm:ss")}`}</Text>
+                  <Text style={styles.text}>{`${
+                    item?.activity?.activityType?.toLowerCase() === "activity"
+                      ? "Activity"
+                      : "Trip"
+                  }: ${item?.activity?.activityName}`}</Text>
+                  <Text
+                    style={styles.text}
+                  >{`Where: ${item?.activity?.venueFromName}`}</Text>
+                  <Text
+                    style={styles.text}
+                  >{`Address: ${item?.activity?.venueFromAddress}`}</Text>
+                  <Text style={styles.text}>{`Status: ${
+                    item?.activity?.status ? "Active" : "Inactive"
+                  }`}</Text>
+                  <Text style={styles.text}>{`Students: ${
+                    (item?.activity?.studentsActivity &&
+                      item?.activity?.studentsActivity?.length) ||
+                    0
+                  }`}</Text>
+                  <Text style={styles.text}>{`Instructors: ${
+                    (item?.activity?.instructors &&
+                      item?.activity?.instructors?.length) ||
+                    0
+                  }`}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedInstructions(item?.activity?.optin);
+                    dispatch(
+                      ChangeModalState.action({
+                        instructionsModalVisibility: true,
+                      })
+                    );
+                  }}
+                  style={[
+                    styles.footer,
+                    {
+                      backgroundColor: !item?.activity?.status
+                        ? "#fff"
+                        : index % 3 === 0
+                        ? "lightgreen"
+                        : index % 2 === 0
+                        ? "#F6DDCC"
+                        : "#fff",
+                    },
+                  ]}
+                >
+                  <Text
+                    style={styles.text}
+                  >{`Instructions / Disclaimer / Agreement`}</Text>
+                </TouchableOpacity>
+              </Swipeable>
+            )}
+          />
+        ) : (
+          <>
+            {partcipants.map((item, index) => {
+              // console.log("item", item);
+              return (
+                <View style={{ flex: 1 }}>
+                  <Marker
+                    onSelect={() => console.log("pressed")}
+                    onPress={() => {
+                      let latitude = trackingList[item.deviceId].lat;
+                      let longititude = trackingList[item.deviceId].lang;
+                      ref.current.fitToSuppliedMarkers(
+                        [
+                          {
+                            latitude: latitude
+                              ? parseFloat(latitude)
+                              : parseFloat(10),
+                            longitude: longititude
+                              ? parseFloat(longititude)
+                              : parseFloat(10),
+                          },
+                        ]
+                        // false, // not animated
+                      );
+                    }}
+                    identifier={item?.email}
+                    key={index}
+                    coordinate={{
+                      latitude: latitude
+                        ? parseFloat(latitude)
+                        : parseFloat(10),
+                      longitude: longititude
+                        ? parseFloat(longititude)
+                        : parseFloat(10),
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => console.log("pressed")}
+                      style={{ alignItems: "center" }}
+                    >
+                      <Text>{item?.firstName}</Text>
+                      <Text style={{ marginBottom: 2 }}>{item?.lastName}</Text>
+                      <Fontisto name="map-marker-alt" size={25} color="red" />
+                    </TouchableOpacity>
+                  </Marker>
+                </View>
+                // </>
+                // </Circle>
+              );
+            })}
+          </>
+        )}
       </View>
     </>
   );

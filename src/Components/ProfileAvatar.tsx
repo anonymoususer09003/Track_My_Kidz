@@ -24,8 +24,13 @@ const ProfileAvatarPicker = (props: any): React.ReactElement<ViewProps> => {
 
   return (
     <View style={style}>
-      <Avatar style={[style, styles.avatar]} {...restProps} />
-      {/* {editButton && renderEditButtonElement()} */}
+      {console.log("rest props", restProps)}
+      <Avatar
+        key={new Date().getTime()}
+        style={[style, styles.avatar]}
+        {...restProps}
+      />
+      {props.editButton && props.editButton()}
     </View>
   );
 };

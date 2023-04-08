@@ -14,6 +14,8 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
+import { Spinner } from "@/Components";
+import { getDeviceId } from "react-native-device-info";
 import { ProfileAvatarPicker } from "@/Components";
 import { Linking } from "react-native";
 import {
@@ -88,6 +90,7 @@ import AddBusInformation from "@/Modals/AddBusInformation";
 import { storeToken } from "@/Storage/MainAppStorage";
 import { GetAllSchools, GetSchoolByFilters } from "@/Services/School";
 import { GetOrgByFilters, GetAllOrg, CreateOrg } from "@/Services/Org";
+import { Login } from "@/Services/LoginServices";
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -126,6 +129,7 @@ const _instructors = [];
 
 const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] =
     React.useState<boolean>(false);
   const [languages, setLanguages] = useState<Array<ReactText>>(["English"]);
@@ -377,9 +381,11 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
           schoolId: 0,
           name: "Other",
         };
-        console.log("res", res);
+        console.log("res school", res);
         const _schools = [...res];
         _schools.unshift(_data);
+
+        console.log("_school0000", _schools);
         setSchools(_schools);
         setSchoolsData(_schools);
         console.log("_schools", _schools);
@@ -388,7 +394,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
         console.log("GetSchoolByFilters", err);
       });
   };
-
+  console.log("schoolsdta", schoolsData);
   const getOrgByFilter = (
     country = "",
     state = "",
@@ -529,7 +535,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                 values.schoolName === "Other"
                   ? values.school_name
                   : values.schoolName;
-              console.log("schooldata", schoolsData);
+              console.log("schooldata", school_name);
               let schoolId =
                 values.schoolName === "Other"
                   ? { schoolId: 0 }
@@ -558,7 +564,11 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                       name: uploadedImage.mime,
                       type: uploadedImage.mime,
                     }
-                  : ""
+                  : {
+                      uri: "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
+                      name: "avatar",
+                      type: "image/png",
+                    }
               );
               formData.append("firstname", values.firstName);
               formData.append("lastname", values.lastName);
@@ -573,20 +583,12 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
               formData.append("password", values.password);
               formData.append("term", true);
               formData.append("isAdmin", true);
-              formData.append("grades", [
-                {
-                  id: 0,
-                  name: "Test",
-                  subject: [
-                    {
-                      id: 0,
-                      name: "Test",
-                    },
-                  ],
-                },
-              ]);
-              formData.append("schoolId", schoolId);
-              formData.append("orgId", orgId);
+              formData.append("deviceId", getDeviceId());
+              formData.append("schoolId", schoolId || "");
+              formData.append("orgId", orgId || "");
+
+              console.log("formData0202002020200202", formData);
+
               const userObject: UserRegistrationDTO = {
                 firstname: values.firstName,
                 lastname: values.lastName,
@@ -615,9 +617,10 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                 schoolId: schoolId,
                 orgId: orgId,
               };
+              console.log("values", values.schoolName);
               const schoolObject: UserRegistrationDTO = {
                 name:
-                  values.schoolName === "Other"
+                  values.school === "Other"
                     ? values.school_name
                     : values.schoolName,
                 address: values.schoolAddress || "",
@@ -637,6 +640,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                 //       }))
                 //     : [],
               };
+              setLoading(true);
               const orgObject: UserRegistrationDTO = {
                 name: values.organizationName,
                 address: values.schoolAddress,
@@ -647,20 +651,29 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                 grades: null,
                 representatives: [],
               };
-
+              let loginObject = {
+                email: emailAddress,
+                password: values.password,
+              };
+              console.log("scholobj", schoolObject);
+              console.log("json stringfy", JSON.stringify(formData));
               Register(registerObject, "instructor")
                 .then(async (response) => {
+                  console.log("response---", response.data);
                   await storeToken(response.data.token);
                   console.log("schoolId", schoolId);
-                  if (values.selected_entity == "School" && schoolId == 0) {
+                  if (
+                    values.selected_entity == "School" &&
+                    (schoolId == 0 || !schoolId)
+                  ) {
                     CompleteRegistration(schoolObject, "school")
                       .then((_res) => {
-                        console.log({
+                        console.log("kskksks", {
                           ...userObject,
-                          schoolId: _res.data.schoolId,
+                          schoolId: _res?.data?.schoolId,
                         });
 
-                        formData.append("schoolId", _res.data.schoolId);
+                        formData.append("schoolId", _res?.data?.schoolId);
                         // {
                         //   ...userObject,
                         //   schoolId: _res.data.schoolId,
@@ -681,7 +694,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                               phoneNumber: item?.phoneNumber || "",
                               isAdmin: item?.isAdmin || false,
                             }));
-
+                            await Login(loginObject, user_type.toLowerCase());
                             await storeInstructors(
                               JSON.stringify(_instructors)
                             );
@@ -748,12 +761,9 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           phoneNumber: item?.phoneNumber || "",
                           isAdmin: item?.isAdmin || false,
                         }));
-
+                        await Login(loginObject, user_type.toLowerCase());
                         await storeInstructors(JSON.stringify(_instructors));
                         dispatch(LoginStore.action(obj));
-
-                        console.log("_instructors", _instructors);
-                        console.log("_instructors", response.data.instructorId);
 
                         if (response.status == 201) {
                           register(emailAddress, values.password);
@@ -799,7 +809,6 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                         // },
                         CompleteRegistration(formData, "instructor")
                           .then(async (response: any) => {
-                            console.log("response2727878", response);
                             let obj = {
                               token: response.data.token,
                               userType: "instructor",
@@ -813,7 +822,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                               phoneNumber: item?.phoneNumber || "",
                               isAdmin: item?.isAdmin || false,
                             }));
-
+                            await Login(loginObject, user_type.toLowerCase());
                             await storeInstructors(
                               JSON.stringify(_instructors)
                             );
@@ -878,7 +887,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           phoneNumber: item?.phoneNumber || "",
                           isAdmin: item?.isAdmin || false,
                         }));
-
+                        await Login(loginObject, user_type.toLowerCase());
                         await storeInstructors(JSON.stringify(_instructors));
                         dispatch(LoginStore.action(obj));
 
@@ -930,6 +939,9 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     onHide: () => {},
                     onPress: () => {},
                   });
+                })
+                .finally(() => {
+                  setLoading(false);
                 });
             }}
           >
@@ -950,8 +962,11 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     <ProfileAvatarPicker
                       style={styles.profileImage}
                       // resizeMode='center'
-                      source={{ uri: selectedImage }}
-                      editButton={true ? renderEditAvatarButton : null}
+                      source={{
+                        uri: selectedImage + "?time" + new Date().getTime(),
+                        headers: { Pragma: "no-cache" },
+                      }}
+                      editButton={false ? renderEditAvatarButton : null}
                     />
                   )}
                   {selectedImage == "" && (
@@ -959,8 +974,8 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                       style={[
                         styles.profileImage,
                         {
-                          alignItems: "center",
-                          justifyContent: "center",
+                          // alignItems: "center",
+                          // justifyContent: "center",
                           backgroundColor: Colors.lightgray,
                         },
                       ]}
@@ -969,7 +984,15 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                       {user?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
                       {user?.lastname?.substring(0, 1)?.toUpperCase()}
                     </Text> */}
-                      {true && renderEditButtonElement()}
+                      <View
+                        style={{
+                          position: "absolute",
+                          marginTop: 70,
+                          marginLeft: 85,
+                        }}
+                      >
+                        {true && renderEditButtonElement()}
+                      </View>
                     </View>
                   )}
                 </View>
@@ -1739,17 +1762,20 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     </View>
                   </View>
                 </Layout>
-                {console.log("error", errors)}
-                <View style={{ marginTop: 18, marginBottom: 20 }}>
-                  <LinearGradientButton
-                    style={styles.signUpButton}
-                    size="medium"
-                    onPress={handleSubmit}
-                    disabled={!isValid || !values.termsAccepted}
-                  >
-                    SIGN UP
-                  </LinearGradientButton>
-                </View>
+
+                {!loading && (
+                  <View style={{ marginTop: 18, marginBottom: 20 }}>
+                    <LinearGradientButton
+                      style={styles.signUpButton}
+                      size="medium"
+                      onPress={handleSubmit}
+                      disabled={!isValid || !values.termsAccepted}
+                    >
+                      SIGN UP
+                    </LinearGradientButton>
+                  </View>
+                )}
+                {loading && <Spinner />}
               </>
             )}
           </Formik>

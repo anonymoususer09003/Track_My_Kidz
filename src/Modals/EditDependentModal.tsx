@@ -11,6 +11,8 @@ import {
   Icon,
   Button,
 } from "@ui-kitten/components";
+import { Image } from "react-native";
+import { Spinner } from "@/Components";
 import * as yup from "yup";
 import { ImagePickerModal } from "@/Modals";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
@@ -80,6 +82,7 @@ const EditDependentModal = ({
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
     undefined
   );
+  const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   // const [dependents, setCities] = useState<Array<any>>([]);
   const [checkBox, setCheckBox] = useState(false);
@@ -200,21 +203,22 @@ const EditDependentModal = ({
   }, [isVisible]);
 
   const handleSetStudent = () => {
-    if (!!selectedDependent) {
+    if (selectedDependent) {
       setStudent(selectedDependent);
     }
   };
 
   useEffect(() => {
     if (isFocused) {
+      console.log("sjsjsjs", student?.studentImage);
       handleSetStudent();
-      setSelectedImage(student?.studentImage);
-      setUploadedImage(student?.studentImage);
+      // setSelectedImage(selectedDependent?.studentImage);
+      // setUploadedImage(selectedDependent?.studentImage);
     } else {
       setCheckBox(false);
       setSelectedImage(null);
     }
-  }, [isFocused, student]);
+  }, [isFocused, selectedDependent]);
   function getUriSource(): any {
     return { uri: selectedImage };
   }
@@ -243,563 +247,591 @@ const EditDependentModal = ({
         style={{ flex: 1 }}
         contentContainerStyle={{ flex: 1 }}
       >
-        <ScrollView>
-          <Card style={styles.modal} disabled={true}>
-            <View style={styles.body}>
-              <View style={{ paddingBottom: 10, paddingTop: 10 }}>
-                <Text
-                  textBreakStrategy={"highQuality"}
-                  style={{
-                    textAlign: "center",
-                    color: "#606060",
-                    fontSize: 18,
-                  }}
-                >
-                  Edit Dependent
-                </Text>
-              </View>
-            </View>
-
-            <View style={{ width: "100%" }}>
-              {selectedImage != "" && (
-                <ProfileAvatarPicker
-                  style={styles.profileImage}
-                  // resizeMode='center'
-                  source={{ uri: selectedImage }}
-                  editButton={true ? renderEditAvatarButton : null}
-                />
-              )}
-              {!selectedImage && (
-                <View
-                  style={[
-                    styles.profileImage,
-                    {
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: Colors.lightgray,
-                    },
-                  ]}
-                >
-                  <Text>
-                    {student?.firstname?.substring(0, 1)?.toUpperCase() || ""}
-                    {student?.lastname?.substring(0, 1)?.toUpperCase() || ""}
+        {isFocused && (
+          <ScrollView>
+            <Card style={styles.modal} disabled={true}>
+              <View style={styles.body}>
+                <View style={{ paddingBottom: 10, paddingTop: 10 }}>
+                  <Text
+                    textBreakStrategy={"highQuality"}
+                    style={{
+                      textAlign: "center",
+                      color: "#606060",
+                      fontSize: 18,
+                    }}
+                  >
+                    Edit Dependent
                   </Text>
-                  {/* <ProfileIcon
+                </View>
+              </View>
+
+              <View style={{ width: "100%" }}>
+                {(selectedImage != "" || selectedDependent?.studentImage) && (
+                  <View>
+                    <ProfileAvatarPicker
+                      style={styles.profileImage}
+                      // resizeMode='center'
+                      source={{
+                        uri:
+                          selectedImage ||
+                          selectedDependent?.studentImage +
+                            "?time" +
+                            new Date().getTime(),
+                        headers: { Pragma: "no-cache" },
+                      }}
+                      // source={{ uri: selectedImage }}
+                      editButton={false ? () => renderEditAvatarButton() : null}
+                    />
+                    {false && renderEditButtonElement()}
+                    {/* {renderEditAvatarButton()} */}
+                  </View>
+                )}
+                {!selectedImage && !selectedDependent?.studentImage && (
+                  <View
+                    style={[
+                      styles.profileImage,
+                      {
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: Colors.lightgray,
+                      },
+                    ]}
+                  >
+                    <Text>
+                      {student?.firstname?.substring(0, 1)?.toUpperCase() || ""}
+                      {student?.lastname?.substring(0, 1)?.toUpperCase() || ""}
+                    </Text>
+                    {/* <ProfileIcon
                   size={110}
                   // style={{ marginRight: 20 }}
                   name="user"
                 /> */}
-                  {true && renderEditButtonElement()}
-                </View>
-              )}
-              <Text
-                style={[
-                  styles.errorText,
-                  {
-                    marginTop: 20,
-                    lineHeight: 17,
-                    textAlign: "center",
-                  },
-                ]}
-              >
-                Headshots preffered
-              </Text>
-            </View>
+                  </View>
+                )}
+                {true && renderEditButtonElement()}
+                <Text
+                  style={[
+                    styles.errorText,
+                    {
+                      marginTop: 20,
+                      lineHeight: 17,
+                      textAlign: "center",
+                    },
+                  ]}
+                >
+                  Headshots preffered
+                </Text>
+              </View>
 
-            <Formik
-              validateOnMount={true}
-              validationSchema={validationSchema}
-              initialValues={{
-                firstName: student?.firstname,
-                lastName: student?.lastname,
-                school: student?.childSchool,
-                selectedSchool: "",
-                grade: "",
-                parentName: "",
-                parentName2: "",
-                password: "",
-                confirmPassword: "",
-                termsAccepted: false,
-                phoneNumber: student?.childPhone,
-                email: student?.childEmail,
-                country: student?.country || "",
-                state: student?.state || "",
-                city: student?.city || "",
-                selectedCountry: student?.country || "",
-                selectedState: student?.state || "",
-                selectedCity: student?.city || "",
-                selectedSchool: "",
-              }}
-              onSubmit={async (values, { resetForm }) => {
-                const userId = await loadUserId();
-                // const data = {
-                //   parentId: parseInt(userId),
-                //   id: parseInt(student?.studentId),
-                //   firstname: values.firstName,
-                //   lastname: values.lastName,
-                //   phone: values.phoneNumber,
-                //   email: values.email,
-                //   school:
-                //     values.selectedSchool != ""
-                //       ? values.selectedSchool
-                //       : values.school,
-                //   grade: values.grade,
-                //   // "grade": "string",
-                //   status: "",
-                //   latitude: "",
-                //   longititude: "",
-                //   country: values.selectedCountry,
-                //   city: values.selectedCity,
-                //   state: values.selectedState,
-                //   parentemail1: currentUser.email,
-                //   parentemail2: "",
-                // };
-
-                let formData = new FormData();
-                formData.append(
-                  "image",
-                  uploadedImage
-                    ? {
-                        uri: uploadedImage?.path,
-                        name: uploadedImage.mime,
-                        type: uploadedImage.mime,
-                      }
-                    : ""
-                );
-                formData.append("id", parseInt(student?.studentId));
-                formData.append("parentId", parseInt(userId, 0));
-                formData.append("firstname", values.firstName);
-                formData.append("lastname", values.lastName);
-                formData.append("phone", values.phoneNumber);
-                formData.append("email", values?.email);
-                formData.append(
-                  "school",
-                  values.selectedSchool != ""
-                    ? values.selectedSchool
-                    : values.school
-                );
-                formData.append("country", values.country);
-                formData.append("state", values.state);
-                formData.append("city", values.city);
-                formData.append("parentemail1", currentUser.email);
-                formData.append("parentemail2", "");
-
-                console.log("data", formData);
-                UpdateStudent(formData)
-                  .then((response) => {
-                    console.log("response", response);
-                    dispatch(
-                      ChangeModalState.action({
-                        editDependentModalVisibility: false,
-                      })
-                    );
-                    setSelectedDependent(null);
-                    setStudent(null);
-                    Toast.show({
-                      type: "success",
-                      position: "top",
-                      text1: `Dependent Info has been successfully updated`,
-                    });
-                    // resetForm();
-                    //   dispatch(
-                    //     ChangeModalState.action({ addStudentModal: false })
-                    //   );
-                  })
-                  .catch((err) => {
-                    console.log("err", err);
-                    Toast.show({
-                      type: "info",
-                      position: "top",
-                      text1: `An error occured`,
-                    });
-                  });
-                // CreateStudent(data)
-                //   .then((response) => {
-                //     console.log("response", response);
-                //     Toast.show({
-                //       type: "success",
-                //       position: "top",
-                //       text1: `Dependent has been successfully added`,
-                //     });
-                //     resetForm();
-                //     //   dispatch(
-                //     //     ChangeModalState.action({ addStudentModal: false })
-                //     //   );
-                //   })
-                //   .catch((err) => {
-                //     Toast.show({
-                //       type: "info",
-                //       position: "top",
-                //       text1: `An error occured`,
-                //     });
-              }}
-            >
-              {({
-                handleChange,
-                setFieldValue,
-                handleBlur,
-                handleSubmit,
-                values,
-                errors,
-                touched,
-                isValid,
-              }) => (
-                <>
-                  <View style={{ marginTop: 30, padding: 20 }}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text style={{ marginRight: 20, marginTop: 10 }}>
-                        Use my address
-                      </Text>
-                      <CheckBox
-                        style={[{ flex: 1, marginTop: 13 }]}
-                        checked={checkBox}
-                        onChange={(checked) => {
-                          if (checked) {
-                            setCheckBox(checked);
-                            setFieldValue(
-                              "country",
-                              currentUser?.country || ""
-                            );
-                            setFieldValue(
-                              "selectedCountry",
-                              currentUser?.country || ""
-                            );
-                            setFieldValue("state", currentUser?.state || "");
-                            setFieldValue(
-                              "selectedState",
-                              currentUser?.state || ""
-                            );
-                            setFieldValue("city", currentUser?.city || "");
-                            setFieldValue(
-                              "selectedCity",
-                              currentUser?.city || ""
-                            );
-                          } else {
-                            setCheckBox(checked);
-                            setFieldValue("country", "");
-                            setFieldValue("selectedCountry", "");
-                            setFieldValue("selectedCity", "");
-                            setFieldValue("selectedState", "");
-                            setFieldValue("state", "");
-                            setFieldValue("city", "");
-                          }
-                          // if (checked) {
-                          //   Alert.alert(checked);
-                          // } else {
-                          //   Alert.alert(checked);
-                          // }
-                        }}
-                      ></CheckBox>
-                    </View>
-                    <Input
-                      style={styles.inputSettings}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      placeholder={`First Name`}
-                      value={values?.firstName}
-                      onChangeText={handleChange("firstName")}
-                      onBlur={handleBlur("firstName")}
-                      // onChangeText={(value: string) =>
-                      //   setStudent({
-                      //     ...student,
-                      //     firstname: value,
-                      //   })
-                      // }
-                    />
-                    {errors.firstName && touched.firstName && (
-                      <Text style={styles.errorText}>{errors.firstName}</Text>
-                    )}
-                    <Input
-                      style={styles.inputSettings}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      placeholder={`Last Name`}
-                      value={values.lastName}
-                      onChangeText={handleChange("lastName")}
-                      onBlur={handleBlur("lastName")}
-                      // value={student?.lastname}
-                      // onChangeText={(value: string) =>
-                      //   setStudent({
-                      //     ...student,
-                      //     lastname: value,
-                      //   })
-                      // }
-                    />
-                    {errors.lastName && touched.lastName && (
-                      <Text style={styles.errorText}>{errors.lastName}</Text>
-                    )}
-                    <Input
-                      style={styles.inputSettings}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      value={values.email}
-                      placeholder="Email*"
-                      onChangeText={handleChange("email")}
-                      onBlur={handleBlur("email")}
-                      // placeholder={`Email*`}
-
-                      // value={student?.email}
-                      // onChangeText={(value: string) =>
-                      //   setStudent({
-                      //     ...student,
-                      //     email: value,
-                      //   })
-                      // }
-                    />
-                    {errors.email && touched.email && (
-                      <Text style={styles.errorText}>{errors.email}</Text>
-                    )}
-                    <Input
-                      style={styles.inputSettings}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      placeholder={`Phone # (Optional)`}
-                      value={values.phoneNumber}
-                      keyboardType="number-pad"
-                      onChangeText={handleChange("phoneNumber")}
-                      // value={student?.phone}
-                      // onChangeText={(value: string) =>
-                      //   setStudent({
-                      //     ...student,
-                      //     phone: value,
-                      //   })
-                      // }
-                    />
-                    <Autocomplete
-                      placeholder="Country*"
-                      value={values?.country}
-                      placement="bottom"
-                      style={{ marginVertical: 5 }}
-                      // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                      // onChangeText={(query) => {
-                      //   // setFieldValue("country", query);
-                      //   setCountriesData(
-                      //     countries.filter((item) => filterCountries(item, query))
-                      //   );
-                      // }}
-                      onChangeText={(query) => {
-                        setFieldValue("country", query);
-                        setCountriesData(
-                          countries.filter((item) =>
-                            filterCountries(item, query)
-                          )
-                        );
-                      }}
-                      // onSelect={(query) => {
-                      //   const selectedCountry = countriesData[query];
-                      //   // setFieldValue("country", selectedCountry.name);
-                      //   // setFieldValue("selectedCountry", selectedCountry.name);
-                      //   // setFieldValue("selectedState", "");
-                      //   // setFieldValue("state", "");
-                      //   setStates([]);
-                      //   GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
-                      //     (res) => {
-                      //       setStates(res.data);
-                      //       setStatesData(states);
-                      //     }
-                      //   );
-                      //   getSchoolsByFilter(selectedCountry.name);
-                      // }}
-                      onSelect={(query) => {
-                        const selectedCountry = countriesData[query];
-                        setFieldValue("country", selectedCountry.name);
-                        setFieldValue("selectedCountry", selectedCountry.name);
-                        setFieldValue("selectedState", "");
-                        setFieldValue("state", "");
-                        setStates([]);
-                        GetAllStates(
-                          selectedCountry.name.replace(/ /g, "")
-                        ).then((res) => {
-                          setStates(res.data);
-                          setStatesData(states);
-                        });
-                        // getSchoolsByFilter(selectedCountry.name);
-                      }}
-                    >
-                      {countriesData.map((item, index) => {
-                        return (
-                          <AutocompleteItem key={index} title={item.name} />
-                        );
-                      })}
-                    </Autocomplete>
-                    {errors.country && touched.country && (
-                      <Text style={styles.errorText}>{errors.country}</Text>
-                    )}
-                    <Autocomplete
-                      placeholder="State*"
-                      value={values.state}
-                      // value={student?.state}
-                      placement="bottom"
-                      style={{ marginVertical: 5 }}
-                      disabled={!values.selectedCountry}
-                      // disabled={!student?.selectedCountry}
-                      // label={evaProps => <Text {...evaProps}>State</Text>}
-                      // onChangeText={(query) => {
-                      //   // setFieldValue("state", query);
-                      //   setStatesData(
-                      //     states.filter((item) => filterStates(item, query))
-                      //   );
-                      // }}
-                      // onSelect={(query) => {
-                      //   const selectedState = statesData[query];
-                      //   // setFieldValue("state", selectedState);
-                      //   // setFieldValue("selectedState", selectedState);
-                      //   // setFieldValue("selectedCity", "");
-                      //   // setFieldValue("city", "");
-                      //   setCities([]);
-                      //   GetAllCities(values.selectedCountry, selectedState).then(
-                      //     (res) => {
-                      //       setCities(res.data);
-                      //     }
-                      //   );
-                      //   getSchoolsByFilter("", selectedState);
-                      // }}
-                      onChangeText={(query) => {
-                        setFieldValue("state", query);
-                        setStatesData(
-                          states.filter((item) => filterStates(item, query))
-                        );
-                      }}
-                      onSelect={(query) => {
-                        const selectedState = statesData[query];
-                        setFieldValue("state", selectedState);
-                        setFieldValue("selectedState", selectedState);
-                        setFieldValue("selectedCity", "");
-                        setFieldValue("city", "");
-                        setCities([]);
-                        GetAllCities(
-                          values.selectedCountry,
-                          selectedState
-                        ).then((res) => {
-                          setCities(res.data);
-                        });
-                        // getSchoolsByFilter(values.selectedCountry, selectedState);
-                      }}
-                    >
-                      {statesData.map((item, index) => {
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
-
-                    {errors.state && touched.state && (
-                      <Text style={styles.errorText}>{errors.state}</Text>
-                    )}
-                    <Autocomplete
-                      placeholder="City"
-                      value={values?.city}
-                      placement="bottom"
-                      disabled={!values.selectedState}
-                      // disabled={!student?.selectedState}
-                      style={{ marginVertical: 5 }}
-                      // label={evaProps => <Text {...evaProps}>City</Text>}
-                      // onChangeText={(query) => {
-                      //   // setFieldValue("city", query);
-                      //   setCitiesData(
-                      //     cities.filter((item) => filterCities(item, query))
-                      //   );
-                      // }}
-                      // onSelect={(query) => {
-                      //   const selectedCity = citiesData[query];
-                      //   // setFieldValue("city", selectedCity);
-                      //   // setFieldValue("selectedCity", selectedCity);
-                      //   getSchoolsByFilter("", "", selectedCity);
-                      // }}
-                      onChangeText={(query) => {
-                        setFieldValue("city", query);
-                        // setFieldValue("selectedCity", query);
-                        setCitiesData(
-                          cities.filter((item) => filterCities(item, query))
-                        );
-                      }}
-                      onSelect={(query) => {
-                        const selectedCity = citiesData[query];
-                        setFieldValue("city", selectedCity);
-                        setFieldValue("selectedCity", selectedCity);
-                        // getSchoolsByFilter("", "", selectedCity);
-                      }}
-                    >
-                      {citiesData.map((item, index) => {
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
-                    {/* {console.log("values", values)} */}
-
-                    <Autocomplete
-                      placeholder="School*"
-                      value={values.school}
-                      placement="bottom"
-                      onBlur={() => setSchoolsData(schools)}
-                      // disabled={!values.selectedState}
-                      style={{ marginVertical: 5 }}
-                      onChangeText={(query) => {
-                        console.log("query", query);
-                        setFieldValue("school", query);
-                        if (values.school.length > 4) {
-                          getSchoolsByFilter("", "", "", query);
+              <Formik
+                validateOnMount={true}
+                validationSchema={validationSchema}
+                initialValues={{
+                  firstName: selectedDependent?.firstname,
+                  lastName: selectedDependent?.lastname,
+                  school: selectedDependent?.childSchool,
+                  selectedSchool: "",
+                  grade: "",
+                  parentName: "",
+                  parentName2: "",
+                  password: "",
+                  confirmPassword: "",
+                  termsAccepted: false,
+                  phoneNumber: selectedDependent?.childPhone,
+                  email: selectedDependent?.childEmail,
+                  country: selectedDependent?.country || "",
+                  state: selectedDependent?.state || "",
+                  city: selectedDependent?.city || "",
+                  selectedCountry: selectedDependent?.country || "",
+                  selectedState: selectedDependent?.state || "",
+                  selectedCity: selectedDependent?.city || "",
+                  selectedSchool: "",
+                }}
+                onSubmit={async (values, { resetForm }) => {
+                  const userId = await loadUserId();
+                  // const data = {
+                  //   parentId: parseInt(userId),
+                  //   id: parseInt(student?.studentId),
+                  //   firstname: values.firstName,
+                  //   lastname: values.lastName,
+                  //   phone: values.phoneNumber,
+                  //   email: values.email,
+                  //   school:
+                  //     values.selectedSchool != ""
+                  //       ? values.selectedSchool
+                  //       : values.school,
+                  //   grade: values.grade,
+                  //   // "grade": "string",
+                  //   status: "",
+                  //   latitude: "",
+                  //   longititude: "",
+                  //   country: values.selectedCountry,
+                  //   city: values.selectedCity,
+                  //   state: values.selectedState,
+                  //   parentemail1: currentUser.email,
+                  //   parentemail2: "",
+                  // };
+                  setLoading(true);
+                  let formData = new FormData();
+                  formData.append(
+                    "image",
+                    uploadedImage
+                      ? {
+                          uri: uploadedImage?.path,
+                          name: uploadedImage.mime,
+                          type: uploadedImage.mime,
                         }
-                        // let schoolList = schools.filter((item: any) =>
-                        //   item?.name?.includes(query)
-                        // );
-                        // if (schoolList.length > 0) {
-                        //   setSchoolsData(schoolList);
-                        // } else {
-                        //   setSchoolsData([
-                        //     {
-                        //       schoolId: 0,
-                        //       name: "Other",
-                        //     },
-                        //   ]);
+                      : {
+                          uri:
+                            selectedDependent?.studentImage ||
+                            "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
+                          name: "avatar",
+                          type: "image/png",
+                        }
+                  );
+                  formData.append("id", parseInt(student?.studentId));
+                  formData.append("parentId", parseInt(userId, 0));
+                  formData.append("firstname", values.firstName);
+                  formData.append("lastname", values.lastName);
+                  formData.append("phone", values.phoneNumber);
+                  formData.append("email", values?.email);
+                  formData.append(
+                    "school",
+                    values.selectedSchool != ""
+                      ? values.selectedSchool
+                      : values.school
+                  );
+                  formData.append("country", values.country);
+
+                  formData.append("state", values.state);
+                  formData.append("city", values.city);
+                  formData.append("parentemail1", currentUser.email);
+                  formData.append("parentemail2", "");
+
+                  console.log("data", JSON.stringify(formData));
+                  UpdateStudent(formData)
+                    .then((response) => {
+                      console.log("response", response);
+                      dispatch(
+                        ChangeModalState.action({
+                          editDependentModalVisibility: false,
+                        })
+                      );
+                      setSelectedImage(null);
+                      setUploadedImage(null);
+                      setSelectedDependent(null);
+                      setStudent(null);
+                      Toast.show({
+                        type: "success",
+                        position: "top",
+                        text1: `Dependent Info has been successfully updated`,
+                      });
+                      // resetForm();
+                      //   dispatch(
+                      //     ChangeModalState.action({ addStudentModal: false })
+                      //   );
+                    })
+                    .catch((err) => {
+                      console.log("err", err);
+                      Toast.show({
+                        type: "info",
+                        position: "top",
+                        text1: `An error occured`,
+                      });
+                    })
+                    .finally(() => {
+                      setLoading(false);
+                    });
+                  // CreateStudent(data)
+                  //   .then((response) => {
+                  //     console.log("response", response);
+                  //     Toast.show({
+                  //       type: "success",
+                  //       position: "top",
+                  //       text1: `Dependent has been successfully added`,
+                  //     });
+                  //     resetForm();
+                  //     //   dispatch(
+                  //     //     ChangeModalState.action({ addStudentModal: false })
+                  //     //   );
+                  //   })
+                  //   .catch((err) => {
+                  //     Toast.show({
+                  //       type: "info",
+                  //       position: "top",
+                  //       text1: `An error occured`,
+                  //     });
+                }}
+              >
+                {({
+                  handleChange,
+                  setFieldValue,
+                  handleBlur,
+                  handleSubmit,
+                  values,
+                  errors,
+                  touched,
+                  isValid,
+                }) => (
+                  <>
+                    <View style={{ marginTop: 30, padding: 20 }}>
+                      <View
+                        style={{
+                          flexDirection: "row",
+
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text style={{ marginRight: 20, marginTop: 10 }}>
+                          Use my address
+                        </Text>
+                        <CheckBox
+                          style={[{ flex: 1, marginTop: 13 }]}
+                          checked={checkBox}
+                          onChange={(checked) => {
+                            if (checked) {
+                              setCheckBox(checked);
+                              setFieldValue(
+                                "country",
+                                currentUser?.country || ""
+                              );
+                              setFieldValue(
+                                "selectedCountry",
+                                currentUser?.country || ""
+                              );
+                              setFieldValue("state", currentUser?.state || "");
+                              setFieldValue(
+                                "selectedState",
+                                currentUser?.state || ""
+                              );
+                              setFieldValue("city", currentUser?.city || "");
+                              setFieldValue(
+                                "selectedCity",
+                                currentUser?.city || ""
+                              );
+                            } else {
+                              setCheckBox(checked);
+                              setFieldValue("country", "");
+                              setFieldValue("selectedCountry", "");
+                              setFieldValue("selectedCity", "");
+                              setFieldValue("selectedState", "");
+                              setFieldValue("state", "");
+                              setFieldValue("city", "");
+                            }
+                            // if (checked) {
+                            //   Alert.alert(checked);
+                            // } else {
+                            //   Alert.alert(checked);
+                            // }
+                          }}
+                        ></CheckBox>
+                      </View>
+                      <Input
+                        style={styles.inputSettings}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        placeholder={`First Name`}
+                        value={values?.firstName}
+                        onChangeText={handleChange("firstName")}
+                        onBlur={handleBlur("firstName")}
+                        // onChangeText={(value: string) =>
+                        //   setStudent({
+                        //     ...student,
+                        //     firstname: value,
+                        //   })
                         // }
-                        // setSchoolsData(
-                        //   schools.filter((item) =>
-                        //     filterSchools(item?.name, query)
-                        //   )
-                        // );
-                      }}
-                      onSelect={(query) => {
-                        const selectedSchool = schoolsData[query];
-                        setFieldValue("school", selectedSchool?.name);
-                        // setFieldValue("selectedSchool", selectedSchool?.name);
-                      }}
-                    >
-                      {schoolsData &&
-                        schoolsData.length > 0 &&
-                        schoolsData.map((school, index) => {
+                      />
+                      {errors.firstName && touched.firstName && (
+                        <Text style={styles.errorText}>{errors.firstName}</Text>
+                      )}
+                      <Input
+                        style={styles.inputSettings}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        placeholder={`Last Name`}
+                        value={values.lastName}
+                        onChangeText={handleChange("lastName")}
+                        onBlur={handleBlur("lastName")}
+                        // value={student?.lastname}
+                        // onChangeText={(value: string) =>
+                        //   setStudent({
+                        //     ...student,
+                        //     lastname: value,
+                        //   })
+                        // }
+                      />
+                      {errors.lastName && touched.lastName && (
+                        <Text style={styles.errorText}>{errors.lastName}</Text>
+                      )}
+                      <Input
+                        style={styles.inputSettings}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        value={values.email}
+                        placeholder="Email*"
+                        onChangeText={handleChange("email")}
+                        onBlur={handleBlur("email")}
+                        // placeholder={`Email*`}
+
+                        // value={student?.email}
+                        // onChangeText={(value: string) =>
+                        //   setStudent({
+                        //     ...student,
+                        //     email: value,
+                        //   })
+                        // }
+                      />
+                      {errors.email && touched.email && (
+                        <Text style={styles.errorText}>{errors.email}</Text>
+                      )}
+                      <Input
+                        style={styles.inputSettings}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        placeholder={`Phone # (Optional)`}
+                        value={values.phoneNumber}
+                        keyboardType="number-pad"
+                        onChangeText={handleChange("phoneNumber")}
+                        // value={student?.phone}
+                        // onChangeText={(value: string) =>
+                        //   setStudent({
+                        //     ...student,
+                        //     phone: value,
+                        //   })
+                        // }
+                      />
+                      <Autocomplete
+                        placeholder="Country*"
+                        value={values?.country}
+                        placement="bottom"
+                        style={{ marginVertical: 5 }}
+                        // label={evaProps => <Text {...evaProps}>Country*</Text>}
+                        // onChangeText={(query) => {
+                        //   // setFieldValue("country", query);
+                        //   setCountriesData(
+                        //     countries.filter((item) => filterCountries(item, query))
+                        //   );
+                        // }}
+                        onChangeText={(query) => {
+                          setFieldValue("country", query);
+                          setCountriesData(
+                            countries.filter((item) =>
+                              filterCountries(item, query)
+                            )
+                          );
+                        }}
+                        // onSelect={(query) => {
+                        //   const selectedCountry = countriesData[query];
+                        //   // setFieldValue("country", selectedCountry.name);
+                        //   // setFieldValue("selectedCountry", selectedCountry.name);
+                        //   // setFieldValue("selectedState", "");
+                        //   // setFieldValue("state", "");
+                        //   setStates([]);
+                        //   GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
+                        //     (res) => {
+                        //       setStates(res.data);
+                        //       setStatesData(states);
+                        //     }
+                        //   );
+                        //   getSchoolsByFilter(selectedCountry.name);
+                        // }}
+                        onSelect={(query) => {
+                          const selectedCountry = countriesData[query];
+                          setFieldValue("country", selectedCountry.name);
+                          setFieldValue(
+                            "selectedCountry",
+                            selectedCountry.name
+                          );
+                          setFieldValue("selectedState", "");
+                          setFieldValue("state", "");
+                          setStates([]);
+                          GetAllStates(
+                            selectedCountry.name.replace(/ /g, "")
+                          ).then((res) => {
+                            setStates(res.data);
+                            setStatesData(states);
+                          });
+                          // getSchoolsByFilter(selectedCountry.name);
+                        }}
+                      >
+                        {countriesData.map((item, index) => {
                           return (
-                            <SelectItem
-                              key={index}
-                              title={school?.name || ""}
-                            />
+                            <AutocompleteItem key={index} title={item.name} />
                           );
                         })}
-                    </Autocomplete>
-                    {values.school == "Other" && (
-                      <>
-                        <Input
-                          style={styles.inputSettings}
-                          autoCapitalize="words"
-                          // accessoryRight={PersonIcon}
-                          value={values.selectedSchool}
-                          placeholder="School Name*"
-                          onChangeText={handleChange("selectedSchool")}
-                          onBlur={handleBlur("selectedSchool")}
-                        />
-                        {values.selectedSchool == "" &&
-                          touched.selectedSchool && (
-                            <Text style={styles.errorText}>
-                              {"School is required"}
-                            </Text>
-                          )}
-                      </>
-                    )}
+                      </Autocomplete>
+                      {errors.country && touched.country && (
+                        <Text style={styles.errorText}>{errors.country}</Text>
+                      )}
+                      <Autocomplete
+                        placeholder="State*"
+                        value={values.state}
+                        // value={student?.state}
+                        placement="bottom"
+                        style={{ marginVertical: 5 }}
+                        disabled={!values.selectedCountry}
+                        // disabled={!student?.selectedCountry}
+                        // label={evaProps => <Text {...evaProps}>State</Text>}
+                        // onChangeText={(query) => {
+                        //   // setFieldValue("state", query);
+                        //   setStatesData(
+                        //     states.filter((item) => filterStates(item, query))
+                        //   );
+                        // }}
+                        // onSelect={(query) => {
+                        //   const selectedState = statesData[query];
+                        //   // setFieldValue("state", selectedState);
+                        //   // setFieldValue("selectedState", selectedState);
+                        //   // setFieldValue("selectedCity", "");
+                        //   // setFieldValue("city", "");
+                        //   setCities([]);
+                        //   GetAllCities(values.selectedCountry, selectedState).then(
+                        //     (res) => {
+                        //       setCities(res.data);
+                        //     }
+                        //   );
+                        //   getSchoolsByFilter("", selectedState);
+                        // }}
+                        onChangeText={(query) => {
+                          setFieldValue("state", query);
+                          setStatesData(
+                            states.filter((item) => filterStates(item, query))
+                          );
+                        }}
+                        onSelect={(query) => {
+                          const selectedState = statesData[query];
+                          setFieldValue("state", selectedState);
+                          setFieldValue("selectedState", selectedState);
+                          setFieldValue("selectedCity", "");
+                          setFieldValue("city", "");
+                          setCities([]);
+                          GetAllCities(
+                            values.selectedCountry,
+                            selectedState
+                          ).then((res) => {
+                            setCities(res.data);
+                          });
+                          // getSchoolsByFilter(values.selectedCountry, selectedState);
+                        }}
+                      >
+                        {statesData.map((item, index) => {
+                          return <AutocompleteItem key={index} title={item} />;
+                        })}
+                      </Autocomplete>
 
-                    {/* <Select
+                      {errors.state && touched.state && (
+                        <Text style={styles.errorText}>{errors.state}</Text>
+                      )}
+                      <Autocomplete
+                        placeholder="City"
+                        value={values?.city}
+                        placement="bottom"
+                        disabled={!values.selectedState}
+                        // disabled={!student?.selectedState}
+                        style={{ marginVertical: 5 }}
+                        // label={evaProps => <Text {...evaProps}>City</Text>}
+                        // onChangeText={(query) => {
+                        //   // setFieldValue("city", query);
+                        //   setCitiesData(
+                        //     cities.filter((item) => filterCities(item, query))
+                        //   );
+                        // }}
+                        // onSelect={(query) => {
+                        //   const selectedCity = citiesData[query];
+                        //   // setFieldValue("city", selectedCity);
+                        //   // setFieldValue("selectedCity", selectedCity);
+                        //   getSchoolsByFilter("", "", selectedCity);
+                        // }}
+                        onChangeText={(query) => {
+                          setFieldValue("city", query);
+                          // setFieldValue("selectedCity", query);
+                          setCitiesData(
+                            cities.filter((item) => filterCities(item, query))
+                          );
+                        }}
+                        onSelect={(query) => {
+                          const selectedCity = citiesData[query];
+                          setFieldValue("city", selectedCity);
+                          setFieldValue("selectedCity", selectedCity);
+                          // getSchoolsByFilter("", "", selectedCity);
+                        }}
+                      >
+                        {citiesData.map((item, index) => {
+                          return <AutocompleteItem key={index} title={item} />;
+                        })}
+                      </Autocomplete>
+                      {/* {console.log("values", values)} */}
+
+                      <Autocomplete
+                        placeholder="School*"
+                        value={values.school}
+                        placement="bottom"
+                        onBlur={() => setSchoolsData(schools)}
+                        // disabled={!values.selectedState}
+                        style={{ marginVertical: 5 }}
+                        onChangeText={(query) => {
+                          console.log("query", query);
+                          setFieldValue("school", query);
+                          if (values.school.length > 4) {
+                            getSchoolsByFilter("", "", "", query);
+                          }
+                          // let schoolList = schools.filter((item: any) =>
+                          //   item?.name?.includes(query)
+                          // );
+                          // if (schoolList.length > 0) {
+                          //   setSchoolsData(schoolList);
+                          // } else {
+                          //   setSchoolsData([
+                          //     {
+                          //       schoolId: 0,
+                          //       name: "Other",
+                          //     },
+                          //   ]);
+                          // }
+                          // setSchoolsData(
+                          //   schools.filter((item) =>
+                          //     filterSchools(item?.name, query)
+                          //   )
+                          // );
+                        }}
+                        onSelect={(query) => {
+                          const selectedSchool = schoolsData[query];
+                          setFieldValue("school", selectedSchool?.name);
+                          // setFieldValue("selectedSchool", selectedSchool?.name);
+                        }}
+                      >
+                        {schoolsData &&
+                          schoolsData.length > 0 &&
+                          schoolsData.map((school, index) => {
+                            return (
+                              <SelectItem
+                                key={index}
+                                title={school?.name || ""}
+                              />
+                            );
+                          })}
+                      </Autocomplete>
+                      {values.school == "Other" && (
+                        <>
+                          <Input
+                            style={styles.inputSettings}
+                            autoCapitalize="words"
+                            // accessoryRight={PersonIcon}
+                            value={values.selectedSchool}
+                            placeholder="School Name*"
+                            onChangeText={handleChange("selectedSchool")}
+                            onBlur={handleBlur("selectedSchool")}
+                          />
+                          {values.selectedSchool == "" &&
+                            touched.selectedSchool && (
+                              <Text style={styles.errorText}>
+                                {"School is required"}
+                              </Text>
+                            )}
+                        </>
+                      )}
+
+                      {/* <Select
                     value={student?.school}
                     placeholder="School"
                     label={(evaProps: any) => <Text {...evaProps}>School</Text>}
@@ -822,7 +854,7 @@ const EditDependentModal = ({
                         );
                       })}
                   </Select> */}
-                    {/* <Select
+                      {/* <Select
               value={student?.grade}
               placeholder="Grade"
               label={(evaProps: any) => <Text {...evaProps}>Grade</Text>}
@@ -840,53 +872,58 @@ const EditDependentModal = ({
                   );
                 })}
             </Select> */}
-                  </View>
-                  <View style={styles.buttonText}>
-                    <LinearGradientButton
-                      style={{
-                        borderRadius: 25,
-                        flex: 1,
-                        backgroundColor:
-                          isValid && selectedImage != ""
-                            ? Colors.primary
-                            : Colors.gray,
-                      }}
-                      appearance="ghost"
-                      size="medium"
-                      status="control"
-                      onPress={() => selectedImage != "" && handleSubmit()}
-                    >
-                      I'm done
-                    </LinearGradientButton>
-                  </View>
-                  <View style={styles.buttonText}>
-                    <LinearGradientButton
-                      style={{
-                        borderRadius: 25,
-                        flex: 1,
-                      }}
-                      appearance="ghost"
-                      size="medium"
-                      status="control"
-                      onPress={() => {
-                        dispatch(
-                          ChangeModalState.action({
-                            editDependentModalVisibility: false,
-                          })
-                        );
-                        setSelectedDependent(null);
-                        setStudent(null);
-                      }}
-                    >
-                      Cancel
-                    </LinearGradientButton>
-                  </View>
-                  <View style={{ marginBottom: 50 }} />
-                </>
-              )}
-            </Formik>
-          </Card>
-        </ScrollView>
+                    </View>
+                    {!loading ? (
+                      <View style={styles.buttonText}>
+                        <LinearGradientButton
+                          style={{
+                            borderRadius: 25,
+                            flex: 1,
+                            backgroundColor:
+                              isValid && selectedImage != ""
+                                ? Colors.primary
+                                : Colors.gray,
+                          }}
+                          appearance="ghost"
+                          size="medium"
+                          status="control"
+                          onPress={() => selectedImage != "" && handleSubmit()}
+                        >
+                          I'm done
+                        </LinearGradientButton>
+                      </View>
+                    ) : (
+                      <Spinner />
+                    )}
+                    <View style={styles.buttonText}>
+                      <LinearGradientButton
+                        style={{
+                          borderRadius: 25,
+                          flex: 1,
+                        }}
+                        appearance="ghost"
+                        size="medium"
+                        status="control"
+                        onPress={() => {
+                          dispatch(
+                            ChangeModalState.action({
+                              editDependentModalVisibility: false,
+                            })
+                          );
+                          setSelectedDependent(null);
+                          setStudent(null);
+                        }}
+                      >
+                        Cancel
+                      </LinearGradientButton>
+                    </View>
+                    <View style={{ marginBottom: 50 }} />
+                  </>
+                )}
+              </Formik>
+            </Card>
+          </ScrollView>
+        )}
       </KeyboardAwareScrollView>
     </Modal>
   );
@@ -973,5 +1010,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+    position: "absolute",
+    top: 70,
+    right: 70,
+    // alignSelf: "center",
+    // marginRight: -50,
   },
 });

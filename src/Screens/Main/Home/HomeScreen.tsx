@@ -17,7 +17,7 @@ import Fontisto from "react-native-vector-icons/Fontisto";
 import { AppHeader } from "@/Components";
 import TrackHistory from "@/Services/Parent/TrackHistory";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-4;
+import { AwsLocationTracker } from "@/Services/TrackController";
 import messaging from "@react-native-firebase/messaging";
 import { UpdateDeviceToken } from "@/Services/User";
 import { useDispatch, useSelector } from "react-redux";
@@ -89,6 +89,8 @@ const HomeScreen = () => {
     setThumbnail(false);
   }, [focused]);
   const [children, setChildren] = useState([]);
+  const [trackingList, setTrackingList] = useState({});
+  const [getChildrendeviceIds, setChildrensDeviceIds] = useState([]);
   const [originalChildren, setOriginalChildren] = useState([]);
   const [thumbnail, setThumbnail] = useState(false);
   const [searchParam, setSearchParam] = useState("");
@@ -203,13 +205,19 @@ const HomeScreen = () => {
     try {
       let res = await GetParentChildrens(referCode);
       let temp = [];
+      let deviceIds = [];
       res.map((item, index) => {
         temp.push({
           latitude: item?.latitude ? parseFloat(item?.latitude) : null,
 
           longitude: item?.longititude ? parseFloat(item?.longititude) : null,
         });
+        if (item?.deviceId) {
+          deviceIds.push(item.deviceId);
+        }
       });
+      setChildrensDeviceIds(deviceIds);
+      turnOnTracker(currentUser?.id, deviceIds, "activity");
       setOriginalChildren(res);
 
       setOriginalStudentsEmail(temp);
@@ -233,6 +241,7 @@ const HomeScreen = () => {
     } else {
       setSelectedChild("All");
       setShowChildFilter(false);
+      turnOffTracker(null);
     }
     return () => {
       setSelectedChild("All");
@@ -246,6 +255,43 @@ const HomeScreen = () => {
     }
   }, [selectedDependent]);
 
+  const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
+    try {
+      let body = {
+        deviceIds: deviceIds,
+        trackerName: id,
+        locationTrackerTrigger: true,
+      };
+
+      let res = await AwsLocationTracker(body);
+
+      let temp = {};
+      res.map((item) => {
+        temp = {
+          ...temp,
+          [temp.deviceId]: {
+            lat: item.position[0],
+            lang: item.position[1],
+          },
+        };
+      });
+      setTrackingList(temp);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+  const turnOffTracker = async (from: any) => {
+    try {
+      let body = {
+        deviceIds: getChildrendeviceIds,
+        trackerName: currentUser.id,
+        locationTrackerTrigger: false,
+      };
+      let res = await AwsLocationTracker(body);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
   // const RightActions = (dragX: any, item) => {
   //   const scale = dragX.interpolate({
   //     inputRange: [-100, 0],
@@ -450,7 +496,8 @@ const HomeScreen = () => {
       )}
       <AppHeader
         title="Home"
-        setThumbnail={() => setThumbnail(true)}
+        thumbnail={thumbnail}
+        setThumbnail={() => setThumbnail(!thumbnail)}
         hideCalendar={thumbnail ? false : true}
       />
       {isCalendarVisible && (
@@ -704,10 +751,13 @@ const HomeScreen = () => {
               {children
                 .filter(
                   (item) =>
-                    item.latitude != "undefined" && item.latitude != null
+                    trackingList[item.deviceId]?.lat != "undefined" &&
+                    trackingList[item.deviceId]?.lat != null
                 )
                 .map((item, index) => {
                   console.log("item", item);
+                  let latitude = trackingList[item.deviceId]?.lat;
+                  let longititude = trackingList[item.deviceId]?.lang;
                   // console.log("item", item);
                   return (
                     <>
@@ -715,11 +765,11 @@ const HomeScreen = () => {
                         <Circle
                           key={index}
                           center={{
-                            latitude: item?.latitude
-                              ? parseFloat(item?.latitude)
+                            latitude: latitude
+                              ? parseFloat(latitude)
                               : parseFloat(10),
-                            longitude: item?.longititude
-                              ? parseFloat(item?.longititude)
+                            longitude: longititude
+                              ? parseFloat(longititude)
                               : parseFloat(10),
                             // latitude: parentLatLong?.location[0]?.parentLat
                             //   ? parseFloat(parentLatLong?.location[0]?.parentLat)
@@ -742,11 +792,11 @@ const HomeScreen = () => {
                           ref.current.fitToSuppliedMarkers(
                             [
                               {
-                                latitude: item?.latitude
-                                  ? parseFloat(item?.latitude)
+                                latitude: latitude
+                                  ? parseFloat(latitude)
                                   : parseFloat(10),
-                                longitude: item?.longititude
-                                  ? parseFloat(item?.longititude)
+                                longitude: longititude
+                                  ? parseFloat(longititude)
                                   : parseFloat(10),
                               },
                             ]
@@ -756,11 +806,11 @@ const HomeScreen = () => {
                         identifier={item?.email}
                         key={index}
                         coordinate={{
-                          latitude: item?.latitude
-                            ? parseFloat(item?.latitude)
+                          latitude: latitude
+                            ? parseFloat(latitude)
                             : parseFloat(10),
-                          longitude: item?.longititude
-                            ? parseFloat(item?.longititude)
+                          longitude: longititude
+                            ? parseFloat(longititude)
                             : parseFloat(10),
                         }}
                       >

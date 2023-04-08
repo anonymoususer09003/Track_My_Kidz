@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Text, Icon, Select, SelectItem } from "@ui-kitten/components";
+import { Text, Icon, Select, SelectItem, Button } from "@ui-kitten/components";
 import {
   StyleSheet,
   View,
   FlatList,
   TouchableOpacity,
   ScrollView,
+  Linking,
 } from "react-native";
 import { AppHeader } from "@/Components";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,7 +28,7 @@ import { ModalState } from "@/Store/Modal";
 import moment from "moment";
 import { Calendar } from "@/Components";
 import { UserState } from "@/Store/User";
-import { GetAllStudents } from "@/Services/Parent";
+import { DownloadCsvFile } from "@/Services/Parent";
 import FetchOne from "@/Services/User/FetchOne";
 import { parse } from "date-fns";
 
@@ -55,7 +56,9 @@ const StudentLocationScreen = () => {
     (state: { modal: ModalState }) => state.modal.showCalendar
   );
   const filterHistory = (month: any, day: any) => {
+    console.log("studet", student);
     let activities = [...student.trackHistory];
+
     console.log("month", month);
     console.log("day", day);
 
@@ -134,6 +137,26 @@ const StudentLocationScreen = () => {
         isThumbnail
         isThumbnailOnly
       />
+      <Button
+        style={{
+          width: 110,
+          height: 40,
+          borderRadius: 12,
+          borderWidth: 1,
+          borderColor: Colors.primary,
+          alignSelf: "flex-end",
+          marginTop: 10,
+        }}
+        status="basic"
+        size="small"
+        onPress={() => {
+          Linking.openURL(
+            `https://live-api.trackmykidz.com/user/parent/download-csv?studentId=${student.studentIdd}`
+          );
+        }}
+      >
+        {() => <Text style={styles.buttonMessage}>Download</Text>}
+      </Button>
       <View style={styles.layout}>
         {!thumbnail ? (
           <View style={{ flex: 1 }}>
@@ -317,5 +340,9 @@ const styles = StyleSheet.create({
     height: 30,
     alignItems: "center",
     justifyContent: "center",
+  },
+  buttonMessage: {
+    color: Colors.primary,
+    fontSize: 17,
   },
 });

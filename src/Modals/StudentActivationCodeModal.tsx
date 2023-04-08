@@ -7,6 +7,7 @@ import {
   Select,
   SelectItem,
 } from "@ui-kitten/components";
+import api from "@/Services";
 import { useDispatch, useSelector } from "react-redux";
 import { ModalState } from "@/Store/Modal";
 import React, { useEffect, useState } from "react";
@@ -19,7 +20,7 @@ import ChangeSelectedState from "@/Store/Selected/ChangeSelectedState";
 import Colors from "@/Theme/Colors";
 import EvilIcons from "react-native-vector-icons/EvilIcons";
 import { navigate } from "@/Navigators/Functions";
-import { GetActivationCode } from "@/Services/ActivationCode";
+import { GetStudent } from "@/Services/Student";
 import QRCode from "react-native-qrcode-svg";
 
 const StudentActivationCodeModal = ({
@@ -32,14 +33,21 @@ const StudentActivationCodeModal = ({
   const isVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.studentActivationCodeModal
   );
+  console.log("student", student);
   const [activationCode, setActivationCode] = useState("");
   const dispatch = useDispatch();
-  const getActivationCode = () => {
-    GetActivationCode({ email: student.email }, "student")
-      .then((res) => {
-        setActivationCode(res?.activation_code);
-      })
-      .catch((err) => console.log("Error:", err));
+  const getActivationCode = async () => {
+    try {
+      const response = await api.get(`/user/student/${student.studentId}`);
+      setActivationCode(response?.data?.referenceCode);
+    } catch (err) {
+      console.log("err", err);
+    }
+    //  GetStudent()
+    //     .then((res) => {
+    //       setActivationCode(res?.activation_code);
+    //     })
+    //     .catch((err) => console.log("Error:", err));
   };
 
   useEffect(() => {
@@ -48,7 +56,7 @@ const StudentActivationCodeModal = ({
     }
   }, [isVisible]);
 
-  console.log(activationCode)
+  console.log(activationCode);
 
   // @ts-ignore
   return (
@@ -63,7 +71,7 @@ const StudentActivationCodeModal = ({
         setStudent(null);
         setActivationCode("");
       }}
-    > 
+    >
       <Card style={styles.modal} disabled={true}>
         <View style={styles.body}>
           <View style={{ paddingBottom: 10, paddingTop: 10 }}>
@@ -83,9 +91,9 @@ const StudentActivationCodeModal = ({
           <Text style={{ fontSize: 15, textAlign: "center" }}>
             {activationCode}
           </Text>
-          <View style={{ marginVertical: 15, alignItems: 'center' }}>
+          <View style={{ marginVertical: 15, alignItems: "center" }}>
             <QRCode
-              value={activationCode || 'test'}
+              value={activationCode || "test"}
               color={"#000"}
               backgroundColor="white"
               size={200}

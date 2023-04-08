@@ -84,20 +84,26 @@ const EditOrgInstructorsModal = ({
       .catch((err) => [console.log("err", err)]);
   };
   const handleUpdate = (values: any) => {
+    dispatch(ChangeModalState.action({ loading: true }));
     // console.log("body", body);
     UpdateMultipleInstructor([values])
       .then((res) => {
+        dispatch(ChangeModalState.action({ loading: false }));
         console.log("res", res);
         onEdit(values);
         // setRerender(values, "update");
         // setVisible(false,);
       })
-      .catch((err) => [console.log("err", err)]);
+      .catch((err) => {
+        console.log("err", err);
+        dispatch(ChangeModalState.action({ loading: false }));
+      });
   };
   const handleAdd = async (values: any, resetForm: any, addOneMore: any) => {
     // console.log("userObject", userObject);
     // console.log("dld");
     // console.log("values", values);
+    dispatch(ChangeModalState.action({ loading: true }));
     const userId = await loadId();
     CreateMultipleInstructor(
       [
@@ -108,6 +114,7 @@ const EditOrgInstructorsModal = ({
       userId
     )
       .then((_res) => {
+        dispatch(ChangeModalState.action({ loading: false }));
         console.log("res", _res);
 
         if (addOneMore) {
@@ -126,6 +133,7 @@ const EditOrgInstructorsModal = ({
         });
       })
       .catch((err) => {
+        dispatch(ChangeModalState.action({ loading: false }));
         Toast.show({
           type: "success",
           position: "top",

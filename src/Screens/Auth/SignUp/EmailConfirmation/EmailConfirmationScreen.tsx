@@ -133,15 +133,6 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
                     activation_code: activation_code,
                     student: student,
                   });
-              } else {
-                navigation &&
-                  navigation.navigate("FinalRegistrationScreen", {
-                    emailAddress: emailAddress,
-                    registrationId: "test",
-                    user_type: user_type,
-                    activation_code: activationCode,
-                    student: student,
-                  });
               }
             } else {
               let object = {

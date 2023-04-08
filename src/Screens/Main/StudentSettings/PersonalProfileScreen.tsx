@@ -121,15 +121,17 @@ const PersonalProfileScreen = () => {
         : ""
     );
     formData.append("id", user?.studentId);
+
     formData.append("parentId", user?.parentId);
-    formData.append("firstname", user?.firstName);
-    formData.append("lastname", user?.lastName);
+    formData.append("firstname", user?.firstname);
+    formData.append("lastname", user?.lastname);
     formData.append("phone", user?.phoneNumber);
     formData.append("email", user?.email);
     formData.append("school", user?.school);
     formData.append("country", user.country);
     formData.append("state", user.state);
     formData.append("city", user.city);
+
     formData.append("parentemail1", user?.parentemail1);
     formData.append("parentemail2", user?.parentemail2);
     console.log("formData", formData);
@@ -254,7 +256,13 @@ const PersonalProfileScreen = () => {
                   <ProfileAvatarPicker
                     style={styles.profileImage}
                     // resizeMode='center'
-                    source={{ uri: selectedImage || user?.studentPhoto }}
+                    source={{
+                      uri:
+                        selectedImage ||
+                        user?.studentPhoto + "?time" + new Date().getTime(),
+                      headers: { Pragma: "no-cache" },
+                    }}
+                    // source={{ uri: selectedImage || user?.studentPhoto }}
                     editButton={true ? renderEditAvatarButton : null}
                   />
                 )}
@@ -306,18 +314,24 @@ const PersonalProfileScreen = () => {
                           name: uploadedImage.mime,
                           type: uploadedImage.mime,
                         }
-                      : ""
+                      : {
+                          uri:
+                            user?.studentPhoto ||
+                            "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
+                          name: "avatar",
+                          type: "image/png",
+                        }
                   );
-                  formData.append("id", user?.studentId);
+                  formData.append("id", user.studentId);
                   formData.append("parentId", user?.parentId);
-                  formData.append("firstname", user?.firstname);
-                  formData.append("lastname", user?.lastname);
-                  formData.append("phone", user?.phoneNumber);
-                  formData.append("email", user?.email);
-                  formData.append("school", user?.school);
-                  formData.append("country", user.country);
-                  formData.append("state", user.state);
-                  formData.append("city", user.city);
+                  formData.append("firstname", values?.firstname);
+                  formData.append("lastname", values?.lastname);
+                  formData.append("phone", values?.phoneNumber);
+                  formData.append("email", values?.email);
+                  formData.append("school", values?.school);
+                  formData.append("country", values.country);
+                  formData.append("state", values.state);
+                  formData.append("city", values.city);
                   formData.append("parentemail1", user?.parentemail1);
                   formData.append("parentemail2", user?.parentemail2);
 

@@ -8,8 +8,13 @@ import {
   Alert,
 } from "react-native";
 import { useTheme } from "@/Theme";
+import { ProfileAvatarPicker } from "@/Components";
+import ImagePicker from "react-native-image-crop-picker";
+import { ImagePickerModal } from "@/Modals";
 import { useIsFocused } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import ChangeUserState from "@/Store/User/FetchOne";
+import fetchOneUserService from "@/Services/User/FetchOne";
 import {
   Button,
   Input,
@@ -19,6 +24,7 @@ import {
   Text,
   Autocomplete,
   AutocompleteItem,
+  Icon,
 } from "@ui-kitten/components";
 import { AppHeader } from "@/Components";
 import { loadUserId } from "@/Storage/MainAppStorage";
@@ -50,6 +56,7 @@ const PersonalProfileScreen = () => {
     (state: { places: PlaceState }) => state.places.countries
   );
   const [isEditMode, setisEditMode] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [isSending, setisSending] = useState(false);
   const user = useSelector((state: { user: UserState }) => state.user.item);
   const [userId, setuserId] = useState(null);
@@ -67,6 +74,9 @@ const PersonalProfileScreen = () => {
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
+  const [selectedImage, setSelectedImage] = React.useState("");
+
+  const [uploadedImage, setUploadedImage] = React.useState();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const getUserId = async () => {
     const id: any = await loadUserId();
@@ -74,6 +84,54 @@ const PersonalProfileScreen = () => {
     dispatch(FetchOne.action(id));
   };
 
+  const imageCameraLaunch = () => {
+    ImagePicker.openCamera({
+      cropping: true,
+      cropperCircleOverlay: true,
+      width: 139,
+      height: 130,
+      compressImageQuality: 1,
+      loadingLabelText: "Loading image",
+    }).then((image) => {
+      if (image != null) {
+        const source = { uri: image?.path };
+        setUploadedImage(image);
+        setSelectedImage(source.uri);
+        // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
+      }
+    });
+  };
+  const imageGalleryLaunch = () => {
+    ImagePicker.openPicker({
+      cropping: true,
+      cropperCircleOverlay: true,
+      width: 139,
+      height: 130,
+      compressImageQuality: 1,
+      loadingLabelText: "Loading image",
+    }).then((image) => {
+      if (image != null) {
+        const source = { uri: image?.path };
+        setSelectedImage(source.uri);
+      }
+    });
+  };
+  const renderEditAvatarButton = (): React.ReactElement => (
+    <Button
+      style={styles.editAvatarButton}
+      status="basic"
+      accessoryRight={<Icon name="edit" />}
+      onPress={() => setVisible(true)}
+    />
+  );
+  const renderEditButtonElement = (): ButtonElement => {
+    const buttonElement: React.ReactElement<ButtonProps> =
+      renderEditAvatarButton();
+
+    return React.cloneElement(buttonElement, {
+      style: [buttonElement.props.style, styles.editButton],
+    });
+  };
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -96,11 +154,11 @@ const PersonalProfileScreen = () => {
   useEffect(() => {
     // getUserId();
 
-    GetAllStates(currentUser?.country.trim()).then((res) => {
+    GetAllStates(currentUser?.country?.trim()).then((res) => {
       setStates(res.data);
       setStatesData(states);
     });
-    GetAllCities(currentUser?.country.trim(), currentUser?.state.trim()).then(
+    GetAllCities(currentUser?.country?.trim(), currentUser?.state?.trim()).then(
       (res) => {
         setCities(res.data);
       }
@@ -109,7 +167,49 @@ const PersonalProfileScreen = () => {
   console.log("current user", currentUser);
   return (
     <>
+      {visible && (
+        <ImagePickerModal
+          openCamera={imageCameraLaunch}
+          openGallery={imageGalleryLaunch}
+          close={() => setVisible(false)}
+        />
+      )}
       <AppHeader title="Profile" isBack />
+
+      <View style={{ width: "100%" }}>
+        {(selectedImage != "" || currentUser?.imageurl?.length > 0) && (
+          <ProfileAvatarPicker
+            style={styles.profileImage}
+            // resizeMode='center'
+            source={{
+              uri:
+                selectedImage ||
+                currentUser?.imageurl + "?time" + new Date().getTime(),
+              headers: { Pragma: "no-cache" },
+            }}
+            editButton={isEditMode ? renderEditAvatarButton : null}
+          />
+        )}
+        {currentUser?.imageurl == null && selectedImage == "" && (
+          <View
+            style={[
+              styles.profileImage,
+              {
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: Colors.lightgray,
+              },
+            ]}
+          >
+            <Text style={{ fontSize: 30 }}>
+              {currentUser?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
+              {currentUser?.lastname?.substring(0, 1)?.toUpperCase()}
+            </Text>
+            {isEditMode && renderEditButtonElement()}
+          </View>
+        )}
+      </View>
+
       {isLoading ? (
         <View style={styles.sppinerContainer}>
           <View style={styles.sppinerContainer}>
@@ -156,14 +256,60 @@ const PersonalProfileScreen = () => {
                     grades: [],
                     isAdmin: currentUser?.isAdmin,
                   };
-                  UpdateUser(objectToPass, "instructor")
-                    .then((response: any) => {
+
+                  let formData = new FormData();
+                  formData.append(
+                    "image",
+                    uploadedImage
+                      ? {
+                          uri: uploadedImage?.path,
+                          name: uploadedImage.mime,
+                          type: uploadedImage.mime,
+                        }
+                      : {
+                          uri:
+                            currentUser?.imageurl ||
+                            "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
+                          name: "avatar",
+                          type: "image/png",
+                        }
+                  );
+                  formData.append("firstname", values.firstName);
+                  formData.append("lastname", values.lastName);
+
+                  formData.append("address", values?.schoolName || "");
+                  formData.append("email", currentUser?.email || "");
+                  formData.append("state", values.state);
+                  formData.append("city", values.city);
+                  formData.append("country", values.country);
+                  formData.append("zipcode", values.zipcode);
+
+                  formData.append("term", true);
+                  formData.append("isAdmin", currentUser?.isAdmin);
+                  formData.append("id", currentUser?.instructorId);
+                  formData.append("schoolId", currentUser?.schoolId || "");
+                  formData.append("orgId", currentUser?.orgId || "");
+                  console.log("form data", JSON.stringify(formData));
+                  UpdateUser(formData, "instructor")
+                    .then(async (response: any) => {
                       if (response.status == 200) {
                         // setisSent(true)
                         setisEditMode(false);
                         setisSending(false);
                         getUserId();
                       }
+                      let res = await fetchOneUserService();
+                      console.log("res", res);
+                      // if (!res?.childTrackHistory) {
+                      //   // await BackgroundService.stop();
+                      // }
+                      // await BackgroundService.stop();
+                      dispatch(
+                        ChangeUserState.action({
+                          item: res,
+                          fetchOne: { loading: false, error: null },
+                        })
+                      );
                     })
                     .catch((error: any) => {
                       console.log("Error", error);
@@ -590,5 +736,27 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "bold",
     color: Colors.fieldLabel,
+  },
+  profileAvatar: {
+    width: 116,
+    height: 116,
+    borderRadius: 58,
+    alignSelf: "center",
+    backgroundColor: "color-primary-default",
+    tintColor: "background-basic-color-1",
+  },
+  profileImage: {
+    width: 116,
+    height: 116,
+    borderRadius: 58,
+    alignSelf: "center",
+  },
+  editAvatarButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    position: "absolute",
+    top: 70,
+    left: 80,
   },
 });

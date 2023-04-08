@@ -4,6 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { Text, Button, Select, SelectItem } from "@ui-kitten/components";
 import { AppHeader } from "@/Components";
 import Colors from "@/Theme/Colors";
+import { loadUserId } from "@/Storage/MainAppStorage";
 import { DeleteStudent } from "@/Services/Student";
 
 const permissions = ["Yes", "No"];
@@ -37,8 +38,9 @@ const ParentDeletePermissionScreen = () => {
       <Button
         style={styles.modalButton}
         size="small"
-        onPress={() => {
-          DeleteStudent(route?.params?.dependentId, route?.params?.parentId)
+        onPress={async () => {
+          const userId = await loadUserId();
+          DeleteStudent(route?.params?.dependentId, userId)
             .then((response) => {
               console.log("response", response);
               navigation.goBack();

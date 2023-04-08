@@ -179,208 +179,227 @@ const AddMembersInstructorScreen = ({ route }) => {
         status: "enabled",
       },
     };
-    if (group?.isEdit) {
-      data["id"] = group?.isEdit?.groupId;
-    }
-    delete data["isEdit"];
-    console.log("989889", group?.isEdit);
-    if (!group?.isEdit) {
-      CreateGroup(data)
-        .then(async (res) => {
-          console.log("res0000000020202020020202020", res);
-          Toast.show({
-            type: "success",
-            text2:
-              "Permission request has been sent to parents and invited instructors",
-          });
-
-          // console.log("group", group);
-          const _students = group?.students?.map((item) => ({
-            firstName: item?.name?.split(" ")[0],
-            lastName: item?.name?.split(" ")[1],
-            parentEmail1: item?.parent1_email,
-            parentEmail2: item?.parent2_email,
-          }));
-
-          console.log("students90909090", _students);
-          try {
-            let notifyToParents = await NotifyToParent(res?.groupId, _students);
-            console.log("notiftoparent", notifyToParents);
-            // NotifyToParent(res?.groupId, _students)
-            //   .then((res) => {
-            //     console.log("parent", res);
-            //   })
-            //   .catch((err) => console.log("NotifyToInstructors", err));
-            const _instructors = [];
-            selectedInstructors.map((item) => {
-              if (!item?.isEdit) {
-                _instructors.push({
-                  firstName: item?.firstname,
-                  lastName: item?.lastname,
-                  email: item?.email,
-                });
-              }
-            });
-            console.log("instructris", _instructors);
-            let notifyToInstructor = await NotifyToInstructors(
-              res?.groupId,
-              _instructors
-            );
-            console.log("notifyToInsftructor", notifyToInstructor);
-            if (notifyToParents && notifyToInstructor) {
-              _dispatch({
-                type: actions.SET_GROUP,
-                payload: null,
-              });
-              navigation.reset({
-                index: 0,
-                routes: [
-                  {
-                    name: "InstructorActivity",
-                    params: {
-                      screen: "InstructorGroup",
-                    },
-                  },
-                ],
-              });
-              setAskPermission(false);
-              dispatch(
-                ChangeAddMembersStudentsState.action({
-                  students: [],
-                })
-              );
-              setSelectedInstructors([]);
-            }
-          } catch (err) {
-            console.log("err", err);
+    try {
+      dispatch(ChangeModalState.action({ loading: true }));
+      if (group?.isEdit) {
+        data["id"] = group?.isEdit?.groupId;
+      }
+      delete data["isEdit"];
+      console.log("989889", group?.isEdit);
+      if (!group?.isEdit) {
+        CreateGroup(data)
+          .then(async (res) => {
+            console.log("res0000000020202020020202020", res);
             Toast.show({
               type: "success",
-              text2: "Something went wrong",
+              text2:
+                "Permission request has been sent to parents and invited instructors",
             });
-          }
-          // NotifyToInstructors(res?.groupId, _instructors)
-          //   .then((res) => {
-          //     console.log(res);
-          //     navigation.navigate("InstructorActivity", {
-          //       screen: "InstructorGroup",
-          //     });
-          //   })
-          //   .catch((err) => console.log("NotifyToInstructors", err));
-        })
-        .catch((err) => {
-          console.log("CreateGroup", err);
-        });
-    } else {
-      UpdateGroup(data)
-        .then(async (res) => {
-          console.log("res0000000020202020020202020", res);
-          Toast.show({
-            type: "success",
-            text2:
-              "Permission request has been sent to parents and invited instructors",
-          });
 
-          // console.log("group", group);
-          const _students = group?.students?.map((item) => ({
-            firstName: item?.name?.split(" ")[0],
-            lastName: item?.item?.name?.split(" ")[1] || "",
-            parentEmail1: item?.parent1_email,
-            parentEmail2: item?.parent2_email,
-          }));
+            // console.log("group", group);
+            const _students = group?.students?.map((item) => ({
+              firstName: item?.name?.split(" ")[0],
+              lastName: item?.name?.split(" ")[1],
+              parentEmail1: item?.parent1_email,
+              parentEmail2: item?.parent2_email,
+            }));
 
-          console.log("students90909090", _students);
-          try {
-            let notifyToParents = true;
-            if (_students && _students?.length > 0) {
-              notifyToParents = false;
-              notifyToParents = await NotifyToParent(
-                group?.isEdit?.groupId,
+            console.log("students90909090", _students);
+            try {
+              let notifyToParents = await NotifyToParent(
+                res?.groupId,
                 _students
               );
-              notifyToParents = true;
-            }
+              console.log("notiftoparent", notifyToParents);
+              // NotifyToParent(res?.groupId, _students)
+              //   .then((res) => {
+              //     console.log("parent", res);
+              //   })
+              //   .catch((err) => console.log("NotifyToInstructors", err));
+              const _instructors = [];
+              let notifyToInstructor;
+              if (!group?.isEdit && selectedInstructors) {
+                selectedInstructors.map((item) => {
+                  _instructors.push({
+                    firstName: item?.firstname,
+                    lastName: item?.lastname,
+                    email: item?.email,
+                  });
+                });
+                console.log("instructris", _instructors);
 
-            console.log("notiftoparent", notifyToParents);
-            // NotifyToParent(res?.groupId, _students)
+                notifyToInstructor = await NotifyToInstructors(
+                  res?.groupId,
+                  _instructors
+                );
+              } else {
+                notifyToInstructor = true;
+              }
+              console.log("notifyToInsftructor", notifyToInstructor);
+              dispatch(ChangeModalState.action({ loading: false }));
+              if (notifyToParents && notifyToInstructor) {
+                _dispatch({
+                  type: actions.SET_GROUP,
+                  payload: null,
+                });
+                navigation.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: "InstructorActivity",
+                      params: {
+                        screen: "InstructorGroup",
+                      },
+                    },
+                  ],
+                });
+                setAskPermission(false);
+                dispatch(
+                  ChangeAddMembersStudentsState.action({
+                    students: [],
+                  })
+                );
+
+                setSelectedInstructors([]);
+              }
+            } catch (err) {
+              dispatch(ChangeModalState.action({ loading: false }));
+              console.log("err", err);
+              Toast.show({
+                type: "success",
+                text2: "Something went wrong",
+              });
+            }
+            // NotifyToInstructors(res?.groupId, _instructors)
             //   .then((res) => {
-            //     console.log("parent", res);
+            //     console.log(res);
+            //     navigation.navigate("InstructorActivity", {
+            //       screen: "InstructorGroup",
+            //     });
             //   })
             //   .catch((err) => console.log("NotifyToInstructors", err));
-            const _instructors = selectedInstructors.map((item) => ({
-              firstName: item?.firstname,
-              lastName: item?.lastname,
-              email: item?.email,
-            }));
-            console.log("instructris", _instructors);
-            let notifyToInstructor = true;
-            if (_instructors?.length > 0) {
-              notifyToInstructor = false;
-              await NotifyToInstructors(group?.isEdit?.groupId, _instructors);
-              notifyToInstructor = true;
-            }
-            console.log("notifyToInsftructor", notifyToInstructor);
-
-            if (notifyToParents && notifyToInstructor) {
-              setDeletedInstructors([]);
-              _dispatch({
-                type: actions.SET_GROUP,
-                payload: null,
-              });
-              navigation.reset({
-                index: 0,
-                routes: [
-                  {
-                    name: "InstructorActivity",
-                    params: {
-                      screen: "InstructorGroup",
-                    },
-                  },
-                ],
-              });
-              setAskPermission(false);
-              dispatch(
-                ChangeAddMembersStudentsState.action({
-                  students: [],
-                })
-              );
-              setSelectedInstructors([]);
-            }
-            let deletedInstructor = [];
-            let deletedStudents = [];
-            deletedInstructors.map((item) => {
-              deletedInstructor.push(item?.instructorId);
-            });
-            if (group?.deletedStudent) {
-              group?.deletedStudent.map((item) => {
-                deletedStudents.push(item?.studentId);
-              });
-            }
-            let deleteParticipant = await DeleteParticipant({
-              studentId: deletedStudents.length == 0 ? [0] : deletedStudents,
-              instructorId:
-                deletedInstructor.length == 0 ? [0] : deletedInstructor,
-              groupId: group?.isEdit?.groupId,
-            });
-            console.log("deleteParticipant", deleteParticipant);
-          } catch (err) {
-            console.log("err", err);
+          })
+          .catch((err) => {
+            console.log("CreateGroup", err);
+          });
+      } else {
+        UpdateGroup(data)
+          .then(async (res) => {
+            console.log("res0000000020202020020202020", res);
             Toast.show({
               type: "success",
-              text2: "Something went wrong",
+              text2:
+                "Permission request has been sent to parents and invited instructors",
             });
-          }
-          // NotifyToInstructors(res?.groupId, _instructors)
-          //   .then((res) => {
-          //     console.log(res);
-          //     navigation.navigate("InstructorActivity", {
-          //       screen: "InstructorGroup",
-          //     });
-          //   })
-          //   .catch((err) => console.log("NotifyToInstructors", err));
-        })
-        .catch((err) => {
-          console.log("CreateGroup", err);
-        });
+
+            // console.log("group", group);
+            const _students = group?.students?.map((item) => ({
+              firstName: item?.name?.split(" ")[0],
+              lastName: item?.item?.name?.split(" ")[1] || "",
+              parentEmail1: item?.parent1_email,
+              parentEmail2: item?.parent2_email,
+            }));
+
+            console.log("students90909090", _students);
+            try {
+              let notifyToParents = true;
+              if (_students && _students?.length > 0) {
+                notifyToParents = false;
+                notifyToParents = await NotifyToParent(
+                  group?.isEdit?.groupId,
+                  _students
+                );
+                notifyToParents = true;
+              }
+
+              console.log("notiftoparent", notifyToParents);
+              // NotifyToParent(res?.groupId, _students)
+              //   .then((res) => {
+              //     console.log("parent", res);
+              //   })
+              //   .catch((err) => console.log("NotifyToInstructors", err));
+              const _instructors = selectedInstructors.map((item) => ({
+                firstName: item?.firstname,
+                lastName: item?.lastname,
+                email: item?.email,
+              }));
+              console.log("instructris", _instructors);
+              dispatch(ChangeModalState.action({ loading: false }));
+              let notifyToInstructor = true;
+              if (_instructors?.length > 0) {
+                notifyToInstructor = false;
+                await NotifyToInstructors(group?.isEdit?.groupId, _instructors);
+                notifyToInstructor = true;
+              }
+              console.log("notifyToInsftructor", notifyToInstructor);
+
+              if (notifyToParents && notifyToInstructor) {
+                setDeletedInstructors([]);
+                _dispatch({
+                  type: actions.SET_GROUP,
+                  payload: null,
+                });
+                navigation.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: "InstructorActivity",
+                      params: {
+                        screen: "InstructorGroup",
+                      },
+                    },
+                  ],
+                });
+                setAskPermission(false);
+                dispatch(
+                  ChangeAddMembersStudentsState.action({
+                    students: [],
+                  })
+                );
+                setSelectedInstructors([]);
+              }
+              let deletedInstructor = [];
+              let deletedStudents = [];
+              deletedInstructors.map((item) => {
+                deletedInstructor.push(item?.instructorId);
+              });
+              if (group?.deletedStudent) {
+                group?.deletedStudent.map((item) => {
+                  deletedStudents.push(item?.studentId);
+                });
+              }
+              let deleteParticipant = await DeleteParticipant({
+                studentId: deletedStudents.length == 0 ? [0] : deletedStudents,
+                instructorId:
+                  deletedInstructor.length == 0 ? [0] : deletedInstructor,
+                groupId: group?.isEdit?.groupId,
+              });
+              console.log("deleteParticipant", deleteParticipant);
+            } catch (err) {
+              dispatch(ChangeModalState.action({ loading: false }));
+              console.log("err", err);
+              Toast.show({
+                type: "success",
+                text2: "Something went wrong",
+              });
+            }
+            // NotifyToInstructors(res?.groupId, _instructors)
+            //   .then((res) => {
+            //     console.log(res);
+            //     navigation.navigate("InstructorActivity", {
+            //       screen: "InstructorGroup",
+            //     });
+            //   })
+            //   .catch((err) => console.log("NotifyToInstructors", err));
+          })
+          .catch((err) => {
+            console.log("CreateGroup", err);
+            dispatch(ChangeModalState.action({ loading: false }));
+          });
+      }
+    } catch (err) {
+      console.log("err", err);
+      dispatch(ChangeModalState.action({ loading: false }));
     }
   };
 

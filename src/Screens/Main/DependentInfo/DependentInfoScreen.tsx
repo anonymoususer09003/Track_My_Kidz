@@ -20,6 +20,7 @@ import {
   StudentVisibilityPermissionModal,
   DistanceAlert,
 } from "@/Modals";
+
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import Colors from "@/Theme/Colors";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -62,9 +63,10 @@ const DependentInfoScreen = () => {
   const [position, setPosition] = useState({});
 
   useEffect(() => {
+    console.log("-------00000");
     Geolocation.getCurrentPosition((pos) => {
       console.log("-------00000", pos);
-      const crd = pos.coords;
+      const crd = pos?.coords;
       setPosition({
         latitude: crd.latitude,
         longitude: crd.longitude,
@@ -273,8 +275,8 @@ const DependentInfoScreen = () => {
         status,
         id,
         _date,
-        coordinates.latitude,
-        coordinates.longitude
+        coordinates?.latitude || null,
+        coordinates?.longitude || null
       );
       console.log("res", res);
       if (res && status) {
@@ -304,14 +306,16 @@ const DependentInfoScreen = () => {
     let _data = [...children];
     const item = _data[index];
     console.log("item", item);
-    item.toggleAlert = status ? true : false;
+    item.toggleAlert = status;
     _data[index] = item;
     setChildren(_data);
 
     console.log("coordinates", coordinates);
+    let lang = coordinates?.longitude || position?.longitude || "0.000";
+    let lat = coordinates?.latitude || position?.latitude || "0.000";
     try {
       let res = await fetch(
-        "https://live-api.trackmykidz.com/user/parent/alert/trackStudent?studentId=2610&parentLatitude=36.7009541&parentLongitude=-122.0840217&toggleAlert=true&distanceAllowed=10&kilometers=false",
+        `https://live-api.trackmykidz.com/user/parent/alert/trackStudent?studentId=${item?.studentId}&parentLatitude=${lat}&parentLongitude=${lang}&toggleAlert=${status}&distanceAllowed=${distanceAllowed}&kilometers=${kilometers}`,
         {
           method: "POST",
           headers: {
@@ -321,6 +325,7 @@ const DependentInfoScreen = () => {
           },
         }
       );
+      setVisible(false);
       // const res = await TrackStudent(
       //   id,
       //   coordinates?.latitude || position?.latitude,
@@ -348,6 +353,7 @@ const DependentInfoScreen = () => {
       );
     }
   };
+
   // const handleToggle=(item,)=>{
   //                           handleTrackStudent(
   //                           item?.studentId,
@@ -363,17 +369,17 @@ const DependentInfoScreen = () => {
     console.log("values----", values);
     setVisible(false);
     handleTrackStudent(
-      values?.student?.studentId,
-      values?.student?.isToggle,
+      dependent?.studentId,
+      dependent?.isToggle,
       values?.distance,
       values?.distanceinkm,
-      values?.student?.index,
+      dependent?.index,
       values?.location
     );
     handleTrackHistory(
-      values?.student?.isToggle,
-      values?.student?.studentId,
-      values?.student?.index,
+      dependent?.isToggle,
+      dependent?.studentId,
+      dependent?.index,
       values?.location
     );
     console.log("values----", values);
@@ -408,9 +414,9 @@ const DependentInfoScreen = () => {
           setStudent={setSelectedStudentVisibility}
         />
       )}
-      <AddStudentModal />
+      {<AddStudentModal />}
       <DependentAddImportModal />
-      {!!selectedDependent && (
+      {!!selectedDependent && isEditVisible && (
         <EditDependentModal
           selectedDependent={selectedDependent}
           setSelectedDependent={(val: any) => setSelectedDependent(val)}
@@ -529,12 +535,19 @@ const DependentInfoScreen = () => {
                       checked={item.childTrackHistory}
                       onChange={(value) => {
                         console.log("values---", value);
-                        handleTrackHistory(
-                          value,
-                          item?.studentId,
-                          index,
-                          position
-                        );
+                        if (item?.childTrackHistory && item.toggleAlert) {
+                          Toast.show({
+                            type: "success",
+                            text2: "Alert needs the Track History to be on.",
+                          });
+                        } else {
+                          handleTrackHistory(
+                            value,
+                            item?.studentId,
+                            index,
+                            position
+                          );
+                        }
                       }}
                     />
                   </View>
@@ -553,25 +566,34 @@ const DependentInfoScreen = () => {
                       checked={item.toggleAlert}
                       onChange={async (value) => {
                         console.log("value", value);
-                        if (value) {
-                          setVisible(value);
-                          setDependent({ ...item, index, isToggle: value });
-                          // setSelectedDependent(item);
-                        } else {
-                          await handleTrackStudent(
-                            item?.studentId,
-                            value,
-                            30,
-                            false,
 
-                            index,
-                            false
-                          );
-                          await handleTrackHistory(
-                            value,
-                            item?.studentId,
-                            index
-                          );
+                        if (item?.childDeviceId) {
+                          if (!item?.toggleAlert) {
+                            setVisible(value);
+                            setDependent({ ...item, index, isToggle: value });
+                            // setSelectedDependent(item);
+                          } else {
+                            await handleTrackStudent(
+                              item?.studentId,
+                              value,
+                              30,
+                              false,
+
+                              index,
+                              false
+                            );
+                            await handleTrackHistory(
+                              value,
+                              item?.studentId,
+                              index
+                            );
+                          }
+                        } else {
+                          Toast.show({
+                            type: "info",
+                            text2:
+                              "To turn on boundry alert,dependent must register",
+                          });
                         }
                       }}
                     />

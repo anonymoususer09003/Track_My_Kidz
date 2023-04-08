@@ -18,6 +18,7 @@ import Swipeable from "react-native-gesture-handler/Swipeable";
 import Colors from "@/Theme/Colors";
 import { InstructionsModal } from "@/Modals";
 import { GetActivityByStudentId, GetAllActivity } from "@/Services/Activity";
+import { AwsLocationTracker } from "@/Services/TrackController";
 import Geolocation from "@react-native-community/geolocation";
 import { UserState } from "@/Store/User";
 import moment from "moment";
@@ -51,6 +52,11 @@ const StudentActivityScreen = ({ route }) => {
   const [showActivityParticipant, setShowActivityParticipant] = useState(false);
   const [participantsEmail, setParticipantsEmail] = useState([]);
   const [partcipants, setParticipants] = useState([]);
+  const [getChildrendeviceIds, setChildrensDeviceIds] = useState([]);
+  const [getParticipantsIds, setParticipantsIds] = useState([]);
+  const [selectedActivity, setSelectedActivity] = useState();
+  const [trackerName, setTrackerName] = useState();
+  const [trackingList, setTrackingList] = useState({});
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
@@ -273,6 +279,13 @@ const StudentActivityScreen = ({ route }) => {
   const getParticipantLocation = async (activityId: any) => {
     try {
       let res = await ParticipantLocation(activityId);
+      let deviceIds = [];
+      res.map((item) => {
+        item.deviceId && deviceIds.push(item.deviceId);
+      });
+      setSelectedActivity(activityId);
+      setParticipantsIds(deviceIds);
+      turnOnTracker(activityId, deviceIds, "activity");
       console.log("res", res);
       setParticipants(res);
     } catch (err) {
@@ -332,15 +345,19 @@ const StudentActivityScreen = ({ route }) => {
     try {
       let res = await GetParentChildrens(referenceCode);
       let temp = [];
+      let deviceIds = [];
       res.map((item, index) => {
         temp.push({
           latitude: item?.latitude ? parseFloat(item?.latitude) : null,
 
           longitude: item?.longititude ? parseFloat(item?.longititude) : null,
         });
+        if (item?.deviceId) {
+          deviceIds.push(item.deviceId);
+        }
       });
       setOriginalChildren(res);
-
+      setChildrensDeviceIds(deviceIds);
       setOriginalStudentsEmail(temp);
       setStudentsEmail(temp);
       setChildren(res);
@@ -348,7 +365,6 @@ const StudentActivityScreen = ({ route }) => {
       console.log("err in children", err);
     }
   };
-  console.log("current user", currentUser);
 
   useEffect(() => {
     if (selectedInstructions) {
@@ -361,6 +377,79 @@ const StudentActivityScreen = ({ route }) => {
     }
     prevOpenedRow = row[index];
   };
+
+  const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
+    try {
+      if (showParticipantMap || showFamilyMap) {
+        let body = {
+          deviceIds: showFamilyMap ? getChildrendeviceIds : deviceIds,
+          trackerName: showFamilyMap ? currentUser?.parentId : id,
+          locationTrackerTrigger: true,
+        };
+        // [
+        //   {
+        //     "deviceId": "string",
+        //     "position": [
+        //       0
+        //     ],
+        //     "receivedTime": "2023-03-31T17:44:11.798Z",
+        //     "sampleTime": "2023-03-31T17:44:11.798Z"
+        //   }
+        // ]
+
+        let res = await AwsLocationTracker(body);
+
+        let temp = {};
+        res.map((item) => {
+          temp = {
+            ...temp,
+            [temp.deviceId]: {
+              lat: item.position[0],
+              lang: item.position[1],
+            },
+          };
+        });
+        setTrackingList(temp);
+      } else {
+        let body2 = {
+          deviceIds: showFamilyMap ? getParticipantsIds : getChildrendeviceIds,
+          trackerName: showFamilyMap ? selectedActivity : currentUser?.parentId,
+          locationTrackerTrigger: false,
+        };
+
+        await AwsLocationTracker(body2);
+      }
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
+  useEffect(() => {
+    if (showFamilyMap) {
+      turnOffTracker(currentUser.parentId, getChildrendeviceIds, "parent");
+    } else {
+      turnOffTracker("family");
+    }
+  }, [showFamilyMap]);
+  useEffect(() => {
+    if (showFamilyMap) {
+      turnOffTracker("activity");
+    }
+  }, [showFamilyMap]);
+
+  const turnOffTracker = async (from: any) => {
+    try {
+      let body = {
+        deviceIds: from == "family" ? getChildrendeviceIds : getParticipantsIds,
+        trackerName: from == "family" ? currentUser.parentId : selectedActivity,
+        locationTrackerTrigger: false,
+      };
+      let res = await AwsLocationTracker(body);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
   return (
     <>
       {selectedInstructions && (
@@ -460,14 +549,16 @@ const StudentActivityScreen = ({ route }) => {
                 <Marker
                   onSelect={() => console.log("pressed")}
                   onPress={() => {
+                    let latitude = trackingList[item.deviceId].lat;
+                    let longititude = trackingList[item.deviceId].lang;
                     ref.current.fitToSuppliedMarkers(
                       [
                         {
-                          latitude: item?.latitude
-                            ? parseFloat(item?.latitude)
+                          latitude: latitude
+                            ? parseFloat(latitude)
                             : parseFloat(10),
-                          longitude: item?.longititude
-                            ? parseFloat(item?.longititude)
+                          longitude: longititude
+                            ? parseFloat(longititude)
                             : parseFloat(10),
                         },
                       ]
@@ -477,11 +568,9 @@ const StudentActivityScreen = ({ route }) => {
                   identifier={item?.email}
                   key={index}
                   coordinate={{
-                    latitude: item?.latitude
-                      ? parseFloat(item?.latitude)
-                      : parseFloat(10),
-                    longitude: item?.longititude
-                      ? parseFloat(item?.longititude)
+                    latitude: latitude ? parseFloat(latitude) : parseFloat(10),
+                    longitude: longititude
+                      ? parseFloat(longititude)
                       : parseFloat(10),
                   }}
                 >
@@ -517,7 +606,9 @@ const StudentActivityScreen = ({ route }) => {
           //   longitudeDelta: 0.0421,
           // }}
           onLayout={() => {
-            let temp = studentsEmails.filter((item) => item.latitude != null);
+            let temp = studentsEmails.filter(
+              (item) => trackingList[item.deviceId].lat != null
+            );
 
             ref?.current?.fitToCoordinates(temp, {
               edgePadding: {
@@ -533,10 +624,14 @@ const StudentActivityScreen = ({ route }) => {
         >
           {children
             .filter(
-              (item) => item.latitude != "undefined" && item.latitude != null
+              (item) =>
+                trackingList[item.deviceId].lat != "undefined" &&
+                trackingList[item.deviceId].lang != null
             )
             .map((item, index) => {
               console.log("item", item);
+              let latitude = trackingList[item.deviceId].lat;
+              let longititude = trackingList[item.deviceId].lang;
               // console.log("item", item);
               return (
                 <>
@@ -547,11 +642,11 @@ const StudentActivityScreen = ({ route }) => {
                       ref.current.fitToSuppliedMarkers(
                         [
                           {
-                            latitude: item?.latitude
-                              ? parseFloat(item?.latitude)
+                            latitude: latitude
+                              ? parseFloat(latitude)
                               : parseFloat(10),
-                            longitude: item?.longititude
-                              ? parseFloat(item?.longititude)
+                            longitude: longititude
+                              ? parseFloat(longititude)
                               : parseFloat(10),
                           },
                         ]
@@ -561,11 +656,11 @@ const StudentActivityScreen = ({ route }) => {
                     identifier={item?.email}
                     key={index}
                     coordinate={{
-                      latitude: item?.latitude
-                        ? parseFloat(item?.latitude)
+                      latitude: latitude
+                        ? parseFloat(latitude)
                         : parseFloat(10),
-                      longitude: item?.longititude
-                        ? parseFloat(item?.longititude)
+                      longitude: longititude
+                        ? parseFloat(longititude)
                         : parseFloat(10),
                     }}
                   >

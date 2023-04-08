@@ -75,6 +75,7 @@ const FirstSignUpScreen = ({ navigation }) => {
     dispatch(ChangeModalState.action({ loading: true }));
     GetAuthStudentByActivationCode(email)
       .then((res) => {
+        console.log("res", res);
         setShowQR(false);
         navigation &&
           navigation.navigate("FinalRegistrationScreen", {
@@ -100,6 +101,9 @@ const FirstSignUpScreen = ({ navigation }) => {
     // return () => setInitialValues(intitialValues);
     if (!isFocuesed) {
       setInitialValues(values);
+    } else {
+      setIsDesignatedAdmin(false);
+      setSelectedUserType("");
     }
     // dispatch(FetchCountries.action());
     // console.log("alert");
@@ -197,7 +201,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                           activation_code: res.data?.activation_code,
                         });
                     }
-                    resetForm();
+                    // resetForm();
                   })
                   .catch((err) => {
                     console.log("err", err);

@@ -28,6 +28,8 @@ instance.interceptors.request.use(async (request) => {
 
       case "/user/student/create":
       case "/user/student/update":
+      case "/user/instructor/create":
+      case "/user/instructor/update":
         request.headers = {
           ...request.headers,
 

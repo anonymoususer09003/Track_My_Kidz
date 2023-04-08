@@ -35,6 +35,7 @@ import RNDeviceInfo from "react-native-device-info";
 import RightDrawerContent from "@/Navigators/Main/DrawerContents/RightDrawerContent/RightDrawerContent";
 import HomeNavigator from "@/Navigators/Main/HomeNavigator";
 import ActivityNavigator from "@/Navigators/Main/ActivityNavigator";
+import InstructorChatNavigator from "@/Navigators/Main/InstructorChatNavigator";
 import StudentActivityNavigator from "@/Navigators/Main/StudentActivityNavigator";
 import ApprovalNavigator from "@/Navigators/Main/ApprovalNavigator";
 import InstructorApprovalNavigator from "@/Navigators/Main/InstructorApprovalNavigator";
@@ -105,6 +106,10 @@ const RightDrawerNavigator = () => {
           component={StudentActivityDetailsScreen}
         />
         <Drawer.Screen name="InstructorHome" component={InstructorHome} />
+        <Drawer.Screen
+          name="InstructorChatNavigator"
+          component={InstructorChatNavigator}
+        />
         <Drawer.Screen
           name="CreateParentActivity"
           component={CreateParentActivityScreen}

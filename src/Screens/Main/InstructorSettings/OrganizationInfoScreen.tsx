@@ -63,6 +63,7 @@ import AddInstructorOrgModal from "@/Modals/AddInstructorOrgModal";
 import Icon from "react-native-vector-icons/Entypo";
 import { navigationRef } from "@/Navigators/Functions";
 
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -83,6 +84,7 @@ const OrganizationInfoScreen = ({ navigation }) => {
   const windowWidth = Dimensions.get("window").width;
   const height = Dimensions.get("screen").height;
   const [instructors, setInstructors] = useState([]);
+  const dispatch = useDispatch();
   const reportAProblemValidationSchema = yup.object().shape({
     message: yup
       .string()
@@ -399,6 +401,7 @@ const OrganizationInfoScreen = ({ navigation }) => {
                       }}
                       enableReinitialize
                       onSubmit={(values, { resetForm }) => {
+                        dispatch(ChangeModalState.action({ loading: true }));
                         if (isEditMode) {
                           const data = {
                             id: orgInfo.schoolId,
@@ -433,10 +436,19 @@ const OrganizationInfoScreen = ({ navigation }) => {
                             .then((res) => {
                               console.log("res", res);
                               setisEditMode(false);
+                              dispatch(
+                                ChangeModalState.action({ loading: false })
+                              );
                             })
-                            .catch((err) => console.log(err));
+                            .catch((err) => {
+                              console.log(err);
+                              dispatch(
+                                ChangeModalState.action({ loading: false })
+                              );
+                            });
                         } else {
                           setisEditMode(true);
+                          dispatch(ChangeModalState.action({ loading: false }));
                         }
                       }}
                     >

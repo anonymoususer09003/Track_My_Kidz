@@ -991,6 +991,11 @@ const InstructorActivityScreen = ({}) => {
             </Select>
           )}
         </View>
+        {activities.length == 0 && (
+          <Text style={{ textAlign: "center", marginTop: 5 }}>
+            You currently do not have any activities
+          </Text>
+        )}
         <FlatList
           data={
             selectedInstructorActivities
@@ -1283,6 +1288,7 @@ const InstructorActivityScreen = ({}) => {
           refreshing={false}
           onRefresh={() => null}
         />
+
         {refreshing && (
           <ActivityIndicator size="large" color={Colors.primary} />
         )}

@@ -249,8 +249,32 @@ const InstructorActivityModal = ({
               });
             }}
           >
-            <Feather size={25} color={Colors.primary} name="copy" />
+            <FontAwesome5 size={25} color={Colors.primary} name="copy" />
             <Text style={styles.textStyle}>Copy Activity</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.buttonStyle}
+            onPress={() => {
+              if (prevOpenedRow) {
+                prevOpenedRow?.close();
+              }
+              hide();
+              _dispatch({
+                type: actions.SET_SELECTED_ACTIVITY,
+                payload: item,
+              });
+              navigation.navigate("InstructorChatNavigator", {
+                isEdit: false,
+              });
+            }}
+          >
+            <Ionicons
+              size={25}
+              color={Colors.primary}
+              name="chatbox-ellipses"
+            />
+            <Text style={styles.textStyle}>Chat</Text>
           </TouchableOpacity>
 
           {!item?.status && (

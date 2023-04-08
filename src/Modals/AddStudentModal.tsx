@@ -14,6 +14,7 @@ import {
   Icon,
   Card,
 } from "@ui-kitten/components";
+import { Spinner } from "@/Components";
 import { PersonIcon, PhoneIcon } from "@/Components/SignUp/icons";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -56,6 +57,7 @@ const AddStudentModal = () => {
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
     ""
   );
+  const [loading, setLoading] = useState(false);
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const [schools, setSchools] = useState<[]>([]);
@@ -259,6 +261,7 @@ const AddStudentModal = () => {
                 }}
                 onSubmit={async (values, { resetForm }) => {
                   console.log("values", values);
+                  setLoading(true);
                   const userId = await loadUserId();
                   let formData = new FormData();
                   formData.append(
@@ -269,7 +272,11 @@ const AddStudentModal = () => {
                           name: uploadedImage.mime,
                           type: uploadedImage.mime,
                         }
-                      : ""
+                      : {
+                          uri: "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
+                          name: "avatar",
+                          type: "image/png",
+                        }
                   );
                   formData.append("parentId", parseInt(userId, 0));
                   formData.append("firstname", values.firstName);
@@ -316,6 +323,10 @@ const AddStudentModal = () => {
                       });
 
                       resetForm();
+                      setUploadedImage(null);
+                      setSelectedImage("");
+                      setVisible(false);
+                      setCheckBox(false);
                       if (!values.addMore) {
                         dispatch(
                           ChangeModalState.action({
@@ -335,7 +346,8 @@ const AddStudentModal = () => {
                         position: "top",
                         text1: `An error occured`,
                       });
-                    });
+                    })
+                    .finally(() => setLoading(false));
                 }}
               >
                 {({
@@ -355,10 +367,16 @@ const AddStudentModal = () => {
                           <ProfileAvatarPicker
                             style={styles.profileImage}
                             // resizeMode='center'
-                            source={getUriSource()}
-                            editButton={false ? renderEditAvatarButton : null}
+                            source={{
+                              uri:
+                                selectedImage + "?time" + new Date().getTime(),
+                              headers: { Pragma: "no-cache" },
+                            }}
+                            // editButton={false ? renderEditAvatarButton : null}
                           />
                         )}
+
+                        {true && renderEditButtonElement()}
                         {!selectedImage && (
                           <View
                             style={[
@@ -371,7 +389,7 @@ const AddStudentModal = () => {
                             ]}
                           >
                             <ProfileIcon size={110} name="user" />
-                            {true && renderEditButtonElement()}
+                            {/* {true && renderEditButtonElement()} */}
                           </View>
                         )}
                         <Text
@@ -674,96 +692,106 @@ const AddStudentModal = () => {
                         onChangeText={handleChange("phoneNumber")}
                       />
                     </Layout>
-                    <View
-                      style={{
-                        // position: "absolute",
-                        // bottom: 120,
-                        // left: 0,
-                        // right: 0,
-                        height: "100%",
-                        alignItems: "center",
-                        width: "100%",
-                        paddingBottom: 30,
-                      }}
-                    >
-                      {console.log(isValid)}
-                      <View
-                        style={[
-                          styles.bottomButton,
-                          {
-                            backgroundColor:
-                              isValid && selectedImage != ""
-                                ? Colors.primary
-                                : Colors.gray,
-                          },
-                        ]}
-                      >
-                        <TouchableOpacity
-                          style={[
-                            styles.bottomButton,
-                            {
-                              backgroundColor:
-                                isValid && selectedImage != ""
-                                  ? Colors.primary
-                                  : Colors.gray,
-                            },
-                          ]}
-                          onPress={() => {
-                            if (selectedImage != "") {
-                              setFieldValue("addMore", false);
-                              handleSubmit();
-                            }
+
+                    <>
+                      {!loading ? (
+                        <View
+                          style={{
+                            // position: "absolute",
+                            // bottom: 120,
+                            // left: 0,
+                            // right: 0,
+                            height: "100%",
+                            alignItems: "center",
+                            width: "100%",
+                            paddingBottom: 30,
                           }}
                         >
-                          <Text style={styles.button}>I'm done</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <View
-                        style={[
-                          styles.bottomButton,
-                          {
-                            backgroundColor:
-                              isValid && selectedImage != ""
-                                ? Colors.primary
-                                : Colors.gray,
-                          },
-                        ]}
-                      >
-                        <TouchableOpacity
-                          style={[
-                            styles.bottomButton,
-                            {
-                              backgroundColor:
-                                isValid && selectedImage != ""
-                                  ? Colors.primary
-                                  : Colors.gray,
-                            },
-                          ]}
-                          onPress={() => {
-                            if (selectedImage != "") {
-                              setFieldValue("addMore", true);
-                              handleSubmit(true);
-                            }
-                          }}
-                        >
-                          <Text style={styles.button}>Add one more</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <View style={[styles.bottomButton, { marginBottom: 50 }]}>
-                        <TouchableOpacity
-                          style={styles.bottomButton}
-                          onPress={() =>
-                            dispatch(
-                              ChangeModalState.action({
-                                addStudentModal: false,
-                              })
-                            )
-                          }
-                        >
-                          <Text style={styles.button}>Cancel</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
+                          <View
+                            style={[
+                              styles.bottomButton,
+                              {
+                                backgroundColor:
+                                  isValid && selectedImage != ""
+                                    ? Colors.primary
+                                    : Colors.gray,
+                              },
+                            ]}
+                          >
+                            <TouchableOpacity
+                              style={[
+                                styles.bottomButton,
+                                {
+                                  backgroundColor:
+                                    isValid && selectedImage != ""
+                                      ? Colors.primary
+                                      : Colors.gray,
+                                },
+                              ]}
+                              onPress={() => {
+                                if (selectedImage != "") {
+                                  setFieldValue("addMore", false);
+                                  handleSubmit();
+                                }
+                              }}
+                            >
+                              <Text style={styles.button}>I'm done</Text>
+                            </TouchableOpacity>
+                          </View>
+                          <View
+                            style={[
+                              styles.bottomButton,
+                              {
+                                backgroundColor:
+                                  isValid && selectedImage != ""
+                                    ? Colors.primary
+                                    : Colors.gray,
+                              },
+                            ]}
+                          >
+                            <TouchableOpacity
+                              style={[
+                                styles.bottomButton,
+                                {
+                                  backgroundColor:
+                                    isValid && selectedImage != ""
+                                      ? Colors.primary
+                                      : Colors.gray,
+                                },
+                              ]}
+                              onPress={() => {
+                                if (selectedImage != "") {
+                                  setFieldValue("addMore", true);
+                                  handleSubmit(true);
+                                }
+                              }}
+                            >
+                              <Text style={styles.button}>Add one more</Text>
+                            </TouchableOpacity>
+                          </View>
+                          <View
+                            style={[styles.bottomButton, { marginBottom: 50 }]}
+                          >
+                            <TouchableOpacity
+                              style={styles.bottomButton}
+                              onPress={() =>
+                                dispatch(
+                                  ChangeModalState.action({
+                                    addStudentModal: false,
+                                  })
+                                )
+                              }
+                            >
+                              <Text style={styles.button}>Cancel</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      ) : (
+                        <View style={{ marginBottom: 50 }}>
+                          <Spinner />
+                        </View>
+                      )}
+                    </>
                   </>
                 )}
               </Formik>
@@ -873,6 +901,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+    position: "absolute",
+    right: 100,
+    top: 80,
+    zIndex: 2,
   },
   formContainer: {
     flex: 1,

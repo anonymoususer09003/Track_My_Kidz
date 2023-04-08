@@ -24,6 +24,7 @@ import {
 import { Formik } from "formik";
 
 import DeviceInfo from "react-native-device-info";
+import { Spinner } from "@/Components";
 import { getDeviceId } from "react-native-device-info";
 import { useIsFocused } from "@react-navigation/native";
 import * as yup from "yup";
@@ -60,6 +61,7 @@ const screenHeight = Dimensions.get("screen").height;
 const SignInScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const isFocuesed = useIsFocused();
+  const [loading, setLoading] = useState(false);
   // const dispatch = useDispatch();
   const countries = useSelector(
     (state: { state: any }) => state.places.countries
@@ -195,6 +197,7 @@ const SignInScreen = ({ navigation }) => {
                 email: values.email,
                 password: values.password,
               };
+              setLoading(true);
               console.log("usertype", values.user_type);
               dispatch(ChangeModalState.action({ loading: true }));
               Login(objectToPass, values.user_type.toLowerCase())
@@ -213,8 +216,10 @@ const SignInScreen = ({ navigation }) => {
                   console.log(obj);
                   dispatch(LoginStore.action(obj));
                   dispatch(ChangeModalState.action({ loading: false }));
+                  setLoading(false);
                 })
                 .catch((err) => {
+                  setLoading(false);
                   console.log("err", err);
                   dispatch(ChangeModalState.action({ loading: false }));
                   if (
@@ -308,6 +313,7 @@ const SignInScreen = ({ navigation }) => {
                   {errors.password && touched.password && (
                     <Text style={styles.errorText}>{errors.password}</Text>
                   )}
+
                   <Layout style={styles.buttonSettings}>
                     <LinearGradientButton
                       style={styles.signInButton}

@@ -167,6 +167,13 @@ const AppHeader = ({ showGlobe, ...props }) => {
               );
             } else {
               nav.navigate("Home");
+              if (props?.thumbnail) {
+                dispatch(
+                  ChangeModalState.action({
+                    showCalendar: false,
+                  })
+                );
+              }
               props?.setThumbnail && props?.setThumbnail();
             }
           }}
