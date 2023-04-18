@@ -36,6 +36,7 @@ import RightDrawerContent from "@/Navigators/Main/DrawerContents/RightDrawerCont
 import HomeNavigator from "@/Navigators/Main/HomeNavigator";
 import ActivityNavigator from "@/Navigators/Main/ActivityNavigator";
 import InstructorChatNavigator from "@/Navigators/Main/InstructorChatNavigator";
+import { ParentChatScreen, StudentChatScreen } from "@/Screens/Chats";
 import StudentActivityNavigator from "@/Navigators/Main/StudentActivityNavigator";
 import ApprovalNavigator from "@/Navigators/Main/ApprovalNavigator";
 import InstructorApprovalNavigator from "@/Navigators/Main/InstructorApprovalNavigator";
@@ -114,6 +115,7 @@ const RightDrawerNavigator = () => {
           name="CreateParentActivity"
           component={CreateParentActivityScreen}
         />
+        <Drawer.Screen name="ChatScreen" component={ParentChatScreen} />
         <Drawer.Screen name="Activity" component={ActivityNavigator} />
         <Drawer.Screen name="Approval" component={ApprovalNavigator} />
         <Drawer.Screen

@@ -26,6 +26,7 @@ import {
   RequestPermissionModalGroups,
   ShowStudentsInstructorsGroupModal,
 } from "@/Modals";
+import SetChatParam from "@/Store/chat/SetChatParams";
 import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {
@@ -393,8 +394,26 @@ const InstructorGroupScreen = ({ route }) => {
         <TouchableOpacity
           onPress={() => {
             prevOpenedRow?.close();
-            navigation.navigate("CreateGroup", {
-              data: item,
+
+            dispatch(
+              SetChatParam.action({
+                title: item?.groupName,
+                chatId: item?.groupId,
+                subcollection: "parent",
+                user: {
+                  _id: user?.instructorId,
+                  avatar: user?.imageurl,
+                  name: user?.firstname
+                    ? user?.firstname[0].toUpperCase() +
+                      user?.firstname.slice(1) +
+                      " " +
+                      user?.lastname[0]?.toUpperCase()
+                    : user?.firstname + " " + user?.lastname,
+                },
+              })
+            );
+            navigation.navigate("InstructorChatNavigator", {
+              title: item?.groupName,
             });
           }}
           style={{

@@ -174,7 +174,7 @@ const AppHeader = ({ showGlobe, ...props }) => {
                   })
                 );
               }
-              props?.setThumbnail && props?.setThumbnail();
+              props?.setThumbnail && props?.setThumbnail(false);
             }
           }}
         />

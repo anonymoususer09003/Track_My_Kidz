@@ -334,7 +334,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
       cropperCircleOverlay: true,
       width: 139,
       height: 130,
-      compressImageQuality: 1,
+      compressImageQuality: 0.2,
       loadingLabelText: "Loading image",
     }).then((image) => {
       if (image != null) {
@@ -351,7 +351,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
       cropperCircleOverlay: true,
       width: 139,
       height: 130,
-      compressImageQuality: 1,
+      compressImageQuality: 0.2,
       loadingLabelText: "Loading image",
     }).then((image) => {
       if (image != null) {

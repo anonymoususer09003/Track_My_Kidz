@@ -8,7 +8,15 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  PermissionsAndroid,
+  Platform,
 } from "react-native";
+import * as Stomp from "stompjs";
+import BackgroundService from "react-native-background-actions";
+import Geolocation from "@react-native-community/geolocation";
+import GeolocationAndroid from "react-native-geolocation-service";
+import SockJS from "sockjs-client";
+import { loadToken } from "@/Storage/MainAppStorage";
 import { useDispatch, useSelector } from "react-redux";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -179,7 +187,6 @@ const InstructorActivityScreen = ({}) => {
       cancelToken: source.token,
     })
       .then((res) => {
-        console.log("res00-00--0-00--0-0", res);
         setRefreshing(false);
         setPageSize(pageSize);
 
@@ -222,7 +229,6 @@ const InstructorActivityScreen = ({}) => {
             result: data,
           });
         }
-        console.log("data9999999999", data);
       })
       .catch((err) => {
         setRefreshing(false);
@@ -295,28 +301,6 @@ const InstructorActivityScreen = ({}) => {
       });
   };
 
-  const getBuses = async () => {
-    let id = await loadUserId();
-    FindAllBus(id, 0, 10)
-      .then((res) => {
-        setBuses(res?.data?.result);
-      })
-      .catch((err) => {
-        console.log("getBuses Error:", err);
-      });
-  };
-
-  const getInstructors = async () => {
-    GetAllInstructors(0, 10)
-      .then((res) => {
-        console.log("res", res);
-        setInstructors(res);
-      })
-      .catch((err) => {
-        console.log("getInstructors Error:", err);
-      });
-  };
-
   const findInstructorBySchoolId = async (res: any) => {
     try {
       let instructorsList = await FindInstructorBySchoolOrg(
@@ -346,7 +330,7 @@ const InstructorActivityScreen = ({}) => {
 
   const getInstructor = async () => {
     const userId = await loadUserId();
-    console.log("instructor------------------", userId);
+
     try {
       if (Object.keys(currentUser).length == 0) {
         let res = await GetInstructor(userId);
@@ -464,12 +448,9 @@ const InstructorActivityScreen = ({}) => {
       setOriginalActivities(JSON.parse(activites));
     }
   };
-  // const controller = new AbortController();
-  // const signal = controller.signal;
+
   const fetchCountries = async () => {
     try {
-      console.log("usertype", countries);
-      // if (!countries) {
       let res = await GetAllCountries({
         cancelToken: source.token,
       });
@@ -505,9 +486,138 @@ const InstructorActivityScreen = ({}) => {
   //   [searchParam, user],
   //   300
   // );
+  let stompClient: any = React.createRef<Stomp.Client>();
+  const connectSockets = async () => {
+    const token = await loadToken();
+    const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+    stompClient = Stomp.over(socket);
+    stompClient.connect({ token }, () => {
+      console.log("Connected");
+      locationPermission(true);
+    });
+  };
+  const locationPermission = async () => {
+    if (Platform.OS === "android") {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+        {
+          title: "Background Location Permission",
+          message: "TrackMyKidz App needs access to your location",
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK",
+        }
+      );
+      // const granted = await PermissionsAndroid.request(
+      //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      // );
+
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        backgroundCall();
+      } else {
+        backgroundCall();
+      }
+    } else {
+      backgroundCall();
+      // backgroundCall();
+    }
+    // handleTrackHistorySchedule();
+  };
+
+  console.log("deviceId-------", user);
+  const sendCoordinates = async (lat: any, lang: any) => {
+    const token = await loadToken();
+    stompClient.send(
+      "/socket/ws-location",
+      { token },
+      JSON.stringify({
+        latitude: lat,
+        longitude: lang,
+        deviceId: currentUser?.deviceId,
+      })
+    );
+  };
+
+  const handleHistorySchedule = async (tracking) => {
+    // if (currentUser?.childTrackHistory) {
+    try {
+      if (Platform.OS == "android") {
+        GeolocationAndroid.getCurrentPosition(async (pos) => {
+          const crd = pos.coords;
+          console.log("crd", crd);
+
+          sendCoordinates(crd.latitude, crd.longitude);
+        });
+      } else {
+        Geolocation.getCurrentPosition(async (pos) => {
+          const crd = pos.coords;
+
+          sendCoordinates(crd.latitude, crd.longitude);
+        });
+      }
+    } catch (err) {
+      console.log("er99999999999999", err);
+    }
+
+    // }
+  };
+  const backgroundCall = async (tracking) => {
+    const sleep = (time) =>
+      new Promise((resolve) => setTimeout(() => resolve(), time));
+
+    // You can do anything in your task such as network requests, timers and so on,
+    // as long as it doesn't touch UI. Once your task completes (i.e. the promise is resolved),
+    // React Native will go into "paused" mode (unless there are other tasks running,
+    // or there is a foreground app).
+    const veryIntensiveTask = async (taskDataArguments) => {
+      // Example of an infinite loop task
+      const { delay } = taskDataArguments;
+
+      await new Promise(async () => {
+        for (let i = 1; BackgroundService.isRunning(); i++) {
+          try {
+            // depends on which lib you are using
+            await handleHistorySchedule(tracking);
+          } catch (error) {
+            // console.log(error);
+          }
+          await sleep(2000);
+        }
+      });
+
+      // await sleep(delay);
+    };
+
+    const options = {
+      taskName: "Example",
+      taskTitle: "TrackMyKidz",
+      taskDesc: "Tracking your Location",
+      taskIcon: {
+        name: "ic_launcher",
+        type: "mipmap",
+      },
+      color: "#ff00ff",
+      linkingURI: "yourSchemeHere://chat/jane", // See Deep Lking for more info
+      parameters: {
+        delay: 2000,
+      },
+    };
+    BackgroundService.on("expiration", () => {
+      console.log("I am being closed :(");
+    });
+
+    // await BackgroundService.start(veryIntensiveTask, options);
+    await BackgroundService.start(veryIntensiveTask, options);
+    await BackgroundService.updateNotification({
+      taskDesc: "Tracking Location",
+    }); // Only Android, iOS will ignore this call
+    // iOS will also run everything here in the background until .stop() is called
+    // await BackgroundService.stop();
+  };
 
   useEffect(() => {
     if (isFocused) {
+      connectSockets();
       // Alert.alert("kk");
       // if (countries) {
       // fetchCountries();

@@ -18,3 +18,5 @@ export { default as GetOptInGroup } from "./GetOptInGroup";
 export { default as FindGroupsByName } from "./FindGroupsByName";
 export { default as DeleteParticipant } from "./DeleteParticipant";
 export { default as GetGroupCount } from "./GetGroupCount";
+export { default as SendEmailToPendingInstructor } from "./SendEmailToPendingInstructor";
+export { default as SendEmailToPendingStudents } from "./SendEmailToPendingStudents";

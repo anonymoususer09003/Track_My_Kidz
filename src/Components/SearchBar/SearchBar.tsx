@@ -35,7 +35,6 @@ const SearchBar = ({
 }: SearchBarProps) => {
   const { Layout } = useTheme();
 
-  const showToggle = isThumbnail;
   const [toggle, setToggle] = useState(false);
   const renderSearchIcon = (props: any) => <Icon {...props} name={"search"} />;
 
@@ -76,7 +75,7 @@ const SearchBar = ({
             <Input
               value={searchText}
               style={{
-                width: showFilter ? "65%" : showToggle ? "80%" : "100%",
+                width: showFilter ? "65%" : isThumbnail ? "80%" : "100%",
                 marginLeft: showFilter ? 20 : 0,
               }}
               placeholder="Search"
@@ -85,16 +84,16 @@ const SearchBar = ({
               accessoryRight={handleClearSearch}
             />
           )}
-          {showToggle && (
+          {isThumbnail && (
             <Switch
               style={{ marginLeft: 20 }}
               trackColor={{ false: "#767577", true: "#50CBC7" }}
               thumbColor={Colors.white}
               ios_backgroundColor="#3e3e3e"
               onValueChange={() => {
-                onToggleChange(!thumbnail);
+                onToggleChange(!thumbnailView);
               }}
-              value={toggle}
+              value={thumbnailView}
             />
           )}
         </View>

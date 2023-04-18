@@ -5,7 +5,14 @@ import React, {
   useLayoutEffect,
   useRef,
 } from "react";
-import { View, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  Image,
+} from "react-native";
+
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 import { useSelector, useDispatch } from "react-redux";
 import { UserState } from "@/Store/User";
@@ -22,8 +29,12 @@ import BlockUser from "@/Services/Comments/BlockUser";
 import Toast from "react-native-toast-message";
 import { useStateValue } from "@/Context/state/State";
 import { navigateAndSimpleReset } from "@/Navigators/Functions";
-
+import Images from "@/Theme/Images";
+import Colors from "@/Theme/Colors";
+import { ChatState } from "@/Store/chat";
+import SetChatParam from "@/Store/chat/SetChatParams";
 const SingleChatScreen = ({ route, navigation }) => {
+  console.log("route--2-2-2--2-2", route);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mainReceiverUser, setReceiverUser] = useState(null);
@@ -37,13 +48,15 @@ const SingleChatScreen = ({ route, navigation }) => {
   const isFocused = useIsFocused();
 
   const user = useSelector((state: { user: UserState }) => state.user.item);
+  const chat = useSelector((state: { user: UserState }) => state.chat.item);
+
   const params =
     route && route.params && route.params.params
       ? route.params.params
       : route.params;
   const fromChats = params && params.fromChats;
   const receiverUser = params?.receiverUser;
-  console.log("activity------------", activity);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
@@ -57,54 +70,55 @@ const SingleChatScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     // const { receiverUser } = route.params;
-
-    setReceiverUser(route?.params?.receiverUser);
-
     if (isFocused) {
-      firstEnter.current = true;
-      getAllMessages();
-    }
+      setReceiverUser(route?.params?.receiverUser);
 
-    const query = firestore()
-      .collection("MESSAGE")
-      .doc(JSON.stringify(activity?.activityId))
-      .collection("messages")
-      .orderBy("createdAt", "desc")
-      .limit(1);
-
-    const unsubscribe = query.onSnapshot((querySnapshot) => {
-      const newMessages: any[] = [];
-      if (querySnapshot) {
-        querySnapshot.forEach((doc) => {
-          if (doc)
-            newMessages.push({
-              ...doc.data(),
-              createdAt: doc.data()?.createdAt.toDate(),
-            });
-        });
-      }
-
-      // NEEDS TO CALL ONLY IF NOT FIRST ENTER
-
-      if (!firstEnter.current && !isMsgDeleted.current) {
-        setMessages((previousMessages) =>
-          GiftedChat.append(previousMessages, newMessages)
-        );
-      } else if (isMsgDeleted.current) {
-        // This is a fix for flicking
+      if (isFocused) {
+        firstEnter.current = true;
         getAllMessages();
       }
-    });
 
-    return () => unsubscribe();
+      const query = firestore()
+        .collection("MESSAGE")
+        .doc(JSON.stringify(chat?.chatId))
+        .collection(`${chat.subcollection}${"_messages"}`)
+        .orderBy("createdAt", "desc")
+        .limit(1);
+
+      const unsubscribe = query.onSnapshot((querySnapshot) => {
+        const newMessages: any[] = [];
+        if (querySnapshot) {
+          querySnapshot.forEach((doc) => {
+            if (doc)
+              newMessages.push({
+                ...doc.data(),
+                createdAt: doc.data()?.createdAt.toDate(),
+              });
+          });
+        }
+
+        // NEEDS TO CALL ONLY IF NOT FIRST ENTER
+
+        if (!firstEnter.current && !isMsgDeleted.current) {
+          setMessages((previousMessages) =>
+            GiftedChat.append(previousMessages, newMessages)
+          );
+        } else if (isMsgDeleted.current) {
+          // This is a fix for flicking
+          getAllMessages();
+        }
+      });
+
+      return () => unsubscribe();
+    }
   }, [isFocused]);
 
   const getAllMessages = () => {
     setLoading(true);
     firestore()
       .collection("MESSAGE")
-      .doc(JSON.stringify(activity?.activityId))
-      .collection("messages")
+      .doc(JSON.stringify(chat?.chatId))
+      .collection(`${chat.subcollection}${"_messages"}`)
       .orderBy("createdAt", "desc")
       .get()
       .then((res) => {
@@ -125,10 +139,11 @@ const SingleChatScreen = ({ route, navigation }) => {
   };
 
   const updateChat = () => {
+    console.log("logsgsgs", chat?.chatId);
     firestore()
       .collection("MESSAGE")
-      .doc(JSON.stringify(activity?.activityId))
-      .collection("messages")
+      .doc(JSON.stringify(chat?.chatId))
+      .collection(`${chat.subcollection}${"_messages"}`)
       .orderBy("createdAt", "desc")
       .get()
       .then((res) => {
@@ -154,30 +169,25 @@ const SingleChatScreen = ({ route, navigation }) => {
       _id: message._id,
       text: message.text,
       createdAt: firestore.Timestamp.fromDate(new Date()),
-      user: {
-        _id: user?.instructorId,
-        avatar: user.imageurl,
-        name: user.firstname,
-      },
+      user: chat?.user,
     };
-
+    console.log(`----sssss-,${chat?.subcollection}${"_messages"}`);
     return new Promise((resolve, reject) => {
       firestore()
         .collection("MESSAGE")
-        .doc(JSON.stringify(activity?.activityId))
-        .collection("messages")
+        .doc(JSON.stringify(chat?.chatId))
+        .collection(`${chat.subcollection}${"_messages"}`)
         .doc(message?._id)
         .set(newMessage)
         .then((docRef) => {
           // THIS WILL UPDATE RECENT MESSAGE ON THREAD
-
-          firestore()
-            .collection("THREADS")
-            .doc(JSON.stringify(activity?.activityId))
-            .update({
-              recentMessage: newMessage,
-            })
-            .then((res) => resolve(res));
+          // firestore()
+          //   .collection("THREADS")
+          //   .doc(JSON.stringify(chat?.chatId))
+          //   .update({
+          //     recentMessage: newMessage,
+          //   })
+          //   .then((res) => resolve(res));
         })
         .catch((err) => reject(err));
     });
@@ -190,7 +200,7 @@ const SingleChatScreen = ({ route, navigation }) => {
       await sendChatMessage(messages[0]);
       updateChat();
     },
-    [activity?.activityId]
+    [chat?.chatId]
   );
 
   const setModalVisible = () => {
@@ -243,7 +253,9 @@ const SingleChatScreen = ({ route, navigation }) => {
     const collectionRef = firestore()
       .collection(collectionPath)
       .doc(params.chatId);
-    const query = collectionRef.collection("messages").limit(batchSize);
+    const query = collectionRef
+      .collection(`${chat.subcollection}${"_messages"}`)
+      .limit(batchSize);
     return new Promise((resolve, reject) => {
       deleteQueryBatch(query, resolve).catch(reject);
     });
@@ -285,7 +297,7 @@ const SingleChatScreen = ({ route, navigation }) => {
       firestore()
         .collection("MESSAGE")
         .doc(params.chatId)
-        .collection("messages")
+        .collection(`${chat.subcollection}${"_messages"}`)
         .doc(message?._id)
         .delete()
         .then((res) => getAllMessages())
@@ -460,24 +472,37 @@ const SingleChatScreen = ({ route, navigation }) => {
 
   return (
     <>
+      {route?.params?.showHeader && (
+        <AppHeader
+          isBack={true}
+          title={`${route?.params?.title} Chat`}
+          hideCalendar={true}
+        />
+      )}
       <GiftedChat
         renderLoading={renderLoading}
         messages={messages}
         alwaysShowSend={true}
         showAvatarForEveryMessage={true}
         renderInputToolbar={
-          params?.chattersIds.length <= 1
+          params?.chattersIds?.length <= 1
             ? () => renderNoUserMessage()
             : undefined
         }
         onSend={(messages) => onSend(messages)}
         user={{
-          _id: user?.id,
-          name: user?.username,
-          avatar: user?.pictureUrl,
+          ...chat?.user,
         }}
-        renderAvatar={null}
+        renderUsernameOnMessage={true}
+        // renderAccessory={renderAccessory}
+        // renderAvatar={() => (
+        //   <Image
+        //     source={{ uri: user?.imageurl }}
+        //     style={{ height: 40, width: 40, borderRadius: 40 }}
+        //   />
+        // )}
         renderBubble={(props) => {
+          const { currentMessage } = props;
           return (
             <Bubble
               {...props}
@@ -486,32 +511,40 @@ const SingleChatScreen = ({ route, navigation }) => {
                   backgroundColor: "#fff",
                 },
                 right: {
-                  backgroundColor: "#289490",
+                  backgroundColor: Colors.primary,
                 },
+              }}
+              textStyle={{
+                left: { fontWeight: "bold" },
+                right: {},
+              }}
+              timeTextStyle={{
+                left: {},
+                right: {},
               }}
             />
           );
         }}
-        onLongPress={(context, message) => {
-          const options = ["Copy Message", "Delete Message", "Cancel"];
-          const cancelButtonIndex = options.length - 1;
-          context.actionSheet().showActionSheetWithOptions(
-            {
-              options,
-              cancelButtonIndex,
-            },
-            (buttonIndex) => {
-              switch (buttonIndex) {
-                case 0:
-                  Clipboard.setString(message.text);
-                  break;
-                case 1:
-                  deleteSingleMessage(message);
-                  break;
-              }
-            }
-          );
-        }}
+        // onLongPress={(context, message) => {
+        //   const options = ["Copy Message", "Delete Message", "Cancel"];
+        //   const cancelButtonIndex = options?.length - 1;
+        //   context.actionSheet().showActionSheetWithOptions(
+        //     {
+        //       options,
+        //       cancelButtonIndex,
+        //     },
+        //     (buttonIndex) => {
+        //       switch (buttonIndex) {
+        //         case 0:
+        //           Clipboard.setString(message.text);
+        //           break;
+        //         case 1:
+        //           deleteSingleMessage(message);
+        //           break;
+        //       }
+        //     }
+        //   );
+        // }}
       />
 
       <Modal visible={chatModalVisible} style={{ width: "60%" }}>

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
+  Image,
 } from "react-native";
 import { AppHeader } from "@/Components";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +18,7 @@ import {
   EditDependentModal,
   OtherTrackingModal,
 } from "@/Modals";
+import { useIsFocused } from "@react-navigation/native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import SearchBar from "@/Components/SearchBar/SearchBar";
 import Colors from "@/Theme/Colors";
@@ -28,13 +30,14 @@ import { ModalState } from "@/Store/Modal";
 import moment from "moment";
 import { Calendar } from "@/Components";
 import { UserState } from "@/Store/User";
-import { DownloadCsvFile } from "@/Services/Parent";
+import { GetChildTrackHistory } from "@/Services/Parent";
 import FetchOne from "@/Services/User/FetchOne";
 import { parse } from "date-fns";
 
 const StudentLocationScreen = () => {
   const route = useRoute();
   console.log("route.params", route.params);
+  const focused = useIsFocused();
   const { student, parent } = route.params;
   const navigation = useNavigation();
 
@@ -44,6 +47,7 @@ const StudentLocationScreen = () => {
   const [searchParam, setSearchParam] = useState("");
   const [selectedDependent, setSelectedDependent] = useState(null);
   const [trackHistroy, setTrackHistory] = useState([]);
+  const [originaltrackHistroy, setOriginalTrackHistory] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(
     moment(new Date()).month()
   );
@@ -57,7 +61,7 @@ const StudentLocationScreen = () => {
   );
   const filterHistory = (month: any, day: any) => {
     console.log("studet", student);
-    let activities = [...student.trackHistory];
+    let activities = [...originaltrackHistroy];
 
     console.log("month", month);
     console.log("day", day);
@@ -75,13 +79,23 @@ const StudentLocationScreen = () => {
     });
     setTrackHistory(temp);
   };
-
+  const getChildrenHistory = async () => {
+    try {
+      let res = await GetChildTrackHistory(student.studentId);
+      setTrackHistory(res);
+      setOriginalTrackHistory(res);
+    } catch (err) {}
+  };
   useEffect(() => {
     if (selectedDependent) {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
-  }, [selectedDependent]);
 
+    if (focused) {
+      getChildrenHistory();
+    }
+  }, [selectedDependent, focused]);
+  console.log("trackhostro", trackHistroy);
   return (
     <>
       <OtherTrackingModal />
@@ -151,7 +165,7 @@ const StudentLocationScreen = () => {
         size="small"
         onPress={() => {
           Linking.openURL(
-            `https://live-api.trackmykidz.com/user/parent/download-csv?studentId=${student.studentIdd}`
+            `https://live-api.trackmykidz.com/user/parent/download-csv?studentId=${student.studentId}`
           );
         }}
       >
@@ -168,83 +182,112 @@ const StudentLocationScreen = () => {
                 marginVertical: 10,
               }}
             >
-              <View style={{ width: "33.33%" }}>
+              <View style={{ width: "22%" }}>
+                <Text style={{ textAlign: "center" }}>Date</Text>
+              </View>
+              <View style={{ width: "22%" }}>
                 <Text style={{ textAlign: "center" }}>Time</Text>
               </View>
-              <View style={{ width: "33.33%" }}>
+              <View style={{ width: "23%" }}>
                 <Text style={{ textAlign: "center" }}>Latitude</Text>
               </View>
-              <View style={{ width: "33.33%" }}>
+              <View style={{ width: "23%" }}>
                 <Text style={{ textAlign: "center" }}>Longitude</Text>
               </View>
             </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                height: 30,
-              }}
-            >
-              <View
-                style={[
-                  styles.rowItem,
-                  { backgroundColor: "#cccccc", width: "38%" },
-                ]}
-              >
-                <Text>{moment(new Date()).format("hh:mm")}</Text>
-              </View>
-              <View style={[styles.rowItem, { backgroundColor: "#cccccc" }]}>
-                <Text>{student?.latitude}</Text>
-              </View>
-              <View style={[styles.rowItem, { backgroundColor: "#cccccc" }]}>
-                <Text>{student?.longititude}</Text>
-              </View>
-            </View>
 
-            {student &&
-              student?.trackHistory &&
-              student?.trackHistory?.length > 0 &&
-              trackHistroy.map((item, index) => (
+            {trackHistroy.length == 0 && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  height: 30,
+                }}
+              >
                 <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    height: 30,
-                  }}
+                  style={[
+                    styles.rowItem,
+                    { backgroundColor: "#cccccc", width: "22%" },
+                  ]}
                 >
-                  <View
-                    style={[
-                      styles.rowItem,
-                      {
-                        backgroundColor: index / 2 === 1 && "#cccccc",
-                        width: "38%",
-                      },
-                    ]}
-                  >
-                    <Text>{moment(item?.date).format("hh:mm")}</Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.rowItem,
-                      { backgroundColor: index / 2 === 1 && "#cccccc" },
-                    ]}
-                  >
-                    <Text>{item?.latitude}</Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.rowItem,
-                      { backgroundColor: index / 2 === 1 && "#cccccc" },
-                    ]}
-                  >
-                    <Text>{item?.longititude}</Text>
-                  </View>
+                  <Text style={styles.title}>
+                    {moment(new Date()).format("YYYY-MM-DD")}
+                  </Text>
                 </View>
-              ))}
+                <View
+                  style={[
+                    styles.rowItem,
+                    { backgroundColor: "#cccccc", width: "22%" },
+                  ]}
+                >
+                  <Text style={styles.title}>
+                    {moment(new Date()).format("hh:mm")}
+                  </Text>
+                </View>
+                <View style={[styles.rowItem, { backgroundColor: "#cccccc" }]}>
+                  <Text style={styles.title}>{student?.latitude}</Text>
+                </View>
+                <View style={[styles.rowItem, { backgroundColor: "#cccccc" }]}>
+                  <Text style={styles.title}>{student?.longititude}</Text>
+                </View>
+              </View>
+            )}
+            {trackHistroy.map((item, index) => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  height: 30,
+                }}
+              >
+                <View
+                  style={[
+                    styles.rowItem,
+                    {
+                      backgroundColor: index / 2 === 1 && "#cccccc",
+                      width: "22%",
+                    },
+                  ]}
+                >
+                  <Text style={styles.title}>
+                    {moment(item?.date).format("YYYY-MM-DD")}
+                  </Text>
+                </View>
+                <View
+                  style={[
+                    styles.rowItem,
+                    {
+                      backgroundColor: index / 2 === 1 && "#cccccc",
+                      width: "22%",
+                    },
+                  ]}
+                >
+                  <Text style={styles.title}>
+                    {moment(item?.date).format("hh:mm")}
+                  </Text>
+                </View>
+                <View
+                  style={[
+                    styles.rowItem,
+                    { backgroundColor: index / 2 === 1 && "#cccccc" },
+                  ]}
+                >
+                  <Text style={styles.title}>{item?.latitude}</Text>
+                </View>
+                <View
+                  style={[
+                    styles.rowItem,
+                    { backgroundColor: index / 2 === 1 && "#cccccc" },
+                  ]}
+                >
+                  <Text style={styles.title}>{item?.longititude}</Text>
+                </View>
+              </View>
+            ))}
           </View>
         ) : (
           <MapView
@@ -279,11 +322,59 @@ const StudentLocationScreen = () => {
                   longitude: parseFloat(student?.longititude),
                 }}
               >
-                <View style={{ alignItems: "center" }}>
+                <View>
+                  <View
+                    style={{
+                      height: 35,
+                      width: 35,
+                      borderRadius: 80,
+                      overflow: "hidden",
+                      // top: 33,
+                      // zIndex: 10,
+                    }}
+                  >
+                    {student?.studentImage == "" && (
+                      <View
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          borderRadius: 80,
+                          backgroundColor: Colors.primary,
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text style={{ color: Colors.white }}>
+                          {student?.firstname?.substring(0, 1)?.toUpperCase() ||
+                            ""}
+                          {student?.lastname?.substring(0, 1)?.toUpperCase() ||
+                            ""}
+                        </Text>
+                      </View>
+                    )}
+                    {student?.studentImage != "" && (
+                      <Image
+                        source={{
+                          uri: student?.studentImage,
+                        }}
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          borderRadius: 80,
+                          aspectRatio: 1.5,
+                        }}
+                        resizeMode="contain"
+                      />
+                    )}
+                  </View>
+                  {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+                </View>
+
+                {/* <View style={{ alignItems: "center" }}>
                   <Text>{student.firstname}</Text>
 
                   <Fontisto name="map-marker-alt" size={25} color="red" />
-                </View>
+                </View> */}
               </Marker>
             </>
           </MapView>
@@ -336,7 +427,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   rowItem: {
-    width: "31%",
+    width: "23%",
     height: 30,
     alignItems: "center",
     justifyContent: "center",
@@ -344,5 +435,8 @@ const styles = StyleSheet.create({
   buttonMessage: {
     color: Colors.primary,
     fontSize: 17,
+  },
+  title: {
+    fontSize: 15,
   },
 });

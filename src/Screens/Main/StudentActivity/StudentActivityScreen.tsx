@@ -9,7 +9,10 @@ import {
   Alert,
   Platform,
   PermissionsAndroid,
+  AppState,
 } from "react-native";
+import * as Stomp from "stompjs";
+import SockJS from "sockjs-client";
 import MapView, { Marker, Circle } from "react-native-maps";
 import GeolocationAndroid from "react-native-geolocation-service";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,16 +29,19 @@ import ChangeStudentActivityState from "@/Store/StudentActivity/ChangeStudentAct
 import TrackHistory from "@/Services/Parent/TrackHistory";
 import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
 import { Activity, Optin } from "@/Models/DTOs";
+import { loadToken } from "@/Storage/MainAppStorage";
+
 import {
   storeHomeScreenCacheInfo,
   getHomeScreenCacheInfo,
 } from "@/Storage/MainAppStorage";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import { ParticipantLocation } from "@/Services/Activity";
 import { GetUserById } from "@/Services/User";
 import { StudentState } from "@/Store/StudentActivity";
 import firestore from "@react-native-firebase/firestore";
 import BackgroundService from "react-native-background-actions";
-
+import SetChatParam from "@/Store/chat/SetChatParams";
 const StudentActivityScreen = ({ route }) => {
   const navigation = useNavigation();
 
@@ -96,57 +102,52 @@ const StudentActivityScreen = ({ route }) => {
   //     console.log("errr------", err);
   //   }
   // }, []);
+
   const handleTrackHistory = async (
     status: boolean,
     id: any,
     latitude: any,
     longitude: any
   ) => {
-    const _date = moment(new Date()).format("YYYY-MM-DD");
+    const _date = moment(new Date()).format();
 
     const res = await TrackHistory(status, id, _date, latitude, longitude);
-    firestore()
-      .collection("students")
-      .doc(JSON.stringify(currentUser.studentId))
-      .set({
-        email: currentUser.email,
-        parentemail1: currentUser.parentemail1,
-        parentemail2: currentUser.parentemail2,
-        latitude,
-        longitude,
-      })
-      .then(() => {
-        console.log("User added!");
-      })
-      .catch((err) => {
-        console.log("err", err);
-      });
+    sendCoordinates(latitude, longitude);
   };
 
-  const handleTrackHistorySchedule = async () => {
+  const handleTrackHistorySchedule = async (tracking) => {
     // if (currentUser?.childTrackHistory) {
     try {
       if (Platform.OS == "android") {
         GeolocationAndroid.getCurrentPosition(async (pos) => {
           const crd = pos.coords;
           console.log("crd", crd);
-          await handleTrackHistory(
-            true,
-            currentUser?.studentId,
-            crd.latitude,
-            crd.longitude
-          );
+
+          if (tracking) {
+            sendCoordinates(crd.latitude, crd.longitude);
+          } else {
+            await handleTrackHistory(
+              true,
+              currentUser?.studentId,
+              crd.latitude,
+              crd.longitude
+            );
+          }
         });
       } else {
         Geolocation.getCurrentPosition(async (pos) => {
           const crd = pos.coords;
           console.log("crd", crd);
-          await handleTrackHistory(
-            true,
-            currentUser?.studentId,
-            crd.latitude,
-            crd.longitude
-          );
+          if (tracking) {
+            sendCoordinates(crd.latitude, crd.longitude);
+          } else {
+            await handleTrackHistory(
+              true,
+              currentUser?.studentId,
+              crd.latitude,
+              crd.longitude
+            );
+          }
         });
       }
     } catch (err) {
@@ -169,6 +170,7 @@ const StudentActivityScreen = ({ route }) => {
       console.log("err", err);
     }
   };
+
   useEffect(() => {
     if (isFocused) {
       getCacheActivites();
@@ -180,7 +182,7 @@ const StudentActivityScreen = ({ route }) => {
         })
       );
     }
-  }, []);
+  }, [isFocused]);
   useEffect(() => {
     if (isFocused) {
       getActivities();
@@ -188,7 +190,6 @@ const StudentActivityScreen = ({ route }) => {
   }, [isFocused]);
 
   const locationPermission = async () => {
-    console.log("logs----");
     if (Platform.OS === "android") {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
@@ -208,7 +209,7 @@ const StudentActivityScreen = ({ route }) => {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         backgroundCall();
       } else {
-        await handleTrackHistorySchedule();
+        backgroundCall();
       }
     } else {
       backgroundCall();
@@ -216,8 +217,36 @@ const StudentActivityScreen = ({ route }) => {
     }
     // handleTrackHistorySchedule();
   };
+  const locationPermissionForTracking = async (tracking: any) => {
+    if (Platform.OS === "android") {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+        {
+          title: "Background Location Permission",
+          message: "TrackMyKidz App needs access to your location",
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK",
+        }
+      );
+      // const granted = await PermissionsAndroid.request(
+      //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      // );
 
-  const backgroundCall = async () => {
+      console.log("logs----", granted === PermissionsAndroid.RESULTS.GRANTED);
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        backgroundCall(tracking);
+      } else {
+        backgroundCall(tracking);
+      }
+    } else {
+      backgroundCall(tracking);
+      // backgroundCall();
+    }
+    // handleTrackHistorySchedule();
+  };
+
+  const backgroundCall = async (tracking) => {
     const sleep = (time) =>
       new Promise((resolve) => setTimeout(() => resolve(), time));
 
@@ -233,11 +262,11 @@ const StudentActivityScreen = ({ route }) => {
         for (let i = 1; BackgroundService.isRunning(); i++) {
           try {
             // depends on which lib you are using
-            await handleTrackHistorySchedule();
+            await handleTrackHistorySchedule(tracking);
           } catch (error) {
             // console.log(error);
           }
-          await sleep(300000);
+          await sleep(tracking ? 2000 : 900000);
         }
       });
 
@@ -255,7 +284,7 @@ const StudentActivityScreen = ({ route }) => {
       color: "#ff00ff",
       linkingURI: "yourSchemeHere://chat/jane", // See Deep Lking for more info
       parameters: {
-        delay: 300000,
+        delay: tracking ? 2000 : 900000,
       },
     };
     BackgroundService.on("expiration", () => {
@@ -276,24 +305,8 @@ const StudentActivityScreen = ({ route }) => {
     // return () => backgroundCall();
   }, []);
 
-  const getParticipantLocation = async (activityId: any) => {
-    try {
-      let res = await ParticipantLocation(activityId);
-      let deviceIds = [];
-      res.map((item) => {
-        item.deviceId && deviceIds.push(item.deviceId);
-      });
-      setSelectedActivity(activityId);
-      setParticipantsIds(deviceIds);
-      turnOnTracker(activityId, deviceIds, "activity");
-      console.log("res", res);
-      setParticipants(res);
-    } catch (err) {
-      console.log("err", err);
-    }
-  };
   // backgroundCall();
-
+  console.log("trackingList", trackingList);
   const RightActions = (dragX: any, item: Activity) => (
     <View
       style={{
@@ -316,13 +329,46 @@ const StudentActivityScreen = ({ route }) => {
               showParticipantMap: true,
             })
           );
-          getParticipantLocation(item?.activityId);
+          // getParticipantLocation(item?.activityId);
         }}
       >
         <Entypo size={25} color={Colors.primary} name="location-pin" />
         <Text style={styles.textStyle}>View Attendees</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          prevOpenedRow?.close();
 
+          dispatch(
+            SetChatParam.action({
+              title: item?.activityName,
+              chatId: item?.activityId,
+              subcollection: "student",
+              user: {
+                _id: currentUser?.studentId,
+                avatar: currentUser?.imageurl,
+                name: currentUser?.firstname
+                  ? currentUser?.firstname[0].toUpperCase() +
+                    currentUser?.firstname.slice(1) +
+                    "" +
+                    currentUser?.lastname[0]?.toUpperCase()
+                  : currentUser?.firstname + "" + currentUser?.lastname,
+              },
+            })
+          );
+          navigation.navigate("ChatScreen", {
+            title: item?.activityName,
+            showHeader: true,
+          });
+        }}
+        style={{
+          padding: 5,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
+      </TouchableOpacity>
       {!item.status && (
         <TouchableOpacity
           style={{
@@ -356,6 +402,7 @@ const StudentActivityScreen = ({ route }) => {
           deviceIds.push(item.deviceId);
         }
       });
+      connectSockets(deviceIds);
       setOriginalChildren(res);
       setChildrensDeviceIds(deviceIds);
       setOriginalStudentsEmail(temp);
@@ -364,6 +411,43 @@ const StudentActivityScreen = ({ route }) => {
     } catch (err) {
       console.log("err in children", err);
     }
+  };
+  const connectSockets = async (deviceIds: any) => {
+    const token = await loadToken();
+    const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+    stompClient = Stomp.over(socket);
+    stompClient.connect({ token }, () => {
+      console.log("Connected");
+      locationPermissionForTracking(true);
+      deviceIds.map((item) => {
+        stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+      });
+    });
+  };
+  const subscriptionCallback = (subscriptionMessage: any) => {
+    const messageBody = JSON.parse(subscriptionMessage.body);
+    console.log("Update Received", messageBody);
+
+    setTrackingList({
+      ...trackingList,
+      [messageBody.deviceId]: {
+        lat: messageBody.latitude,
+        lang: messageBody.longitude,
+      },
+    });
+  };
+  let stompClient: any = React.createRef<Stomp.Client>();
+  const sendCoordinates = async (lat: any, lang: any) => {
+    const token = await loadToken();
+    stompClient.send(
+      "/socket/ws-location",
+      { token },
+      JSON.stringify({
+        latitude: lat,
+        longitude: lang,
+        deviceId: currentUser?.childDevice,
+      })
+    );
   };
 
   useEffect(() => {
@@ -376,78 +460,6 @@ const StudentActivityScreen = ({ route }) => {
       prevOpenedRow.close();
     }
     prevOpenedRow = row[index];
-  };
-
-  const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
-    try {
-      if (showParticipantMap || showFamilyMap) {
-        let body = {
-          deviceIds: showFamilyMap ? getChildrendeviceIds : deviceIds,
-          trackerName: showFamilyMap ? currentUser?.parentId : id,
-          locationTrackerTrigger: true,
-        };
-        // [
-        //   {
-        //     "deviceId": "string",
-        //     "position": [
-        //       0
-        //     ],
-        //     "receivedTime": "2023-03-31T17:44:11.798Z",
-        //     "sampleTime": "2023-03-31T17:44:11.798Z"
-        //   }
-        // ]
-
-        let res = await AwsLocationTracker(body);
-
-        let temp = {};
-        res.map((item) => {
-          temp = {
-            ...temp,
-            [temp.deviceId]: {
-              lat: item.position[0],
-              lang: item.position[1],
-            },
-          };
-        });
-        setTrackingList(temp);
-      } else {
-        let body2 = {
-          deviceIds: showFamilyMap ? getParticipantsIds : getChildrendeviceIds,
-          trackerName: showFamilyMap ? selectedActivity : currentUser?.parentId,
-          locationTrackerTrigger: false,
-        };
-
-        await AwsLocationTracker(body2);
-      }
-    } catch (err) {
-      console.log("err", err);
-    }
-  };
-
-  useEffect(() => {
-    if (showFamilyMap) {
-      turnOffTracker(currentUser.parentId, getChildrendeviceIds, "parent");
-    } else {
-      turnOffTracker("family");
-    }
-  }, [showFamilyMap]);
-  useEffect(() => {
-    if (showFamilyMap) {
-      turnOffTracker("activity");
-    }
-  }, [showFamilyMap]);
-
-  const turnOffTracker = async (from: any) => {
-    try {
-      let body = {
-        deviceIds: from == "family" ? getChildrendeviceIds : getParticipantsIds,
-        trackerName: from == "family" ? currentUser.parentId : selectedActivity,
-        locationTrackerTrigger: false,
-      };
-      let res = await AwsLocationTracker(body);
-    } catch (err) {
-      console.log("err", err);
-    }
   };
 
   return (
@@ -549,8 +561,8 @@ const StudentActivityScreen = ({ route }) => {
                 <Marker
                   onSelect={() => console.log("pressed")}
                   onPress={() => {
-                    let latitude = trackingList[item.deviceId].lat;
-                    let longititude = trackingList[item.deviceId].lang;
+                    let latitude = trackingList[item.childDevice].lat;
+                    let longititude = trackingList[item.childDevice].lang;
                     ref.current.fitToSuppliedMarkers(
                       [
                         {
@@ -607,7 +619,7 @@ const StudentActivityScreen = ({ route }) => {
           // }}
           onLayout={() => {
             let temp = studentsEmails.filter(
-              (item) => trackingList[item.deviceId].lat != null
+              (item) => trackingList[item.childDevice].lat != null
             );
 
             ref?.current?.fitToCoordinates(temp, {
@@ -622,97 +634,89 @@ const StudentActivityScreen = ({ route }) => {
           }}
           style={{ flex: 1 }}
         >
-          {children
-            .filter(
-              (item) =>
-                trackingList[item.deviceId].lat != "undefined" &&
-                trackingList[item.deviceId].lang != null
-            )
-            .map((item, index) => {
-              console.log("item", item);
-              let latitude = trackingList[item.deviceId].lat;
-              let longititude = trackingList[item.deviceId].lang;
-              // console.log("item", item);
-              return (
-                <>
-                  <Marker
-                    onSelect={() => console.log("pressed")}
-                    onPress={() => {
-                      console.log("ref", ref);
-                      ref.current.fitToSuppliedMarkers(
-                        [
-                          {
-                            latitude: latitude
-                              ? parseFloat(latitude)
-                              : parseFloat(10),
-                            longitude: longititude
-                              ? parseFloat(longititude)
-                              : parseFloat(10),
-                          },
-                        ]
-                        // false, // not animated
-                      );
-                    }}
-                    identifier={item?.email}
-                    key={index}
-                    coordinate={{
-                      latitude: latitude
-                        ? parseFloat(latitude)
-                        : parseFloat(10),
-                      longitude: longititude
-                        ? parseFloat(longititude)
-                        : parseFloat(10),
-                    }}
-                  >
-                    <View style={{}}>
-                      <View
-                        style={{
-                          height: 30,
-                          width: 30,
-                          borderRadius: 80,
-                          overflow: "hidden",
-                          // top: 33,
-                          // zIndex: 10,
-                        }}
-                      >
-                        {item?.studentImage == "" && (
-                          <View
-                            style={{
-                              height: "100%",
-                              width: "100%",
-                              borderRadius: 80,
-                              backgroundColor: Colors.primary,
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Text style={{ color: Colors.white }}>
-                              {item?.firstname
-                                ?.substring(0, 1)
-                                ?.toUpperCase() || ""}
-                              {item?.lastname?.substring(0, 1)?.toUpperCase() ||
-                                ""}
-                            </Text>
-                          </View>
-                        )}
-                        {item?.studentImage != "" && (
-                          <Image
-                            source={{
-                              uri: item?.studentImage,
-                            }}
-                            style={{
-                              height: "100%",
-                              width: "100%",
-                              borderRadius: 80,
-                              aspectRatio: 2,
-                            }}
-                            resizeMode="contain"
-                          />
-                        )}
-                      </View>
-                      {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+          {console.log("children", children)}
+          {children.map((item, index) => {
+            console.log("item", item);
+            let latitude = trackingList[item.childDevice].lat;
+            let longititude = trackingList[item.childDevice].lang;
+            // console.log("item", item);
+            return (
+              <>
+                <Marker
+                  onSelect={() => console.log("pressed")}
+                  onPress={() => {
+                    console.log("ref", ref);
+                    ref.current.fitToSuppliedMarkers(
+                      [
+                        {
+                          latitude: latitude
+                            ? parseFloat(latitude)
+                            : parseFloat(10),
+                          longitude: longititude
+                            ? parseFloat(longititude)
+                            : parseFloat(10),
+                        },
+                      ]
+                      // false, // not animated
+                    );
+                  }}
+                  identifier={item?.email}
+                  key={index}
+                  coordinate={{
+                    latitude: latitude ? parseFloat(latitude) : parseFloat(10),
+                    longitude: longititude
+                      ? parseFloat(longititude)
+                      : parseFloat(10),
+                  }}
+                >
+                  <View style={{}}>
+                    <View
+                      style={{
+                        height: 30,
+                        width: 30,
+                        borderRadius: 80,
+                        overflow: "hidden",
+                        // top: 33,
+                        // zIndex: 10,
+                      }}
+                    >
+                      {item?.studentImage == "" && (
+                        <View
+                          style={{
+                            height: "100%",
+                            width: "100%",
+                            borderRadius: 80,
+                            backgroundColor: Colors.primary,
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Text style={{ color: Colors.white }}>
+                            {item?.firstname?.substring(0, 1)?.toUpperCase() ||
+                              ""}
+                            {item?.lastname?.substring(0, 1)?.toUpperCase() ||
+                              ""}
+                          </Text>
+                        </View>
+                      )}
+                      {item?.studentImage != "" && (
+                        <Image
+                          source={{
+                            uri: item?.studentImage,
+                          }}
+                          style={{
+                            height: "100%",
+                            width: "100%",
+                            borderRadius: 80,
+                            aspectRatio: 2,
+                          }}
+                          resizeMode="contain"
+                        />
+                      )}
                     </View>
-                    {/* <TouchableOpacity
+                    {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+                  </View>
+                  {/* <TouchableOpacity
                     onPress={() => console.log("pressed")}
                     style={{ alignItems: "center" }}
                   >
@@ -726,12 +730,12 @@ const StudentActivityScreen = ({ route }) => {
                       color="red"
                     />
                   </TouchableOpacity> */}
-                  </Marker>
-                </>
-                // </>
-                // </Circle>
-              );
-            })}
+                </Marker>
+              </>
+              // </>
+              // </Circle>
+            );
+          })}
         </MapView>
       )}
     </>

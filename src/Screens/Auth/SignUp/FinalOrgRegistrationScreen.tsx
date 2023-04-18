@@ -146,7 +146,8 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
     (state: { modal: ModalState }) => state.modal.addInstructorModalVisibility
   );
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.addStudentModal
+    (state: { modal: ModalState }) =>
+      state.modal.addButInformationModalVisibility
   );
   const [countriesData, setCountriesData] = React.useState(countries);
   const [schoolsData, setSchoolsData] = React.useState(schools);
@@ -442,7 +443,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
       cropperCircleOverlay: true,
       width: 139,
       height: 130,
-      compressImageQuality: 1,
+      compressImageQuality: 0.2,
       loadingLabelText: "Loading image",
     }).then((image) => {
       if (image != null) {
@@ -459,7 +460,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
       cropperCircleOverlay: true,
       width: 139,
       height: 130,
-      compressImageQuality: 1,
+      compressImageQuality: 0.2,
       loadingLabelText: "Loading image",
     }).then((image) => {
       if (image != null) {
@@ -1091,7 +1092,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                       GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
                         (res) => {
                           setStates(res.data);
-                          setStatesData(states);
+                          setStatesData(res.data);
                         }
                       );
                       selectedCountry.phone_code.toString().startsWith("+")
@@ -1128,6 +1129,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                       GetAllCities(values.selectedCountry, selectedState).then(
                         (res) => {
                           setCities(res.data);
+                          setCitiesData(res.data);
                         }
                       );
                       getSchoolsByFilter(values.selectedCountry, selectedState);

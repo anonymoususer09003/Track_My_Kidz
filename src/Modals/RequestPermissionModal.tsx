@@ -34,6 +34,7 @@ import {
   FindAllStudentsWhichActivity,
   FindAllIstructorActivities,
   SendEmailToPendingStudent,
+  SendEmailToPenidngInstructor,
 } from "@/Services/Activity";
 
 const RequestPermissionModal = ({}) => {
@@ -43,7 +44,7 @@ const RequestPermissionModal = ({}) => {
 
   const dispatch = useDispatch();
   const [pageStudents, pageNumberStudents] = useState(0);
-  const [pageSizeStudents, setPageSizeStudents] = useState(10);
+  const [pageSizeStudents, setPageSizeStudents] = useState(30);
   const [totalRecordsStudents, setTotalRecordsStudents] = useState(true);
   const [pageInstructors, pageNumberInstructors] = useState(true);
   const [pageSizeInstructors, setPageSizeInstructors] = useState(10);
@@ -95,7 +96,7 @@ const RequestPermissionModal = ({}) => {
       instructorData.forEach((i) =>
         __data.push({
           ...i,
-          selected: true,
+          selected: false,
         })
       );
       setInstructors(__data);
@@ -118,47 +119,60 @@ const RequestPermissionModal = ({}) => {
     setInstructors(data);
   };
 
-  const handleSubmit = () => {
-    let ids = [];
-    let filterStudents =
-      students &&
-      students?.map((item: any) => {
-        if (item.selected) {
-          ids.push(item.studentId);
-        }
-      });
-    console.log("isntructors", instructors);
-    let body = {
-      activityId: selectedActivity.activityId,
-      pendingStudents: ids,
-    };
-    SendEmailToPendingStudent(body)
-      .then((res) => {
-        console.log("res", res);
-        dispatch(
-          ChangeModalState.action({ requestPermissionModalVisibility: false })
-        );
-        _dispatch({
-          type: actions.SET_SELECTED_ACTIVITY,
-          payload: null,
+  const handleSubmit = async () => {
+    try {
+      console.log("instructors", instructors);
+      let ids = [];
+      let filterStudents =
+        students &&
+        students?.map((item: any) => {
+          if (item.selected) {
+            ids.push(item.studentId);
+          }
         });
-        setSelectAll(false);
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: "Permission request resent successfully.",
+      console.log("isntructors", instructors);
+      let body = {
+        activityId: selectedActivity.activityId,
+        pendingStudents: ids,
+      };
+      if (ids.length > 0) {
+        let res = await SendEmailToPendingStudent(body);
+      }
+
+      let instructor_ids = [];
+      let filterInstructors =
+        instructors &&
+        instructors?.map((item: any) => {
+          if (item.selected) {
+            instructor_ids.push(item.instructorId);
+          }
         });
-      })
-      .catch((err) => {
-        console.log("err", err);
+
+      let instructorBody = {
+        activityId: selectedActivity.activityId,
+        pendingInstructors: instructor_ids,
+        studentId: 0,
+      };
+      if (instructor_ids.length > 0) {
+        let response = await SendEmailToPenidngInstructor(instructorBody);
+      }
+
+      dispatch(
+        ChangeModalState.action({ requestPermissionModalVisibility: false })
+      );
+      _dispatch({
+        type: actions.SET_SELECTED_ACTIVITY,
+        payload: null,
       });
-    // let filterInstructors =
-    //   instructors &&
-    //   instructors?.map((item: any) => {
-    //     if (item.selected) {
-    //       ids.push(item.studentId);
-    //     }
-    //   });
+      setSelectAll(false);
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Permission request resent successfully.",
+      });
+    } catch (err) {
+      console.log("err", err);
+    }
 
     // console.log("id", ids);
 
@@ -413,15 +427,13 @@ const RequestPermissionModal = ({}) => {
                       </View>
                     )}
                     onEndReached={async () => {
-                      if (totalRecordsStudents) {
-                        console.log("logs");
-
-                        getPendingStudents(true);
-
-                        if (totalRecordsInstructors) {
-                          getPendingInstructors(true);
-                        }
-                      }
+                      // if (totalRecordsStudents) {
+                      //   console.log("logs");
+                      //   getPendingStudents(true);
+                      //   if (totalRecordsInstructors) {
+                      //     getPendingInstructors(true);
+                      //   }
+                      // }
                     }}
                     refreshing={false}
                     onRefresh={() => null}
@@ -462,15 +474,13 @@ const RequestPermissionModal = ({}) => {
                       </View>
                     )}
                     onEndReached={async () => {
-                      if (totalRecordsStudents) {
-                        console.log("logs");
-
-                        getPendingStudents(true);
-
-                        if (totalRecordsInstructors) {
-                          getPendingInstructors(true);
-                        }
-                      }
+                      // if (totalRecordsStudents) {
+                      //   console.log("logs");
+                      //   getPendingStudents(true);
+                      //   if (totalRecordsInstructors) {
+                      //     getPendingInstructors(true);
+                      //   }
+                      // }
                     }}
                     refreshing={false}
                     onRefresh={() => null}
@@ -496,7 +506,8 @@ const RequestPermissionModal = ({}) => {
                     styles.bottomButton,
                     {
                       backgroundColor:
-                        students?.filter((i) => i.selected).length === 0
+                        students?.filter((i) => i.selected).length === 0 &&
+                        instructors?.filter((i) => i.selected).length === 0
                           ? Colors.lightgray
                           : Colors.primary,
                     },
@@ -507,12 +518,18 @@ const RequestPermissionModal = ({}) => {
                       styles.bottomButton,
                       {
                         backgroundColor:
-                          students?.filter((i) => i.selected).length === 0
+                          students?.filter((i) => i.selected == true).length ===
+                            0 &&
+                          instructors?.filter((i) => i.selected == true)
+                            .length === 0
                             ? Colors.lightgray
                             : Colors.primary,
                       },
                     ]}
-                    disabled={students?.filter((i) => i.selected).length === 0}
+                    disabled={
+                      students?.filter((i) => i.selected).length === 0 &&
+                      instructors?.filter((i) => i.selected).length === 0
+                    }
                     onPress={handleSubmit}
                   >
                     <Text style={styles.button}>Resend Permission Request</Text>

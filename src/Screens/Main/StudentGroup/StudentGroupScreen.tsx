@@ -17,6 +17,8 @@ import {
   storeHomeScreenCacheInfo,
   getHomeScreenCacheInfo,
 } from "@/Storage/MainAppStorage";
+import SetChatParam from "@/Store/chat/SetChatParams";
+import Ionicons from "react-native-vector-icons/Ionicons";
 const StudentGroupScreen = ({ route }) => {
   const navigation = useNavigation();
   const dependent = route && route.params && route.params.dependent;
@@ -75,6 +77,38 @@ const StudentGroupScreen = ({ route }) => {
           justifyContent: "center",
         }}
       >
+        <TouchableOpacity
+          onPress={() => {
+            dispatch(
+              SetChatParam.action({
+                title: item?.groupName,
+                chatId: item?.groupId,
+                subcollection: "student",
+                user: {
+                  _id: currentUser?.studentId,
+                  avatar: currentUser?.imageurl,
+                  name: currentUser?.firstname
+                    ? currentUser?.firstname[0].toUpperCase() +
+                      currentUser?.firstname.slice(1) +
+                      "" +
+                      currentUser?.lastname[0]
+                    : currentUser?.firstname + "" + currentUser?.lastname,
+                },
+              })
+            );
+            navigation.navigate("ChatScreen", {
+              title: item?.groupName,
+              showHeader: true,
+            });
+          }}
+          style={{
+            padding: 5,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
+        </TouchableOpacity>
         {!item.status && (
           <TouchableOpacity
             style={{

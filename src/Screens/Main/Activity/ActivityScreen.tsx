@@ -16,7 +16,8 @@ import { Activity } from "@/Models/DTOs";
 import { useStateValue } from "@/Context/state/State";
 import { AwsLocationTracker } from "@/Services/TrackController";
 import moment from "moment";
-
+import Ionicons from "react-native-vector-icons/Ionicons";
+import SetChatParam from "@/Store/chat/SetChatParams";
 const ActivityScreen = ({ route }) => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
@@ -50,6 +51,38 @@ const ActivityScreen = ({ route }) => {
           justifyContent: "center",
         }}
       >
+        <TouchableOpacity
+          onPress={() => {
+            dispatch(
+              SetChatParam.action({
+                title: item?.activityName,
+                chatId: item?.activityId,
+                subcollection: "student",
+                user: {
+                  _id: currentUser?.studentId,
+                  avatar: currentUser?.imageurl,
+                  name: currentUser?.firstname
+                    ? currentUser?.firstname[0].toUpperCase() +
+                      currentUser?.firstname.slice(1) +
+                      " " +
+                      currentUser?.lastname[0].toUpperCase()
+                    : currentUser?.firstname + "" + currentUser?.lastname,
+                },
+              })
+            );
+            navigation.navigate("ChatScreen", {
+              title: item?.activityName,
+              showHeader: true,
+            });
+          }}
+          style={{
+            padding: 5,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
+        </TouchableOpacity>
         {!item.status && (
           <TouchableOpacity
             style={{
@@ -88,7 +121,9 @@ const ActivityScreen = ({ route }) => {
       });
 
       setParticipantsIds(deviceIds);
-      turnOnTracker(activityId, deviceIds, "activity");
+      if (deviceIds.length > 0) {
+        turnOnTracker(activityId, deviceIds, "activity");
+      }
       console.log("res", res);
       setParticipants(res);
     } catch (err) {
@@ -151,7 +186,8 @@ const ActivityScreen = ({ route }) => {
         getActivities();
       }
     } else {
-      turnOffTracker(currentUser.parentId, getChildrendeviceIds, "parent");
+      getChildrendeviceIds.length > 0 &&
+        turnOffTracker(currentUser.parentId, getChildrendeviceIds, "parent");
     }
   }, [child, isFocused]);
 

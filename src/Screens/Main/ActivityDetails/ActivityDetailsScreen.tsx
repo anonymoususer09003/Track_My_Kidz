@@ -12,6 +12,9 @@ import {
   TouchableOpacity,
   Switch,
 } from "react-native";
+import { loadToken } from "@/Storage/MainAppStorage";
+import * as Stomp from "stompjs";
+import SockJS from "sockjs-client";
 import { AppHeader } from "@/Components";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import messaging from "@react-native-firebase/messaging";
@@ -56,57 +59,39 @@ const ActivityDetailsScreen = () => {
       });
 
       setParticipantsIds(deviceIds);
-      turnOnTracker(activity?.activityId, deviceIds, "activity");
+      deviceIds.length > 0 &&
+        turnOnTracker(activity?.activityId, deviceIds, "activity");
       console.log("res", res);
       setParticipants(res);
     } catch (err) {
       console.log("err", err);
     }
   };
+  let stompClient: any = React.createRef<Stomp.Client>();
   const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
     try {
-      let body = {
-        deviceIds: deviceIds,
-        trackerName: id,
-        locationTrackerTrigger: true,
-      };
+      const token = await loadToken();
 
-      let res = await AwsLocationTracker(body);
-
-      let temp = {};
-      res.map((item) => {
-        temp = {
-          ...temp,
-          [temp.deviceId]: {
-            lat: item.position[0],
-            lang: item.position[1],
-          },
-        };
+      const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+      stompClient = Stomp.over(socket);
+      stompClient.connect({ token }, () => {
+        console.log("Connected");
+        deviceIds.map((item) => {
+          stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+        });
       });
-      setTrackingList(temp);
     } catch (err) {
-      console.log("err", err);
+      console.log("Error:", err);
     }
   };
-
-  const turnOffTracker = async (id: any, deviceIds: any, from: any) => {
-    try {
-      let body = {
-        deviceIds: getParticipantsIds,
-        trackerName: selectedActivity?.activityId,
-        locationTrackerTrigger: false,
-      };
-
-      let res = await AwsLocationTracker(body);
-    } catch (err) {
-      console.log("err", err);
-    }
+  const subscriptionCallback = (subscriptionMessage: any) => {
+    const messageBody = JSON.parse(subscriptionMessage.body);
+    console.log("Update Received", messageBody);
   };
+
   useEffect(() => {
     if (isFocused) {
       getParticipantLocation();
-    } else {
-      turnOffTracker(currentUser.parentId, getChildrendeviceIds, "parent");
     }
     if (selectedDependent) {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));

@@ -5,3 +5,4 @@ export { default as GetAllStudents } from "./GetAllStudents";
 export { default as GetParent } from "./GetParent";
 export { default as UpdateParent } from "./UpdateParent";
 export { default as DownloadCsvFile } from "./DownloadCsvTrackFile";
+export { default as GetChildTrackHistory } from "./GetChildTrackHistory";

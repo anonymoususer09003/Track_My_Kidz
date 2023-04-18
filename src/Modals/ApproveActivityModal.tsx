@@ -204,7 +204,7 @@ const ApproveActivityModal = ({
                     fontSize: 18,
                   }}
                 >
-                  You have opted to approve
+                  You have opted to approved
                 </Text>
               </View>
             </View>

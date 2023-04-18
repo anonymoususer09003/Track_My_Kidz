@@ -18,3 +18,4 @@ export { default as GetOptIn } from "./GetOptIn";
 export { default as DeleteActivityParticipants } from "./DeleteActivityParticipants";
 export { default as GetActivitesCount } from "./GetActivitesCount";
 export { default as ParticipantLocation } from "./ParticipantLocation";
+export { default as SendEmailToPenidngInstructor } from "./SendEmailToPenidngInstructor";

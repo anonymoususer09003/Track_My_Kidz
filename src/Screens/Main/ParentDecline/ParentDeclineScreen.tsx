@@ -267,7 +267,7 @@ const ParentDeclineScreen = ({ route }) => {
                     )}`}</Text>
                     <Text
                       style={styles.text}
-                    >{` ${item?.firstName} ${item?.lastName}`}</Text>
+                    >{` Name: ${item?.firstName} ${item?.lastName}`}</Text>
                     <Text style={styles.text}>{`Status: ${item?.status}`}</Text>
                     <Text
                       style={styles.text}

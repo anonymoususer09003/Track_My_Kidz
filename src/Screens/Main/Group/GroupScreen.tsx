@@ -21,6 +21,10 @@ import {
   GetAllGroup,
   GetGroupByStudentId,
 } from "@/Services/Group";
+import { UserState } from "@/Store/User";
+import SetChatParam from "@/Store/chat/SetChatParams";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { current } from "@reduxjs/toolkit";
 const children = [
   {
     id: 1,
@@ -46,6 +50,9 @@ const GroupScreen = ({ route }) => {
   const swipeableRef = useRef(null);
   const dispatch = useDispatch();
   const [{ selectedDependentActivity, child }] = useStateValue();
+  const currentUser = useSelector(
+    (state: { user: UserState }) => state.user.item
+  );
   const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
   const [loading, setLoading] = useState(true);
   const [thumbnail, setThumbnail] = useState(false);
@@ -86,6 +93,38 @@ const GroupScreen = ({ route }) => {
           justifyContent: "center",
         }}
       >
+        <TouchableOpacity
+          onPress={() => {
+            dispatch(
+              SetChatParam.action({
+                title: item?.groupName,
+                chatId: item?.groupId,
+                subcollection: "student",
+                user: {
+                  _id: currentUser?.studentId,
+                  avatar: currentUser?.imageurl,
+                  name: currentUser?.firstname
+                    ? currentUser?.firstname[0].toUpperCase() +
+                      currentUser?.firstname.slice(1) +
+                      " " +
+                      currentUser?.lastname[0].toUpperCase()
+                    : currentUser?.firstname + "" + currentUser?.lastname,
+                },
+              })
+            );
+            navigation.navigate("ChatScreen", {
+              title: item?.groupName,
+              showHeader: true,
+            });
+          }}
+          style={{
+            padding: 5,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
+        </TouchableOpacity>
         {!item.status && (
           <TouchableOpacity
             onPress={() => setSelectedDependent(item)}

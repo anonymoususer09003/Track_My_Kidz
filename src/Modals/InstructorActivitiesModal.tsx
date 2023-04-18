@@ -33,6 +33,8 @@ import Feather from "react-native-vector-icons/Feather";
 import { useStateValue } from "@/Context/state/State";
 import { useNavigation } from "@react-navigation/native";
 import { DeleteActivity } from "@/Services/Activity";
+import SetChatParam from "@/Store/chat/SetChatParams";
+
 const InstructorActivityModal = ({
   selectedInstructions,
   setSelectedInstructions,
@@ -264,8 +266,26 @@ const InstructorActivityModal = ({
                 type: actions.SET_SELECTED_ACTIVITY,
                 payload: item,
               });
+
+              dispatch(
+                SetChatParam.action({
+                  title: item?.activityName,
+                  chatId: item?.activityId,
+                  subcollection: "parent",
+                  user: {
+                    _id: user?.instructorId,
+                    avatar: user?.imageurl,
+                    name: user?.firstname
+                      ? user?.firstname[0].toUpperCase() +
+                        user?.firstname.slice(1) +
+                        " " +
+                        user?.lastname[0]?.toUpperCase()
+                      : user?.firstname + "" + user?.lastname,
+                  },
+                })
+              );
               navigation.navigate("InstructorChatNavigator", {
-                isEdit: false,
+                title: item?.activityName,
               });
             }}
           >

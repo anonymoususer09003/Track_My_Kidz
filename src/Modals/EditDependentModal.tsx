@@ -117,7 +117,7 @@ const EditDependentModal = ({
       cropperCircleOverlay: true,
       width: 139,
       height: 130,
-      compressImageQuality: 1,
+      compressImageQuality: 0.2,
       loadingLabelText: "Loading image",
     }).then((image) => {
       if (image != null) {
@@ -134,7 +134,7 @@ const EditDependentModal = ({
       cropperCircleOverlay: true,
       width: 139,
       height: 130,
-      compressImageQuality: 1,
+      compressImageQuality: 0.2,
       loadingLabelText: "Loading image",
     }).then((image) => {
       if (image != null) {
@@ -272,12 +272,7 @@ const EditDependentModal = ({
                       style={styles.profileImage}
                       // resizeMode='center'
                       source={{
-                        uri:
-                          selectedImage ||
-                          selectedDependent?.studentImage +
-                            "?time" +
-                            new Date().getTime(),
-                        headers: { Pragma: "no-cache" },
+                        uri: selectedImage || selectedDependent?.studentImage,
                       }}
                       // source={{ uri: selectedImage }}
                       editButton={false ? () => renderEditAvatarButton() : null}

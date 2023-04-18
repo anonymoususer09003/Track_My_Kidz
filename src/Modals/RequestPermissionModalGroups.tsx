@@ -25,6 +25,8 @@ import {
   CreateGroup,
   NotifyToInstructors,
   NotifyToParent,
+  SendEmailToPendingInstructor,
+  SendEmailToPendingStudents,
 } from "@/Services/Group";
 import Toast from "react-native-toast-message";
 import { useStateValue } from "@/Context/state/State";
@@ -32,7 +34,6 @@ import { actions } from "@/Context/state/Reducer";
 import {
   FindAllStudentsWhichActivity,
   FindAllIstructorActivities,
-  SendEmailToPendingStudent,
 } from "@/Services/Activity";
 import {
   GetPendingApprovedInstructors,
@@ -114,85 +115,149 @@ const RequestPermissionModal = ({ activity }) => {
     setInstructors(data);
   };
 
-  const handleSubmit = () => {
-    const _students = students?.map((item) => ({
-      firstName: item?.firstname,
-      lastName: item?.lastname,
-      email: item?.email,
-    }));
-    NotifyToParent(activity?.groupId, _students)
-      .then((res) => {
-        const _instructors = instructors.map((item) => ({
-          firstName: item?.firstname,
-          lastName: item?.lastname,
-          email: item?.email,
-        }));
-        NotifyToInstructors(activity?.groupId, _instructors)
-          .then((res) => {
-            console.log(res);
-            dispatch(
-              ChangeModalState.action({
-                requestPermissionModalGroupVisibility: false,
-              })
-            );
-            _dispatch({
-              type: actions.SET_SELECTED_ACTIVITY,
-              payload: null,
-            });
-            setSelectAll(false);
-            Toast.show({
-              type: "success",
-              text1: "Success",
-              text2: "Permission request resent successfully.",
-            });
-          })
-          .catch((err) => console.log("NotifyToInstructors", err));
+  // const handleSubmit = () => {
+  //   const _students = students?.map((item) => ({
+  //     firstName: item?.firstname,
+  //     lastName: item?.lastname,
+  //     email: item?.email,
+  //   }));
+  //   NotifyToParent(activity?.groupId, _students)
+  //     .then((res) => {
+  //       const _instructors = instructors.map((item) => ({
+  //         firstName: item?.firstname,
+  //         lastName: item?.lastname,
+  //         email: item?.email,
+  //       }));
+  //       NotifyToInstructors(activity?.groupId, _instructors)
+  //         .then((res) => {
+  //           console.log(res);
+  //           dispatch(
+  //             ChangeModalState.action({
+  //               requestPermissionModalGroupVisibility: false,
+  //             })
+  //           );
+  //           _dispatch({
+  //             type: actions.SET_SELECTED_ACTIVITY,
+  //             payload: null,
+  //           });
+  //           setSelectAll(false);
+  //           Toast.show({
+  //             type: "success",
+  //             text1: "Success",
+  //             text2: "Permission request resent successfully.",
+  //           });
+  //         })
+  //         .catch((err) => console.log("NotifyToInstructors", err));
 
-        console.log("parent", res);
-      })
-      .catch((err) => console.log("NotifyToInstructors", err));
+  //       console.log("parent", res);
+  //     })
+  //     .catch((err) => console.log("NotifyToInstructors", err));
 
-    // SendEmailToPendingStudent(body)
-    //   .then((res) => {
-    //     console.log("res", res);
-    //     dispatch(
-    //       ChangeModalState.action({
-    //         requestPermissionModalGroupVisibility: false,
-    //       })
-    //     );
-    //     _dispatch({
-    //       type: actions.SET_SELECTED_ACTIVITY,
-    //       payload: null,
-    //     });
-    //     setSelectAll(false);
-    //     Toast.show({
-    //       type: "success",
-    //       text1: "Success",
-    //       text2: "Permission request resent successfully.",
-    //     });
-    //   })
-    //   .catch((err) => {
-    //     console.log("err", err);
-    //   });
-    // let filterInstructors =
-    //   instructors &&
-    //   instructors?.map((item: any) => {
-    //     if (item.selected) {
-    //       ids.push(item.studentId);
-    //     }
-    //   });
+  //   // SendEmailToPendingStudent(body)
+  //   //   .then((res) => {
+  //   //     console.log("res", res);
+  //   //     dispatch(
+  //   //       ChangeModalState.action({
+  //   //         requestPermissionModalGroupVisibility: false,
+  //   //       })
+  //   //     );
+  //   //     _dispatch({
+  //   //       type: actions.SET_SELECTED_ACTIVITY,
+  //   //       payload: null,
+  //   //     });
+  //   //     setSelectAll(false);
+  //   //     Toast.show({
+  //   //       type: "success",
+  //   //       text1: "Success",
+  //   //       text2: "Permission request resent successfully.",
+  //   //     });
+  //   //   })
+  //   //   .catch((err) => {
+  //   //     console.log("err", err);
+  //   //   });
+  //   // let filterInstructors =
+  //   //   instructors &&
+  //   //   instructors?.map((item: any) => {
+  //   //     if (item.selected) {
+  //   //       ids.push(item.studentId);
+  //   //     }
+  //   //   });
+
+  //   // console.log("id", ids);
+
+  //   // dispatch(
+  //   //   ChangeModalState.action({ requestPermissionModalGroupVisibility: false })
+  //   // );
+  //   // _dispatch({
+  //   //   type: actions.SET_SELECTED_ACTIVITY,
+  //   //   payload: null,
+  //   // });
+  // };
+  const handleSubmit = async () => {
+    try {
+      console.log("instructors", instructors);
+      let ids = [];
+      let filterStudents =
+        students &&
+        students?.map((item: any) => {
+          if (item.selected) {
+            ids.push(item.studentId);
+          }
+        });
+      console.log("isntructors", instructors);
+      let body = {
+        groupId: activity.groupId,
+        pendingStudents: ids,
+      };
+      if (ids.length > 0) {
+        let res = await SendEmailToPendingStudents(body);
+      }
+
+      let instructor_ids = [];
+      let filterInstructors =
+        instructors &&
+        instructors?.map((item: any) => {
+          if (item.selected) {
+            instructor_ids.push(item.instructorId);
+          }
+        });
+
+      let instructorBody = {
+        groupId: activity.groupId,
+        pendingInstructors: instructor_ids,
+        studentId: 0,
+      };
+      if (instructor_ids.length > 0) {
+        let response = await SendEmailToPendingInstructor(instructorBody);
+      }
+
+      dispatch(
+        ChangeModalState.action({ requestPermissionModalVisibility: false })
+      );
+      _dispatch({
+        type: actions.SET_SELECTED_ACTIVITY,
+        payload: null,
+      });
+      setSelectAll(false);
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Permission request resent successfully.",
+      });
+    } catch (err) {
+      console.log("err", err);
+    }
 
     // console.log("id", ids);
 
     // dispatch(
-    //   ChangeModalState.action({ requestPermissionModalGroupVisibility: false })
+    //   ChangeModalState.action({ requestPermissionModalVisibility: false })
     // );
     // _dispatch({
     //   type: actions.SET_SELECTED_ACTIVITY,
     //   payload: null,
     // });
   };
-
   const RightDrawerAction = () => (
     <TopNavigationAction
       icon={(props: any) => (

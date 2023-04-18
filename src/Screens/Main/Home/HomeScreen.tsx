@@ -11,8 +11,11 @@ import {
   Alert,
   Dimensions,
 } from "react-native";
+import * as Stomp from "stompjs";
+import SockJS from "sockjs-client";
 import firestore from "@react-native-firebase/firestore";
 import Fontisto from "react-native-vector-icons/Fontisto";
+import { loadToken } from "@/Storage/MainAppStorage";
 // import { LinearGradientButton } from "@/Components/LinearGradientButton/LinearGradientButton";
 import { AppHeader } from "@/Components";
 import TrackHistory from "@/Services/Parent/TrackHistory";
@@ -114,6 +117,8 @@ const HomeScreen = () => {
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
+  const socketRef = useRef();
+
   // console.log("currentUser", currentUser);
   const [isSubscribed, setIsSubscribed] = useState<boolean>();
 
@@ -131,59 +136,13 @@ const HomeScreen = () => {
   };
   const getParentInfo = async () => {
     const userId = await loadUserId();
-    console.log("respo9090090909", userId);
+
     GetParent(userId)
       .then((res) => {
         setparentLatLong(res.data);
-        console.log("respo9090090909", res.data);
       })
       .catch((err) => console.log("error", err));
   };
-
-  useEffect(() => {
-    let loop = ["KXx7HLpckEuYMiIPmX0T", "54V52gB9Bft15OUQ3A5G", "2313"];
-
-    let temp = [];
-    let promise = [];
-    loop.map(async (item) =>
-      promise.push(
-        await firestore()
-          .collection("students")
-          .doc(typeof item != "string" ? JSON.stringify(item) : item)
-          .onSnapshot((documentSnapshot) => {
-            temp.push(documentSnapshot.data());
-            console.log("User data: ", documentSnapshot.data());
-          })
-      )
-    );
-    // Promise.all(promise).then((res) => {
-    //   console.log("log100101011", res);
-    // });
-    // console.log("temp", temp);
-    // Stop listening for updates when no longer required
-    // return () => subscriber();
-
-    // try {
-    //   const colRef = firestore().collection("students");
-    //   //real time update
-    //   let temp = [];
-    //   const unsubscribe = colRef
-    //     .doc("54V52gB9Bft15OUQ3A5G")
-    //     .where("parentemail1", "==", currentUser.email)
-    //     .onSnapshot(async (snapshot) => {
-    //       snapshot.docs.forEach((doc) => {
-    //         temp.push(doc.data());
-    //         // setTestData((prev) => [...prev, doc.data()])
-    //         // console.log("onsnapshot", doc.data());
-    //       });
-    //     });
-    //   console.log("temp firestore", temp);
-    // } catch (err) {
-    //   console.log("err", err);
-    // }
-    //remember to unsubscribe from your realtime listener on unmount or you will create a memory leak
-    // return () => unsubscribe();
-  }, []);
 
   useEffect(() => {
     getParentInfo();
@@ -194,7 +153,6 @@ const HomeScreen = () => {
     (state: { modal: ModalState }) => state.modal.showCalendar
   );
   const closeRow = (index) => {
-    console.log(index);
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
     }
@@ -212,12 +170,14 @@ const HomeScreen = () => {
 
           longitude: item?.longititude ? parseFloat(item?.longititude) : null,
         });
-        if (item?.deviceId) {
-          deviceIds.push(item.deviceId);
+        if (item?.childDevice) {
+          deviceIds.push(item.childDevice);
         }
       });
       setChildrensDeviceIds(deviceIds);
+
       turnOnTracker(currentUser?.id, deviceIds, "activity");
+
       setOriginalChildren(res);
 
       setOriginalStudentsEmail(temp);
@@ -241,7 +201,6 @@ const HomeScreen = () => {
     } else {
       setSelectedChild("All");
       setShowChildFilter(false);
-      turnOffTracker(null);
     }
     return () => {
       setSelectedChild("All");
@@ -254,43 +213,33 @@ const HomeScreen = () => {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
   }, [selectedDependent]);
-
+  let stompClient: any = React.createRef<Stomp.Client>();
   const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
     try {
-      let body = {
-        deviceIds: deviceIds,
-        trackerName: id,
-        locationTrackerTrigger: true,
-      };
+      const token = await loadToken();
 
-      let res = await AwsLocationTracker(body);
-
-      let temp = {};
-      res.map((item) => {
-        temp = {
-          ...temp,
-          [temp.deviceId]: {
-            lat: item.position[0],
-            lang: item.position[1],
-          },
-        };
+      const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+      stompClient = Stomp.over(socket);
+      stompClient.connect({ token }, () => {
+        console.log("Connected");
+        deviceIds.map((item) => {
+          stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+        });
       });
-      setTrackingList(temp);
     } catch (err) {
-      console.log("err", err);
+      console.log("Error:", err);
     }
   };
-  const turnOffTracker = async (from: any) => {
-    try {
-      let body = {
-        deviceIds: getChildrendeviceIds,
-        trackerName: currentUser.id,
-        locationTrackerTrigger: false,
-      };
-      let res = await AwsLocationTracker(body);
-    } catch (err) {
-      console.log("err", err);
-    }
+  const subscriptionCallback = (subscriptionMessage: any) => {
+    const messageBody = JSON.parse(subscriptionMessage.body);
+    console.log("Update Received", messageBody);
+    setTrackingList({
+      ...trackingList,
+      [messageBody.deviceId]: {
+        lat: messageBody.latitude,
+        lang: messageBody.longitude,
+      },
+    });
   };
   // const RightActions = (dragX: any, item) => {
   //   const scale = dragX.interpolate({
@@ -497,7 +446,7 @@ const HomeScreen = () => {
       <AppHeader
         title="Home"
         thumbnail={thumbnail}
-        setThumbnail={() => setThumbnail(!thumbnail)}
+        setThumbnail={(value) => setThumbnail(value)}
         hideCalendar={thumbnail ? false : true}
       />
       {isCalendarVisible && (
@@ -540,7 +489,6 @@ const HomeScreen = () => {
             value={selectedChild}
             placeholder="Select Child"
             onSelect={(index: any) => {
-              console.log("index", index.row);
               let children = [...originalChildren];
 
               const child =
@@ -549,7 +497,7 @@ const HomeScreen = () => {
                   : children[index.row - 1]?.firstname +
                     " " +
                     children[index.row - 1]?.lastname;
-              console.log("children", originalStudentsEmails);
+
               if (index.row == 0) {
                 setChildren([...originalChildren]);
                 setOriginalStudentsEmail([...originalStudentsEmails]);
@@ -748,17 +696,17 @@ const HomeScreen = () => {
               }}
               style={{ flex: 1 }}
             >
+              {console.log("children", children)}
               {children
                 .filter(
                   (item) =>
-                    trackingList[item.deviceId]?.lat != "undefined" &&
-                    trackingList[item.deviceId]?.lat != null
+                    trackingList[item.childDevice]?.lat != "undefined" &&
+                    trackingList[item.childDevice]?.lat != null
                 )
                 .map((item, index) => {
-                  console.log("item", item);
-                  let latitude = trackingList[item.deviceId]?.lat;
-                  let longititude = trackingList[item.deviceId]?.lang;
-                  // console.log("item", item);
+                  let latitude = trackingList[item.childDevice]?.lat;
+                  let longititude = trackingList[item.childDevice]?.lang;
+
                   return (
                     <>
                       {item?.childTrackHistory && (
@@ -788,7 +736,6 @@ const HomeScreen = () => {
                       <Marker
                         onSelect={() => console.log("pressed")}
                         onPress={() => {
-                          console.log("ref", ref);
                           ref.current.fitToSuppliedMarkers(
                             [
                               {
@@ -855,7 +802,7 @@ const HomeScreen = () => {
                                   height: "100%",
                                   width: "100%",
                                   borderRadius: 80,
-                                  aspectRatio: 2,
+                                  aspectRatio: 1.5,
                                 }}
                                 resizeMode="contain"
                               />
