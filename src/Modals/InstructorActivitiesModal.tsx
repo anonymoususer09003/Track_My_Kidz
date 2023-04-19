@@ -270,7 +270,7 @@ const InstructorActivityModal = ({
               dispatch(
                 SetChatParam.action({
                   title: item?.activityName,
-                  chatId: item?.activityId,
+                  chatId: `activity_${item?.activityId}`,
                   subcollection: "parent",
                   user: {
                     _id: user?.instructorId,

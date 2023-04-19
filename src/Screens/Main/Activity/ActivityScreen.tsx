@@ -56,7 +56,7 @@ const ActivityScreen = ({ route }) => {
             dispatch(
               SetChatParam.action({
                 title: item?.activityName,
-                chatId: item?.activityId,
+                chatId: `activity_${item?.activityId}`,
                 subcollection: "student",
                 user: {
                   _id: currentUser?.studentId,

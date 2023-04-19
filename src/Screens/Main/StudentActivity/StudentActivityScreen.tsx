@@ -10,6 +10,7 @@ import {
   Platform,
   PermissionsAndroid,
   AppState,
+  Image,
 } from "react-native";
 import * as Stomp from "stompjs";
 import SockJS from "sockjs-client";
@@ -162,10 +163,10 @@ const StudentActivityScreen = ({ route }) => {
       setActivities(JSON.parse(activites));
     }
   };
+
   const fetchParent = async () => {
     try {
-      let res = await GetUserById(currentUser?.parentId);
-      getChildrens(res?.parent?.referenceCode);
+      getChildrens(currentUser?.parentReferenceCode1);
     } catch (err) {
       console.log("err", err);
     }
@@ -342,7 +343,7 @@ const StudentActivityScreen = ({ route }) => {
           dispatch(
             SetChatParam.action({
               title: item?.activityName,
-              chatId: item?.activityId,
+              chatId: `activity_${item?.activityId}`,
               subcollection: "student",
               user: {
                 _id: currentUser?.studentId,
@@ -561,8 +562,8 @@ const StudentActivityScreen = ({ route }) => {
                 <Marker
                   onSelect={() => console.log("pressed")}
                   onPress={() => {
-                    let latitude = trackingList[item.childDevice].lat;
-                    let longititude = trackingList[item.childDevice].lang;
+                    let latitude = trackingList[item.childDevice]?.lat;
+                    let longititude = trackingList[item.childDevice]?.lang;
                     ref.current.fitToSuppliedMarkers(
                       [
                         {
@@ -619,7 +620,7 @@ const StudentActivityScreen = ({ route }) => {
           // }}
           onLayout={() => {
             let temp = studentsEmails.filter(
-              (item) => trackingList[item.childDevice].lat != null
+              (item) => trackingList[item.childDevice]?.lat != null
             );
 
             ref?.current?.fitToCoordinates(temp, {
@@ -634,11 +635,9 @@ const StudentActivityScreen = ({ route }) => {
           }}
           style={{ flex: 1 }}
         >
-          {console.log("children", children)}
           {children.map((item, index) => {
-            console.log("item", item);
-            let latitude = trackingList[item.childDevice].lat;
-            let longititude = trackingList[item.childDevice].lang;
+            let latitude = trackingList[item.childDevice]?.lat;
+            let longititude = trackingList[item.childDevice]?.lang;
             // console.log("item", item);
             return (
               <>

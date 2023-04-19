@@ -82,7 +82,7 @@ const StudentGroupScreen = ({ route }) => {
             dispatch(
               SetChatParam.action({
                 title: item?.groupName,
-                chatId: item?.groupId,
+                chatId: `activity_${item?.groupId}`,
                 subcollection: "student",
                 user: {
                   _id: currentUser?.studentId,

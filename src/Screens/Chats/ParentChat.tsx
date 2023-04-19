@@ -33,6 +33,7 @@ import Images from "@/Theme/Images";
 import Colors from "@/Theme/Colors";
 import { ChatState } from "@/Store/chat";
 import SetChatParam from "@/Store/chat/SetChatParams";
+import moment from "moment";
 const SingleChatScreen = ({ route, navigation }) => {
   console.log("route--2-2-2--2-2", route);
   const [messages, setMessages] = useState([]);
@@ -80,7 +81,7 @@ const SingleChatScreen = ({ route, navigation }) => {
 
       const query = firestore()
         .collection("MESSAGE")
-        .doc(JSON.stringify(chat?.chatId))
+        .doc(chat?.chatId)
         .collection(`${chat.subcollection}${"_messages"}`)
         .orderBy("createdAt", "desc")
         .limit(1);
@@ -92,8 +93,9 @@ const SingleChatScreen = ({ route, navigation }) => {
             if (doc)
               newMessages.push({
                 ...doc.data(),
-                createdAt: doc.data()?.createdAt.toDate(),
+                createdAt: new Date(doc.data()?.createdAt),
               });
+            newMessages.sort((a, b) => b.createdAt - a.createdAt);
           });
         }
 
@@ -112,14 +114,14 @@ const SingleChatScreen = ({ route, navigation }) => {
       return () => unsubscribe();
     }
   }, [isFocused]);
-
+  console.log("000000000", chat?.chatId);
   const getAllMessages = () => {
     setLoading(true);
     firestore()
       .collection("MESSAGE")
-      .doc(JSON.stringify(chat?.chatId))
+      .doc(chat?.chatId)
       .collection(`${chat.subcollection}${"_messages"}`)
-      .orderBy("createdAt", "desc")
+
       .get()
       .then((res) => {
         const newMessages: any[] = [];
@@ -127,9 +129,10 @@ const SingleChatScreen = ({ route, navigation }) => {
         res.forEach((msg) => {
           newMessages.push({
             ...msg.data(),
-            createdAt: msg.data()?.createdAt.toDate(),
+            createdAt: new Date(msg.data()?.createdAt),
           });
         });
+        newMessages.sort((a, b) => b.createdAt - a.createdAt);
         setMessages(newMessages);
         setLoading(false);
       })
@@ -142,9 +145,9 @@ const SingleChatScreen = ({ route, navigation }) => {
     console.log("logsgsgs", chat?.chatId);
     firestore()
       .collection("MESSAGE")
-      .doc(JSON.stringify(chat?.chatId))
+      .doc(chat?.chatId)
       .collection(`${chat.subcollection}${"_messages"}`)
-      .orderBy("createdAt", "desc")
+
       .get()
       .then((res) => {
         const newMessages: any[] = [];
@@ -152,9 +155,10 @@ const SingleChatScreen = ({ route, navigation }) => {
         res.forEach((msg) => {
           newMessages.push({
             ...msg.data(),
-            createdAt: msg.data()?.createdAt.toDate(),
+            createdAt: new Date(msg.data()?.createdAt),
           });
         });
+        newMessages.sort((a, b) => b.createdAt - a.createdAt);
         setMessages(newMessages);
         setLoading(false);
       })
@@ -168,14 +172,14 @@ const SingleChatScreen = ({ route, navigation }) => {
     const newMessage = {
       _id: message._id,
       text: message.text,
-      createdAt: firestore.Timestamp.fromDate(new Date()),
+      createdAt: moment().toISOString(),
       user: chat?.user,
     };
     console.log(`----sssss-,${chat?.subcollection}${"_messages"}`);
     return new Promise((resolve, reject) => {
       firestore()
         .collection("MESSAGE")
-        .doc(JSON.stringify(chat?.chatId))
+        .doc(chat?.chatId)
         .collection(`${chat.subcollection}${"_messages"}`)
         .doc(message?._id)
         .set(newMessage)
@@ -183,7 +187,7 @@ const SingleChatScreen = ({ route, navigation }) => {
           // THIS WILL UPDATE RECENT MESSAGE ON THREAD
           // firestore()
           //   .collection("THREADS")
-          //   .doc(JSON.stringify(chat?.chatId))
+          //   .doc(chat?.chatId)
           //   .update({
           //     recentMessage: newMessage,
           //   })

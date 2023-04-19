@@ -524,7 +524,6 @@ const InstructorActivityScreen = ({}) => {
     // handleTrackHistorySchedule();
   };
 
-  console.log("deviceId-------", user);
   const sendCoordinates = async (lat: any, lang: any) => {
     const token = await loadToken();
     stompClient.send(
