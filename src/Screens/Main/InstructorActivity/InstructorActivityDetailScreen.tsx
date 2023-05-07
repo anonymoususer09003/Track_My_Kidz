@@ -1,0 +1,503 @@
+import React, { useEffect, useState, useRef } from "react";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Text, Icon, Input, Select, SelectItem } from "@ui-kitten/components";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  PermissionsAndroid,
+  Platform,
+  Image,
+} from "react-native";
+import moment from "moment";
+import * as Stomp from "stompjs";
+import BackgroundService from "react-native-background-actions";
+import Geolocation from "@react-native-community/geolocation";
+import GeolocationAndroid from "react-native-geolocation-service";
+import SockJS from "sockjs-client";
+import { loadToken } from "@/Storage/MainAppStorage";
+import { useDispatch, useSelector } from "react-redux";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import Colors from "@/Theme/Colors";
+import Entypo from "react-native-vector-icons/Entypo";
+import { UserTypeState } from "@/Store/UserType";
+import { InstructionsModal, ShowInstructorsStudentsModal } from "@/Modals";
+
+import {
+  GetAllInstructors,
+  GetInstructor,
+  FindInstructorBySchoolOrg,
+} from "@/Services/Instructor";
+import { loadUserId } from "@/Storage/MainAppStorage";
+import { GetSchool } from "@/Services/School";
+import { actions } from "@/Context/state/Reducer";
+import { useStateValue } from "@/Context/state/State";
+import { ModalState } from "@/Store/Modal";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import { UserState } from "@/Store/User";
+
+const instructorImage = require("@/Assets/Images/approval_icon2.png");
+const location = require("@/Assets/Images/marker.png");
+const clock = require("@/Assets/Images/clock1.png");
+const InstructorActivityDetailScreen = ({ route }) => {
+  const dispatch = useDispatch();
+  const [, _dispatch] = useStateValue();
+  const isFocused = useIsFocused();
+  const currentUser = useSelector(
+    (state: { user: UserState }) => state.user.item
+  );
+  const user_type = useSelector(
+    (state: { userType: UserTypeState }) => state.userType.userType
+  );
+  const [selectionData, setSelectionData] = useState({
+    type: "student",
+    status: "pending",
+  });
+  const [orgInfo, setOrgInfo] = useState(null);
+  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
+    useState(false);
+
+  const data = route?.params?.data;
+  const activitiesCount = route?.params?.activitiesCount || {};
+  const showInstructorModal = useSelector(
+    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
+  );
+  let temp = [];
+  let instructor = data?.instructors?.map((item) => temp.push(item?.firstName));
+  const handleGetOrganizationInfo = async () => {
+    const userId = await loadUserId();
+
+    let res = await GetInstructor(userId);
+    if (res.schoolId || res.orgId) {
+      GetSchool(res?.schoolId)
+        .then((org) => {
+          setOrgInfo(org);
+        })
+        .catch((err) => console.log(err));
+    }
+  };
+  useEffect(() => {
+    if (isFocused && user_type == "instructor") {
+      handleGetOrganizationInfo();
+    }
+  }, [isFocused]);
+
+  return (
+    <BackgroundLayout style={{ paddingBottom: 10 }}>
+      {showInstructorModal && (
+        <InstructionsModal
+          selectedInstructions={data?.optin}
+          activity={data}
+          setSelectedInstructions={() => null}
+        />
+      )}
+
+      {showStudentsInstructorsModal && (
+        <ShowInstructorsStudentsModal
+          isVisible={showStudentsInstructorsModal}
+          setIsVisible={() => {
+            setShowStudentsInstructorsModal(false);
+          }}
+          status={selectionData?.status}
+          type={selectionData?.type}
+        />
+      )}
+
+      <View
+        style={{
+          width: "100%",
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={{ color: Colors.white, fontSize: 30, textAlign: "center" }}
+        >
+          {data?.activityName}
+        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View
+            style={{
+              height: 10,
+              width: 10,
+              borderRadius: 15,
+              marginRight: 7,
+              marginTop: 5,
+              backgroundColor:
+                data?.status == "pending" ? Colors.secondary : Colors.green,
+            }}
+          />
+          <Text style={[styles.text, { color: Colors.white }]}>
+            {data?.status}
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          onPress={() => {
+            dispatch(
+              ChangeModalState.action({
+                instructionsModalVisibility: true,
+              })
+            );
+          }}
+          style={{ width: "100%", alignItems: "center" }}
+        >
+          <Text
+            style={[
+              styles.text,
+              {
+                fontSize: 16,
+                marginVertical: 15,
+                opacity: 0.6,
+                color: Colors.white,
+              },
+            ]}
+          >{`Instructions     /    Disclaimer    /    Agreement`}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.main}>
+        <View style={styles.countHeader}>
+          <View style={{ alignItems: "center" }}>
+            <Text
+              style={[styles.text, { color: Colors.black }]}
+            >{`Approval`}</Text>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity
+                style={styles.horizontal}
+                onPress={() => {
+                  _dispatch({
+                    type: actions.SET_SELECTED_ACTIVITY,
+                    payload: data,
+                  });
+                  setSelectionData({
+                    status: "approved",
+                    type: "student",
+                  });
+                  setShowStudentsInstructorsModal(true);
+                }}
+              >
+                <Text style={styles.footerText}>{`${
+                  activitiesCount[data?.activityId]?.countApprovedStudents ||
+                  "0"
+                }`}</Text>
+                <Entypo
+                  name="book"
+                  color={Colors.primary}
+                  size={15}
+                  style={{ marginHorizontal: 5 }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.horizontal}
+                onPress={() => {
+                  _dispatch({
+                    type: actions.SET_SELECTED_ACTIVITY,
+                    payload: data,
+                  });
+                  setSelectionData({
+                    status: "approved",
+                    type: "instructor",
+                  });
+                  setShowStudentsInstructorsModal(true);
+                }}
+              >
+                <Text style={styles.text}>
+                  {activitiesCount[data?.activityId]
+                    ?.countApprovedInstructors || "0"}
+                </Text>
+                <Image
+                  source={instructorImage}
+                  style={[styles.iconImages, { marginLeft: 3 }]}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={{ alignItems: "center" }}>
+            <Text style={styles.footerText}>{`Declined`}</Text>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity
+                style={styles.horizontal}
+                onPress={() => {
+                  _dispatch({
+                    type: actions.SET_SELECTED_ACTIVITY,
+                    payload: data,
+                  });
+                  setSelectionData({
+                    status: "declined",
+                    type: "student",
+                  });
+                  setShowStudentsInstructorsModal(true);
+                }}
+              >
+                <Text style={styles.text}>{`${
+                  activitiesCount[data?.activityId]?.countDeclinedStudents ||
+                  "0"
+                }`}</Text>
+                <Entypo
+                  name="book"
+                  color={Colors.primary}
+                  size={15}
+                  style={{ marginHorizontal: 5 }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.horizontal}
+                onPress={() => {
+                  _dispatch({
+                    type: actions.SET_SELECTED_ACTIVITY,
+                    payload: data,
+                  });
+                  setSelectionData({
+                    status: "declined",
+                    type: "instructor",
+                  });
+                  setShowStudentsInstructorsModal(true);
+                }}
+              >
+                <Text style={styles.text}>
+                  {activitiesCount[data?.activityId]
+                    ?.countDeclinedInstructors || "0"}
+                </Text>
+                <Image
+                  source={instructorImage}
+                  style={[styles.iconImages, { marginLeft: 3 }]}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={{ alignItems: "center" }}>
+            <Text style={styles.footerText}>{`Pending`}</Text>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  _dispatch({
+                    type: actions.SET_SELECTED_ACTIVITY,
+                    payload: data,
+                  });
+                  setSelectionData({
+                    status: "pending",
+                    type: "student",
+                  });
+                  setShowStudentsInstructorsModal(true);
+                }}
+                style={styles.horizontal}
+              >
+                <Text style={styles.text}>
+                  {`${
+                    activitiesCount[data?.activityId]?.countPendingStudents ||
+                    "0"
+                  }`}
+                </Text>
+                <Entypo
+                  name="book"
+                  color={Colors.primary}
+                  size={15}
+                  style={{ marginHorizontal: 5 }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.horizontal}
+                onPress={() => {
+                  _dispatch({
+                    type: actions.SET_SELECTED_ACTIVITY,
+                    payload: data,
+                  });
+                  setSelectionData({
+                    status: "pending",
+                    type: "instructor",
+                  });
+                  setShowStudentsInstructorsModal(true);
+                }}
+              >
+                <Text style={styles.text}>
+                  {activitiesCount[data?.activityId]?.countPendingInstructors ||
+                    "0"}
+                  {/* {data.countPendingInstructors || `0`} */}
+                </Text>
+                <Image
+                  source={instructorImage}
+                  style={[styles.iconImages, { marginLeft: 3 }]}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+        <View style={{ paddingHorizontal: 25 }}>
+          <View style={styles.horizontal}>
+            <View style={styles.circle}>
+              <Image source={clock} style={styles.iconImages} />
+            </View>
+            <View>
+              <Text style={styles.label}>From</Text>
+              <Text style={styles.text}>{`${moment(
+                data?.fromDate == "string" ? new Date() : data?.fromDate
+              ).format("YYYY-MM-DD")} at ${moment(
+                data?.fromDate == "string" ? new Date() : data?.fromDate
+              )
+                .subtract("hours", 5)
+                .format("hh:mm a")} `}</Text>
+              {/* <Text style={styles.text}>{`${moment(
+              data?.toDate == "string" ? new Date() : data?.toDate
+            ).format("YYYY-MM-DD")} at ${moment(
+              data?.toDate == "string" ? new Date() : data?.toDate
+            )
+              .subtract("hours", 5)
+              .format("hh:mm a")} `}</Text> */}
+            </View>
+          </View>
+
+          <View style={styles.horizontal}>
+            <View style={styles.circle}>
+              <Image source={clock} style={styles.iconImages} />
+            </View>
+            <View>
+              <Text style={styles.label}>To</Text>
+
+              <Text style={styles.text}>{`${moment(
+                data?.toDate == "string" ? new Date() : data?.toDate
+              ).format("YYYY-MM-DD")} at ${moment(
+                data?.toDate == "string" ? new Date() : data?.toDate
+              )
+                .subtract("hours", 5)
+                .format("hh:mm a")} `}</Text>
+            </View>
+          </View>
+
+          <View style={styles.horizontal}>
+            <View style={styles.circle}>
+              <Image source={location} style={styles.iconImages} />
+            </View>
+            <View>
+              <Text style={styles.label}>Where</Text>
+
+              <Text style={styles.text}>{data?.venueFromAddress}</Text>
+            </View>
+          </View>
+
+          <View style={styles.horizontal}>
+            <View style={styles.circle}>
+              <Image source={location} style={styles.iconImages} />
+            </View>
+            <View>
+              <Text style={styles.label}>Address</Text>
+
+              <Text style={styles.text}>{orgInfo?.address}</Text>
+            </View>
+          </View>
+
+          <View style={styles.horizontal}>
+            <View style={styles.circle}>
+              <Image source={instructorImage} style={styles.iconImages} />
+            </View>
+            <View>
+              <Text style={styles.label}>Instructor</Text>
+
+              <Text style={styles.text}>{`${temp.toString() || "-"}`}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </BackgroundLayout>
+  );
+};
+
+export default InstructorActivityDetailScreen;
+
+const styles = StyleSheet.create({
+  layout: {
+    flex: 1,
+    flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
+  },
+  item: {
+    borderRadius: 15,
+    width: "96%",
+    backgroundColor: "#fff",
+    marginTop: 10,
+    marginHorizontal: "2%",
+    // paddingHorizontal: 10,
+    paddingTop: 10,
+    height: 175,
+  },
+  footer: {
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    width: "96%",
+    backgroundColor: "#fff",
+    marginHorizontal: "2%",
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  text: {
+    fontSize: 13,
+
+    // marginVertical: 4,
+    color: Colors.black,
+  },
+  floatButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    shadowColor: Colors.primary,
+    shadowOffset: {
+      height: 10,
+      width: 10,
+    },
+    shadowOpacity: 0.9,
+    shadowRadius: 50,
+    elevation: 5,
+  },
+  iconImages: {
+    height: 15,
+    width: 15,
+    resizeMode: "contain",
+  },
+  footerText: {
+    fontSize: 13,
+    marginVertical: 2,
+  },
+  horizontal: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  circle: {
+    height: 25,
+    width: 25,
+    borderRadius: 50,
+    backgroundColor: Colors.white,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  main: {
+    height: "60%",
+    width: "100%",
+    borderRadius: 20,
+    backgroundColor: Colors.newBackgroundColor,
+    overflow: "hidden",
+  },
+  countHeader: {
+    paddingTop: 10,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: Colors.white,
+    paddingBottom: 10,
+  },
+  label: {
+    fontSize: 12,
+    // marginVertical: 4,
+    color: Colors.lightgray,
+  },
+});

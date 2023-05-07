@@ -26,6 +26,7 @@ import {
   StudentLocationScreen,
   CreateParentActivityScreen,
   DragDropStudentScreen,
+  InstructorActivityDetailScreen,
 } from "@/Screens";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
@@ -41,6 +42,7 @@ import StudentActivityNavigator from "@/Navigators/Main/StudentActivityNavigator
 import ApprovalNavigator from "@/Navigators/Main/ApprovalNavigator";
 import InstructorApprovalNavigator from "@/Navigators/Main/InstructorApprovalNavigator";
 import InstructorActivityNavigator from "@/Navigators/Main/InstructorActivityNavigator";
+
 import InstructorGroupApprovalNavigator from "@/Navigators/Main/InstructorGroupApprovalNavigator";
 import AddMembersNavigator from "@/Navigators/Main/AddMembersNavigator";
 import { UserTypeState } from "@/Store/UserType";
@@ -102,6 +104,12 @@ const RightDrawerNavigator = () => {
             component={StudentActivityNavigator}
           />
         )}
+
+        <Drawer.Screen
+          name="InstructorActivityDetail"
+          component={InstructorActivityDetailScreen}
+        />
+
         <Drawer.Screen
           name="StudentActivityDetails"
           component={StudentActivityDetailsScreen}

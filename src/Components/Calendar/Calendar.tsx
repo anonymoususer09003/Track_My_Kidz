@@ -98,9 +98,6 @@ const Calendar = ({
           value={months[selectedMonth]}
           placeholder="Grade"
           onSelect={(index: any) => {
-            console.log("logs", moment().format("M"));
-            console.log("index", index.row);
-
             setSelectedMonth(index.row);
             setDays(getDays(months[index.row]));
           }}
@@ -149,7 +146,7 @@ const styles = StyleSheet.create({
     // zIndex: -1,
     padding: 10,
     width: "100%",
-    backgroundColor: Colors.primary,
+    backgroundColor: "transparent",
     flexDirection: "row",
     alignItems: "center",
   },

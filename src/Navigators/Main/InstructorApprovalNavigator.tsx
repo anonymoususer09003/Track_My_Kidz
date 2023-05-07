@@ -8,8 +8,9 @@ import {
   InstructorDeclineScreen,
   InstructorPendingScreen,
 } from "@/Screens";
-import { AppHeader } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import Colors from "@/Theme/Colors";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 
 // @refresh reset
 const InstructorApprovalNavigator = () => {
@@ -18,6 +19,7 @@ const InstructorApprovalNavigator = () => {
   //@ts-ignore
   const TopTabBar = ({ navigation, state }) => (
     <TabBar
+      style={styles.toolBar}
       selectedIndex={state.index}
       indicatorStyle={{ display: "none" }}
       onSelect={(index) => navigation.navigate(state.routeNames[index])}
@@ -25,32 +27,25 @@ const InstructorApprovalNavigator = () => {
       {tabNames.map((tabName, index) => {
         if (state.index == index) {
           return (
-            <Button
-              key={index}
-              style={[
-                styles.buttonText,
-                styles.background,
-                { backgroundColor: Colors.lightgray },
-              ]}
-              appearance="ghost"
-              size="small"
-              status="primary"
-            >
-              {tabName}
-            </Button>
+            <View key={index} style={styles.background}>
+              <LinearGradientButton
+                onPress={() => null}
+                textStyle={{ fontSize: 14 }}
+              >
+                {tabName}
+              </LinearGradientButton>
+            </View>
           );
         } else {
           return (
             <View key={index} style={styles.background}>
-              <Button
-                style={styles.buttonText}
-                appearance="ghost"
-                size="small"
-                status="control"
+              <LinearGradientButton
+                textStyle={{ color: Colors.black, fontSize: 14 }}
+                gradient={[Colors.white, Colors.white]}
                 onPress={() => navigation.navigate(state.routeNames[index])}
               >
                 {tabName}
-              </Button>
+              </LinearGradientButton>
             </View>
           );
         }
@@ -58,8 +53,7 @@ const InstructorApprovalNavigator = () => {
     </TabBar>
   );
   return (
-    <>
-      <AppHeader title={``} />
+    <BackgroundLayout title="Event Information">
       <TabNavigator.Navigator
         screenOptions={{ lazy: true, swipeEnabled: false }}
         tabBar={(props) => <TopTabBar {...props} />}
@@ -80,7 +74,7 @@ const InstructorApprovalNavigator = () => {
           component={InstructorPendingScreen}
         />
       </TabNavigator.Navigator>
-    </>
+    </BackgroundLayout>
   );
 };
 
@@ -89,17 +83,19 @@ const styles = StyleSheet.create({
   background: {
     color: Colors.white,
     zIndex: -1,
-    marginLeft: 2,
-    marginRight: 2,
+
     borderRadius: 10,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.newBackgroundColor,
+    marginTop: 20,
+    paddingHorizontal: 20,
+    width: "100%",
   },
   topNav: {
     color: Colors.white,
   },
   text: {
-    color: Colors.white,
-    fontWeight: "bold",
+    color: Colors.black,
+    // fontWeight: "bold",
     fontSize: 18,
   },
   buttonText: {
@@ -111,5 +107,12 @@ const styles = StyleSheet.create({
     shadowOffset: { height: 1, width: 1 }, // IOS
     justifyContent: "center",
     alignItems: "center",
+  },
+  toolBar: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+
+    backgroundColor: Colors.newBackgroundColor,
+    width: "100%",
   },
 });

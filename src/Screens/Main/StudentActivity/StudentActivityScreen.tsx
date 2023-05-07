@@ -21,7 +21,11 @@ import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import Colors from "@/Theme/Colors";
 import { InstructionsModal } from "@/Modals";
-import { GetActivityByStudentId, GetAllActivity } from "@/Services/Activity";
+import {
+  GetActivityByStudentId,
+  GetAllActivity,
+  GetActivitesCount,
+} from "@/Services/Activity";
 import { AwsLocationTracker } from "@/Services/TrackController";
 import Geolocation from "@react-native-community/geolocation";
 import { UserState } from "@/Store/User";
@@ -31,7 +35,7 @@ import TrackHistory from "@/Services/Parent/TrackHistory";
 import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
 import { Activity, Optin } from "@/Models/DTOs";
 import { loadToken } from "@/Storage/MainAppStorage";
-
+import Entypo from "react-native-vector-icons/Entypo";
 import {
   storeHomeScreenCacheInfo,
   getHomeScreenCacheInfo,
@@ -47,6 +51,11 @@ const StudentActivityScreen = ({ route }) => {
   const navigation = useNavigation();
 
   const isFocused = useIsFocused();
+  const searchBarValue = useSelector(
+    (state: any) => state.header.searchBarValue
+  );
+  const [originalActivities, setOriginalActivities] = useState<Activity[]>([]);
+  const [activitiesCount, setActivitiesCount] = useState({});
   const [children, setChildren] = useState([]);
   const [originalChildren, setOriginalChildren] = useState([]);
   const [studentsEmails, setStudentsEmail] = useState([]);
@@ -67,6 +76,7 @@ const StudentActivityScreen = ({ route }) => {
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
+  const instructorImage = require("@/Assets/Images/approval_icon2.png");
   const { showFamilyMap, showParticipantMap } = useSelector(
     (state: { studentActivity: StudentState }) => state.studentActivity
   );
@@ -78,6 +88,7 @@ const StudentActivityScreen = ({ route }) => {
     GetActivityByStudentId(currentUser?.studentId)
       .then((res) => {
         setActivities(res);
+        setOriginalActivities(res);
         storeHomeScreenCacheInfo("student_activites", JSON.stringify(res));
       })
       .catch((err) => {
@@ -161,6 +172,7 @@ const StudentActivityScreen = ({ route }) => {
     let activites = await getHomeScreenCacheInfo("student_activites");
     if (activites) {
       setActivities(JSON.parse(activites));
+      setOriginalActivities(JSON.parse(activites));
     }
   };
 
@@ -307,7 +319,7 @@ const StudentActivityScreen = ({ route }) => {
   }, []);
 
   // backgroundCall();
-  console.log("trackingList", trackingList);
+  console.log("current", currentUser);
   const RightActions = (dragX: any, item: Activity) => (
     <View
       style={{
@@ -317,7 +329,7 @@ const StudentActivityScreen = ({ route }) => {
       }}
     >
       <TouchableOpacity
-        style={styles.buttonStyle}
+        // style={styles.buttonStyle}
         onPress={() => {
           if (prevOpenedRow) {
             prevOpenedRow?.close();
@@ -333,9 +345,10 @@ const StudentActivityScreen = ({ route }) => {
           // getParticipantLocation(item?.activityId);
         }}
       >
-        <Entypo size={25} color={Colors.primary} name="location-pin" />
-        <Text style={styles.textStyle}>View Attendees</Text>
+        <Entypo size={45} color={Colors.primary} name="location-pin" />
+        {/* <Text style={styles.textStyle}>View Attendees</Text> */}
       </TouchableOpacity>
+
       <TouchableOpacity
         onPress={() => {
           prevOpenedRow?.close();
@@ -347,7 +360,7 @@ const StudentActivityScreen = ({ route }) => {
               subcollection: "student",
               user: {
                 _id: currentUser?.studentId,
-                avatar: currentUser?.imageurl,
+                avatar: currentUser?.studentPhoto,
                 name: currentUser?.firstname
                   ? currentUser?.firstname[0].toUpperCase() +
                     currentUser?.firstname.slice(1) +
@@ -360,6 +373,9 @@ const StudentActivityScreen = ({ route }) => {
           navigation.navigate("ChatScreen", {
             title: item?.activityName,
             showHeader: true,
+            fromChat: true,
+            receiverUser: {},
+            chatId: 1,
           });
         }}
         style={{
@@ -368,7 +384,7 @@ const StudentActivityScreen = ({ route }) => {
           justifyContent: "center",
         }}
       >
-        <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
+        <Ionicons size={45} color={Colors.primary} name="chatbox-ellipses" />
       </TouchableOpacity>
       {!item.status && (
         <TouchableOpacity
@@ -399,8 +415,10 @@ const StudentActivityScreen = ({ route }) => {
 
           longitude: item?.longititude ? parseFloat(item?.longititude) : null,
         });
-        if (item?.deviceId) {
-          deviceIds.push(item.deviceId);
+
+        console.log("item", item);
+        if (item?.childDevice) {
+          deviceIds.push(item?.childDevice);
         }
       });
       connectSockets(deviceIds);
@@ -414,6 +432,7 @@ const StudentActivityScreen = ({ route }) => {
     }
   };
   const connectSockets = async (deviceIds: any) => {
+    console.log("deviceids", deviceIds);
     const token = await loadToken();
     const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
     stompClient = Stomp.over(socket);
@@ -463,6 +482,51 @@ const StudentActivityScreen = ({ route }) => {
     prevOpenedRow = row[index];
   };
 
+  const getActivityesCountApi = async (body: any) => {
+    try {
+      let res = await GetActivitesCount(body, {
+        cancelToken: source.token,
+      });
+      let temp = {};
+      res.map((item) => {
+        temp[item.activityId] = item;
+      });
+      console.log("res", res);
+      setActivitiesCount({ ...activitiesCount, ...temp });
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+  const search = (text: String) => {
+    let allActivities = { ...activities };
+
+    let temp = originalActivities?.filter((item, index) =>
+      item.activityName.toLowerCase().includes(text.toLowerCase())
+    );
+    allActivities = temp;
+    setActivities(allActivities);
+  };
+  useEffect(() => {
+    if (isFocused) {
+      let temp = [];
+      if (activities?.length > 0) {
+        activities?.forEach(async (element) => {
+          temp.push(element.activityId);
+          // await getActivityesCountApi(element?.activityId);
+        });
+
+        getActivityesCountApi(temp);
+      }
+    }
+  }, [activities?.length, isFocused]);
+
+  useEffect(() => {
+    if (searchBarValue) {
+      search(searchBarValue);
+    } else {
+      setActivities(originalActivities);
+    }
+  }, [searchBarValue]);
   return (
     <>
       {selectedInstructions && (
@@ -471,78 +535,266 @@ const StudentActivityScreen = ({ route }) => {
           setSelectedInstructions={setSelectedInstructions}
         />
       )}
-      {!showFamilyMap ? (
+      {!showFamilyMap && !showParticipantMap ? (
         <View style={styles.layout}>
           {activities.length > 0 && (
             <FlatList
               data={activities}
-              style={{ padding: 10, width: "100%", marginTop: 10 }}
+              style={{
+                padding: 10,
+                width: "100%",
+                marginTop: 10,
+              }}
               renderItem={({ item, index }) => (
                 <Swipeable
                   ref={(ref) => (row[index] = ref)}
+                  // ref={swipeableRef}
+
                   onSwipeableOpen={() => closeRow(index)}
-                  renderRightActions={(e) => RightActions(e, item)}
+                  renderRightActions={(e) => RightActions(e, item, index)}
                 >
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate("InstructorGroupApproval")
-                    }
+                  <View
                     style={[
                       styles.item,
                       {
-                        backgroundColor: !item?.status
-                          ? "#fff"
-                          : index % 3 === 0
-                          ? "lightgreen"
-                          : index % 2 === 0
-                          ? "#F6DDCC"
-                          : "#fff",
+                        backgroundColor: "#fff",
                       },
                     ]}
                   >
-                    <Text
-                      style={styles.text}
-                    >{`Date: ${item?.scheduler?.fromDate}`}</Text>
-                    <Text
-                      style={styles.text}
-                    >{`Activity: ${item?.activityName}`}</Text>
-                    <Text
-                      style={styles.text}
-                    >{`Where: ${item?.venueToName}`}</Text>
-                    <Text
-                      style={styles.text}
-                    >{`Address: ${item?.venueToAddress}`}</Text>
-                    <Text style={styles.text}>{`Status: ${
-                      item?.status ? "Active" : "Inactive"
-                    }`}</Text>
-                    <Text style={styles.text}>{`Students: ${
-                      (item?.students && item?.students?.length) || 0
-                    }`}</Text>
-                    <Text style={styles.text}>{`Instructors: ${
-                      (item?.instructors && item?.instructors?.length) || 0
-                    }`}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setSelectedInstructions(item.optin);
-                    }}
-                    style={[
-                      styles.footer,
-                      {
-                        backgroundColor: !item?.status
-                          ? "#fff"
-                          : index % 3 === 0
-                          ? "lightgreen"
-                          : index % 2 === 0
-                          ? "#F6DDCC"
-                          : "#fff",
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={styles.text}
-                    >{`Instructions / Disclaimer / Agreement`}</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        navigation.navigate("InstructorActivityDetail", {
+                          data: item,
+                          activitiesCount: activitiesCount,
+                        });
+                      }}
+                    >
+                      <Text
+                        style={[
+                          styles.text,
+                          {
+                            fontSize: 20,
+                            fontWeight: "800",
+                            paddingLeft: 25,
+                          },
+                        ]}
+                      >
+                        {item?.activityName}
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          paddingBottom: 20,
+                          borderBottomWidth: 0.5,
+                          paddingHorizontal: 10,
+                          borderColor: Colors.borderGrey,
+                        }}
+                      >
+                        <Image
+                          source={require("@/Assets/Images/circle-dashed.png")}
+                          style={{
+                            height: 40,
+                            width: 40,
+                            resizeMode: "contain",
+                            // marginRight: 10,
+                          }}
+                        />
+                        <View>
+                          <Text style={styles.text}>{`${moment(
+                            item?.fromDate == "string"
+                              ? new Date()
+                              : item?.fromDate
+                          ).format("YYYY-MM-DD")} at ${moment(
+                            item?.fromDate == "string"
+                              ? new Date()
+                              : item?.fromDate
+                          )
+                            .subtract("hours", 5)
+                            .format("hh:mm a")} `}</Text>
+                          <Text style={styles.text}>{`${moment(
+                            item?.toDate == "string" ? new Date() : item?.toDate
+                          ).format("YYYY-MM-DD")} at ${moment(
+                            item?.toDate == "string" ? new Date() : item?.toDate
+                          )
+                            .subtract("hours", 5)
+                            .format("hh:mm a")} `}</Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-around",
+                      }}
+                    >
+                      <View style={{ alignItems: "center" }}>
+                        <Text style={styles.text}>{`Approval`}</Text>
+                        <View style={{ flexDirection: "row" }}>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "approved",
+                                type: "student",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.footerText}>{`${
+                              activitiesCount[item.activityId]
+                                ?.countApprovedStudents || "0"
+                            }`}</Text>
+                            <Entypo
+                              name="book"
+                              color={Colors.primary}
+                              size={15}
+                              style={{ marginHorizontal: 5 }}
+                            />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "approved",
+                                type: "instructor",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>
+                              {activitiesCount[item.activityId]
+                                ?.countApprovedInstructors || "0"}
+                            </Text>
+                            <Image
+                              source={instructorImage}
+                              style={styles.iconImages}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+
+                      <View style={{ alignItems: "center" }}>
+                        <Text style={styles.footerText}>{`Declined`}</Text>
+                        <View style={{ flexDirection: "row" }}>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "declined",
+                                type: "student",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>{`${
+                              activitiesCount[item.activityId]
+                                ?.countDeclinedStudents || "0"
+                            }`}</Text>
+                            <Entypo
+                              name="book"
+                              color={Colors.primary}
+                              size={15}
+                              style={{ marginHorizontal: 5 }}
+                            />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "declined",
+                                type: "instructor",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>
+                              {activitiesCount[item.activityId]
+                                ?.countDeclinedInstructors || "0"}
+                            </Text>
+                            <Image
+                              source={instructorImage}
+                              style={styles.iconImages}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+
+                      <View style={{ alignItems: "center" }}>
+                        <Text style={styles.footerText}>{`Pending`}</Text>
+                        <View style={{ flexDirection: "row" }}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "pending",
+                                type: "student",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                            style={styles.horizontal}
+                          >
+                            <Text style={styles.text}>
+                              {`${
+                                activitiesCount[item.activityId]
+                                  ?.countPendingStudents || "0"
+                              }`}
+                            </Text>
+                            <Entypo
+                              name="book"
+                              color={Colors.primary}
+                              size={15}
+                              style={{ marginHorizontal: 5 }}
+                            />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "pending",
+                                type: "instructor",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>
+                              {activitiesCount[item.activityId]
+                                ?.countPendingInstructors || "0"}
+                              {/* {item.countPendingInstructors || `0`} */}
+                            </Text>
+                            <Image
+                              source={instructorImage}
+                              style={styles.iconImages}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
                 </Swipeable>
               )}
             />
@@ -554,7 +806,7 @@ const StudentActivityScreen = ({ route }) => {
           )}
         </View>
       ) : showParticipantMap ? (
-        <>
+        <MapView style={{ flex: 1 }}>
           {partcipants.map((item, index) => {
             // console.log("item", item);
             return (
@@ -601,7 +853,7 @@ const StudentActivityScreen = ({ route }) => {
               // </Circle>
             );
           })}
-        </>
+        </MapView>
       ) : (
         <MapView
           ref={ref}
@@ -638,84 +890,89 @@ const StudentActivityScreen = ({ route }) => {
           {children.map((item, index) => {
             let latitude = trackingList[item.childDevice]?.lat;
             let longititude = trackingList[item.childDevice]?.lang;
+
             // console.log("item", item);
-            return (
-              <>
-                <Marker
-                  onSelect={() => console.log("pressed")}
-                  onPress={() => {
-                    console.log("ref", ref);
-                    ref.current.fitToSuppliedMarkers(
-                      [
-                        {
-                          latitude: latitude
-                            ? parseFloat(latitude)
-                            : parseFloat(10),
-                          longitude: longititude
-                            ? parseFloat(longititude)
-                            : parseFloat(10),
-                        },
-                      ]
-                      // false, // not animated
-                    );
-                  }}
-                  identifier={item?.email}
-                  key={index}
-                  coordinate={{
-                    latitude: latitude ? parseFloat(latitude) : parseFloat(10),
-                    longitude: longititude
-                      ? parseFloat(longititude)
-                      : parseFloat(10),
-                  }}
-                >
-                  <View style={{}}>
-                    <View
-                      style={{
-                        height: 30,
-                        width: 30,
-                        borderRadius: 80,
-                        overflow: "hidden",
-                        // top: 33,
-                        // zIndex: 10,
-                      }}
-                    >
-                      {item?.studentImage == "" && (
-                        <View
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 80,
-                            backgroundColor: Colors.primary,
-                            justifyContent: "center",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Text style={{ color: Colors.white }}>
-                            {item?.firstname?.substring(0, 1)?.toUpperCase() ||
-                              ""}
-                            {item?.lastname?.substring(0, 1)?.toUpperCase() ||
-                              ""}
-                          </Text>
-                        </View>
-                      )}
-                      {item?.studentImage != "" && (
-                        <Image
-                          source={{
-                            uri: item?.studentImage,
-                          }}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 80,
-                            aspectRatio: 2,
-                          }}
-                          resizeMode="contain"
-                        />
-                      )}
+            if (trackingList[item.childDevice]?.lat) {
+              return (
+                <>
+                  <Marker
+                    onSelect={() => console.log("pressed")}
+                    onPress={() => {
+                      console.log("ref", ref);
+                      ref.current.fitToSuppliedMarkers(
+                        [
+                          {
+                            latitude: latitude
+                              ? parseFloat(latitude)
+                              : parseFloat(10),
+                            longitude: longititude
+                              ? parseFloat(longititude)
+                              : parseFloat(10),
+                          },
+                        ]
+                        // false, // not animated
+                      );
+                    }}
+                    identifier={item?.email}
+                    key={index}
+                    coordinate={{
+                      latitude: latitude
+                        ? parseFloat(latitude)
+                        : parseFloat(10),
+                      longitude: longititude
+                        ? parseFloat(longititude)
+                        : parseFloat(10),
+                    }}
+                  >
+                    <View style={{}}>
+                      <View
+                        style={{
+                          height: 30,
+                          width: 30,
+                          borderRadius: 80,
+                          overflow: "hidden",
+                          // top: 33,
+                          // zIndex: 10,
+                        }}
+                      >
+                        {item?.studentImage == "" && (
+                          <View
+                            style={{
+                              height: "100%",
+                              width: "100%",
+                              borderRadius: 80,
+                              backgroundColor: Colors.primary,
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Text style={{ color: Colors.white }}>
+                              {item?.firstname
+                                ?.substring(0, 1)
+                                ?.toUpperCase() || ""}
+                              {item?.lastname?.substring(0, 1)?.toUpperCase() ||
+                                ""}
+                            </Text>
+                          </View>
+                        )}
+                        {item?.studentImage != "" && (
+                          <Image
+                            source={{
+                              uri: item?.studentImage,
+                            }}
+                            style={{
+                              height: "100%",
+                              width: "100%",
+                              borderRadius: 80,
+                              aspectRatio: 2,
+                            }}
+                            resizeMode="contain"
+                          />
+                        )}
+                      </View>
+                      {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
                     </View>
-                    {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
-                  </View>
-                  {/* <TouchableOpacity
+                    {/* <TouchableOpacity
                     onPress={() => console.log("pressed")}
                     style={{ alignItems: "center" }}
                   >
@@ -729,11 +986,12 @@ const StudentActivityScreen = ({ route }) => {
                       color="red"
                     />
                   </TouchableOpacity> */}
-                </Marker>
-              </>
-              // </>
-              // </Circle>
-            );
+                  </Marker>
+                </>
+                // </>
+                // </Circle>
+              );
+            }
           })}
         </MapView>
       )}
@@ -747,16 +1005,17 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
   },
   item: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderRadius: 15,
     width: "96%",
     backgroundColor: "#fff",
     marginTop: 10,
     marginHorizontal: "2%",
-    paddingHorizontal: 10,
+    // paddingHorizontal: 10,
     paddingTop: 10,
+    height: 175,
   },
   footer: {
     borderBottomLeftRadius: 10,
@@ -773,20 +1032,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    fontSize: 16,
+    fontSize: 13,
     marginVertical: 4,
   },
-  buttonStyle: {
-    padding: 5,
-    alignItems: "center",
-    //   justifyContent: "center",
-    //   padding: 5,
-    width: "100%",
-    height: 50,
-    backgroundColor: Colors.tintgray,
-    borderRadius: 4,
+
+  iconImages: {
+    height: 15,
+    width: 15,
+    resizeMode: "contain",
+    marginLeft: 5,
+    marginRight: 5,
+  },
+  footerText: {
+    fontSize: 13,
+    marginVertical: 2,
+  },
+  horizontal: {
     flexDirection: "row",
-    paddingLeft: 20,
-    marginBottom: 10,
+    alignItems: "center",
   },
 });

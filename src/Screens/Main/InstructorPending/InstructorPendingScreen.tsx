@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 // import axios from "axios";
@@ -35,6 +36,7 @@ import { loadUserId, loadUserType, loadId } from "@/Storage/MainAppStorage";
 import { useStateValue } from "@/Context/state/State";
 import { actions } from "@/Context/state/Reducer";
 import axios from "axios";
+import { date } from "yup";
 const _students = [
   {
     name: "Dylan B.",
@@ -73,6 +75,12 @@ const InstructorGroupPendingScreen = ({ route }) => {
   const approveActivityModalVisibility = useSelector(
     (state: { modal: any }) => state.modal.approveActivityModalVisibility
   );
+  const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
+  const marker = require("@/Assets/Images/marker.png");
+
+  const email = require("@/Assets/Images/email.png");
+  const clockIcon = require("@/Assets/Images/clock1.png");
+  const instructorImage = require("@/Assets/Images/approval_icon2.png");
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [pageActivity, pageNumberActivity] = useState(0);
   const [pageSizeActivity, setPageSizeActivity] = useState(20);
@@ -277,7 +285,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
       </View>
     );
   };
-  console.log("acitivties--------", activities);
+
   return (
     <>
       <View style={styles.layout}>
@@ -335,16 +343,23 @@ const InstructorGroupPendingScreen = ({ route }) => {
             }}
           />
         )}
-
-        <View style={{ flex: 1 }}>
+        {activities.length === 0 && groups.length == 0 && (
+          <View style={{ margin: 10 }}>
+            <Text style={[styles.text, { textAlign: "center" }]}>
+              You do not have any pending activities or groups
+            </Text>
+          </View>
+        )}
+        <View style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}>
           {isFocused && (
             <FlatList
               data={[...activities, ...groups] || []}
               keyExtractor={(item, index) => index}
               style={{ padding: 10, width: "100%", marginTop: 10 }}
+              contentContainerStyle={{ paddingBottom: 15 }}
               renderItem={({ item, index }) => {
                 if (item?.activityId) {
-                  let date = item?.date || "date";
+                  let date = moment(item.fromDate).format("YYYY-MM-DD");
 
                   return (
                     <Swipeable
@@ -358,35 +373,37 @@ const InstructorGroupPendingScreen = ({ route }) => {
                         onPress={() => {
                           // navigation.navigate('InstructorGroupApproval')
                         }}
-                        style={[
-                          styles.item,
-                          {
-                            backgroundColor: !item?.status
-                              ? "#fff"
-                              : index % 3 === 0
-                              ? "lightgreen"
-                              : index % 2 === 0
-                              ? "#F6DDCC"
-                              : "#fff",
-                          },
-                        ]}
+                        style={[styles.item]}
                       >
-                        <Text style={styles.text}>{`Date: ${date} `}</Text>
-                        <Text style={styles.text}>{`Time: ${moment().format(
-                          "hh:mm a"
-                        )}
-                    `}</Text>
-                        <Text style={styles.text}>{`${
-                          item?.activityType?.toLowerCase() === "activity"
-                            ? "Activity"
-                            : "Trip"
-                        }: ${item?.activityName}`}</Text>
-                        <Text
-                          style={styles.text}
-                        >{`Where: ${item?.venueFromName}`}</Text>
-                        <Text
-                          style={styles.text}
-                        >{`Address: ${item?.venueFromAddress}`}</Text>
+                        <Text style={[styles.text, { fontSize: 25 }]}>
+                          {item?.activityName}
+                        </Text>
+                        <View style={styles.horizontal}>
+                          <Image
+                            source={calendarIcon}
+                            style={styles.iconStyle}
+                          />
+                          <Text style={styles.text}>{`Date: ${date} `}</Text>
+                        </View>
+
+                        <View style={styles.horizontal}>
+                          <Image source={clockIcon} style={styles.iconStyle} />
+                          <Text style={styles.text}>{`${moment().format(
+                            "hh:mm a"
+                          )}`}</Text>
+                        </View>
+
+                        <View style={styles.horizontal}>
+                          <Image source={marker} style={styles.iconStyle} />
+                          <Text style={styles.text}>{item?.venueFromName}</Text>
+                        </View>
+
+                        <View style={styles.horizontal}>
+                          <Image source={marker} style={styles.iconStyle} />
+                          <Text style={styles.text}>
+                            {item?.venueFromAddress}
+                          </Text>
+                        </View>
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={() => {
@@ -397,21 +414,10 @@ const InstructorGroupPendingScreen = ({ route }) => {
                           );
                           setSelectedInstructions(item);
                         }}
-                        style={[
-                          styles.footer,
-                          {
-                            backgroundColor: !item?.status
-                              ? "#fff"
-                              : index % 3 === 0
-                              ? "lightgreen"
-                              : index % 2 === 0
-                              ? "#F6DDCC"
-                              : "#fff",
-                          },
-                        ]}
+                        style={[styles.footer]}
                       >
                         <Text
-                          style={styles.text}
+                          style={[styles.text, { textAlign: "center" }]}
                         >{`Instructions / Disclaimer / Agreement`}</Text>
                       </TouchableOpacity>
                     </Swipeable>
@@ -424,26 +430,27 @@ const InstructorGroupPendingScreen = ({ route }) => {
                       renderRightActions={(e) => RightActions(e, item)}
                       onSwipeableOpen={() => closeRow(item?.groupId)}
                     >
-                      <View style={[styles.item, { backgroundColor: "#fff" }]}>
-                        <Text
-                          style={styles.text}
-                        >{`Group Name: ${item?.groupName}`}</Text>
-                        <Text style={styles.text}>{`Status: ${
-                          item?.status ? "Active" : "Inactive"
-                        }`}</Text>
-                        {/* <Text style={styles.text}>{`${
-                    item?.students && item?.students?.length
-                  } Students`}</Text>
-                  <Text style={styles.text}>{`Instructors: ${
-                    (item?.instructors && item?.instructors?.length) || 0
-                  }`}</Text> */}
+                      <View style={[styles.item]}>
+                        <Text style={[styles.text, { fontSize: 25 }]}>
+                          {item?.groupName}
+                        </Text>
+
+                        <View style={styles.horizontal}>
+                          <Image
+                            source={instructorImage}
+                            style={styles.iconStyle}
+                          />
+                          <Text style={styles.text}>
+                            {item?.status ? "Active" : "Inactive"}
+                          </Text>
+                        </View>
                       </View>
                       <TouchableOpacity
                         onPress={() => setSelectedInstructions(item?.optin)}
                         style={[styles.footer, { backgroundColor: "#fff" }]}
                       >
                         <Text
-                          style={styles.text}
+                          style={[styles.text, { textAlign: "center" }]}
                         >{`Instructions / Disclaimer / Agreement`}</Text>
                       </TouchableOpacity>
                     </Swipeable>
@@ -493,9 +500,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginHorizontal: "2%",
     paddingHorizontal: 10,
-    paddingTop: 10,
+    paddingVertical: 10,
   },
   footer: {
+    borderTopWidth: 0.3,
+    borderTopColor: Colors.lightgray,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     width: "96%",
@@ -535,5 +544,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     marginBottom: 10,
+  },
+  iconStyle: {
+    height: 25,
+    width: 15,
+    marginRight: 10,
+    resizeMode: "contain",
+    tintColor: Colors.secondary,
+  },
+  horizontal: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });

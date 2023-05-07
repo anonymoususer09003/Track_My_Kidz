@@ -47,7 +47,7 @@ import {
   GetInstructor,
   FindInstructorBySchoolOrg,
 } from "@/Services/Instructor";
-import { template } from "@babel/core";
+
 const AddMembersInstructorScreen = ({ route }) => {
   const navigation = useNavigation();
   const [{ group, orgInstructors }, _dispatch] = useStateValue();
@@ -60,30 +60,20 @@ const AddMembersInstructorScreen = ({ route }) => {
     (state: { students: AddMembersStudentsState }) => state.students?.students
   );
   console.log("group", group);
-  const theme = useTheme();
+
   const [askPermission, setAskPermission] = useState(false);
   const [user, setUser] = useState(null);
 
-  const getAllInstructors = () => {
-    GetAllInstructors(0, 10)
-      .then((res) => {
-        setInstructors(res?.result);
-      })
-      .catch((err) => console.log("Error:", err));
-  };
   const getInstructor = async () => {
-    console.log("instructor------------------");
     const userId = await loadUserId();
 
-    console.log("instructor------------------");
     GetInstructor(userId)
       .then((res) => {
         console.log("res", res);
         setUser(res);
         FindInstructorBySchoolOrg({
           schoolId: res?.schoolId,
-          // 2198,
-          // res?.schoolId,
+
           orgId: res?.orgId || null,
         })
           .then((instructors) => {
@@ -147,13 +137,6 @@ const AddMembersInstructorScreen = ({ route }) => {
     }
   };
 
-  // const loadUserDetails = async () => {
-  //   FetchOne().then((res) => {
-  //     setUser(res);
-  //   });
-  // };
-  // console.log("groups", group);
-  console.log("group----", group);
   const handleSubmit = () => {
     console.log("user", user);
     const data = {
@@ -189,7 +172,6 @@ const AddMembersInstructorScreen = ({ route }) => {
       if (!group?.isEdit) {
         CreateGroup(data)
           .then(async (res) => {
-            console.log("res0000000020202020020202020", res);
             Toast.show({
               type: "success",
               text2:
@@ -204,18 +186,12 @@ const AddMembersInstructorScreen = ({ route }) => {
               parentEmail2: item?.parent2_email,
             }));
 
-            console.log("students90909090", _students);
             try {
               let notifyToParents = await NotifyToParent(
                 res?.groupId,
                 _students
               );
-              console.log("notiftoparent", notifyToParents);
-              // NotifyToParent(res?.groupId, _students)
-              //   .then((res) => {
-              //     console.log("parent", res);
-              //   })
-              //   .catch((err) => console.log("NotifyToInstructors", err));
+
               const _instructors = [];
               let notifyToInstructor;
               if (!group?.isEdit && selectedInstructors) {
@@ -226,7 +202,6 @@ const AddMembersInstructorScreen = ({ route }) => {
                     email: item?.email,
                   });
                 });
-                console.log("instructris", _instructors);
 
                 notifyToInstructor = await NotifyToInstructors(
                   res?.groupId,
@@ -235,7 +210,7 @@ const AddMembersInstructorScreen = ({ route }) => {
               } else {
                 notifyToInstructor = true;
               }
-              console.log("notifyToInsftructor", notifyToInstructor);
+
               dispatch(ChangeModalState.action({ loading: false }));
               if (notifyToParents && notifyToInstructor) {
                 _dispatch({
@@ -270,14 +245,6 @@ const AddMembersInstructorScreen = ({ route }) => {
                 text2: "Something went wrong",
               });
             }
-            // NotifyToInstructors(res?.groupId, _instructors)
-            //   .then((res) => {
-            //     console.log(res);
-            //     navigation.navigate("InstructorActivity", {
-            //       screen: "InstructorGroup",
-            //     });
-            //   })
-            //   .catch((err) => console.log("NotifyToInstructors", err));
           })
           .catch((err) => {
             console.log("CreateGroup", err);
@@ -285,7 +252,6 @@ const AddMembersInstructorScreen = ({ route }) => {
       } else {
         UpdateGroup(data)
           .then(async (res) => {
-            console.log("res0000000020202020020202020", res);
             Toast.show({
               type: "success",
               text2:
@@ -300,7 +266,6 @@ const AddMembersInstructorScreen = ({ route }) => {
               parentEmail2: item?.parent2_email,
             }));
 
-            console.log("students90909090", _students);
             try {
               let notifyToParents = true;
               if (_students && _students?.length > 0) {
@@ -312,18 +277,12 @@ const AddMembersInstructorScreen = ({ route }) => {
                 notifyToParents = true;
               }
 
-              console.log("notiftoparent", notifyToParents);
-              // NotifyToParent(res?.groupId, _students)
-              //   .then((res) => {
-              //     console.log("parent", res);
-              //   })
-              //   .catch((err) => console.log("NotifyToInstructors", err));
               const _instructors = selectedInstructors.map((item) => ({
                 firstName: item?.firstname,
                 lastName: item?.lastname,
                 email: item?.email,
               }));
-              console.log("instructris", _instructors);
+
               dispatch(ChangeModalState.action({ loading: false }));
               let notifyToInstructor = true;
               if (_instructors?.length > 0) {
@@ -331,7 +290,6 @@ const AddMembersInstructorScreen = ({ route }) => {
                 await NotifyToInstructors(group?.isEdit?.groupId, _instructors);
                 notifyToInstructor = true;
               }
-              console.log("notifyToInsftructor", notifyToInstructor);
 
               if (notifyToParents && notifyToInstructor) {
                 setDeletedInstructors([]);
@@ -374,7 +332,6 @@ const AddMembersInstructorScreen = ({ route }) => {
                   deletedInstructor.length == 0 ? [0] : deletedInstructor,
                 groupId: group?.isEdit?.groupId,
               });
-              console.log("deleteParticipant", deleteParticipant);
             } catch (err) {
               dispatch(ChangeModalState.action({ loading: false }));
               console.log("err", err);
@@ -383,14 +340,6 @@ const AddMembersInstructorScreen = ({ route }) => {
                 text2: "Something went wrong",
               });
             }
-            // NotifyToInstructors(res?.groupId, _instructors)
-            //   .then((res) => {
-            //     console.log(res);
-            //     navigation.navigate("InstructorActivity", {
-            //       screen: "InstructorGroup",
-            //     });
-            //   })
-            //   .catch((err) => console.log("NotifyToInstructors", err));
           })
           .catch((err) => {
             console.log("CreateGroup", err);
@@ -469,54 +418,13 @@ const AddMembersInstructorScreen = ({ route }) => {
             </CheckBox> */}
           </View>
           <View style={styles.buttonSettings}>
-            <View
-              style={[
-                styles.background,
-                {
-                  backgroundColor:
-                    // selectedInstructors.length === 0
-                    //   ? Colors.lightgray
-                    //   :
-                    Colors.primary,
-                },
-              ]}
-            >
-              <TouchableOpacity
-                style={[
-                  styles.background,
-                  {
-                    backgroundColor:
-                      // selectedInstructors.length === 0
-                      //   ? Colors.lightgray
-                      //   :
-                      Colors.primary,
-                  },
-                ]}
-                // disabled={selectedInstructors.length === 0}
-                onPress={() => {
-                  console.log("deleted instructors", deletedInstructors);
-                  // const _instructors = [];
-                  // selectedInstructors.map((item) => {
-                  //   if (!item?.isEdit) {
-                  //     _instructors.push({
-                  //       firstName: item?.firstname,
-                  //       lastName: item?.lastname,
-                  //       email: item?.email,
-                  //     });
-                  //   }
-                  // });
-                  // console.log("instructris", _instructors);
-                  handleSubmit();
-                }}
-              >
-                <Text style={styles.button}>
-                  {group?.isEdit ? "Update Group" : "Invite to Group"}
-                </Text>
-              </TouchableOpacity>
+            <View style={[styles.background]}>
+              <LinearGradientButton onPress={handleSubmit}>
+                {group?.isEdit ? "Update Group" : "Invite to Group"}
+              </LinearGradientButton>
             </View>
             <View style={styles.background}>
-              <TouchableOpacity
-                style={styles.background}
+              <LinearGradientButton
                 onPress={() => {
                   navigation.reset({
                     index: 0,
@@ -542,8 +450,8 @@ const AddMembersInstructorScreen = ({ route }) => {
                   setSelectedInstructors([]);
                 }}
               >
-                <Text style={styles.button}>Cancel</Text>
-              </TouchableOpacity>
+                Cancel
+              </LinearGradientButton>
             </View>
           </View>
         </View>
@@ -559,6 +467,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     paddingTop: 20,
+    backgroundColor: Colors.newBackgroundColor,
   },
   mainLayout: {
     flex: 1,
@@ -583,7 +492,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 10,
-    backgroundColor: Colors.primary,
+    // backgroundColor: Colors.primary,
   },
   button: {
     paddingTop: 5,
@@ -595,7 +504,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonSettings: {
-    marginTop: 20,
+    marginTop: 70,
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-start",

@@ -1,6 +1,7 @@
 export default {
   transparent: "transparent",
   whiteTransparent: "rgba(0,0,0,0.3)",
+  newBackgroundColor: "#ebf2fb",
   white: "#FFFFFF",
   black: "#000000",
   borderGrey: "#C6C6C6",

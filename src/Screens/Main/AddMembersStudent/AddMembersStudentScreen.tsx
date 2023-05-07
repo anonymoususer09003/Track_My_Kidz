@@ -1,13 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import {
-  Text,
-  Icon,
-  CheckBox,
-  Select,
-  SelectItem,
-  Input,
-} from "@ui-kitten/components";
+import { Text } from "@ui-kitten/components";
 import {
   StyleSheet,
   View,
@@ -16,16 +9,16 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Image,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-
+import { LinearGradientButton } from "@/Components";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { useIsFocused } from "@react-navigation/native";
-import Swipeable from "react-native-gesture-handler/Swipeable";
+
 import Colors from "@/Theme/Colors";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import DocumentPicker from "react-native-document-picker";
-import Papa from "papaparse";
+
 import ChangeAddMembersStudentsState from "@/Store/AddMembersStudents/ChangeAddMembersStudentsState";
 import { useStateValue } from "@/Context/state/State";
 import { actions } from "@/Context/state/Reducer";
@@ -39,22 +32,18 @@ const AddMembersStudentScreen = ({ route }) => {
     (state: { students: AddMembersStudentsState }) => state.students?.students
   );
   const dispatch = useDispatch();
-  const [selctedGrade, setSelectedGrade] = useState("");
+
   const [selectedStudents, setSelectedStudents] = useState([]);
-  const [selectAll, setSelectAll] = useState(false);
+
   const [askPermission, setAskPermission] = useState(false);
   const [students, setStudents] = useState([]);
   const [deletedStudents, setDeletedStudents] = useState([]);
-  // const _students = useSelector(
-  //     (state: { students: AddMembersStudentsState }) =>
-  //         state.students?.students,
-  // )
+
   const handleSelectStudent = (index, status) => {
     const data = [...students];
     if (status) {
       const item = data[index];
-      console.log("item------if", item);
-      // let filterRemoveStudents=deletedStudents.filter((student)=>student.)
+
       const _selectedStudents = [...selectedStudents];
       _selectedStudents.push(item);
       setSelectedStudents(_selectedStudents);
@@ -65,7 +54,7 @@ const AddMembersStudentScreen = ({ route }) => {
       );
     } else {
       const item = selectedStudents[index];
-      console.log("else------", item);
+
       let _selectedStudents = [...selectedStudents];
       _selectedStudents = _selectedStudents.filter((i) => i !== item);
       setSelectedStudents(_selectedStudents);
@@ -76,28 +65,6 @@ const AddMembersStudentScreen = ({ route }) => {
       dispatch(
         ChangeAddMembersStudentsState.action({
           students: _selectedStudents,
-        })
-      );
-    }
-  };
-
-  const handleSelectAll = () => {
-    setSelectAll(!selectAll);
-    if (!selectAll) {
-      const data = [...students];
-      const _data = [];
-      data.forEach((i) => _data.push(i));
-      setSelectedStudents(_data);
-      dispatch(
-        ChangeAddMembersStudentsState.action({
-          students: _data,
-        })
-      );
-    } else {
-      setSelectedStudents([]);
-      dispatch(
-        ChangeAddMembersStudentsState.action({
-          students: [],
         })
       );
     }
@@ -115,10 +82,6 @@ const AddMembersStudentScreen = ({ route }) => {
     }
     addStudents = group?.isEdit ? temp : [...students];
     let filter = addStudents.filter((s) => s?.firstName !== "");
-    console.log("deletedstudent", deletedStudents);
-    console.log("students---", filter);
-    // deletedStudent: group?.isEdit ? deletedStudents : false,
-    // students: addStudents.filter((s) => s?.firstName !== ""),
 
     _dispatch({
       type: actions.SET_GROUP,
@@ -134,38 +97,9 @@ const AddMembersStudentScreen = ({ route }) => {
     });
   };
 
-  const handleImport = () => {
-    DocumentPicker.pick({ type: [DocumentPicker.types.csv] })
-      .then((res) => {
-        Papa.parse(res[0].fileCopyUri, {
-          download: true,
-          delimiter: ",",
-          complete: function (results: any) {
-            const _data: any = [];
-            if (results.data && results.data.length > 0) {
-              let i = 1;
-              results.data.map((item: any) => {
-                const items = item[0].split(";");
-                _data.push({
-                  id: i,
-                  firstName: items[0],
-                  lastName: items[1],
-                  email: items[2],
-                });
-                i = i + 1;
-              });
-              setStudents(_data);
-            }
-          },
-          error: function (error: any) {},
-        });
-      })
-      .catch((err) => {});
-  };
-
   const handleRemoveStudent = (item) => {
     let data = [...students];
-    console.log("item", item);
+
     if (!item?.studentId) {
       data = data.filter((d) => d.parent1_email !== item.parent1_email);
     } else {
@@ -195,14 +129,20 @@ const AddMembersStudentScreen = ({ route }) => {
   }, [isFocused]);
 
   return (
-    <ScrollView>
+    <ScrollView style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}>
       <AddIndividialMembersModal
         individuals={students}
         setIndividuals={setStudents}
         hideImport
       />
       <View style={styles.layout}>
-        <View style={{ flex: 1, paddingHorizontal: 20 }}>
+        <View
+          style={{
+            flex: 1,
+            paddingHorizontal: 20,
+            backgroundColor: Colors.newBackgroundColor,
+          }}
+        >
           <View
             style={{
               marginVertical: 10,
@@ -220,10 +160,8 @@ const AddMembersStudentScreen = ({ route }) => {
             >
               Add Students
             </Text>
-            <AntDesign
-              name="pluscircle"
-              size={25}
-              color={Colors.primary}
+
+            <TouchableOpacity
               onPress={() =>
                 dispatch(
                   ChangeModalState.action({
@@ -231,7 +169,16 @@ const AddMembersStudentScreen = ({ route }) => {
                   })
                 )
               }
-            />
+            >
+              <Image
+                source={require("@/Assets/Images/add.png")}
+                style={{
+                  height: 24,
+                  width: 24,
+                  resizeMode: "contain",
+                }}
+              />
+            </TouchableOpacity>
           </View>
           <View style={{ marginTop: 10, maxHeight: 150 }}>
             <FlatList
@@ -265,41 +212,6 @@ const AddMembersStudentScreen = ({ route }) => {
                 </View>
               )}
             />
-            {false && (
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <View style={styles.bottomButton}>
-                  <TouchableOpacity
-                    style={styles.bottomButton}
-                    onPress={handleImport}
-                  >
-                    <Text style={styles.button}>Import from CSV</Text>
-                  </TouchableOpacity>
-                </View>
-                <TouchableOpacity
-                  onPress={() =>
-                    Linking.openURL(
-                      "https://csv-tmk.s3.us-east-2.amazonaws.com/Student.csv"
-                    )
-                  }
-                >
-                  <Text
-                    style={{
-                      color: Colors.primary,
-                      textDecorationLine: "underline",
-                      fontSize: 14,
-                    }}
-                  >
-                    Download Template
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
           </View>
           <View style={{ marginTop: 10, maxHeight: 150 }}>
             <FlatList
@@ -307,78 +219,61 @@ const AddMembersStudentScreen = ({ route }) => {
               nestedScrollEnabled
               renderItem={({ item, index }) => (
                 <TouchableOpacity
-                  style={{
-                    marginVertical: 2,
-                    padding: 2,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
                   onPress={() => handleSelectStudent(index, false)}
+                  style={[
+                    styles.participantsListCards,
+                    {
+                      borderBottomWidth: students.length != index + 1 ? 2 : 0,
+                    },
+                  ]}
                 >
-                  <Text>{item}</Text>
-                  <AntDesign name="close" color={Colors.primary} size={20} />
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <View>
+                      <Text>{item?.name}</Text>
+                      <Text>{item?.parent1_email}</Text>
+                    </View>
+                  </View>
+                  <AntDesign
+                    name="delete"
+                    color={Colors.primary}
+                    size={20}
+                    style={{ marginHorizontal: 5 }}
+                    onPress={() => handleRemoveStudent(item)}
+                  />
                 </TouchableOpacity>
               )}
             />
           </View>
-          {/* <View style={{ marginVertical: 20, marginTop: 270 }}>
-            <CheckBox
-              style={{ marginLeft: 20 }}
-              checked={askPermission}
-              onChange={() => setAskPermission(!askPermission)}
-            >
-              {"Request Permission from Parents/Guardian"}
-            </CheckBox>
-          </View> */}
+
           <View style={[styles.buttonSettings, { paddingBottom: 20 }]}>
-            <View
-              style={[
-                styles.background,
-                {
-                  backgroundColor:
-                    students.filter((s) => s.firstName !== "").length === 0
-                      ? Colors.lightgray
-                      : Colors.primary,
-                },
-              ]}
+            <LinearGradientButton
+              disabled={students.filter((s) => s.firstName !== "").length === 0}
+              onPress={handleSubmit}
             >
-              <TouchableOpacity
-                style={[
-                  styles.background,
-                  {
-                    backgroundColor:
-                      students.filter((s) => s.firstName !== "").length === 0
-                        ? Colors.lightgray
-                        : Colors.primary,
-                  },
-                ]}
-                disabled={
-                  students.filter((s) => s.firstName !== "").length === 0
-                }
-                onPress={handleSubmit}
-              >
-                <Text style={styles.button}>Continue</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.background}>
-              <TouchableOpacity
-                style={styles.background}
-                onPress={() => {
-                  resetFields();
-                  navigation.reset({
-                    index: 0,
-                    routes: [
-                      {
-                        name: "InstructorActivity",
-                      },
-                    ],
-                  });
-                }}
-              >
-                <Text style={styles.button}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+              {route?.params ? "Edit Members" : "Add Members"}
+            </LinearGradientButton>
+            <View style={{ marginTop: 20 }} />
+            <LinearGradientButton
+              gradient={["#EC5ADD", Colors.primary]}
+              onPress={() => {
+                resetFields();
+                navigation.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: "InstructorActivity",
+                    },
+                  ],
+                });
+              }}
+            >
+              Cancel
+            </LinearGradientButton>
           </View>
         </View>
       </View>
@@ -393,6 +288,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     paddingTop: 20,
+    backgroundColor: Colors.newBackgroundColor,
   },
   mainLayout: {
     flex: 1,
@@ -439,15 +335,40 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonSettings: {
-    marginTop: 20,
+    marginTop: "25%",
     flexDirection: "column",
+
     alignItems: "center",
-    justifyContent: "flex-start",
+    width: "80%",
+    marginLeft: "10%",
+
+    // alignItems: "center",
+    // justifyContent: "flex-start",
   },
   errorText: {
     fontSize: 10,
     color: "red",
     marginLeft: 10,
     marginTop: 10,
+  },
+  participantContainer: {
+    width: "80%",
+    marginVertical: 5,
+    marginLeft: "5%",
+  },
+  participantListView: {
+    borderRadius: 10,
+    backgroundColor: Colors.white,
+    padding: 5,
+    elevation: 2,
+  },
+  participantsListCards: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 2.5,
+    borderColor: Colors.newBackgroundColor,
+    paddingBottom: 10,
+    paddingHorizontal: 10,
   },
 });

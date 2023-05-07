@@ -34,6 +34,7 @@ import Colors from "@/Theme/Colors";
 import { ChatState } from "@/Store/chat";
 import SetChatParam from "@/Store/chat/SetChatParams";
 import moment from "moment";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 const SingleChatScreen = ({ route, navigation }) => {
   console.log("route--2-2-2--2-2", route);
   const [messages, setMessages] = useState([]);
@@ -475,14 +476,7 @@ const SingleChatScreen = ({ route, navigation }) => {
   // );
 
   return (
-    <>
-      {route?.params?.showHeader && (
-        <AppHeader
-          isBack={true}
-          title={`${route?.params?.title} Chat`}
-          hideCalendar={true}
-        />
-      )}
+    <BackgroundLayout title={`${route?.params?.title} Chat`}>
       <GiftedChat
         renderLoading={renderLoading}
         messages={messages}
@@ -597,7 +591,7 @@ const SingleChatScreen = ({ route, navigation }) => {
           </Button>
         </Card>
       </Modal>
-    </>
+    </BackgroundLayout>
   );
 };
 

@@ -44,7 +44,8 @@ const DeclineActivityModal = ({
       const data = {
         activityId: activity?.activity?.activityId,
         status: "declined",
-        studentId: activity?.studentId,
+        studentId: activity?.selectedStudentId,
+        studentActivityId: activity?.studentId,
       };
       console.log("data", data);
       UpdateActivityByStatus(data)
@@ -57,12 +58,19 @@ const DeclineActivityModal = ({
             })
           );
         })
-        .catch((err) => console.log("eeteet", err));
+        .catch((err) => {
+          dispatch(
+            ChangeModalState.action({
+              declineActivityModalVisibility: false,
+            })
+          );
+        });
     } else {
       const data = {
         groupId: activity?.group?.groupId,
         status: "declined",
-        studentId: activity?.studentId,
+        studentId: activity?.selectedStudentId,
+        studentGroupId: activity?.studentId,
       };
       UpdateGroupByStatus(data)
         .then((res) => {

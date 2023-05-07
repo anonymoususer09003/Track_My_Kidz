@@ -75,7 +75,7 @@ const InstructionsModal = ({
         getGroupsOptInDetail();
       } else if (activity) getActivityOptInDetail();
     }
-  }, [isVisible]);
+  }, [isVisible, group, activity]);
   const getActivityOptInDetail = async () => {
     try {
       console.log("activity99", activity?.activityId);

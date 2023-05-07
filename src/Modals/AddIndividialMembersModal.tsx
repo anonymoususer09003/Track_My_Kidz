@@ -6,7 +6,7 @@ import { StyleSheet, TouchableOpacity, View, ScrollView } from "react-native";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import DocumentPicker from "react-native-document-picker";
 import Papa from "papaparse";
-
+import { LinearGradientButton } from "@/Components";
 import { Formik } from "formik";
 import * as yup from "yup";
 import Colors from "@/Theme/Colors";
@@ -81,8 +81,9 @@ const AddIndividialMembersModal = ({
         );
       }}
     >
-      <>
+      <View style={{ flex: 1 }}>
         <ScrollView
+          showsVerticalScrollIndicator={false}
           style={{
             flex: 1,
             backgroundColor: Colors.white,
@@ -130,19 +131,19 @@ const AddIndividialMembersModal = ({
                 <Layout style={styles.formContainer} level="1">
                   <Input
                     value={values.first_name}
-                    style={{ marginTop: 10 }}
+                    style={styles.textInput}
                     placeholder="First Name"
                     onChangeText={handleChange("first_name")}
                   />
                   <Input
+                    style={styles.textInput}
                     value={values.last_name}
-                    style={{ marginTop: 10 }}
                     placeholder="Last Name"
                     onChangeText={handleChange("last_name")}
                   />
                   <Input
                     value={values.parent1_email}
-                    style={{ marginTop: 10 }}
+                    style={styles.textInput}
                     placeholder="Parent1 Email"
                     onChangeText={handleChange("parent1_email")}
                     autoCapitalize="none"
@@ -150,7 +151,7 @@ const AddIndividialMembersModal = ({
                   />
                   <Input
                     value={values.parent2_email}
-                    style={{ marginTop: 10 }}
+                    style={styles.textInput}
                     placeholder="Parent2 Email (Optional)"
                     onChangeText={handleChange("parent2_email")}
                     autoCapitalize="none"
@@ -158,36 +159,63 @@ const AddIndividialMembersModal = ({
                   />
                 </Layout>
                 <View
-                  style={{ marginTop: 20, width: "100%", alignItems: "center" }}
+                  style={{
+                    marginTop: 20,
+                    width: "100%",
+                    alignItems: "center",
+                    paddingLeft: 40,
+                  }}
                 >
-                  <Button
-                    style={styles.modalButton}
-                    size="medium"
-                    onPress={handleSubmit}
-                    disabled={!isValid}
-                  >
-                    Add one more
-                  </Button>
-                  <Button
-                    style={styles.modalButton}
-                    size="medium"
-                    onPress={() => {
-                      handleSubmit();
-                      hidemodal();
-                    }}
-                    disabled={!isValid}
-                  >
-                    I'm done
-                  </Button>
-                  <Button
-                    style={styles.modalButton}
-                    size="medium"
-                    onPress={() => {
-                      hidemodal();
+                  <View
+                    style={{
+                      height: 50,
+                      width: "100%",
+                      marginBottom: 10,
                     }}
                   >
-                    <Text> Cancel</Text>
-                  </Button>
+                    <LinearGradientButton
+                      size="medium"
+                      onPress={handleSubmit}
+                      disabled={!isValid}
+                    >
+                      Add one more
+                    </LinearGradientButton>
+                  </View>
+                  <View
+                    style={{
+                      height: 50,
+                      width: "100%",
+                      marginBottom: 10,
+                    }}
+                  >
+                    <LinearGradientButton
+                      size="medium"
+                      onPress={() => {
+                        handleSubmit();
+                        hidemodal();
+                      }}
+                      disabled={!isValid}
+                    >
+                      I'm done
+                    </LinearGradientButton>
+                  </View>
+                  <View
+                    style={{
+                      height: 50,
+                      width: "100%",
+                      marginBottom: 10,
+                    }}
+                  >
+                    <LinearGradientButton
+                      style={styles.modalButton}
+                      size="medium"
+                      onPress={() => {
+                        hidemodal();
+                      }}
+                    >
+                      Cancel
+                    </LinearGradientButton>
+                  </View>
                 </View>
                 {false && (
                   <TouchableOpacity
@@ -201,7 +229,7 @@ const AddIndividialMembersModal = ({
             )}
           </Formik>
         </ScrollView>
-      </>
+      </View>
     </Modal>
   );
 };
@@ -380,5 +408,13 @@ const styles = StyleSheet.create({
   },
   selectSettings: {
     marginTop: 18,
+  },
+  textInput: {
+    marginTop: 10,
+    alignSelf: "center",
+    width: "95%",
+    marginLeft: "5%",
+    borderRadius: 8,
+    elevation: 2,
   },
 });

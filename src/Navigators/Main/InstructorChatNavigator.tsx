@@ -11,9 +11,9 @@ import { useStateValue } from "@/Context/state/State";
 import SetChatParam from "@/Store/chat/SetChatParams";
 import { UserState } from "@/Store/User";
 import { useDispatch, useSelector } from "react-redux";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 // @refresh reset
 const ActivityNavigator = ({ route }) => {
-  console.log("route-----------", route.params);
   const isFocused = useIsFocused();
   const TabNavigator = createMaterialTopTabNavigator();
   const tabNames = ["Parents", "Participants"];
@@ -108,12 +108,7 @@ const ActivityNavigator = ({ route }) => {
     );
   };
   return (
-    <>
-      <AppHeader
-        isBack={true}
-        title={`${route?.params?.title} Chat`}
-        hideCalendar={true}
-      />
+    <BackgroundLayout title={`${route?.params?.title} Chat`}>
       <TabNavigator.Navigator
         screenOptions={{ lazy: true, swipeEnabled: false, ...route.params }}
         tabBar={(props) => <TopTabBar {...props} {...route.params} />}
@@ -129,7 +124,7 @@ const ActivityNavigator = ({ route }) => {
           component={ParentChatScreen}
         />
       </TabNavigator.Navigator>
-    </>
+    </BackgroundLayout>
   );
 };
 

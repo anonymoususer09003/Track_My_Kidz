@@ -18,13 +18,14 @@ import { useDispatch, useSelector } from "react-redux";
 import Colors from "@/Theme/Colors";
 import { AddIndividialMembersModal, GroupSelectionModal } from "@/Modals";
 import { Formik } from "formik";
-import { AppHeader } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { CreateActivity } from "@/Services/Activity";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import moment from "moment";
 import { GetAllStudents } from "@/Services/Student";
 import { useIsFocused } from "@react-navigation/native";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 
 const _days = [
   {
@@ -170,13 +171,13 @@ const CreateParentActivityScreen = ({ route }) => {
 
   console.log("currentUser29992929292929", currentUser);
   return (
-    <>
+    <BackgroundLayout title="Create Event">
       <GroupSelectionModal individuals={groups} setIndividuals={setGroups} />
       <AddIndividialMembersModal
         individuals={students}
         setIndividuals={setStudents}
       />
-      <AppHeader hideCalendar={true} title="Create Event" />
+
       <ScrollView style={styles.layout}>
         <Formik
           validateOnMount={true}
@@ -322,7 +323,7 @@ const CreateParentActivityScreen = ({ route }) => {
             <>
               <View style={styles.formContainer}>
                 <Input
-                  style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
+                  style={[styles.textInput, { marginLeft: "5%" }]}
                   placeholder="Event Name*"
                   onChangeText={handleChange("name")}
                   value={values.name}
@@ -332,19 +333,24 @@ const CreateParentActivityScreen = ({ route }) => {
                 ) : null}
                 <View
                   style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
+                    flexDirection: "column",
+
+                    // justifyContent: "space-between",
                     marginLeft: "5%",
                     width: "100%",
                   }}
                 >
+                  <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}>
+                    {" "}
+                    Event Type*
+                  </Text>
                   <RadioGroup
                     selectedIndex={selectedIndex}
                     style={{
-                      flexDirection: "column",
-                      alignItems: "center",
+                      flexDirection: "row",
+                      alignItems: "space-between",
                       width: "50%",
+                      icon: () => null,
                     }}
                     onChange={(index) => {
                       setSelectedIndex(index);
@@ -352,7 +358,15 @@ const CreateParentActivityScreen = ({ route }) => {
                       setFromCheckBox(false);
                     }}
                   >
-                    <Radio style={{ flexDirection: "row", width: "50%" }}>
+                    <Radio
+                      style={[
+                        styles.radioButton,
+                        {
+                          borderColor:
+                            selectedIndex == 0 ? Colors.primary : "transparent",
+                        },
+                      ]}
+                    >
                       {(evaProps) => (
                         <Text
                           {...evaProps}
@@ -364,7 +378,15 @@ const CreateParentActivityScreen = ({ route }) => {
                       )}
                     </Radio>
                     <Divider />
-                    <Radio style={{ flexDirection: "row", width: "50%" }}>
+                    <Radio
+                      style={[
+                        styles.radioButton,
+                        {
+                          borderColor:
+                            selectedIndex == 2 ? Colors.primary : "transparent",
+                        },
+                      ]}
+                    >
                       {(evaProps) => (
                         <Text
                           {...evaProps}
@@ -376,16 +398,31 @@ const CreateParentActivityScreen = ({ route }) => {
                     </Radio>
                     <Divider />
                   </RadioGroup>
+                  <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}>
+                    {" "}
+                    Event Duration*
+                  </Text>
                   <RadioGroup
                     selectedIndex={timeSelectedIndex}
                     style={{
-                      flexDirection: "column",
+                      flexDirection: "row",
                       alignItems: "center",
+                      justifyContent: "space-between",
                       width: "50%",
                     }}
                     onChange={(index) => setTimeSelectedIndex(index)}
                   >
-                    <Radio style={{ flexDirection: "row", width: "50%" }}>
+                    <Radio
+                      style={[
+                        styles.radioButton,
+                        {
+                          borderColor:
+                            timeSelectedIndex == 0
+                              ? Colors.primary
+                              : "transparent",
+                        },
+                      ]}
+                    >
                       {(evaProps) => (
                         <Text
                           {...evaProps}
@@ -397,7 +434,17 @@ const CreateParentActivityScreen = ({ route }) => {
                       )}
                     </Radio>
                     <Divider />
-                    <Radio style={{ flexDirection: "row", width: "50%" }}>
+                    <Radio
+                      style={[
+                        styles.radioButton,
+                        {
+                          borderColor:
+                            timeSelectedIndex == 2
+                              ? Colors.primary
+                              : "transparent",
+                        },
+                      ]}
+                    >
                       {(evaProps) => (
                         <Text
                           {...evaProps}
@@ -795,7 +842,7 @@ const CreateParentActivityScreen = ({ route }) => {
                   }}
                 >
                   <Input
-                    style={{ marginRight: 20, width: "100%" }}
+                    style={styles.textInput}
                     placeholder="Venue name*"
                     onChangeText={handleChange("fromVenueName")}
                     value={values.fromVenueName}
@@ -804,7 +851,7 @@ const CreateParentActivityScreen = ({ route }) => {
                     <Text style={styles.errorText}>{errors.venueName}</Text>
                   )}
                   <Input
-                    style={{ marginRight: 20, marginTop: 10, width: "100%" }}
+                    style={styles.textInput}
                     placeholder="Address*"
                     onChangeText={handleChange("fromAddress")}
                     value={values.fromAddress}
@@ -829,7 +876,7 @@ const CreateParentActivityScreen = ({ route }) => {
                     placeholder="Country*"
                     value={values?.fromCountry}
                     placement="bottom"
-                    style={{ marginVertical: 5 }}
+                    style={styles.textInput}
                     // label={evaProps => <Text {...evaProps}>Country*</Text>}
                     onChangeText={(query) => {
                       setFieldValue("fromCountry", query);
@@ -861,7 +908,7 @@ const CreateParentActivityScreen = ({ route }) => {
                     placeholder="State"
                     value={values.fromState}
                     placement="bottom"
-                    style={{ marginVertical: 5 }}
+                    style={styles.textInput}
                     // label={evaProps => <Text {...evaProps}>State</Text>}
                     onChangeText={(query) => {
                       setFieldValue("fromState", query);
@@ -891,7 +938,7 @@ const CreateParentActivityScreen = ({ route }) => {
                     placeholder="City"
                     value={values.fromCity}
                     placement="bottom"
-                    style={{ marginVertical: 5 }}
+                    style={styles.textInput}
                     // label={evaProps => <Text {...evaProps}>City</Text>}
                     onChangeText={(query) => {
                       setFieldValue("fromCity", query);
@@ -909,7 +956,7 @@ const CreateParentActivityScreen = ({ route }) => {
                     })}
                   </Autocomplete>
                   <Input
-                    style={{ width: "100%" }}
+                    style={styles.textInput}
                     placeholder="Zip/Post Code"
                     onChangeText={handleChange("fromZipCode")}
                     value={values.fromZipCode}
@@ -996,17 +1043,13 @@ const CreateParentActivityScreen = ({ route }) => {
                       }}
                     >
                       <Input
-                        style={{ marginRight: 20, width: "100%" }}
+                        style={styles.textInput}
                         placeholder="Venue name"
                         onChangeText={handleChange("venueName")}
                         value={values.venueName}
                       />
                       <Input
-                        style={{
-                          marginRight: 20,
-                          marginTop: 10,
-                          width: "100%",
-                        }}
+                        style={styles.textInput}
                         placeholder="Address"
                         onChangeText={handleChange("address")}
                         value={values.address}
@@ -1016,7 +1059,7 @@ const CreateParentActivityScreen = ({ route }) => {
                         placeholder="Country*"
                         value={values.country}
                         placement="bottom"
-                        style={{ marginVertical: 5 }}
+                        style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>Country*</Text>}
                         onChangeText={(query) => {
                           setFieldValue("country", query);
@@ -1028,7 +1071,7 @@ const CreateParentActivityScreen = ({ route }) => {
                         }}
                         onSelect={(query) => {
                           const selectedCountry = countriesData[query];
-                          console.log("000000", selectedCountry.name);
+
                           setFieldValue("country", selectedCountry.name);
                           setFieldValue(
                             "selectedCountry",
@@ -1055,7 +1098,7 @@ const CreateParentActivityScreen = ({ route }) => {
                         placeholder="State"
                         value={values.state}
                         placement="bottom"
-                        style={{ marginVertical: 5 }}
+                        style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>State</Text>}
                         onChangeText={(query) => {
                           setFieldValue("state", query);
@@ -1086,7 +1129,7 @@ const CreateParentActivityScreen = ({ route }) => {
                         placeholder="City"
                         value={values.city}
                         placement="bottom"
-                        style={{ marginVertical: 5 }}
+                        style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>City</Text>}
                         onChangeText={(query) => {
                           setFieldValue("city", query);
@@ -1105,7 +1148,7 @@ const CreateParentActivityScreen = ({ route }) => {
                       </Autocomplete>
 
                       <Input
-                        style={{ width: "100%" }}
+                        style={styles.textInput}
                         placeholder="Zip/Post Code"
                         onChangeText={handleChange("zipCode")}
                         value={values.zipCode}
@@ -1115,8 +1158,8 @@ const CreateParentActivityScreen = ({ route }) => {
                 )}
 
                 <Input
-                  style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                  textStyle={{ minHeight: 120 }}
+                  style={styles.textArea}
+                  textStyle={{ minHeight: 70, textAlignVertical: "top" }}
                   placeholder="Instructions"
                   onChangeText={handleChange("instructions")}
                   value={values.instructions}
@@ -1124,8 +1167,8 @@ const CreateParentActivityScreen = ({ route }) => {
                   maxLength={500}
                 />
                 <Input
-                  style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                  textStyle={{ minHeight: 120 }}
+                  style={styles.textArea}
+                  textStyle={{ minHeight: 70, textAlignVertical: "top" }}
                   placeholder="Disclaimer"
                   onChangeText={handleChange("disclaimer")}
                   value={values.disclaimer}
@@ -1133,8 +1176,8 @@ const CreateParentActivityScreen = ({ route }) => {
                   maxLength={500}
                 />
                 <Input
-                  style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                  textStyle={{ minHeight: 120 }}
+                  style={styles.textArea}
+                  textStyle={{ minHeight: 70, textAlignVertical: "top" }}
                   placeholder="Agreement"
                   onChangeText={handleChange("agreement")}
                   value={values.agreement}
@@ -1301,41 +1344,16 @@ const CreateParentActivityScreen = ({ route }) => {
                       {"Request Permission from Parents/Guardian"}
                     </CheckBox>
                   </View>
-                  <View
-                    style={[
-                      styles.background,
-                      {
-                        backgroundColor:
-                          values?.name?.length < 3 || values?.name?.length > 20
-                            ? Colors.lightgray
-                            : Colors.primary,
-                      },
-                    ]}
-                  >
-                    <TouchableOpacity
-                      style={[
-                        styles.background,
-                        {
-                          backgroundColor:
-                            values?.name?.length < 3 ||
-                            values?.name?.length > 20
-                              ? Colors.lightgray
-                              : Colors.primary,
-                        },
-                      ]}
+                  <View style={styles.buttonSettings}>
+                    <LinearGradientButton
                       onPress={handleSubmit}
+                      colors={[Colors.primary, "#EC5ADD"]}
+                      start={{ x: 0, y: 1 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.linearGradient}
                     >
-                      <Text style={styles.button}>I'm done</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={[styles.background]}>
-                    <TouchableOpacity
-                      style={[styles.background]}
-                      disabled={!isValid}
-                      onPress={() => navigation.navigate("HomeScreen")}
-                    >
-                      <Text style={styles.button}>Cancel</Text>
-                    </TouchableOpacity>
+                      I'm done
+                    </LinearGradientButton>
                   </View>
                 </View>
               </View>
@@ -1343,7 +1361,7 @@ const CreateParentActivityScreen = ({ route }) => {
           )}
         </Formik>
       </ScrollView>
-    </>
+    </BackgroundLayout>
   );
 };
 
@@ -1354,6 +1372,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     paddingTop: 20,
+    backgroundColor: Colors.newBackgroundColor,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
   mainLayout: {
     flex: 1,
@@ -1371,7 +1392,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   background: {
-    width: "90%",
+    width: "98%",
     borderRadius: 10,
     paddingBottom: 7,
     flexDirection: "row",
@@ -1379,6 +1400,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 10,
     backgroundColor: Colors.primary,
+    marginLeft: "5%",
   },
   button: {
     paddingTop: 5,
@@ -1396,7 +1418,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 40,
+    marginBottom: 70,
+    width: "90%",
   },
   errorText: {
     fontSize: 10,
@@ -1427,5 +1450,72 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderColor: "#fff",
     marginLeft: 5,
+  },
+  inputLabels: {
+    color: Colors.black,
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  radioButton: {
+    width: "60%",
+    height: 40,
+    borderRadius: 8,
+    borderWidth: 1,
+    backgroundColor: Colors.white,
+    elevation: 2,
+    paddingLeft: 10,
+    marginLeft: "10%",
+  },
+  participantContainer: {
+    width: "95%",
+    marginVertical: 5,
+    marginLeft: "2%",
+  },
+  participantListView: {
+    borderRadius: 10,
+    backgroundColor: Colors.white,
+    padding: 5,
+    elevation: 2,
+  },
+  participantsListCards: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 2.5,
+    borderColor: Colors.newBackgroundColor,
+    paddingBottom: 10,
+    paddingHorizontal: 10,
+  },
+
+  linearGradient: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 20,
+    width: "80%",
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  textArea: {
+    marginRight: 20,
+    marginTop: 10,
+    marginLeft: "8%",
+    borderRadius: 10,
+    elevation: 2,
+    width: "95%",
+  },
+  textInput: {
+    marginTop: 10,
+    alignSelf: "center",
+    width: "95%",
+
+    borderRadius: 8,
+    elevation: 2,
+  },
+  autoCompleteItem: {
+    // elevation: 2,
+    backgroundColor: "transparent",
+    width: "100%",
+    marginLeft: "1%",
   },
 });

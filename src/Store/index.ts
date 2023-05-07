@@ -18,6 +18,7 @@ import theme from "./Theme";
 import modal from "./Modal";
 import userType from "./UserType";
 import chat from "./chat";
+import header from "./header";
 import addMembersStudents from "./AddMembersStudents";
 import navigation from "./Navigation";
 import authentication from "./Authentication";
@@ -51,6 +52,7 @@ const reducers = combineReducers({
   instructorsActivity,
   studentActivity,
   chat,
+  header,
 });
 
 const persistConfig = {

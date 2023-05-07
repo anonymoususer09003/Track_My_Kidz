@@ -49,7 +49,7 @@ const ActivityDetailsScreen = () => {
   const [getParticipantsIds, setParticipantsIds] = useState([]);
   const [trackingList, setTrackingList] = useState({});
   const isFocused = useIsFocused();
-  console.log("acitvity", activity);
+
   const getParticipantLocation = async () => {
     try {
       let res = await ParticipantLocation(activity?.activityId);
@@ -86,6 +86,13 @@ const ActivityDetailsScreen = () => {
   };
   const subscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
+    setTrackingList({
+      ...trackingList,
+      [messageBody.deviceId]: {
+        lat: messageBody.latitude,
+        lang: messageBody.longitude,
+      },
+    });
     console.log("Update Received", messageBody);
   };
 

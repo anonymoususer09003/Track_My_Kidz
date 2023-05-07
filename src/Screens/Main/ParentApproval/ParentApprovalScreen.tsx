@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
@@ -23,7 +24,15 @@ import GetActivityByStatus from "@/Services/Activity/GetActivityByStatus";
 import { GetChildrenAcitivities } from "@/Services/Activity";
 import { UserState } from "@/Store/User";
 import { GetChildrenGroups } from "@/Services/Group";
+import ChildrenSelectionModal from "@/Modals/ChildrenSelectionModal";
+import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
 const ParentApprovalScreen = ({ route }) => {
+  const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
+  const marker = require("@/Assets/Images/marker.png");
+
+  const email = require("@/Assets/Images/email.png");
+  const clockIcon = require("@/Assets/Images/clock1.png");
+  const instructorImage = require("@/Assets/Images/approval_icon2.png");
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const dependent = route && route.params && route.params.dependent;
@@ -39,9 +48,11 @@ const ParentApprovalScreen = ({ route }) => {
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
+  const [activity, setActivity] = useState(null);
   let prevOpenedRow: any;
   let row: Array<any> = [];
   const [groups, setGroups] = useState([]);
+  const [children, setChildren] = useState([]);
   const [pageGroup, pageNumberGroup] = useState(0);
   const [pageSizeGroup, setPageSizeGroup] = useState(10);
   const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
@@ -50,6 +61,7 @@ const ParentApprovalScreen = ({ route }) => {
   const [pageSizeActivity, setPageSizeActivity] = useState(10);
   const [totalRecordsActivity, setTotalRecordsActivity] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedChild, setSelectedChild] = useState("");
 
   const getActivities = async (refreshing: any) => {
     if (refreshing) {
@@ -119,6 +131,18 @@ const ParentApprovalScreen = ({ route }) => {
         console.log("Error:", err);
       });
   };
+
+  const loadUserDetails = async () => {
+    GetParentChildrens(currentUser?.referenceCode)
+      .then((res) => {
+        console.log("children", res);
+        setChildren(res);
+      })
+      .catch((err) => console.log("loadUserDetails", err));
+  };
+  useEffect(() => {
+    loadUserDetails();
+  }, []);
   useEffect(() => {
     if (isFocused || declineActivity) {
       getActivities();
@@ -160,7 +184,9 @@ const ParentApprovalScreen = ({ route }) => {
           }}
           onPress={() => {
             dispatch(
-              ChangeModalState.action({ declineActivityModalVisibility: true })
+              ChangeModalState.action({
+                childrenSelectionModalVisibility: true,
+              })
             );
             setDeclineActivity(item);
           }}
@@ -178,6 +204,7 @@ const ParentApprovalScreen = ({ route }) => {
       </View>
     );
   };
+  console.log("selected child", selectedChild);
 
   return (
     <>
@@ -186,10 +213,37 @@ const ParentApprovalScreen = ({ route }) => {
         setSelectedInstructions={setSelectedInstructions}
       />
       {declineActivity && (
+        <ChildrenSelectionModal
+          acceptModal={false}
+          setSelectedChild={setSelectedChild}
+          activity={declineActivity}
+          children={children}
+        />
+      )}
+
+      {declineActivity && !!selectedChild && (
         <DeclineActivityModal
           fromParent={true}
-          activity={declineActivity}
-          setActivity={setDeclineActivity}
+          activity={{
+            ...declineActivity,
+            selectedStudentId: selectedChild.studentId,
+          }}
+          setActivity={(id) => {
+            setSelectedChild("");
+            if (declineActivity?.activity) {
+              console.log("declinedactivity", declineActivity);
+
+              console.log("activites", activities);
+              let filter = activities.filter(
+                (item) => item?.activity?.activityId != id
+              );
+              setDeclineActivity(false);
+              setActivities(filter);
+            } else {
+              let filter = groups.filter((item) => item?.group?.groupId != id);
+              setGroups(filter);
+            }
+          }}
         />
       )}
       <View style={styles.layout}>
@@ -201,7 +255,7 @@ const ParentApprovalScreen = ({ route }) => {
           </View>
         )}
 
-        <View style={styles.layout}>
+        <View style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}>
           <FlatList
             data={[...activities, ...groups]}
             // style={{ padding: 20, width: "100%" }}
@@ -214,54 +268,41 @@ const ParentApprovalScreen = ({ route }) => {
                     onSwipeableOpen={() => closeRow(item?.activity?.activityId)}
                     renderRightActions={(e) => RightActions(e, item)}
                   >
-                    <View
-                      style={[
-                        styles.item,
-                        {
-                          backgroundColor: !item.status
-                            ? "#fff"
-                            : index % 3 === 0
-                            ? "lightgreen"
-                            : index % 2 === 0
-                            ? "#F6DDCC"
-                            : "#fff",
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={styles.text}
-                      >{` Activity Name: ${item?.activity?.activityName}`}</Text>
-                      {/* 
-                      <Text style={styles.text}>{`Date: ${moment(
-                        date == "string" ? new Date() : date[0]
-                      ).format("YYYY-MM-DD")}`}</Text>
-                      {!date[1] ? (
-                        <Text style={styles.text}>{`Time: ${moment(
-                          date == "string" ? new Date() : date
-                        )
-                          .subtract("hours", 5)
-                          .format("hh:mm a")}`}</Text>
-                      ) : (
-                        <Text style={styles.text}>{`Time: ${
-                          date[2] + " " + date[3]
-                        }`}</Text>
-                      )} */}
+                    <View style={[styles.item]}>
+                      <Text style={[styles.text, { fontSize: 25 }]}>
+                        {`${item?.activity?.activityName}`}
+                      </Text>
 
-                      <Text style={styles.text}>{` Date: ${moment(date).format(
-                        "YYYY-MM-DD"
-                      )}`}</Text>
-                      <Text style={styles.text}>{` Time: ${moment(date).format(
-                        "hh:mm A"
-                      )}`}</Text>
-                      <Text
-                        style={styles.text}
-                      >{` Name: ${item?.firstName} ${item?.lastName}`}</Text>
-                      <Text
-                        style={styles.text}
-                      >{`Status: ${item?.status}`}</Text>
-                      <Text
-                        style={styles.text}
-                      >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
+                      <View style={styles.horizontal}>
+                        <Image source={calendarIcon} style={styles.iconStyle} />
+                        <Text style={styles.text}>{`${moment(date).format(
+                          "YYYY-MM-DD"
+                        )}`}</Text>
+                      </View>
+                      <View style={styles.horizontal}>
+                        <Image source={clockIcon} style={styles.iconStyle} />
+                        <Text style={styles.text}>{`${moment(date).format(
+                          "hh:mm A"
+                        )}`}</Text>
+                      </View>
+
+                      <View style={styles.horizontal}>
+                        <Image
+                          source={instructorImage}
+                          style={styles.iconStyle}
+                        />
+                        <Text
+                          style={styles.text}
+                        >{`${item?.firstName} ${item?.lastName}`}</Text>
+                      </View>
+
+                      <View style={styles.horizontal}>
+                        <Image source={email} style={styles.iconStyle} />
+
+                        <Text
+                          style={styles.text}
+                        >{`${item?.parentEmail1}`}</Text>
+                      </View>
                     </View>
                   </Swipeable>
                 );
@@ -272,35 +313,31 @@ const ParentApprovalScreen = ({ route }) => {
                     renderRightActions={(e) => RightActions(e, item)}
                     onSwipeableOpen={() => closeRow(item?.groupId)}
                   >
-                    <View
-                      style={[
-                        styles.item,
-                        {
-                          backgroundColor: !item.status
-                            ? "#fff"
-                            : index % 3 === 0
-                            ? "lightgreen"
-                            : index % 2 === 0
-                            ? "#F6DDCC"
-                            : "#fff",
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={styles.text}
-                      >{` Group Name: ${item?.group?.groupName}`}</Text>
-                      <Text style={styles.text}>{` Date: ${moment(
-                        item?.activity?.scheduler?.fromDate
-                      ).format("YYYY-MM-DD")}`}</Text>
-                      <Text
-                        style={styles.text}
-                      >{` ${item?.firstName} ${item?.lastName}`}</Text>
-                      <Text
-                        style={styles.text}
-                      >{`Status: ${item?.status}`}</Text>
-                      <Text
-                        style={styles.text}
-                      >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
+                    <View style={[styles.item]}>
+                      <Text style={[styles.text, { fontSize: 25 }]}>
+                        {item?.group?.groupName}
+                      </Text>
+                      <View style={styles.horizontal}>
+                        <Image source={calendarIcon} style={styles.iconStyle} />
+                        <Text style={styles.text}>{`${moment(
+                          item?.activity?.scheduler?.fromDate
+                        ).format("YYYY-MM-DD")}`}</Text>
+                      </View>
+                      <View style={styles.horizontal}>
+                        <Image
+                          source={instructorImage}
+                          style={styles.iconStyle}
+                        />
+                        <Text
+                          style={styles.text}
+                        >{` ${item?.firstName} ${item?.lastName}`}</Text>
+                      </View>
+                      <View style={styles.horizontal}>
+                        <Image source={email} style={styles.iconStyle} />
+                        <Text
+                          style={styles.text}
+                        >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
+                      </View>
                     </View>
                   </Swipeable>
                 );
@@ -333,19 +370,22 @@ export default ParentApprovalScreen;
 
 const styles = StyleSheet.create({
   layout: {
-    // flex: 1,
-    // flexDirection: "column",
+    flex: 1,
+    flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
   },
   item: {
-    borderRadius: 10,
+    borderRadius: 20,
     width: "96%",
     backgroundColor: "#fff",
     marginTop: 10,
     marginHorizontal: "2%",
-    paddingHorizontal: 10,
-    paddingTop: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
   },
   footer: {
+    borderTopWidth: 0.3,
+    borderTopColor: Colors.lightgray,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     width: "96%",
@@ -354,6 +394,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
+    overflow: "hidden",
   },
   row: {
     flexDirection: "row",
@@ -362,5 +403,39 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     marginVertical: 4,
+  },
+  background: {
+    width: "80%",
+    borderRadius: 10,
+    paddingBottom: 7,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    backgroundColor: Colors.primary,
+  },
+  button: {
+    paddingTop: 5,
+    fontSize: 15,
+    color: Colors.white,
+    borderRadius: 10,
+  },
+  buttonSettings: {
+    marginTop: 10,
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    marginBottom: 10,
+  },
+  iconStyle: {
+    height: 25,
+    width: 15,
+    marginRight: 10,
+    resizeMode: "contain",
+    tintColor: Colors.secondary,
+  },
+  horizontal: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });

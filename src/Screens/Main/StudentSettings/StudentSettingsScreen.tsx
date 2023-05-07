@@ -33,6 +33,7 @@ import Colors from "@/Theme/Colors";
 import { AppHeader } from "@/Components";
 import { TwoFactorAuthenticationModal, VerifyYourselfModal } from "@/Modals";
 import LogoutStore from "@/Store/Authentication/LogoutStore";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 
 const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
   const dispatch = useDispatch();
@@ -81,8 +82,7 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
   };
 
   return (
-    <>
-      <AppHeader title="Settings" hideCalendar={true} />
+    <BackgroundLayout title="Settings">
       <TwoFactorAuthenticationModal />
       <VerifyYourselfModal
         isActivationCode={verifyType === "activation-code"}
@@ -301,7 +301,7 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
           </View>
         </View>
       </View>
-    </>
+    </BackgroundLayout>
   );
 };
 

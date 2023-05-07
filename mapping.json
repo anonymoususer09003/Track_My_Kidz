@@ -118,8 +118,7 @@
       },
       "appearances": {
         "default": {
-          "mapping": {
-          },
+          "mapping": {},
           "variantGroups": {
             "shape": {
               "round": {
@@ -1579,10 +1578,8 @@
             "default": true
           }
         },
-        "variantGroups": {
-        },
-        "states": {
-        }
+        "variantGroups": {},
+        "states": {}
       },
       "appearances": {
         "default": {
@@ -3931,6 +3928,7 @@
         }
       }
     },
+
     "SelectOption": {
       "meta": {
         "scope": "all",
@@ -4017,7 +4015,7 @@
           "mapping": {
             "paddingHorizontal": 8,
             "paddingVertical": 12,
-            "backgroundColor": "background-basic-color-1",
+            "backgroundColor": "white",
             "textMarginHorizontal": 8,
             "textFontSize": "text-subtitle-1-font-size",
             "textFontWeight": "text-subtitle-1-font-weight",
@@ -4607,9 +4605,7 @@
           }
         },
         "appearances": {
-          "default": {
-            "default": true
-          }
+          "default": {}
         },
         "variantGroups": {
           "status": {
@@ -4657,8 +4653,7 @@
       },
       "appearances": {
         "default": {
-          "mapping": {
-          },
+          "mapping": {},
           "variantGroups": {
             "status": {
               "basic": {

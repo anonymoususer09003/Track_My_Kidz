@@ -42,7 +42,7 @@ const InstructorsStudentsModal = ({
   type,
   group,
 }: any) => {
-  //   console.log("selectedActivity", selectedActivity);
+  console.log("status", status);
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
@@ -71,7 +71,6 @@ const InstructorsStudentsModal = ({
     };
     GetPendingApprovedStudents(body)
       .then((res) => {
-        console.log("res", res);
         setTotalRecordsStudents(res.length == 0 ? false : true);
         setRefreshing(false);
         setPageSizeStudents(100);
@@ -87,7 +86,7 @@ const InstructorsStudentsModal = ({
         console.log("err", err);
       });
   };
-  console.log("selected", group);
+
   const getInstructors = async (refreshing: any) => {
     let pageNumberStudentCount = refreshing ? pageInstructors : 0;
     let body = {
@@ -98,10 +97,6 @@ const InstructorsStudentsModal = ({
     };
     GetPendingApprovedInstructors(body)
       .then((res) => {
-        console.log(
-          "res ins==============00000000303399398983983899839839838998393",
-          res
-        );
         setTotalRecordsInstructors(res.length == 0 ? false : true);
         setRefreshing(false);
         setPageSizeInstructors(10);
@@ -123,7 +118,7 @@ const InstructorsStudentsModal = ({
     } else {
       getInstructors();
     }
-  }, []);
+  }, [status, isVisible]);
   // console.log("selectedacitivty-------------", selectedActivity);
   // @ts-ignore
   return (

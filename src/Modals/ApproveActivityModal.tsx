@@ -70,7 +70,8 @@ const ApproveActivityModal = ({
       const data = {
         activityId: activity?.activity?.activityId,
         status: "approved",
-        studentId: activity?.studentId,
+        studentId: activity?.selectedStudentId,
+        studentActivityId: activity?.studentId,
       };
       console.log("data", data);
       UpdateActivityByStatus(data)
@@ -86,12 +87,23 @@ const ApproveActivityModal = ({
           setActivity(activity?.activity?.activityId);
           setSelectedChild(null);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          dispatch(
+            ChangeModalState.action({
+              approveActivityModalVisibility: false,
+            })
+          );
+          onClose();
+          setSelectedChild();
+          setActivity(activity?.activity?.activityId);
+          setSelectedChild(null);
+        });
     } else {
       const data = {
         groupId: activity?.group?.groupId,
         status: "approved",
-        studentId: activity?.studentId,
+        studentId: activity?.selectedStudentId,
+        studentGroupId: activity?.studentId,
       };
       UpdateGroupByStatus(data)
         .then((res) => {

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { createStackNavigator } from "@react-navigation/stack";
+
 import { Button, TabBar } from "@ui-kitten/components";
-import { StyleSheet, View } from "react-native";
-import { GetGroup } from "@/Services/Group";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+
 import { AddMembersInstructorScreen, AddMembersStudentScreen } from "@/Screens";
-import { AppHeader } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import Colors from "@/Theme/Colors";
 import { AuthStackHeader } from "@/Components";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 
 // @refresh reset
 const AddMembersNavigator = ({ route }) => {
@@ -16,11 +17,16 @@ const AddMembersNavigator = ({ route }) => {
   const [activeTab, setActiveTab] = useState(1);
   const [groupDetail, setGroupDetail] = useState();
   //@ts-ignore
-  console.log("909090909009", route?.params);
+
   const TopTabBar = ({ navigation, state, route }) => {
-    console.log("route00", route);
     return (
       <TabBar
+        style={{
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          // paddingVertical: 20,
+          backgroundColor: Colors.newBackgroundColor,
+        }}
         selectedIndex={state.index}
         indicatorStyle={{ display: "none" }}
         onSelect={(index) =>
@@ -32,28 +38,8 @@ const AddMembersNavigator = ({ route }) => {
         {tabNames.map((tabName, index) => {
           if (state.index == index) {
             return (
-              <Button
-                key={index}
-                style={[
-                  styles.buttonText,
-                  styles.background,
-                  { backgroundColor: Colors.lightgray },
-                ]}
-                appearance="ghost"
-                size="medium"
-                status="primary"
-              >
-                {tabName}
-              </Button>
-            );
-          } else {
-            return (
               <View key={index} style={styles.background}>
-                <Button
-                  style={styles.buttonText}
-                  appearance="ghost"
-                  size="medium"
-                  status="control"
+                <LinearGradientButton
                   onPress={() => {
                     setActiveTab(state.index);
                     navigation.navigate(state.routeNames[index], {
@@ -62,7 +48,30 @@ const AddMembersNavigator = ({ route }) => {
                   }}
                 >
                   {tabName}
-                </Button>
+                </LinearGradientButton>
+              </View>
+            );
+          } else {
+            return (
+              <View
+                key={index}
+                style={[styles.background, { backgroundColor: Colors.white }]}
+              >
+                <TouchableOpacity
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: 38,
+                  }}
+                  onPress={() => {
+                    setActiveTab(state.index);
+                    navigation.navigate(state.routeNames[index], {
+                      data: route?.params?.data,
+                    });
+                  }}
+                >
+                  <Text style={styles.text}>{tabName}</Text>
+                </TouchableOpacity>
               </View>
             );
           }
@@ -72,11 +81,7 @@ const AddMembersNavigator = ({ route }) => {
   };
   return (
     <>
-      <AppHeader
-        hideCalendar={true}
-        hideApproval={true}
-        // hideCalendar={activeTab == 1 ? false : true}
-        // hideApproval={activeTab == 1 ? false : true}
+      <BackgroundLayout
         title={
           route.name == "AddMembers"
             ? "Add Group Members"
@@ -84,22 +89,23 @@ const AddMembersNavigator = ({ route }) => {
             ? "Edit Group"
             : `Create Group`
         }
-      />
-      <TabNavigator.Navigator
-        screenOptions={{ lazy: true, swipeEnabled: false }}
-        tabBar={(props) => <TopTabBar {...props} route={route} />}
       >
-        <TabNavigator.Screen
-          name="AddMembersStudent"
-          options={{ title: "Students" }}
-          component={AddMembersStudentScreen}
-        />
-        <TabNavigator.Screen
-          name="AddMembersInstructor"
-          options={{ title: "Instructors" }}
-          component={AddMembersInstructorScreen}
-        />
-      </TabNavigator.Navigator>
+        <TabNavigator.Navigator
+          screenOptions={{ lazy: true, swipeEnabled: false }}
+          tabBar={(props) => <TopTabBar {...props} route={route} />}
+        >
+          <TabNavigator.Screen
+            name="AddMembersStudent"
+            options={{ title: "Students" }}
+            component={AddMembersStudentScreen}
+          />
+          <TabNavigator.Screen
+            name="AddMembersInstructor"
+            options={{ title: "Instructors" }}
+            component={AddMembersInstructorScreen}
+          />
+        </TabNavigator.Navigator>
+      </BackgroundLayout>
     </>
   );
 };
@@ -107,26 +113,26 @@ const AddMembersNavigator = ({ route }) => {
 export default AddMembersNavigator;
 const styles = StyleSheet.create({
   background: {
-    color: Colors.white,
+    color: Colors.black,
     zIndex: -1,
-    marginLeft: 2,
+    marginLeft: 10,
     marginRight: 2,
-    borderRadius: 10,
-    backgroundColor: Colors.primary,
+    borderRadius: 50,
+    marginTop: 20,
   },
   topNav: {
-    color: Colors.white,
+    color: Colors.black,
   },
   text: {
-    color: Colors.white,
-    fontWeight: "bold",
+    color: Colors.black,
+    // fontWeight: "bold",
     fontSize: 18,
   },
   buttonText: {
-    borderRadius: 10,
+    borderRadius: 90,
     fontFamily: "Gill Sans",
     textAlign: "center",
-    color: Colors.white,
+    color: Colors.black,
     shadowColor: "rgba(0,0,0, .4)", // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
     justifyContent: "center",

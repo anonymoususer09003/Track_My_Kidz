@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 import {
   Text,
   Divider,
@@ -20,7 +21,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  TextInput,
+  ImageBackground,
+  Image,
+  StatusBar,
 } from "react-native";
+import LinearGradient from "react-native-linear-gradient";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import fetchOneUserService from "@/Services/User/FetchOne";
 import ChangeUserState from "@/Store/User/FetchOne";
 import { GetSchool, UpdateSchool } from "@/Services/School";
@@ -275,7 +282,7 @@ const CreateActivityScreen = ({ route }) => {
 
   const getInstructors = async () => {
     const userId = await loadUserId();
-    console.log("instructor------------------", userId);
+
     try {
       if (!currentUser) {
         let res = await GetInstructor(userId);
@@ -485,7 +492,6 @@ const CreateActivityScreen = ({ route }) => {
 
   useEffect(() => {
     if (isFocused) {
-      console.log("instructor", infomation);
       setInitialValues({
         orgId: instructorInfo?.orgId,
         schoolId: instructorInfo?.schoolId,
@@ -550,37 +556,34 @@ const CreateActivityScreen = ({ route }) => {
       });
     }
   }, [isFocused, activity, infomation, user, optIn, groupInfo, onBehalf]);
-  console.log("orgId9009909090909090909090", orgSchoolInfo);
+
   // console.log("format date0000000000000000000000", activity);
   return (
-    <>
-      <GroupSelectionModal
-        getGroupDetail={(id: any) => {
-          getGroupDetail(id);
-          dispatch(
-            ChangeModalState.action({ groupSelectionModalVisibility: false })
-          );
-        }}
-        individuals={groups}
-        setIndividuals={setGroups}
-      />
-      <AddIndividialMembersModal
-        individuals={students}
-        // individual={(item)=>{
-        //   setStudents([...students, item]);
-        // }}
-        setIndividuals={(item) => {
-          console.log("item---", item);
-          setStudents([...item]);
-        }}
-      />
-      <AppHeader
-        title={isEdit ? "Edit Event" : "Create Event"}
-        hideCalendar={true}
-        hideApproval={true}
-      />
-      <ScrollView style={styles.layout}>
-        {/* <Text
+    <View style={{ flex: 1, backgroundColor: Colors.primary }}>
+      <StatusBar backgroundColor="transparent" translucent={true} />
+      <BackgroundLayout title="Create Event">
+        <GroupSelectionModal
+          getGroupDetail={(id: any) => {
+            getGroupDetail(id);
+            dispatch(
+              ChangeModalState.action({ groupSelectionModalVisibility: false })
+            );
+          }}
+          individuals={groups}
+          setIndividuals={setGroups}
+        />
+        <AddIndividialMembersModal
+          individuals={students}
+          // individual={(item)=>{
+          //   setStudents([...students, item]);
+          // }}
+          setIndividuals={(item) => {
+            setStudents([...item]);
+          }}
+        />
+
+        <ScrollView style={styles.layout}>
+          {/* <Text
           textBreakStrategy={"highQuality"}
           style={{
             textAlign: "center",
@@ -591,586 +594,522 @@ const CreateActivityScreen = ({ route }) => {
           Create a name for your Activity / Trip
         </Text> */}
 
-        {isFocused && (
-          <Formik
-            // validateOnMount={true}
-            enableReinitialize
-            validationSchema={validationSchema}
-            initialValues={initialValues}
-            onSubmit={async (values, { resetForm }) => {
-              dispatch(ChangeModalState.action({ loading: true }));
-              const _instructor =
-                (instructors &&
-                  instructors?.result?.length > 0 &&
-                  instructors?.result.find(
-                    (i) =>
-                      i?.firstname + " " + i?.lastname === values.onBehalfOf
-                  ) &&
-                  instructors?.result.find(
-                    (i) =>
-                      i?.firstname + " " + i?.lastname === values.onBehalfOf
-                  ).instructorId) ||
-                0;
-              // console.log("onBhelf", _instructor);
-              let totime = moment(values.toTime, ["h:mm A"]).format("HH:mm");
-              let todate = moment(values.to).format("YYYY-MM-DD");
-              let fromtime = moment(values.fromTime, ["h:mm A"]).format(
-                "HH:mm"
-              );
-              let fromdate = moment(values.from).format("YYYY-MM-DD");
-              // console.log("date", values.from + "----", +values.fromTime);
-              // console.log("fafaffafafafafa", date + "T" + time + ":00.000Z");
-              const data = {
-                id: isEdit ? activity?.activityId : 0,
-                name: values.name,
-                requestPermission: true,
-                type: selectedIndex === 2 ? "trip" : "activity",
-                where: values.venueName,
-                address: values.address,
-                venueToName: values.venueName,
-                venueToAddress: values.address,
-                venueToCity: values.city,
-                venueToState: values.state,
-                venueToZip: values.zipCode,
-                venueFromName: values.fromVenueName,
-                venueFromAddress: values.fromAddress,
-                venueFromCity: values.fromCity,
-                venueFromState: values.fromState,
-                venueFromZip: values.fromZipCode,
-                schoolId: currentUser?.schoolId || null,
-                venueToCountry: selectedIndex == 0 ? values.country : "",
-                venueFromCountry: selectedIndex != 0 ? values.fromCountry : "",
-                orgId: currentUser?.orgId || null,
-                onBehalfOf: values.onBehalfOf ? _instructor : 0,
-                students: [],
-                instructors: [],
-                status: "approved",
-                completionStatus: "active",
-                groups: [0],
-                schedule: {
-                  id: 0,
-                  recurrence: timeSelectedIndex === 2 ? 1 : 0,
-                  fromDate: fromdate + "T" + fromtime + ":00.000Z",
-                  // `${moment(values.from).format(
-                  //   "YYYY-MM-DD hh:mm:ss"
-                  // )} ${values.fromTime}`,
-                  toDate: values.noEnd
-                    ? "9999-12-31T12:00.000Z"
-                    : todate + "T" + totime + ":00.000Z",
-                  //  `${moment(values.to).format("YYYY-MM-DD hh:mm:ss")} ${
-                  //   values.toTime
-                  // }`,,
-                  days:
-                    timeSelectedIndex === 2
-                      ? days.map((d) => (d.selected ? 1 : 0)).join("")
-                      : 0,
-                  status: "enabled",
-                },
+          {isFocused && (
+            <Formik
+              // validateOnMount={true}
+              enableReinitialize
+              validationSchema={validationSchema}
+              initialValues={initialValues}
+              onSubmit={async (values, { resetForm }) => {
+                dispatch(ChangeModalState.action({ loading: true }));
+                const _instructor =
+                  (instructors &&
+                    instructors?.result?.length > 0 &&
+                    instructors?.result.find(
+                      (i) =>
+                        i?.firstname + " " + i?.lastname === values.onBehalfOf
+                    ) &&
+                    instructors?.result.find(
+                      (i) =>
+                        i?.firstname + " " + i?.lastname === values.onBehalfOf
+                    ).instructorId) ||
+                  0;
+                // console.log("onBhelf", _instructor);
+                let totime = moment(values.toTime, ["h:mm A"]).format("HH:mm");
+                let todate = moment(values.to).format("YYYY-MM-DD");
+                let fromtime = moment(values.fromTime, ["h:mm A"]).format(
+                  "HH:mm"
+                );
+                let fromdate = moment(values.from).format("YYYY-MM-DD");
+                // console.log("date", values.from + "----", +values.fromTime);
+                // console.log("fafaffafafafafa", date + "T" + time + ":00.000Z");
+                const data = {
+                  id: isEdit ? activity?.activityId : 0,
+                  name: values.name,
+                  requestPermission: true,
+                  type: selectedIndex === 2 ? "trip" : "activity",
+                  where: values.venueName,
+                  address: values.address,
+                  venueToName: values.venueName,
+                  venueToAddress: values.address,
+                  venueToCity: values.city,
+                  venueToState: values.state,
+                  venueToZip: values.zipCode,
+                  venueFromName: values.fromVenueName,
+                  venueFromAddress: values.fromAddress,
+                  venueFromCity: values.fromCity,
+                  venueFromState: values.fromState,
+                  venueFromZip: values.fromZipCode,
+                  schoolId: currentUser?.schoolId || null,
+                  venueToCountry: selectedIndex == 0 ? values.country : "",
+                  venueFromCountry:
+                    selectedIndex != 0 ? values.fromCountry : "",
+                  orgId: currentUser?.orgId || null,
+                  onBehalfOf: values.onBehalfOf ? _instructor : 0,
+                  students: [],
+                  instructors: [],
+                  status: "approved",
+                  completionStatus: "active",
+                  groups: [0],
+                  schedule: {
+                    id: 0,
+                    recurrence: timeSelectedIndex === 2 ? 1 : 0,
+                    fromDate: fromdate + "T" + fromtime + ":00.000Z",
+                    // `${moment(values.from).format(
+                    //   "YYYY-MM-DD hh:mm:ss"
+                    // )} ${values.fromTime}`,
+                    toDate: values.noEnd
+                      ? "9999-12-31T12:00.000Z"
+                      : todate + "T" + totime + ":00.000Z",
+                    //  `${moment(values.to).format("YYYY-MM-DD hh:mm:ss")} ${
+                    //   values.toTime
+                    // }`,,
+                    days:
+                      timeSelectedIndex === 2
+                        ? days.map((d) => (d.selected ? 1 : 0)).join("")
+                        : 0,
+                    status: "enabled",
+                  },
 
-                journey: {
-                  journeyStartToDestination: "",
-                  journeyStartToOrgin: "",
-                  eta: 0,
-                  id: 0,
-                },
-                optin: {
-                  instructions: values.instructions || "",
-                  disclaimer: values.disclaimer || "",
-                  agreement: values.agreement || "",
-                  status: true,
-                },
-              };
-              // console.log("data", data);
-              const _students = [];
-              students.map((item) => {
-                if (!item?.isEdit) {
-                  _students.push({
-                    firstName: item?.name?.split(" ")[0],
+                  journey: {
+                    journeyStartToDestination: "",
+                    journeyStartToOrgin: "",
+                    eta: 0,
+                    id: 0,
+                  },
+                  optin: {
+                    instructions: values.instructions || "",
+                    disclaimer: values.disclaimer || "",
+                    agreement: values.agreement || "",
+                    status: true,
+                  },
+                };
+                // console.log("data", data);
+                const _students = [];
+                students.map((item) => {
+                  if (!item?.isEdit) {
+                    _students.push({
+                      firstName: item?.name?.split(" ")[0],
 
-                    parentEmail1: item.parent1_email,
-                    parentEmail12: item.parent2_email,
-                    lastName: item?.name?.split(" ")[1] || "",
-                  });
-                }
-              });
-              // const _individuals = students.map((student) => ({
-              //   email: student?.email,
-              //   grades: [
-              //     {
-              //       id: 0,
-              //       name: "string",
-              //       subject: [
-              //         {
-              //           id: 0,
-              //           name: "string",
-              //         },
-              //       ],
-              //     },
-              //   ],
-              //   firstname: student?.firstName,
-              //   lastname: student?.lastName,
-              //   address: "",
-              //   state: "",
-              //   city: "",
-              //   country: "",
-              //   zipcode: "",
-              //   phone: "",
-              //   term: true,
-              //   isAdmin: true,
-              //   schoolId: user?.schoolId,
-              //   orgId: user?.orgId,
-              // }));
-              // console.log("data-------------------------", data);
-              if (!isEdit) {
-                console.log("data", data);
-                CreateActivity(data)
-                  .then(async (res) => {
-                    let notifyToParents = true;
-                    if (_students && _students?.length > 0) {
-                      notifyToParents = false;
-                      notifyToParents = await NotifyToParent(
-                        res?.activityId,
-                        _students
-                      );
-                      notifyToParents = true;
-                    }
-                    // NotifyToParent(res?.activityId, _students)
-                    //   .then((res) => {})
-                    //   .catch((err) => console.log("NotifyToParent", err));
-                    const _instructors = instructorsList?.map((item) => ({
-                      firstName: item?.firstname,
-                      lastName: item?.lastname,
-                      email: item?.email,
-                    }));
+                      parentEmail1: item.parent1_email,
+                      parentEmail12: item.parent2_email,
+                      lastName: item?.name?.split(" ")[1] || "",
+                    });
+                  }
+                });
+                // const _individuals = students.map((student) => ({
+                //   email: student?.email,
+                //   grades: [
+                //     {
+                //       id: 0,
+                //       name: "string",
+                //       subject: [
+                //         {
+                //           id: 0,
+                //           name: "string",
+                //         },
+                //       ],
+                //     },
+                //   ],
+                //   firstname: student?.firstName,
+                //   lastname: student?.lastName,
+                //   address: "",
+                //   state: "",
+                //   city: "",
+                //   country: "",
+                //   zipcode: "",
+                //   phone: "",
+                //   term: true,
+                //   isAdmin: true,
+                //   schoolId: user?.schoolId,
+                //   orgId: user?.orgId,
+                // }));
+                // console.log("data-------------------------", data);
+                if (!isEdit) {
+                  console.log("data", data);
+                  CreateActivity(data)
+                    .then(async (res) => {
+                      let notifyToParents = true;
+                      if (_students && _students?.length > 0) {
+                        notifyToParents = false;
+                        notifyToParents = await NotifyToParent(
+                          res?.activityId,
+                          _students
+                        );
+                        notifyToParents = true;
+                      }
+                      // NotifyToParent(res?.activityId, _students)
+                      //   .then((res) => {})
+                      //   .catch((err) => console.log("NotifyToParent", err));
+                      const _instructors = instructorsList?.map((item) => ({
+                        firstName: item?.firstname,
+                        lastName: item?.lastname,
+                        email: item?.email,
+                      }));
 
-                    let notifyToInstructor = true;
-                    if (_instructors?.length > 0) {
-                      notifyToInstructor = false;
-                      await NotifyToInstructors(res?.activityId, _instructors);
-                      notifyToInstructor = true;
-                    }
+                      let notifyToInstructor = true;
+                      if (_instructors?.length > 0) {
+                        notifyToInstructor = false;
+                        await NotifyToInstructors(
+                          res?.activityId,
+                          _instructors
+                        );
+                        notifyToInstructor = true;
+                      }
 
-                    // NotifyToInstructors(res?.activityId, _instructors)
-                    //   .then((res) => {
-                    //     console.log(res);
-                    //   })
-                    //   .catch((err) => console.log("NotifyToInstructors", err));
-                    if (notifyToInstructor && notifyToParents) {
+                      // NotifyToInstructors(res?.activityId, _instructors)
+                      //   .then((res) => {
+                      //     console.log(res);
+                      //   })
+                      //   .catch((err) => console.log("NotifyToInstructors", err));
+                      if (notifyToInstructor && notifyToParents) {
+                        Toast.show({
+                          type: "success",
+                          text2: "Activity has been successfully created",
+                        });
+                        dispatch(ChangeModalState.action({ loading: false }));
+                        resetForm();
+                        setStudents([]);
+                        setDeletedStudents([]);
+                        setDeletedInstructors([]);
+                        setInstructorList([]);
+                        setInformation({});
+                        navigation.reset({
+                          index: 0,
+                          routes: [
+                            {
+                              name: "InstructorActivity",
+                            },
+                          ],
+                        });
+                        // CreateMultipleInstructor(_individuals).then(res => {
+                        //   console.log(res)
+                        // }).catch(err => console.log('CreateMultipleInstructor', err))
+                        setGroups([]);
+                        // setStudents([])
+                        setAskPermission(false);
+                      }
+                      // resetForm();
+                    })
+                    .catch((err) => {
+                      console.log("err", err);
+                      Toast.show({
+                        type: "info",
+                        text2: "Something went wrong",
+                      });
+                      // dispatch(ChangeModalState.action({ loading: false }));
+                    });
+                } else {
+                  UpdateActivity(data)
+                    .then(async (res) => {
                       Toast.show({
                         type: "success",
-                        text2: "Activity has been successfully created",
+                        text2: "Activity has been updated successfully",
                       });
                       dispatch(ChangeModalState.action({ loading: false }));
-                      resetForm();
-                      setStudents([]);
-                      setDeletedStudents([]);
-                      setDeletedInstructors([]);
-                      setInstructorList([]);
-                      setInformation({});
-                      navigation.reset({
-                        index: 0,
-                        routes: [
-                          {
-                            name: "InstructorActivity",
-                          },
-                        ],
-                      });
+                      // navigation.navigate("InstructorActivity");
                       // CreateMultipleInstructor(_individuals).then(res => {
                       //   console.log(res)
                       // }).catch(err => console.log('CreateMultipleInstructor', err))
-                      setGroups([]);
-                      // setStudents([])
-                      setAskPermission(false);
-                    }
-                    // resetForm();
-                  })
-                  .catch((err) => {
-                    console.log("err", err);
-                    Toast.show({
-                      type: "info",
-                      text2: "Something went wrong",
-                    });
-                    // dispatch(ChangeModalState.action({ loading: false }));
-                  });
-              } else {
-                UpdateActivity(data)
-                  .then(async (res) => {
-                    Toast.show({
-                      type: "success",
-                      text2: "Activity has been updated successfully",
-                    });
-                    dispatch(ChangeModalState.action({ loading: false }));
-                    // navigation.navigate("InstructorActivity");
-                    // CreateMultipleInstructor(_individuals).then(res => {
-                    //   console.log(res)
-                    // }).catch(err => console.log('CreateMultipleInstructor', err))
 
-                    let deletedInstructor = [];
-                    let deletedStudent = [];
-                    deletedInstructors.map((item) => {
-                      deletedInstructor.push(item?.instructorId);
-                    });
-
-                    deletedStudents.map((item) => {
-                      deletedStudent.push(item?.id);
-                    });
-                    if (
-                      deletedInstructor.length > 0 ||
-                      deletedStudent.length > 0
-                    ) {
-                      await DeleteActivityParticipants({
-                        studentId:
-                          deletedStudent.length == 0 ? [] : deletedStudent,
-                        instructorId:
-                          deletedInstructor.length == 0
-                            ? []
-                            : deletedInstructor,
-                        activityId: activity?.activityId,
+                      let deletedInstructor = [];
+                      let deletedStudent = [];
+                      deletedInstructors.map((item) => {
+                        deletedInstructor.push(item?.instructorId);
                       });
-                    }
 
-                    let notifyToParents = true;
-                    if (_students && _students?.length > 0) {
-                      notifyToParents = false;
-                      notifyToParents = await NotifyToParent(
-                        activity?.activityId,
-                        _students
-                      );
-                      notifyToParents = true;
-                    }
-                    // NotifyToParent(activity?.activityId, _students)
-                    //   .then((res) => {})
-                    //   .catch((err) => console.log("NotifyToParent", err));
-                    let instructors = [];
-                    instructorsList?.map((item) => {
-                      if (!item?.isEdit) {
-                        instructors.push({
-                          firstName: item?.firstname,
-                          lastName: item?.lastname,
-                          email: item?.email,
+                      deletedStudents.map((item) => {
+                        deletedStudent.push(item?.id);
+                      });
+                      if (
+                        deletedInstructor.length > 0 ||
+                        deletedStudent.length > 0
+                      ) {
+                        await DeleteActivityParticipants({
+                          studentId:
+                            deletedStudent.length == 0 ? [] : deletedStudent,
+                          instructorId:
+                            deletedInstructor.length == 0
+                              ? []
+                              : deletedInstructor,
+                          activityId: activity?.activityId,
                         });
                       }
-                    });
 
-                    // NotifyToInstructors(activity?.activityId, instructors)
-                    //   .then((res) => {
-                    //     console.log(res);
-                    //   })
-                    //   .catch((err) => console.log("NotifyToInstructors", err));
-
-                    let notifyToInstructor = true;
-                    if (instructors?.length > 0) {
-                      notifyToInstructor = false;
-                      await NotifyToInstructors(
-                        activity?.activityId,
-                        instructors
-                      );
-                      notifyToInstructor = true;
-                    }
-
-                    if (notifyToInstructor && notifyToParents) {
-                      dispatch(ChangeModalState.action({ loading: false }));
-                      resetForm();
-                      setStudents([]);
-                      setDeletedStudents([]);
-                      setDeletedInstructors([]);
-                      setInstructorList([]);
-                      setDeletedStudents([]);
-                      setDeletedInstructors([]);
-                      setInformation({});
-                      navigation.reset({
-                        index: 0,
-                        routes: [
-                          {
-                            name: "InstructorActivity",
-                          },
-                        ],
+                      let notifyToParents = true;
+                      if (_students && _students?.length > 0) {
+                        notifyToParents = false;
+                        notifyToParents = await NotifyToParent(
+                          activity?.activityId,
+                          _students
+                        );
+                        notifyToParents = true;
+                      }
+                      // NotifyToParent(activity?.activityId, _students)
+                      //   .then((res) => {})
+                      //   .catch((err) => console.log("NotifyToParent", err));
+                      let instructors = [];
+                      instructorsList?.map((item) => {
+                        if (!item?.isEdit) {
+                          instructors.push({
+                            firstName: item?.firstname,
+                            lastName: item?.lastname,
+                            email: item?.email,
+                          });
+                        }
                       });
 
-                      setGroups([]);
-                      setInformation({});
-                      // setStudents([])
-                      setAskPermission(false);
-                    }
-                    // resetForm();
-                  })
-                  .catch((err) => {
-                    console.log("err", err);
-                    Toast.show({
-                      type: "info",
-                      text2: "Something went wrong",
-                    });
-                    // dispatch(ChangeModalState.action({ loading: false }));
-                  });
-              }
-            }}
-          >
-            {({
-              handleChange,
-              handleSubmit,
-              setFieldValue,
-              values,
-              errors,
-              isValid,
-              resetForm,
-              touched,
-            }) => (
-              <>
-                {console.log("err", errors)}
-                <View style={styles.formContainer}>
-                  {/* {console.log("values", values)} */}
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      marginTop: 5,
-                      alignSelf: "center",
-                      width: "100%",
-                      marginLeft: "5%",
-                    }}
-                  >
-                    <Text style={{ marginTop: 18 }}>On behalf of</Text>
-                    <Select
-                      style={{ width: "50%", marginTop: -10 }}
-                      value={values.onBehalfOf}
-                      placeholder="Select Name"
-                      onSelect={(index: any) => {
-                        setFieldValue(
-                          "onBehalfOf",
-                          instructors?.result[index.row]?.firstname +
-                            " " +
-                            instructors?.result[index.row]?.lastname
-                        );
-                      }}
-                      label={(evaProps: any) => <Text {...evaProps}></Text>}
-                    >
-                      {instructors &&
-                        instructors?.result &&
-                        instructors?.result?.map((item) => (
-                          <SelectItem
-                            key={item?.instructorId}
-                            title={item?.firstname + " " + item?.lastname}
-                          />
-                        ))}
-                    </Select>
-                  </View>
-                  <Input
-                    style={{
-                      marginTop: 10,
-                      alignSelf: "center",
-                      width: "100%",
-                      marginLeft: "5%",
-                    }}
-                    placeholder="Name your Activity/Trip*"
-                    onChangeText={handleChange("name")}
-                    value={values.name}
-                  />
-                  {errors.name ? (
-                    <Text style={styles.errorText}>{errors.name}</Text>
-                  ) : null}
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      marginLeft: "5%",
-                      width: "100%",
-                    }}
-                  >
-                    <RadioGroup
-                      selectedIndex={selectedIndex}
-                      style={{
-                        flexDirection: "column",
-                        alignItems: "center",
-                        width: "50%",
-                      }}
-                      onChange={(index) => {
-                        setSelectedIndex(index);
-                        setToCheckBox(false);
-                        setFromCheckBox(false);
-                      }}
-                    >
-                      <Radio style={{ flexDirection: "row", width: "50%" }}>
-                        {(evaProps) => (
-                          <Text
-                            {...evaProps}
-                            style={{ fontSize: 14, marginLeft: 10 }}
-                          >
-                            {" "}
-                            Activity
-                          </Text>
-                        )}
-                      </Radio>
-                      <Divider />
-                      <Radio style={{ flexDirection: "row", width: "50%" }}>
-                        {(evaProps) => (
-                          <Text
-                            {...evaProps}
-                            style={{ fontSize: 14, marginLeft: 10 }}
-                          >
-                            Trip
-                          </Text>
-                        )}
-                      </Radio>
-                      <Divider />
-                    </RadioGroup>
-                    <RadioGroup
-                      selectedIndex={timeSelectedIndex}
-                      style={{
-                        flexDirection: "column",
-                        alignItems: "center",
-                        width: "50%",
-                      }}
-                      onChange={(index) => setTimeSelectedIndex(index)}
-                    >
-                      <Radio style={{ flexDirection: "row", width: "50%" }}>
-                        {(evaProps) => (
-                          <Text
-                            {...evaProps}
-                            style={{ fontSize: 14, marginLeft: 10 }}
-                          >
-                            {" "}
-                            One-Time
-                          </Text>
-                        )}
-                      </Radio>
-                      <Divider />
-                      <Radio style={{ flexDirection: "row", width: "50%" }}>
-                        {(evaProps) => (
-                          <Text
-                            {...evaProps}
-                            style={{ fontSize: 14, marginLeft: 10 }}
-                          >
-                            {" "}
-                            Recurring
-                          </Text>
-                        )}
-                      </Radio>
+                      // NotifyToInstructors(activity?.activityId, instructors)
+                      //   .then((res) => {
+                      //     console.log(res);
+                      //   })
+                      //   .catch((err) => console.log("NotifyToInstructors", err));
 
-                      <Divider />
-                    </RadioGroup>
-                  </View>
-                  {timeSelectedIndex !== 2 && (
-                    <>
-                      <View
+                      let notifyToInstructor = true;
+                      if (instructors?.length > 0) {
+                        notifyToInstructor = false;
+                        await NotifyToInstructors(
+                          activity?.activityId,
+                          instructors
+                        );
+                        notifyToInstructor = true;
+                      }
+
+                      if (notifyToInstructor && notifyToParents) {
+                        dispatch(ChangeModalState.action({ loading: false }));
+                        resetForm();
+                        setStudents([]);
+                        setDeletedStudents([]);
+                        setDeletedInstructors([]);
+                        setInstructorList([]);
+                        setDeletedStudents([]);
+                        setDeletedInstructors([]);
+                        setInformation({});
+                        navigation.reset({
+                          index: 0,
+                          routes: [
+                            {
+                              name: "InstructorActivity",
+                            },
+                          ],
+                        });
+
+                        setGroups([]);
+                        setInformation({});
+                        // setStudents([])
+                        setAskPermission(false);
+                      }
+                      // resetForm();
+                    })
+                    .catch((err) => {
+                      console.log("err", err);
+                      Toast.show({
+                        type: "info",
+                        text2: "Something went wrong",
+                      });
+                      // dispatch(ChangeModalState.action({ loading: false }));
+                    });
+                }
+              }}
+            >
+              {({
+                handleChange,
+                handleSubmit,
+                setFieldValue,
+                values,
+                errors,
+                isValid,
+                resetForm,
+                touched,
+              }) => (
+                <>
+                  <View style={styles.formContainer}>
+                    {/* {console.log("values", values)} */}
+                    <View
+                      style={{
+                        marginTop: 5,
+
+                        width: "95%",
+                        marginLeft: "5%",
+                      }}
+                    >
+                      <Select
+                        style={{
+                          width: "100%",
+                          marginTop: -10,
+                          borderRadius: 20,
+                        }}
+                        value={values.onBehalfOf}
+                        placeholder="Select Name"
+                        onSelect={(index: any) => {
+                          setFieldValue(
+                            "onBehalfOf",
+                            instructors?.result[index.row]?.firstname +
+                              " " +
+                              instructors?.result[index.row]?.lastname
+                          );
+                        }}
+                        label={(evaProps: any) => (
+                          <Text style={styles.inputLabels}>On behalf of</Text>
+                        )}
+                      >
+                        {instructors &&
+                          instructors?.result &&
+                          instructors?.result?.map((item) => (
+                            <SelectItem
+                              key={item?.instructorId}
+                              title={item?.firstname + " " + item?.lastname}
+                            />
+                          ))}
+                      </Select>
+                    </View>
+
+                    <Input
+                      style={styles.textInput}
+                      placeholder="Name your Activity/Trip*"
+                      onChangeText={handleChange("name")}
+                      value={values.name}
+                      label={(evaProps: any) => (
+                        <Text style={styles.inputLabels}>Event name</Text>
+                      )}
+                    />
+                    {errors.name ? (
+                      <Text style={styles.errorText}>{errors.name}</Text>
+                    ) : null}
+                    <View
+                      style={{
+                        flexDirection: "column",
+
+                        // justifyContent: "space-between",
+                        marginLeft: "5%",
+                        width: "100%",
+                      }}
+                    >
+                      <Text
+                        style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}
+                      >
+                        {" "}
+                        Event Type*
+                      </Text>
+                      <RadioGroup
+                        selectedIndex={selectedIndex}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "space-between",
+                          width: "50%",
+                          icon: () => null,
+                        }}
+                        onChange={(index) => {
+                          setSelectedIndex(index);
+                          setToCheckBox(false);
+                          setFromCheckBox(false);
+                        }}
+                      >
+                        <Radio
+                          appearance="default"
+                          status="primary"
+                          style={[
+                            styles.radioButton,
+                            {
+                              borderColor:
+                                selectedIndex == 0
+                                  ? Colors.primary
+                                  : "transparent",
+                            },
+                          ]}
+                        >
+                          {(evaProps) => (
+                            <Text style={{ fontSize: 14, marginLeft: 10 }}>
+                              {" "}
+                              Activity
+                            </Text>
+                          )}
+                        </Radio>
+                        <Divider />
+
+                        <Radio
+                          style={[
+                            styles.radioButton,
+                            {
+                              borderColor:
+                                selectedIndex == 2
+                                  ? Colors.primary
+                                  : "transparent",
+                            },
+                          ]}
+                        >
+                          {(evaProps) => (
+                            <Text style={{ fontSize: 14, marginLeft: 10 }}>
+                              Trip
+                            </Text>
+                          )}
+                        </Radio>
+                        <Divider />
+                      </RadioGroup>
+                      <Text
+                        style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}
+                      >
+                        {" "}
+                        Event Duration*
+                      </Text>
+                      <RadioGroup
+                        selectedIndex={timeSelectedIndex}
                         style={{
                           flexDirection: "row",
                           alignItems: "center",
                           justifyContent: "space-between",
-                          width: "90%",
+                          width: "50%",
                         }}
+                        onChange={(index) => setTimeSelectedIndex(index)}
                       >
-                        <Datepicker
-                          min={new Date(1900, 0, 0)}
-                          style={[styles.selectSettings, { width: "60%" }]}
-                          label="From*"
-                          placeholder="From"
-                          date={values.from}
-                          onSelect={(date: Date | null) => {
-                            setFieldValue("from", date);
-                            setFieldValue("to", date);
-                          }}
-                        />
-                        <Select
-                          value={values.fromTime}
-                          style={{ marginTop: 5, marginLeft: 5, width: "45%" }}
-                          placeholder="From"
-                          onSelect={(index: any) => {
-                            setFieldValue("fromTime", timeStamp[index.row]);
-                          }}
-                          label={(evaProps: any) => <Text {...evaProps}></Text>}
+                        <Radio
+                          style={[
+                            styles.radioButton,
+                            {
+                              borderColor:
+                                timeSelectedIndex == 0
+                                  ? Colors.primary
+                                  : "transparent",
+                            },
+                          ]}
                         >
-                          {timeStamp &&
-                            timeStamp.length > 0 &&
-                            timeStamp.map((_timeStamp, index) => {
-                              return (
-                                <SelectItem
-                                  key={index}
-                                  title={_timeStamp || ""}
-                                />
-                              );
-                            })}
-                        </Select>
-                      </View>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          width: "90%",
-                        }}
-                      >
-                        <Datepicker
-                          min={new Date(1900, 0, 0)}
-                          style={[styles.selectSettings, { width: "60%" }]}
-                          label="To*"
-                          placeholder="To"
-                          date={values.to}
-                          onSelect={(date: Date | null) => {
-                            setFieldValue("to", date);
-                          }}
-                        />
-                        {/* {console.log("values", values.toTime)} */}
-                        <Select
-                          value={values.toTime}
-                          style={{ marginTop: 5, marginLeft: 5, width: "45%" }}
-                          placeholder="To"
-                          onSelect={(index: any) => {
-                            setFieldValue("toTime", timeStamp[index.row]);
-                          }}
-                          label={(evaProps: any) => <Text {...evaProps}></Text>}
+                          {(evaProps) => (
+                            <Text
+                              {...evaProps}
+                              style={{ fontSize: 14, marginLeft: 10 }}
+                            >
+                              {" "}
+                              One-Time
+                            </Text>
+                          )}
+                        </Radio>
+                        <Divider />
+                        <Radio
+                          style={[
+                            styles.radioButton,
+                            {
+                              borderColor:
+                                timeSelectedIndex == 2
+                                  ? Colors.primary
+                                  : "transparent",
+                            },
+                          ]}
                         >
-                          {timeStamp &&
-                            timeStamp.length > 0 &&
-                            timeStamp.map((_timeStamp, index) => {
-                              return (
-                                <SelectItem
-                                  key={index}
-                                  title={_timeStamp || ""}
-                                />
-                              );
-                            })}
-                        </Select>
-                      </View>
-                    </>
-                  )}
-                  {timeSelectedIndex === 2 && (
-                    <>
-                      {/* <Datepicker
-                        min={new Date(1900, 0, 0)}
-                        style={[styles.selectSettings, { width: "90%" }]}
-                        label="Starting*"
-                        placeholder="Starting"
-                        date={values.from}
-                        onSelect={(date: Date | null) => {
-                          setFieldValue("from", date);
-                        }}
-                      /> */}
-                      {/* <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          width: "90%",
-                          marginTop: 10,
-                        }}
-                      >
-                        <Text>From</Text>
-                        <Input
-                          placeholder="00:00 AM"
-                          onChangeText={handleChange("toTime")}
-                          value={values.startingFrom}
-                          style={{ marginLeft: 10 }}
-                        />
-                        <Text style={{ marginLeft: 10 }}>To</Text>
-                        <Input
-                          disabled={values?.noEnd}
-                          placeholder="00:00 AM"
-                          onChangeText={handleChange("startingTo")}
-                          value={values.startingTo}
-                          style={{ marginLeft: 10 }}
-                        />
-                      </View> */}
+                          {(evaProps) => (
+                            <Text
+                              {...evaProps}
+                              style={{ fontSize: 14, marginLeft: 10 }}
+                            >
+                              {" "}
+                              Recurring
+                            </Text>
+                          )}
+                        </Radio>
+
+                        <Divider />
+                      </RadioGroup>
+                    </View>
+                    {timeSelectedIndex !== 2 && (
                       <>
                         <View
                           style={{
@@ -1190,7 +1129,22 @@ const CreateActivityScreen = ({ route }) => {
                               setFieldValue("from", date);
                               setFieldValue("to", date);
                             }}
-                          />
+                          >
+                            {({ date, onFocus, onBlur }) => (
+                              <TextInput
+                                value={date ? date.toLocaleDateString() : ""}
+                                onFocus={onFocus}
+                                onBlur={onBlur}
+                                onChangeText={() => {}}
+                                placeholder="Select date"
+                                style={{
+                                  color: "red",
+                                  backgroundColor: "red",
+                                  width: 2,
+                                }} // set the color of the text input
+                              />
+                            )}
+                          </Datepicker>
                           <Select
                             value={values.fromTime}
                             style={{
@@ -1227,7 +1181,6 @@ const CreateActivityScreen = ({ route }) => {
                           }}
                         >
                           <Datepicker
-                            disabled={values?.noEnd}
                             min={new Date(1900, 0, 0)}
                             style={[styles.selectSettings, { width: "60%" }]}
                             label="To*"
@@ -1239,7 +1192,6 @@ const CreateActivityScreen = ({ route }) => {
                           />
                           {/* {console.log("values", values.toTime)} */}
                           <Select
-                            disabled={values?.noEnd}
                             value={values.toTime}
                             style={{
                               marginTop: 5,
@@ -1267,7 +1219,251 @@ const CreateActivityScreen = ({ route }) => {
                           </Select>
                         </View>
                       </>
+                    )}
+                    {timeSelectedIndex === 2 && (
+                      <>
+                        {/* <Datepicker
+                        min={new Date(1900, 0, 0)}
+                        style={[styles.selectSettings, { width: "90%" }]}
+                        label="Starting*"
+                        placeholder="Starting"
+                        date={values.from}
+                        onSelect={(date: Date | null) => {
+                          setFieldValue("from", date);
+                        }}
+                      /> */}
+                        {/* <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          width: "90%",
+                          marginTop: 10,
+                        }}
+                      >
+                        <Text>From</Text>
+                        <Input
+                          placeholder="00:00 AM"
+                          onChangeText={handleChange("toTime")}
+                          value={values.startingFrom}
+                          style={{ marginLeft: 10 }}
+                        />
+                        <Text style={{ marginLeft: 10 }}>To</Text>
+                        <Input
+                          disabled={values?.noEnd}
+                          placeholder="00:00 AM"
+                          onChangeText={handleChange("startingTo")}
+                          value={values.startingTo}
+                          style={{ marginLeft: 10 }}
+                        />
+                      </View> */}
+                        <>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              width: "90%",
+                            }}
+                          >
+                            <Datepicker
+                              min={new Date(1900, 0, 0)}
+                              style={[
+                                styles.selectSettings,
+                                { width: "60%", borderRadius: 20 },
+                              ]}
+                              label={() => (
+                                <Text style={styles.inputLabels}>From*</Text>
+                              )}
+                              placeholder="From"
+                              date={values.from}
+                              onSelect={(date: Date | null) => {
+                                setFieldValue("from", date);
+                                setFieldValue("to", date);
+                              }}
+                            >
+                              {({ date, onFocus, onBlur }) => (
+                                <TextInput
+                                  value={date ? date.toLocaleDateString() : ""}
+                                  onFocus={onFocus}
+                                  onBlur={onBlur}
+                                  onChangeText={() => {}}
+                                  placeholder="Select date"
+                                  style={{
+                                    color: "red",
+                                    backgroundColor: "red",
+                                    width: 2,
+                                  }} // set the color of the text input
+                                />
+                              )}
+                            </Datepicker>
+                            <Select
+                              value={values.fromTime}
+                              style={{
+                                marginTop: 5,
+                                marginLeft: 5,
+                                width: "45%",
+                              }}
+                              placeholder="From"
+                              onSelect={(index: any) => {
+                                setFieldValue("fromTime", timeStamp[index.row]);
+                              }}
+                              label={(evaProps: any) => (
+                                <Text {...evaProps}></Text>
+                              )}
+                            >
+                              {timeStamp &&
+                                timeStamp.length > 0 &&
+                                timeStamp.map((_timeStamp, index) => {
+                                  return (
+                                    <SelectItem
+                                      key={index}
+                                      title={_timeStamp || ""}
+                                    />
+                                  );
+                                })}
+                            </Select>
+                          </View>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              width: "90%",
+                            }}
+                          >
+                            <Datepicker
+                              disabled={values?.noEnd}
+                              min={new Date(1900, 0, 0)}
+                              style={[styles.selectSettings, { width: "60%" }]}
+                              label={() => (
+                                <Text style={styles.inputLabels}>To*</Text>
+                              )}
+                              placeholder="To"
+                              date={values.to}
+                              onSelect={(date: Date | null) => {
+                                setFieldValue("to", date);
+                              }}
+                            />
+                            {/* {console.log("values", values.toTime)} */}
+                            <Select
+                              disabled={values?.noEnd}
+                              value={values.toTime}
+                              style={{
+                                marginTop: 5,
+                                marginLeft: 5,
+                                width: "45%",
+                              }}
+                              placeholder="To"
+                              onSelect={(index: any) => {
+                                setFieldValue("toTime", timeStamp[index.row]);
+                              }}
+                              label={(evaProps: any) => (
+                                <Text {...evaProps}></Text>
+                              )}
+                            >
+                              {timeStamp &&
+                                timeStamp.length > 0 &&
+                                timeStamp.map((_timeStamp, index) => {
+                                  return (
+                                    <SelectItem
+                                      key={index}
+                                      title={_timeStamp || ""}
+                                    />
+                                  );
+                                })}
+                            </Select>
+                          </View>
+                        </>
 
+                        <View
+                          style={{
+                            flexDirection: "row",
+
+                            alignItems: "center",
+                          }}
+                        >
+                          <Text style={{ marginHorizontal: 15, marginTop: 10 }}>
+                            No end
+                          </Text>
+                          <CheckBox
+                            style={[{ flex: 1, marginTop: 15 }]}
+                            checked={values?.noEnd}
+                            onChange={(checked) => {
+                              setFieldValue("noEnd", checked);
+
+                              console.log("checked", checked);
+                              // if (checked) {
+                              //   Alert.alert(checked);
+                              // } else {
+                              //   Alert.alert(checked);
+                              // }
+                            }}
+                          >
+                            {""}
+                          </CheckBox>
+                        </View>
+
+                        <Text
+                          style={{
+                            color: "#000",
+                            marginTop: 15,
+                            marginLeft: 15,
+                            alignSelf: "flex-start",
+                          }}
+                        >
+                          Every
+                        </Text>
+                        <ScrollView
+                          style={{ flexDirection: "row" }}
+                          contentContainerStyle={{ alignItems: "center" }}
+                          horizontal
+                        >
+                          {days &&
+                            days.map((day) => (
+                              <TouchableOpacity
+                                style={
+                                  day.selected ? styles.selectedDay : styles.day
+                                }
+                                onPress={() => {
+                                  const data = [...days];
+                                  const index = data.findIndex(
+                                    (i) => i.name === day.name
+                                  );
+                                  data[index].selected = !day.selected;
+                                  setDays(data);
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    color: day.selected ? "#fff" : "#000",
+                                  }}
+                                >
+                                  {day.name}
+                                </Text>
+                              </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+                      </>
+                    )}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        width: "94%",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: Colors.primary,
+                          fontSize: 18,
+                          fontWeight: "700",
+                          marginVertical: 10,
+                          alignSelf: "flex-start",
+                          marginLeft: "5%",
+                        }}
+                      >
+                        {selectedIndex === 0 ? "At*" : "From*"}
+                      </Text>
                       <View
                         style={{
                           flexDirection: "row",
@@ -1275,15 +1471,46 @@ const CreateActivityScreen = ({ route }) => {
                           alignItems: "center",
                         }}
                       >
-                        <Text style={{ marginHorizontal: 15, marginTop: 10 }}>
-                          No end
+                        <Text style={{ marginRight: 20, marginTop: 10 }}>
+                          Use school/org
                         </Text>
                         <CheckBox
+                          disabled={toCheckBox}
                           style={[{ flex: 1, marginTop: 15 }]}
-                          checked={values?.noEnd}
+                          checked={fromCheckBox}
                           onChange={(checked) => {
-                            setFieldValue("noEnd", checked);
+                            setFromCheckBox(checked);
+                            if (!fromCheckBox) {
+                              setFieldValue(
+                                "fromVenueName",
+                                orgSchoolInfo?.name
+                              );
+                              setFieldValue(
+                                "fromAddress",
+                                orgSchoolInfo?.address
+                              );
 
+                              setFieldValue("fromState", orgSchoolInfo?.state);
+
+                              setFieldValue(
+                                "fromCountry",
+                                orgSchoolInfo?.country
+                              );
+                              setFieldValue("fromCity", orgSchoolInfo?.city);
+                              setFieldValue(
+                                "fromZipCode",
+                                orgSchoolInfo?.zipcode
+                              );
+                            } else {
+                              setFieldValue("fromVenueName", "");
+                              setFieldValue("fromAddress", "");
+
+                              setFieldValue("fromState", "");
+
+                              setFieldValue("fromCountry", "");
+                              setFieldValue("fromCity", "");
+                              setFieldValue("fromZipCode", "");
+                            }
                             console.log("checked", checked);
                             // if (checked) {
                             //   Alert.alert(checked);
@@ -1295,155 +1522,39 @@ const CreateActivityScreen = ({ route }) => {
                           {""}
                         </CheckBox>
                       </View>
+                    </View>
 
-                      <Text
-                        style={{
-                          color: "#000",
-                          marginTop: 15,
-                          marginLeft: 15,
-                          alignSelf: "flex-start",
-                        }}
-                      >
-                        Every
-                      </Text>
-                      <ScrollView
-                        style={{ flexDirection: "row" }}
-                        contentContainerStyle={{ alignItems: "center" }}
-                        horizontal
-                      >
-                        {days &&
-                          days.map((day) => (
-                            <TouchableOpacity
-                              style={
-                                day.selected ? styles.selectedDay : styles.day
-                              }
-                              onPress={() => {
-                                const data = [...days];
-                                const index = data.findIndex(
-                                  (i) => i.name === day.name
-                                );
-                                data[index].selected = !day.selected;
-                                setDays(data);
-                              }}
-                            >
-                              <Text
-                                style={{
-                                  color: day.selected ? "#fff" : "#000",
-                                }}
-                              >
-                                {day.name}
-                              </Text>
-                            </TouchableOpacity>
-                          ))}
-                      </ScrollView>
-                    </>
-                  )}
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      width: "100%",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: Colors.primary,
-                        fontSize: 18,
-                        fontWeight: "700",
-                        marginVertical: 10,
-                        alignSelf: "flex-start",
-                        marginLeft: "5%",
-                      }}
-                    >
-                      {selectedIndex === 0 ? "At*" : "From*"}
-                    </Text>
                     <View
                       style={{
-                        flexDirection: "row",
-
-                        alignItems: "center",
+                        padding: 15,
+                        paddingHorizontal: 2,
+                        // borderWidth: 1,
+                        borderRadius: 20,
+                        borderColor: Colors.primary,
+                        width: "100%",
+                        // marginLeft: "%",
+                        marginVertical: 10,
                       }}
                     >
-                      <Text style={{ marginRight: 20, marginTop: 10 }}>
-                        Use school/org
-                      </Text>
-                      <CheckBox
-                        disabled={toCheckBox}
-                        style={[{ flex: 1, marginTop: 15 }]}
-                        checked={fromCheckBox}
-                        onChange={(checked) => {
-                          setFromCheckBox(checked);
-                          if (!fromCheckBox) {
-                            setFieldValue("fromVenueName", orgSchoolInfo?.name);
-                            setFieldValue(
-                              "fromAddress",
-                              orgSchoolInfo?.address
-                            );
-
-                            setFieldValue("fromState", orgSchoolInfo?.state);
-
-                            setFieldValue(
-                              "fromCountry",
-                              orgSchoolInfo?.country
-                            );
-                            setFieldValue("fromCity", orgSchoolInfo?.city);
-                            setFieldValue(
-                              "fromZipCode",
-                              orgSchoolInfo?.zipcode
-                            );
-                          } else {
-                            setFieldValue("fromVenueName", "");
-                            setFieldValue("fromAddress", "");
-
-                            setFieldValue("fromState", "");
-
-                            setFieldValue("fromCountry", "");
-                            setFieldValue("fromCity", "");
-                            setFieldValue("fromZipCode", "");
-                          }
-                          console.log("checked", checked);
-                          // if (checked) {
-                          //   Alert.alert(checked);
-                          // } else {
-                          //   Alert.alert(checked);
-                          // }
-                        }}
-                      >
-                        {""}
-                      </CheckBox>
-                    </View>
-                  </View>
-                  {/* {console.log("errors", errors)} */}
-                  <View
-                    style={{
-                      padding: 15,
-                      borderWidth: 1,
-                      borderRadius: 20,
-                      borderColor: Colors.primary,
-                      width: "100%",
-                      marginLeft: "5%",
-                      marginVertical: 10,
-                    }}
-                  >
-                    <Input
-                      style={{ marginRight: 20, width: "100%" }}
-                      placeholder="Venue name*"
-                      onChangeText={handleChange("fromVenueName")}
-                      value={values.fromVenueName}
-                    />
-                    {errors.venueName && touched.venueName && (
-                      <Text style={styles.errorText}>{errors.venueName}</Text>
-                    )}
-                    <Input
-                      style={{ marginRight: 20, marginTop: 10, width: "100%" }}
-                      placeholder="Address*"
-                      onChangeText={handleChange("fromAddress")}
-                      value={values.fromAddress}
-                    />
-                    {errors.address && touched.address && (
-                      <Text style={styles.errorText}>{errors.address}</Text>
-                    )}
-                    {/* <Select
+                      <Input
+                        style={styles.textInput}
+                        placeholder="Venue name*"
+                        onChangeText={handleChange("fromVenueName")}
+                        value={values.fromVenueName}
+                      />
+                      {errors.venueName && touched.venueName && (
+                        <Text style={styles.errorText}>{errors.venueName}</Text>
+                      )}
+                      <Input
+                        style={styles.textInput}
+                        placeholder="Address*"
+                        onChangeText={handleChange("fromAddress")}
+                        value={values.fromAddress}
+                      />
+                      {errors.address && touched.address && (
+                        <Text style={styles.errorText}>{errors.address}</Text>
+                      )}
+                      {/* <Select
                     style={[styles.selectSettings, { marginVertical: 5 }]}
                     value={values.fromState}
                     placeholder="State"
@@ -1456,108 +1567,558 @@ const CreateActivityScreen = ({ route }) => {
                     onChangeText={handleChange("fromCity")}
                     value={values.fromCity}
                   /> */}
-                    <Autocomplete
-                      placeholder="Country*"
-                      value={values?.fromCountry}
-                      placement="bottom"
-                      style={{ marginVertical: 5 }}
-                      // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue("fromCountry", query);
-                        setCountriesData(
-                          countries.filter((item) =>
-                            filterCountries(item, query)
-                          )
-                        );
-                      }}
-                      onSelect={(query) => {
-                        const selectedCountry = countriesData[query];
-                        console.log("000000", selectedCountry.name);
-                        setFieldValue("fromCountry", selectedCountry.name);
-                        setFieldValue("selectedCountry", selectedCountry.name);
-                        setFieldValue("fromSelectedState", "");
-                        setFieldValue("fromState", "");
-                        setStates([]);
-                        GetAllStates(
-                          selectedCountry.name.replace(/ /g, "")
-                        ).then((res) => {
-                          setStates(res.data);
-                          setStatesData(states);
-                        });
-                      }}
-                    >
-                      {countriesData?.map((item, index) => {
-                        return (
-                          <AutocompleteItem key={index} title={item.name} />
-                        );
-                      })}
-                    </Autocomplete>
-                    <Autocomplete
-                      placeholder="State"
-                      value={values.fromState}
-                      placement="bottom"
-                      style={{ marginVertical: 5 }}
-                      // label={evaProps => <Text {...evaProps}>State</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue("fromState", query);
-                        setStatesData(
-                          states.filter((item) => filterStates(item, query))
-                        );
-                      }}
-                      onSelect={(query) => {
-                        const selectedState = statesData[query];
-                        setFieldValue("fromState", selectedState);
-                        setFieldValue("fromSelectedState", selectedState);
-                        setFieldValue("fromSelectedCity", "");
-                        setFieldValue("fromCity", "");
-                        setCities([]);
-                        GetAllCities(
-                          values.selectedCountry,
-                          selectedState
-                        ).then((res) => {
-                          setCities(res.data);
-                        });
-                      }}
-                    >
-                      {statesData.map((item, index) => {
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
-                    <Autocomplete
-                      placeholder="City"
-                      value={values.fromCity}
-                      placement="bottom"
-                      style={{ marginVertical: 5 }}
-                      // label={evaProps => <Text {...evaProps}>City</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue("fromCity", query);
-                        setCitiesData(
-                          cities.filter((item) => filterCities(item, query))
-                        );
-                      }}
-                      onSelect={(query) => {
-                        setFieldValue("fromCity", citiesData[query]);
-                        setFieldValue("fromSelectedCity", citiesData[query]);
-                      }}
-                    >
-                      {citiesData.map((item, index) => {
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
+                      <Autocomplete
+                        placeholder="Country*"
+                        value={values?.fromCountry}
+                        placement="bottom"
+                        style={styles.textInput}
+                        // label={evaProps => <Text {...evaProps}>Country*</Text>}
+                        onChangeText={(query) => {
+                          setFieldValue("fromCountry", query);
+                          setCountriesData(
+                            countries.filter((item) =>
+                              filterCountries(item, query)
+                            )
+                          );
+                        }}
+                        onSelect={(query) => {
+                          const selectedCountry = countriesData[query];
+                          console.log("000000", selectedCountry.name);
+                          setFieldValue("fromCountry", selectedCountry.name);
+                          setFieldValue(
+                            "selectedCountry",
+                            selectedCountry.name
+                          );
+                          setFieldValue("fromSelectedState", "");
+                          setFieldValue("fromState", "");
+                          setStates([]);
+                          GetAllStates(
+                            selectedCountry.name.replace(/ /g, "")
+                          ).then((res) => {
+                            setStates(res.data);
+                            setStatesData(states);
+                          });
+                        }}
+                      >
+                        {countriesData?.map((item, index) => {
+                          return (
+                            <AutocompleteItem
+                              style={styles.autoCompleteItem}
+                              key={index}
+                              title={item.name}
+                            />
+                          );
+                        })}
+                      </Autocomplete>
+                      <Autocomplete
+                        placeholder="State"
+                        value={values.fromState}
+                        placement="bottom"
+                        style={styles.textInput}
+                        // label={evaProps => <Text {...evaProps}>State</Text>}
+                        onChangeText={(query) => {
+                          setFieldValue("fromState", query);
+                          setStatesData(
+                            states.filter((item) => filterStates(item, query))
+                          );
+                        }}
+                        onSelect={(query) => {
+                          const selectedState = statesData[query];
+                          setFieldValue("fromState", selectedState);
+                          setFieldValue("fromSelectedState", selectedState);
+                          setFieldValue("fromSelectedCity", "");
+                          setFieldValue("fromCity", "");
+                          setCities([]);
+                          GetAllCities(
+                            values.selectedCountry,
+                            selectedState
+                          ).then((res) => {
+                            setCities(res.data);
+                          });
+                        }}
+                      >
+                        {statesData.map((item, index) => {
+                          return (
+                            <AutocompleteItem
+                              style={styles.autoCompleteItem}
+                              key={index}
+                              title={item}
+                            />
+                          );
+                        })}
+                      </Autocomplete>
+                      <Autocomplete
+                        placeholder="City"
+                        value={values.fromCity}
+                        placement="bottom"
+                        style={styles.textInput}
+                        // label={evaProps => <Text {...evaProps}>City</Text>}
+                        onChangeText={(query) => {
+                          setFieldValue("fromCity", query);
+                          setCitiesData(
+                            cities.filter((item) => filterCities(item, query))
+                          );
+                        }}
+                        onSelect={(query) => {
+                          setFieldValue("fromCity", citiesData[query]);
+                          setFieldValue("fromSelectedCity", citiesData[query]);
+                        }}
+                      >
+                        {citiesData.map((item, index) => {
+                          return (
+                            <AutocompleteItem
+                              style={styles.autoCompleteItem}
+                              key={index}
+                              title={item}
+                            />
+                          );
+                        })}
+                      </Autocomplete>
+                      <Input
+                        style={styles.textInput}
+                        placeholder="Zip/Post Code"
+                        onChangeText={handleChange("fromZipCode")}
+                        value={values.fromZipCode}
+                      />
+                    </View>
+                    {selectedIndex === 2 && (
+                      <>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            width: "100%",
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: Colors.primary,
+                              fontSize: 18,
+                              fontWeight: "700",
+                              marginVertical: 10,
+                              alignSelf: "flex-start",
+                              marginLeft: "5%",
+                            }}
+                          >
+                            To*
+                          </Text>
+
+                          <View
+                            style={{
+                              flexDirection: "row",
+
+                              alignItems: "center",
+                            }}
+                          >
+                            <Text style={{ marginRight: 20, marginTop: 10 }}>
+                              Use school/org
+                            </Text>
+                            <CheckBox
+                              disabled={fromCheckBox}
+                              style={[{ flex: 1, marginTop: 15 }]}
+                              checked={toCheckBox}
+                              onChange={(checked) => {
+                                setToCheckBox(checked);
+                                if (!toCheckBox) {
+                                  setFieldValue(
+                                    "venueName",
+                                    orgSchoolInfo?.name
+                                  );
+                                  setFieldValue(
+                                    "address",
+                                    orgSchoolInfo?.address
+                                  );
+
+                                  setFieldValue("state", orgSchoolInfo?.state);
+
+                                  setFieldValue(
+                                    "country",
+                                    orgSchoolInfo?.country
+                                  );
+                                  setFieldValue("city", orgSchoolInfo?.city);
+                                  setFieldValue(
+                                    "zipCode",
+                                    orgSchoolInfo?.zipcode
+                                  );
+                                } else {
+                                  setFieldValue("venueName", "");
+                                  setFieldValue("address", "");
+
+                                  setFieldValue("state", "");
+
+                                  setFieldValue("country", "");
+                                  setFieldValue("city", "");
+                                  setFieldValue("zipCode", "");
+                                }
+                                console.log("checked", checked);
+                                // if (checked) {
+                                //   Alert.alert(checked);
+                                // } else {
+                                //   Alert.alert(checked);
+                                // }
+                              }}
+                            >
+                              {""}
+                            </CheckBox>
+                          </View>
+                        </View>
+                        <View
+                          style={{
+                            padding: 15,
+                            borderWidth: 1,
+                            borderRadius: 20,
+                            borderColor: Colors.primary,
+                            width: "100%",
+                            marginLeft: "5%",
+                            marginVertical: 10,
+                          }}
+                        >
+                          <Input
+                            style={styles.textInput}
+                            placeholder="Venue name"
+                            onChangeText={handleChange("venueName")}
+                            value={values.venueName}
+                          />
+                          <Input
+                            style={styles.textInput}
+                            placeholder="Address"
+                            onChangeText={handleChange("address")}
+                            value={values.address}
+                          />
+
+                          <Autocomplete
+                            placeholder="Country*"
+                            value={values.country}
+                            placement="bottom"
+                            style={styles.textInput}
+                            // label={evaProps => <Text {...evaProps}>Country*</Text>}
+                            onChangeText={(query) => {
+                              setFieldValue("country", query);
+                              setCountriesData(
+                                countries.filter((item) =>
+                                  filterCountries(item, query)
+                                )
+                              );
+                            }}
+                            onSelect={(query) => {
+                              const selectedCountry = countriesData[query];
+                              console.log("000000", selectedCountry.name);
+                              setFieldValue("country", selectedCountry.name);
+                              setFieldValue(
+                                "selectedCountry",
+                                selectedCountry.name
+                              );
+                              setFieldValue("toSelectedState", "");
+                              setFieldValue("state", "");
+                              setStates([]);
+                              GetAllStates(
+                                selectedCountry.name.replace(/ /g, "")
+                              ).then((res) => {
+                                setStates(res.data);
+                                setStatesData(states);
+                              });
+                            }}
+                          >
+                            {countriesData?.map((item, index) => {
+                              return (
+                                <AutocompleteItem
+                                  key={index}
+                                  title={item.name}
+                                />
+                              );
+                            })}
+                          </Autocomplete>
+                          <Autocomplete
+                            placeholder="State"
+                            value={values.state}
+                            placement="bottom"
+                            style={styles.textInput}
+                            // label={evaProps => <Text {...evaProps}>State</Text>}
+                            onChangeText={(query) => {
+                              setFieldValue("state", query);
+                              setStatesData(
+                                states.filter((item) =>
+                                  filterStates(item, query)
+                                )
+                              );
+                            }}
+                            onSelect={(query) => {
+                              const selectedState = statesData[query];
+                              setFieldValue("state", selectedState);
+                              setFieldValue("toSelectedState", selectedState);
+                              setFieldValue("toSelectedCity", "");
+                              setFieldValue("city", "");
+                              setCities([]);
+                              GetAllCities(
+                                values.selectedCountry,
+                                selectedState
+                              ).then((res) => {
+                                setCities(res.data);
+                              });
+                            }}
+                          >
+                            {statesData.map((item, index) => {
+                              return (
+                                <AutocompleteItem key={index} title={item} />
+                              );
+                            })}
+                          </Autocomplete>
+                          <Autocomplete
+                            placeholder="City"
+                            value={values.city}
+                            placement="bottom"
+                            style={{ marginVertical: 5 }}
+                            // label={evaProps => <Text {...evaProps}>City</Text>}
+                            onChangeText={(query) => {
+                              setFieldValue("city", query);
+                              setCitiesData(
+                                cities.filter((item) =>
+                                  filterCities(item, query)
+                                )
+                              );
+                            }}
+                            onSelect={(query) => {
+                              setFieldValue("city", citiesData[query]);
+                              setFieldValue(
+                                "toSelectedCity",
+                                citiesData[query]
+                              );
+                            }}
+                          >
+                            {citiesData.map((item, index) => {
+                              return (
+                                <AutocompleteItem key={index} title={item} />
+                              );
+                            })}
+                          </Autocomplete>
+
+                          <Input
+                            style={styles.textInput}
+                            placeholder="Zip/Post Code"
+                            onChangeText={handleChange("zipCode")}
+                            value={values.zipCode}
+                          />
+                        </View>
+                      </>
+                    )}
+
                     <Input
-                      style={{ width: "100%" }}
-                      placeholder="Zip/Post Code"
-                      onChangeText={handleChange("fromZipCode")}
-                      value={values.fromZipCode}
+                      style={styles.textArea}
+                      textStyle={{ minHeight: 70, textAlignVertical: "top" }}
+                      placeholder="Instructions"
+                      onChangeText={handleChange("instructions")}
+                      value={values.instructions}
+                      multiline={true}
+                      maxLength={500}
                     />
-                  </View>
-                  {selectedIndex === 2 && (
-                    <>
+                    <Input
+                      style={styles.textArea}
+                      textStyle={{ minHeight: 70, textAlignVertical: "top" }}
+                      placeholder="Disclaimer"
+                      onChangeText={handleChange("disclaimer")}
+                      value={values.disclaimer}
+                      multiline={true}
+                      maxLength={500}
+                    />
+                    <Input
+                      style={styles.textArea}
+                      textStyle={{ minHeight: 70, textAlignVertical: "top" }}
+                      placeholder="Agreement"
+                      onChangeText={handleChange("agreement")}
+                      value={values.agreement}
+                      multiline={true}
+                      maxLength={500}
+                    />
+
+                    <View
+                      style={[
+                        styles.background,
+                        {
+                          backgroundColor: "transparent",
+                        },
+                      ]}
+                    >
                       <View
                         style={{
                           flexDirection: "row",
+                          width: "95%",
                           justifyContent: "space-between",
+                        }}
+                      >
+                        <Text style={[{ color: Colors.primary, fontSize: 15 }]}>
+                          Add Students
+                        </Text>
+                        <TouchableOpacity
+                          disabled={!isValid}
+                          onPress={() => {
+                            dispatch(
+                              ChangeModalState.action({
+                                addIndividualMemberModalVisibility: true,
+                              })
+                            );
+                          }}
+                        >
+                          <Image
+                            source={require("@/Assets/Images/add.png")}
+                            style={{
+                              height: 24,
+                              width: 24,
+                              resizeMode: "contain",
+                            }}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    {students && students.length > 0 && (
+                      <View style={styles.participantContainer}>
+                        <View style={styles.participantListView}>
+                          {students &&
+                            students.length > 0 &&
+                            students?.map((item, index) => (
+                              <View
+                                style={[
+                                  styles.participantsListCards,
+                                  {
+                                    borderBottomWidth:
+                                      students.length != index + 1 ? 2 : 0,
+                                  },
+                                ]}
+                              >
+                                <View
+                                  style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <View>
+                                    <Text>{item?.name}</Text>
+                                    <Text>{item?.parent1_email}</Text>
+                                  </View>
+                                </View>
+                                <AntDesign
+                                  name="delete"
+                                  color={Colors.primary}
+                                  size={20}
+                                  style={{ marginHorizontal: 5 }}
+                                  onPress={() => handleRemoveStudent(item)}
+                                />
+                              </View>
+                            ))}
+                        </View>
+                      </View>
+                    )}
+
+                    <Select
+                      style={{
+                        width: "94%",
+                        marginBottom: 10,
+                        marginLeft: "3%",
+                      }}
+                      // value={months[selectedMonth]}
+                      placeholder="Add Instructors"
+                      onSelect={(index: any) => {
+                        // console.log("LOGS000000", instructorsList[index.row]);
+                        let findItem = instructorsList.filter(
+                          (item) =>
+                            item?.instructorId ==
+                            instructorsList[index.row]?.instructorId
+                        );
+                        // console.log("findItem", findItem);
+                        if (findItem.length == 0) {
+                          setInstructorList([
+                            ...instructorsList,
+                            instructors?.result[index.row],
+                          ]);
+                        }
+                        // console.log("logs", moment().format("M"));
+                        // console.log("index", index.row);
+                        // setSelectedMonth(index.row);
+                        // setDays(getDays(months[index.row]));
+                      }}
+                      label={(evaProps: any) => (
+                        <Text
+                          style={[
+                            {
+                              color: Colors.primary,
+                              fontSize: 15,
+                              marginBottom: 10,
+                            },
+                          ]}
+                        >
+                          Add Instructors
+                        </Text>
+                      )}
+                    >
+                      {instructors?.result?.map((item, index) => {
+                        return (
+                          <SelectItem
+                            key={index}
+                            title={item?.firstname + " " + item?.lastname}
+                          />
+                        );
+                      })}
+                    </Select>
+                    {instructorsList?.length > 0 && (
+                      <View style={styles.participantContainer}>
+                        <View style={styles.participantListView}>
+                          {instructorsList &&
+                            instructorsList.length > 0 &&
+                            instructorsList?.map((item, index) => (
+                              <View
+                                style={[
+                                  styles.participantsListCards,
+                                  {
+                                    borderBottomWidth:
+                                      students.length != index + 1 ? 2 : 0,
+                                  },
+                                ]}
+                              >
+                                <View
+                                  style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <View>
+                                    <Text>
+                                      {item?.firstname + " " + item?.lastname}
+                                    </Text>
+                                    <Text>{item?.email}</Text>
+                                  </View>
+                                </View>
+                                <AntDesign
+                                  name="delete"
+                                  color={Colors.primary}
+                                  size={20}
+                                  style={{ marginHorizontal: 5 }}
+                                  onPress={() => handleRemoveInstructors(item)}
+                                />
+                              </View>
+                            ))}
+                        </View>
+                      </View>
+                    )}
+                    <View style={{ height: 42, width: "80%", marginTop: 10 }}>
+                      <LinearGradientButton
+                        // disabled={values?.name?.length < 3 || values?.name?.length > 20}
+                        onPress={() =>
+                          dispatch(
+                            ChangeModalState.action({
+                              groupSelectionModalVisibility: true,
+                            })
+                          )
+                        }
+                      >
+                        Add Existing Group
+                      </LinearGradientButton>
+                    </View>
+
+                    {groups && groups.length > 0 && (
+                      <View
+                        style={{
                           width: "100%",
+                          marginTop: 15,
+                          marginLeft: "5%",
                         }}
                       >
                         <Text
@@ -1565,509 +2126,53 @@ const CreateActivityScreen = ({ route }) => {
                             color: Colors.primary,
                             fontSize: 18,
                             fontWeight: "700",
-                            marginVertical: 10,
-                            alignSelf: "flex-start",
-                            marginLeft: "5%",
+                            marginBottom: 10,
                           }}
                         >
-                          To*
+                          Members*
                         </Text>
-
                         <View
                           style={{
-                            flexDirection: "row",
-
-                            alignItems: "center",
+                            borderWidth: 1,
+                            borderRadius: 10,
+                            borderColor: Colors.primary,
+                            padding: 5,
                           }}
                         >
-                          <Text style={{ marginRight: 20, marginTop: 10 }}>
-                            Use school/org
-                          </Text>
-                          <CheckBox
-                            disabled={fromCheckBox}
-                            style={[{ flex: 1, marginTop: 15 }]}
-                            checked={toCheckBox}
-                            onChange={(checked) => {
-                              setToCheckBox(checked);
-                              if (!toCheckBox) {
-                                setFieldValue("venueName", orgSchoolInfo?.name);
-                                setFieldValue(
-                                  "address",
-                                  orgSchoolInfo?.address
-                                );
-
-                                setFieldValue("state", orgSchoolInfo?.state);
-
-                                setFieldValue(
-                                  "country",
-                                  orgSchoolInfo?.country
-                                );
-                                setFieldValue("city", orgSchoolInfo?.city);
-                                setFieldValue(
-                                  "zipCode",
-                                  orgSchoolInfo?.zipcode
-                                );
-                              } else {
-                                setFieldValue("venueName", "");
-                                setFieldValue("address", "");
-
-                                setFieldValue("state", "");
-
-                                setFieldValue("country", "");
-                                setFieldValue("city", "");
-                                setFieldValue("zipCode", "");
-                              }
-                              console.log("checked", checked);
-                              // if (checked) {
-                              //   Alert.alert(checked);
-                              // } else {
-                              //   Alert.alert(checked);
-                              // }
-                            }}
-                          >
-                            {""}
-                          </CheckBox>
+                          {groups &&
+                            groups.length > 0 &&
+                            groups?.map((item) => (
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  paddingVertical: 2.5,
+                                }}
+                              >
+                                <View
+                                  style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <Text>{item.groupName}</Text>
+                                </View>
+                                <AntDesign
+                                  name="delete"
+                                  color={Colors.primary}
+                                  size={20}
+                                  style={{ marginHorizontal: 5 }}
+                                  onPress={() => handleRemoveGroup(item)}
+                                />
+                              </View>
+                            ))}
                         </View>
                       </View>
-                      <View
-                        style={{
-                          padding: 15,
-                          borderWidth: 1,
-                          borderRadius: 20,
-                          borderColor: Colors.primary,
-                          width: "100%",
-                          marginLeft: "5%",
-                          marginVertical: 10,
-                        }}
-                      >
-                        <Input
-                          style={{ marginRight: 20, width: "100%" }}
-                          placeholder="Venue name"
-                          onChangeText={handleChange("venueName")}
-                          value={values.venueName}
-                        />
-                        <Input
-                          style={{
-                            marginRight: 20,
-                            marginTop: 10,
-                            width: "100%",
-                          }}
-                          placeholder="Address"
-                          onChangeText={handleChange("address")}
-                          value={values.address}
-                        />
+                    )}
 
-                        <Autocomplete
-                          placeholder="Country*"
-                          value={values.country}
-                          placement="bottom"
-                          style={{ marginVertical: 5 }}
-                          // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                          onChangeText={(query) => {
-                            setFieldValue("country", query);
-                            setCountriesData(
-                              countries.filter((item) =>
-                                filterCountries(item, query)
-                              )
-                            );
-                          }}
-                          onSelect={(query) => {
-                            const selectedCountry = countriesData[query];
-                            console.log("000000", selectedCountry.name);
-                            setFieldValue("country", selectedCountry.name);
-                            setFieldValue(
-                              "selectedCountry",
-                              selectedCountry.name
-                            );
-                            setFieldValue("toSelectedState", "");
-                            setFieldValue("state", "");
-                            setStates([]);
-                            GetAllStates(
-                              selectedCountry.name.replace(/ /g, "")
-                            ).then((res) => {
-                              setStates(res.data);
-                              setStatesData(states);
-                            });
-                          }}
-                        >
-                          {countriesData?.map((item, index) => {
-                            return (
-                              <AutocompleteItem key={index} title={item.name} />
-                            );
-                          })}
-                        </Autocomplete>
-                        <Autocomplete
-                          placeholder="State"
-                          value={values.state}
-                          placement="bottom"
-                          style={{ marginVertical: 5 }}
-                          // label={evaProps => <Text {...evaProps}>State</Text>}
-                          onChangeText={(query) => {
-                            setFieldValue("state", query);
-                            setStatesData(
-                              states.filter((item) => filterStates(item, query))
-                            );
-                          }}
-                          onSelect={(query) => {
-                            const selectedState = statesData[query];
-                            setFieldValue("state", selectedState);
-                            setFieldValue("toSelectedState", selectedState);
-                            setFieldValue("toSelectedCity", "");
-                            setFieldValue("city", "");
-                            setCities([]);
-                            GetAllCities(
-                              values.selectedCountry,
-                              selectedState
-                            ).then((res) => {
-                              setCities(res.data);
-                            });
-                          }}
-                        >
-                          {statesData.map((item, index) => {
-                            return (
-                              <AutocompleteItem key={index} title={item} />
-                            );
-                          })}
-                        </Autocomplete>
-                        <Autocomplete
-                          placeholder="City"
-                          value={values.city}
-                          placement="bottom"
-                          style={{ marginVertical: 5 }}
-                          // label={evaProps => <Text {...evaProps}>City</Text>}
-                          onChangeText={(query) => {
-                            setFieldValue("city", query);
-                            setCitiesData(
-                              cities.filter((item) => filterCities(item, query))
-                            );
-                          }}
-                          onSelect={(query) => {
-                            setFieldValue("city", citiesData[query]);
-                            setFieldValue("toSelectedCity", citiesData[query]);
-                          }}
-                        >
-                          {citiesData.map((item, index) => {
-                            return (
-                              <AutocompleteItem key={index} title={item} />
-                            );
-                          })}
-                        </Autocomplete>
-
-                        <Input
-                          style={{ width: "100%" }}
-                          placeholder="Zip/Post Code"
-                          onChangeText={handleChange("zipCode")}
-                          value={values.zipCode}
-                        />
-                      </View>
-                    </>
-                  )}
-
-                  <Input
-                    style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                    textStyle={{ minHeight: 120, textAlignVertical: "top" }}
-                    placeholder="Instructions"
-                    onChangeText={handleChange("instructions")}
-                    value={values.instructions}
-                    multiline={true}
-                    maxLength={500}
-                  />
-                  <Input
-                    style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                    textStyle={{ minHeight: 120, textAlignVertical: "top" }}
-                    placeholder="Disclaimer"
-                    onChangeText={handleChange("disclaimer")}
-                    value={values.disclaimer}
-                    multiline={true}
-                    maxLength={500}
-                  />
-                  <Input
-                    style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                    textStyle={{ minHeight: 120, textAlignVertical: "top" }}
-                    placeholder="Agreement"
-                    onChangeText={handleChange("agreement")}
-                    value={values.agreement}
-                    multiline={true}
-                    maxLength={500}
-                  />
-
-                  <View
-                    style={[
-                      styles.background,
-                      {
-                        backgroundColor: Colors.white,
-                        borderWidth: 2,
-                        borderColor: Colors.primary,
-                        // margin: 0,
-                        // padding: 0,
-                      },
-                    ]}
-                  >
-                    <TouchableOpacity
-                      style={[
-                        styles.background,
-                        {
-                          backgroundColor: Colors.white,
-                          // alignItems: "center",
-                          // margin: 0,
-                          // padding: 0,
-                        },
-                      ]}
-                      disabled={!isValid}
-                      onPress={() => {
-                        dispatch(
-                          ChangeModalState.action({
-                            addIndividualMemberModalVisibility: true,
-                          })
-                        );
-                      }}
-                    >
-                      <Text
-                        style={[
-                          styles.button,
-                          { color: Colors.primary, fontSize: 20 },
-                        ]}
-                      >
-                        Add Students
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  {students && students.length > 0 && (
-                    <View
-                      style={{ width: "100%", marginTop: 15, marginLeft: "5%" }}
-                    >
-                      <Text
-                        style={{
-                          color: Colors.primary,
-                          fontSize: 18,
-                          fontWeight: "700",
-                          marginBottom: 10,
-                        }}
-                      >
-                        Students*
-                      </Text>
-                      <View
-                        style={{
-                          borderWidth: 1,
-                          borderRadius: 10,
-                          borderColor: Colors.primary,
-                          padding: 5,
-                        }}
-                      >
-                        {students &&
-                          students.length > 0 &&
-                          students?.map((item) => (
-                            <View
-                              style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                paddingVertical: 2.5,
-                              }}
-                            >
-                              <View
-                                style={{
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Text>{item?.name}</Text>
-                              </View>
-                              <AntDesign
-                                name="delete"
-                                color={Colors.primary}
-                                size={20}
-                                style={{ marginHorizontal: 5 }}
-                                onPress={() => handleRemoveStudent(item)}
-                              />
-                            </View>
-                          ))}
-                      </View>
-                    </View>
-                  )}
-
-                  <Select
-                    style={{ width: "90%", marginBottom: 10 }}
-                    // value={months[selectedMonth]}
-                    placeholder="Add Instructors"
-                    onSelect={(index: any) => {
-                      // console.log("LOGS000000", instructorsList[index.row]);
-                      let findItem = instructorsList.filter(
-                        (item) =>
-                          item?.instructorId ==
-                          instructorsList[index.row]?.instructorId
-                      );
-                      // console.log("findItem", findItem);
-                      if (findItem.length == 0) {
-                        setInstructorList([
-                          ...instructorsList,
-                          instructors?.result[index.row],
-                        ]);
-                      }
-                      // console.log("logs", moment().format("M"));
-                      // console.log("index", index.row);
-                      // setSelectedMonth(index.row);
-                      // setDays(getDays(months[index.row]));
-                    }}
-                    label={(evaProps: any) => <Text {...evaProps}></Text>}
-                  >
-                    {instructors?.result?.map((item, index) => {
-                      return (
-                        <SelectItem
-                          key={index}
-                          title={item?.firstname + " " + item?.lastname}
-                        />
-                      );
-                    })}
-                  </Select>
-                  {instructorsList?.length > 0 && (
-                    <View
-                      style={{ width: "100%", marginTop: 15, marginLeft: "5%" }}
-                    >
-                      <Text
-                        style={{
-                          color: Colors.primary,
-                          fontSize: 18,
-                          fontWeight: "700",
-                          marginBottom: 10,
-                        }}
-                      >
-                        Instructors*
-                      </Text>
-                      <View
-                        style={{
-                          borderWidth: 1,
-                          borderRadius: 10,
-                          borderColor: Colors.primary,
-                          padding: 5,
-                        }}
-                      >
-                        {instructorsList &&
-                          instructorsList.length > 0 &&
-                          instructorsList?.map((item) => (
-                            <View
-                              style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                paddingVertical: 2.5,
-                              }}
-                            >
-                              <View
-                                style={{
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Text>
-                                  {item?.firstname + " " + item?.lastname}
-                                </Text>
-                              </View>
-                              <AntDesign
-                                name="delete"
-                                color={Colors.primary}
-                                size={20}
-                                style={{ marginHorizontal: 5 }}
-                                onPress={() => handleRemoveInstructors(item)}
-                              />
-                            </View>
-                          ))}
-                      </View>
-                    </View>
-                  )}
-                  <View
-                    style={[
-                      styles.background,
-                      {
-                        backgroundColor: Colors.white,
-                        borderWidth: 2,
-                        borderColor: Colors.primary,
-                      },
-                    ]}
-                  >
-                    <TouchableOpacity
-                      style={[
-                        styles.background,
-                        {
-                          backgroundColor: Colors.white,
-                        },
-                      ]}
-                      // disabled={values?.name?.length < 3 || values?.name?.length > 20}
-                      onPress={() =>
-                        dispatch(
-                          ChangeModalState.action({
-                            groupSelectionModalVisibility: true,
-                          })
-                        )
-                      }
-                    >
-                      <Text
-                        style={[
-                          styles.button,
-                          { color: Colors.primary, fontSize: 20 },
-                        ]}
-                      >
-                        Add Existing Group
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {groups && groups.length > 0 && (
-                    <View
-                      style={{ width: "100%", marginTop: 15, marginLeft: "5%" }}
-                    >
-                      <Text
-                        style={{
-                          color: Colors.primary,
-                          fontSize: 18,
-                          fontWeight: "700",
-                          marginBottom: 10,
-                        }}
-                      >
-                        Members*
-                      </Text>
-                      <View
-                        style={{
-                          borderWidth: 1,
-                          borderRadius: 10,
-                          borderColor: Colors.primary,
-                          padding: 5,
-                        }}
-                      >
-                        {groups &&
-                          groups.length > 0 &&
-                          groups?.map((item) => (
-                            <View
-                              style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                paddingVertical: 2.5,
-                              }}
-                            >
-                              <View
-                                style={{
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Text>{item.groupName}</Text>
-                              </View>
-                              <AntDesign
-                                name="delete"
-                                color={Colors.primary}
-                                size={20}
-                                style={{ marginHorizontal: 5 }}
-                                onPress={() => handleRemoveGroup(item)}
-                              />
-                            </View>
-                          ))}
-                      </View>
-                    </View>
-                  )}
-
-                  <View style={styles.buttonSettings}>
-                    {/* <View style={{ marginVertical: 20 }}>
+                    <View style={styles.buttonSettings}>
+                      {/* <View style={{ marginVertical: 20 }}>
                       <CheckBox
                         style={{ marginLeft: 20 }}
                         checked={askPermission}
@@ -2076,71 +2181,34 @@ const CreateActivityScreen = ({ route }) => {
                         {"Request Permission from Parents/Guardian"}
                       </CheckBox>
                     </View> */}
-                    <View
-                      style={[
-                        styles.background,
-                        {
-                          backgroundColor:
-                            values?.name?.length < 3 ||
-                            values?.name?.length > 20
-                              ? Colors.lightgray
-                              : Colors.primary,
-                        },
-                      ]}
-                    >
+
                       <TouchableOpacity
-                        style={[
-                          styles.background,
-                          {
-                            backgroundColor:
-                              values?.name?.length < 3 ||
-                              values?.name?.length > 20
-                                ? Colors.lightgray
-                                : Colors.primary,
-                          },
-                        ]}
-                        // disabled={values?.name?.length < 3 || values?.name?.length > 20}
+                        style={{ width: "100%", alignItems: "center" }}
+                        disabled={
+                          values?.name?.length < 3 || values?.name?.length > 20
+                        }
                         onPress={handleSubmit}
                       >
-                        <Text style={styles.button}>
-                          {isEdit ? "Update" : `Send invitation`}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={[styles.background]}>
-                      <TouchableOpacity
-                        style={[styles.background]}
-                        // disabled={!isValid}
-                        onPress={() => {
-                          resetForm();
-                          _dispatch({
-                            type: actions.SET_SELECTED_ACTIVITY,
-                            payload: [],
-                          });
-                          setStudents([]);
-                          setInstructorList([]);
-                          navigation.reset({
-                            index: 0,
-                            routes: [
-                              {
-                                name: "InstructorActivity",
-                              },
-                            ],
-                          });
-                          // navigation.goBack();
-                        }}
-                      >
-                        <Text style={styles.button}>Cancel</Text>
+                        <LinearGradient
+                          colors={[Colors.primary, "#EC5ADD"]}
+                          start={{ x: 0, y: 1 }}
+                          end={{ x: 1, y: 1 }}
+                          style={styles.linearGradient}
+                        >
+                          <Text style={styles.button}>
+                            {isEdit ? "Update" : `Send invitation`}
+                          </Text>
+                        </LinearGradient>
                       </TouchableOpacity>
                     </View>
                   </View>
-                </View>
-              </>
-            )}
-          </Formik>
-        )}
-      </ScrollView>
-    </>
+                </>
+              )}
+            </Formik>
+          )}
+        </ScrollView>
+      </BackgroundLayout>
+    </View>
   );
 };
 
@@ -2151,6 +2219,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     paddingTop: 20,
+    backgroundColor: Colors.newBackgroundColor,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
   mainLayout: {
     flex: 1,
@@ -2168,7 +2239,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   background: {
-    width: "90%",
+    width: "98%",
     borderRadius: 10,
     paddingBottom: 7,
     flexDirection: "row",
@@ -2176,6 +2247,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 10,
     backgroundColor: Colors.primary,
+    marginLeft: "5%",
   },
   button: {
     paddingTop: 5,
@@ -2194,6 +2266,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 40,
+    width: "90%",
   },
   errorText: {
     fontSize: 10,
@@ -2224,5 +2297,72 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderColor: "#fff",
     marginLeft: 5,
+  },
+  inputLabels: {
+    color: Colors.black,
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  radioButton: {
+    width: "60%",
+    height: 40,
+    borderRadius: 8,
+    borderWidth: 1,
+    backgroundColor: Colors.white,
+    elevation: 2,
+    paddingLeft: 10,
+    marginLeft: "10%",
+  },
+  participantContainer: {
+    width: "95%",
+    marginVertical: 5,
+    marginLeft: "2%",
+  },
+  participantListView: {
+    borderRadius: 10,
+    backgroundColor: Colors.white,
+    padding: 5,
+    elevation: 2,
+  },
+  participantsListCards: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 2.5,
+    borderColor: Colors.newBackgroundColor,
+    paddingBottom: 10,
+    paddingHorizontal: 10,
+  },
+
+  linearGradient: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 20,
+    width: "80%",
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  textArea: {
+    marginRight: 20,
+    marginTop: 10,
+    marginLeft: "8%",
+    borderRadius: 10,
+    elevation: 2,
+    width: "95%",
+  },
+  textInput: {
+    marginTop: 10,
+    alignSelf: "center",
+    width: "95%",
+    marginLeft: "5%",
+    borderRadius: 8,
+    elevation: 2,
+  },
+  autoCompleteItem: {
+    // elevation: 2,
+    backgroundColor: "transparent",
+    width: "100%",
+    marginLeft: "1%",
   },
 });

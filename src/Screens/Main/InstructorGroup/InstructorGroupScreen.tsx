@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Image,
 } from "react-native";
+import setHeaderParams from "@/Store/header/setHeaderParams";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useStateValue } from "@/Context/state/State";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,6 +28,7 @@ import {
   RequestPermissionModalGroups,
   ShowStudentsInstructorsGroupModal,
 } from "@/Modals";
+import { AppHeader } from "@/Components";
 import SetChatParam from "@/Store/chat/SetChatParams";
 import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -52,6 +55,7 @@ import {
 } from "@/Services/Instructor";
 import axios from "axios";
 import MaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
+const instructorImage = require("@/Assets/Images/approval_icon2.png");
 const InstructorGroupScreen = ({ route }) => {
   const navigation = useNavigation();
   const dependent = route && route.params && route.params.dependent;
@@ -70,6 +74,10 @@ const InstructorGroupScreen = ({ route }) => {
   const source = cancelToken.source();
   const [, _dispatch] = useStateValue();
   const dispatch = useDispatch();
+  const searchBarValue = useSelector(
+    (state: any) => state.header.searchBarValue
+  );
+  const dropDownValue = useSelector((state: any) => state.header.dropDownValue);
   const [initialize, setInitialize] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
@@ -81,7 +89,7 @@ const InstructorGroupScreen = ({ route }) => {
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedInstructions, setSelectedInstructions] = useState(null);
-  const [instructors, setInstructors] = useState([]);
+  const instructors = route.params.instructors;
   const [selectedInstructor, setSelectedInstructor] = useState(null);
   const [selectedInstructorGroup, setSelectedInstructorGroup] = useState(null);
   const [page, pageNumber] = useState(0);
@@ -514,17 +522,15 @@ const InstructorGroupScreen = ({ route }) => {
   );
 
   const search = (text: String) => {
-    if (searchParam == "") {
+    if (text == "") {
       if (user?.isAdmin) {
         getGroups();
       } else {
         getGroupsByUserId();
       }
     } else {
-      FindGroupsByName({ groupName: searchParam }, refreshing ? page : 0, 20)
+      FindGroupsByName({ groupName: text }, refreshing ? page : 0, 20)
         .then((res) => {
-          console.log("res", res);
-
           setRefreshing(false);
           setPageSize(10);
 
@@ -592,11 +598,42 @@ const InstructorGroupScreen = ({ route }) => {
   useEffect(() => {
     if (isFocused) {
       getInstructor();
+    } else {
+      dispatch(
+        setHeaderParams.action({
+          selectedDropDownOption: "",
+          searchBarValue: "",
+        })
+      );
     }
     return () => source.cancel("axios request cancelled");
     //  abortControllerRef.current.abort();
   }, [isFocused]);
-  console.log("selecetd activitye", selectedActivity);
+
+  useEffect(() => {
+    if (dropDownValue) {
+      if (dropDownValue.row === 0) {
+        setSelectedInstructor(null);
+        setSelectedInstructorGroup(null);
+      } else {
+        setSelectedInstructor(
+          instructors?.result[dropDownValue.row - 1]?.firstname +
+            " " +
+            instructors?.result[dropDownValue.row - 1]?.lastname
+        );
+
+        getGroupByInstructor(
+          instructors?.result[dropDownValue.row]?.instructorId
+        );
+      }
+    }
+  }, [dropDownValue]);
+  useEffect(() => {
+    if (searchBarValue) {
+      search(searchBarValue);
+    }
+  }, [searchBarValue]);
+
   return (
     <>
       {isVisible && (
@@ -624,7 +661,7 @@ const InstructorGroupScreen = ({ route }) => {
         />
       )}
       <View style={styles.layout}>
-        <View
+        {/* <View
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -681,7 +718,8 @@ const InstructorGroupScreen = ({ route }) => {
                 ))}
             </Select>
           )}
-        </View>
+        </View> */}
+
         {groups.length == 0 && (
           <Text style={{ textAlign: "center", marginTop: 5 }}>
             You currently do not have any groups
@@ -691,7 +729,12 @@ const InstructorGroupScreen = ({ route }) => {
           data={
             selectedInstructorGroup ? selectedInstructorGroup : groups || []
           }
-          style={{ padding: 10, width: "100%" }}
+          style={{
+            padding: 10,
+            width: "100%",
+            marginTop: 10,
+            marginBottom: 20,
+          }}
           renderItem={({ item, index }) => {
             let temp = [];
             let instructor = item?.instructors?.map((item) =>
@@ -705,157 +748,178 @@ const InstructorGroupScreen = ({ route }) => {
               >
                 <View style={[styles.item, { backgroundColor: "#fff" }]}>
                   <Text
-                    style={styles.text}
-                  >{`Group Name: ${item?.groupName}`}</Text>
+                    style={[
+                      styles.text,
+                      {
+                        fontSize: 20,
+                        fontWeight: "800",
+                        paddingLeft: 25,
+                      },
+                    ]}
+                  >{`${item?.groupName}`}</Text>
                   {/* <Text style={styles.text}>{`Status: ${
                     item?.status ? "Active" : "Inactive"
                   }`}</Text> */}
 
                   <Text
-                    style={styles.text}
+                    style={[
+                      styles.text,
+                      {
+                        fontSize: 12,
+                        fontWeight: "700",
+                        paddingLeft: 25,
+                      },
+                    ]}
                   >{`Instructors: ${temp.toString()}`}</Text>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <TouchableOpacity
-                      style={styles.horizontal}
-                      onPress={() => {
-                        setSelectionData({
-                          status: "approved",
-                          type: "student",
-                          group: item,
-                        });
-                        setShowStudentsInstructorsModal(true);
-                      }}
-                    >
-                      <Text style={styles.text}>{`Approval: ${
-                        groupCount[item.groupId]?.countApprovedStudents || "0"
-                      }`}</Text>
-                      <Entypo
-                        name="book"
-                        color={Colors.primary}
-                        size={20}
-                        style={{ marginHorizontal: 5 }}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.horizontal}
-                      onPress={() => {
-                        setSelectionData({
-                          status: "approved",
-                          type: "instructor",
-                          group: item,
-                        });
-                        setShowStudentsInstructorsModal(true);
-                      }}
-                    >
-                      <Text style={styles.text}>
-                        <Text style={styles.text}>
-                          {groupCount[item.groupId]?.countApprovedInstructors ||
-                            "0"}
-                        </Text>
-                      </Text>
-                      <Ionicons
-                        name="person"
-                        color={Colors.primary}
-                        size={20}
-                        style={{ marginHorizontal: 5 }}
-                      />
-                    </TouchableOpacity>
+                  <View style={styles.divider}>
+                    <View style={{ alignItems: "center" }}>
+                      <Text style={styles.text}>{`Approval`}</Text>
+                      <View style={{ flexDirection: "row" }}>
+                        <TouchableOpacity
+                          style={styles.horizontal}
+                          onPress={() => {
+                            setSelectionData({
+                              status: "approved",
+                              type: "student",
+                              group: item,
+                            });
+                            setShowStudentsInstructorsModal(true);
+                          }}
+                        >
+                          <Text style={styles.footerText}>{`${
+                            groupCount[item.groupId]?.countApprovedStudents ||
+                            "0"
+                          }`}</Text>
+                          <Entypo
+                            name="book"
+                            color={Colors.primary}
+                            size={15}
+                            style={{ marginHorizontal: 5 }}
+                          />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.horizontal}
+                          onPress={() => {
+                            setSelectionData({
+                              status: "approved",
+                              type: "instructor",
+                              group: item,
+                            });
+                            setShowStudentsInstructorsModal(true);
+                          }}
+                        >
+                          <Text style={styles.text}>
+                            {groupCount[item.groupId]
+                              ?.countApprovedInstructors || "0"}
+                          </Text>
+                          <Image
+                            source={instructorImage}
+                            style={styles.iconImages}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    <View style={{ alignItems: "center" }}>
+                      <Text style={styles.footerText}>{`Declined`}</Text>
+                      <View style={{ flexDirection: "row" }}>
+                        <TouchableOpacity
+                          style={styles.horizontal}
+                          onPress={() => {
+                            setSelectionData({
+                              status: "declined",
+                              type: "student",
+                              group: item,
+                            });
+                            setShowStudentsInstructorsModal(true);
+                          }}
+                        >
+                          <Text style={styles.text}>{`${
+                            groupCount[item.groupId]?.countDeclinedStudents ||
+                            "0"
+                          }`}</Text>
+                          <Entypo
+                            name="book"
+                            color={Colors.primary}
+                            size={15}
+                            style={{ marginHorizontal: 5 }}
+                          />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.horizontal}
+                          onPress={() => {
+                            setSelectionData({
+                              status: "declined",
+                              type: "instructor",
+                              group: item,
+                            });
+                            setShowStudentsInstructorsModal(true);
+                          }}
+                        >
+                          <Text style={styles.text}>
+                            {groupCount[item.groupId]
+                              ?.countDeclinedInstructors || "0"}
+                          </Text>
+                          <Image
+                            source={instructorImage}
+                            style={styles.iconImages}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    <View style={{ alignItems: "center" }}>
+                      <Text style={styles.footerText}>{`Pending`}</Text>
+                      <View style={{ flexDirection: "row" }}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            setSelectionData({
+                              status: "pending",
+                              type: "student",
+                              group: item,
+                            });
+                            setShowStudentsInstructorsModal(true);
+                          }}
+                          style={styles.horizontal}
+                        >
+                          <Text style={styles.text}>
+                            {`${
+                              groupCount[item.groupId]?.countPendingStudents ||
+                              "0"
+                            }`}
+                          </Text>
+                          <Entypo
+                            name="book"
+                            color={Colors.primary}
+                            size={15}
+                            style={{ marginHorizontal: 5 }}
+                          />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.horizontal}
+                          onPress={() => {
+                            setSelectionData({
+                              status: "pending",
+                              type: "instructor",
+                              group: item,
+                            });
+                            setShowStudentsInstructorsModal(true);
+                          }}
+                        >
+                          <Text style={styles.text}>
+                            {groupCount[item.groupId]
+                              ?.countPendingInstructors || "0"}
+                            {/* {item.countPendingInstructors || `0`} */}
+                          </Text>
+                          <Image
+                            source={instructorImage}
+                            style={styles.iconImages}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                   </View>
 
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <TouchableOpacity
-                      style={styles.horizontal}
-                      onPress={() => {
-                        setSelectionData({
-                          status: "declined",
-                          type: "student",
-                          group: item,
-                        });
-                        setShowStudentsInstructorsModal(true);
-                      }}
-                    >
-                      <Text style={styles.text}>{`Declined: ${
-                        groupCount[item.groupId]?.countDeclinedStudents || "0"
-                      }`}</Text>
-                      <Entypo
-                        name="book"
-                        color={Colors.primary}
-                        size={20}
-                        style={{ marginHorizontal: 5 }}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.horizontal}
-                      onPress={() => {
-                        setSelectionData({
-                          status: "declined",
-                          type: "instructor",
-                          group: item,
-                        });
-                        setShowStudentsInstructorsModal(true);
-                      }}
-                    >
-                      <Text style={styles.text}>
-                        {groupCount[item.groupId]?.countDeclinedInstructors ||
-                          "0"}
-                      </Text>
-                      <Ionicons
-                        name="person"
-                        color={Colors.primary}
-                        size={20}
-                        style={{ marginHorizontal: 5 }}
-                      />
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <TouchableOpacity
-                      style={styles.horizontal}
-                      onPress={() => {
-                        setSelectionData({
-                          status: "pending",
-                          type: "student",
-                          group: item,
-                        });
-                        setShowStudentsInstructorsModal(true);
-                      }}
-                    >
-                      <Text style={styles.text}>
-                        {`Pending:  ${
-                          groupCount[item.groupId]?.countPendingStudents || "0"
-                        }`}
-                      </Text>
-                      <Entypo
-                        name="book"
-                        color={Colors.primary}
-                        size={20}
-                        style={{ marginHorizontal: 5 }}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.horizontal}
-                      onPress={() => {
-                        setSelectionData({
-                          status: "pending",
-                          type: "instructor",
-                          group: item,
-                        });
-                        setShowStudentsInstructorsModal(true);
-                      }}
-                    >
-                      <Text style={styles.text}>
-                        {groupCount[item.groupId]?.countPendingInstructors ||
-                          "0"}
-                        {/* {item.countPendingInstructors || `0`} */}
-                      </Text>
-                      <Ionicons
-                        name="person"
-                        color={Colors.primary}
-                        size={20}
-                        style={{ marginHorizontal: 5 }}
-                      />
-                    </TouchableOpacity>
-                  </View>
                   <TouchableOpacity
                     onPress={() => {
                       setSelectedActivity(item);
@@ -866,11 +930,18 @@ const InstructorGroupScreen = ({ route }) => {
                         })
                       );
                     }}
-                    style={styles.horizontal}
+                    style={{ width: "100%", alignItems: "center" }}
                   >
                     <Text
-                      style={styles.text}
-                    >{`Instructions / Disclaimer / Agreement`}</Text>
+                      style={[
+                        styles.text,
+                        {
+                          fontSize: 16,
+                          marginVertical: 15,
+                          opacity: 0.6,
+                        },
+                      ]}
+                    >{`Instructions     /    Disclaimer    /    Agreement`}</Text>
                   </TouchableOpacity>
                 </View>
               </Swipeable>
@@ -893,12 +964,12 @@ const InstructorGroupScreen = ({ route }) => {
           <ActivityIndicator size="large" color={Colors.primary} />
         )}
       </View>
-      <TouchableOpacity
-        style={styles.floatButton}
-        onPress={() => navigation.navigate("CreateGroup")}
-      >
-        <AntDesign name="pluscircle" size={50} color={Colors.primary} />
-      </TouchableOpacity>
+
+      <AppHeader
+        onAddPress={() => {
+          navigation.navigate("CreateGroup");
+        }}
+      />
     </>
   );
 };
@@ -909,16 +980,38 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
   },
   item: {
-    borderRadius: 10,
-    paddingBottom: 10,
+    borderRadius: 15,
     width: "96%",
     backgroundColor: "#fff",
     marginTop: 10,
     marginHorizontal: "2%",
-    paddingHorizontal: 10,
+    // paddingHorizontal: 10,
     paddingTop: 10,
+    minHeight: 205,
+  },
+
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  text: {
+    fontSize: 13,
+    marginVertical: 4,
+  },
+
+  iconImages: {
+    height: 15,
+    width: 15,
+    resizeMode: "contain",
+    marginLeft: 5,
+    marginRight: 5,
+  },
+  footerText: {
+    fontSize: 13,
+    marginVertical: 2,
   },
   footer: {
     borderBottomLeftRadius: 10,
@@ -930,29 +1023,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  text: {
-    fontSize: 16,
-    marginVertical: 4,
-  },
-  floatButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    shadowColor: Colors.primary,
-    shadowOffset: {
-      height: 10,
-      width: 10,
-    },
-    shadowOpacity: 0.9,
-    shadowRadius: 50,
-    elevation: 5,
-  },
   horizontal: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  divider: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    borderTopWidth: 0.5,
+    borderBottomWidth: 0.5,
+    borderColor: Colors.lightgray,
+    paddingVertical: 10,
+    marginVertical: 10,
   },
 });

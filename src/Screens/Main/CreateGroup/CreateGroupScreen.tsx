@@ -4,13 +4,14 @@ import {
   useNavigation,
   useIsFocused,
 } from "@react-navigation/native";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 import { Text, Input } from "@ui-kitten/components";
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 import { useDispatch } from "react-redux";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Colors from "@/Theme/Colors";
 import { Formik } from "formik";
-import { AppHeader } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import { useStateValue } from "@/Context/state/State";
 import { actions } from "@/Context/state/Reducer";
 import { GetOptInGroup } from "@/Services/Group";
@@ -80,163 +81,120 @@ const CreateGroupScreen = ({ route }) => {
   }, [selectedDependent]);
   console.log("9099090099099", infomation);
   return (
-    <ScrollView>
-      <AppHeader
-        title={route?.params ? "Edit Group" : "Create Group"}
-        hideCalendar={true}
-        hideApproval={true}
-      />
-      <View style={styles.layout}>
-        <Text
-          textBreakStrategy={"highQuality"}
-          style={{
-            textAlign: "center",
-            color: "#606060",
-            fontSize: 18,
-          }}
-        >
-          Create a name for your Group
-        </Text>
-        <Formik
-          enableReinitialize
-          validationSchema={ValidationSchema}
-          // validateOnMount={true}
-          initialValues={{
-            name: infomation?.groupName || "",
-            instructions: infomation?.instructions || "",
-            disclaimer: infomation?.disclaimer || "",
-            agreement: infomation?.agreement || "",
-          }}
-          onSubmit={(values, { resetForm }) => {
-            const data = {
-              name: values.name,
-              optin: {
-                instructions: values.instructions,
-                disclaimer: values.disclaimer,
-                agreement: values.agreement,
-                status: true,
-              },
-              isEdit: route?.params
-                ? { ...route?.params?.data, ...groupDetail }
-                : false,
-            };
-            _dispatch({
-              type: actions.SET_GROUP,
-              payload: data,
-            });
+    <BackgroundLayout title="Create Group">
+      <ScrollView style={styles.layout}>
+        <View>
+          <Text
+            textBreakStrategy={"highQuality"}
+            style={{
+              textAlign: "center",
+              color: "#606060",
+              fontSize: 18,
+            }}
+          >
+            Create a name for your Group
+          </Text>
+          <Formik
+            enableReinitialize
+            validationSchema={ValidationSchema}
+            // validateOnMount={true}
+            initialValues={{
+              name: infomation?.groupName || "",
+              instructions: infomation?.instructions || "",
+              disclaimer: infomation?.disclaimer || "",
+              agreement: infomation?.agreement || "",
+            }}
+            onSubmit={(values, { resetForm }) => {
+              const data = {
+                name: values.name,
+                optin: {
+                  instructions: values.instructions,
+                  disclaimer: values.disclaimer,
+                  agreement: values.agreement,
+                  status: true,
+                },
+                isEdit: route?.params
+                  ? { ...route?.params?.data, ...groupDetail }
+                  : false,
+              };
+              _dispatch({
+                type: actions.SET_GROUP,
+                payload: data,
+              });
 
-            navigation.navigate("AddMembers", {
-              isEdit: route?.params ? true : false,
-              data: { ...route?.params?.data, ...groupDetail },
-            });
-            resetForm();
-          }}
-        >
-          {({
-            handleChange,
-            handleSubmit,
-            values,
-            errors,
-            isValid,
-            touched,
-            handleBlur,
-          }) => (
-            <>
-              {console.log("values9999", values)}
-              <View style={styles.formContainer}>
-                <Input
-                  style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                  textStyle={{ minHeight: 30, textAlignVertical: "center" }}
-                  placeholder="Group name*"
-                  onBlur={handleBlur("name")}
-                  onChangeText={handleChange("name")}
-                  value={values.name}
-                />
-                {errors.name && touched.name ? (
-                  <Text style={styles.errorText}>{errors.name}</Text>
-                ) : null}
-                <Input
-                  style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                  textStyle={{ minHeight: 120, textAlignVertical: "top" }}
-                  placeholder="Instructions"
-                  onChangeText={handleChange("instructions")}
-                  value={values.instructions}
-                  multiline={true}
-                  maxLength={500}
-                />
-                <Input
-                  style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                  textStyle={{ minHeight: 120, textAlignVertical: "top" }}
-                  placeholder="Disclaimer"
-                  onChangeText={handleChange("disclaimer")}
-                  value={values.disclaimer}
-                  multiline={true}
-                  maxLength={500}
-                />
-                <Input
-                  style={{ marginRight: 20, marginTop: 10, marginLeft: "5%" }}
-                  textStyle={{ minHeight: 120 }}
-                  placeholder="Agreement"
-                  onChangeText={handleChange("agreement")}
-                  value={values.agreement}
-                  multiline={true}
-                  maxLength={500}
-                />
-                {console.log("error", errors)}
-                <View style={styles.buttonSettings}>
-                  <View
-                    style={[
-                      styles.background,
-                      {
-                        backgroundColor: !isValid
-                          ? Colors.lightgray
-                          : Colors.primary,
-                      },
-                    ]}
-                  >
-                    <TouchableOpacity
-                      style={[
-                        styles.background,
-                        {
-                          backgroundColor: !isValid
-                            ? Colors.lightgray
-                            : Colors.primary,
-                        },
-                      ]}
+              navigation.navigate("AddMembers", {
+                isEdit: route?.params ? true : false,
+                data: { ...route?.params?.data, ...groupDetail },
+              });
+              resetForm();
+            }}
+          >
+            {({
+              handleChange,
+              handleSubmit,
+              values,
+              errors,
+              isValid,
+              touched,
+              handleBlur,
+            }) => (
+              <>
+                {console.log("values9999", values)}
+                <View style={styles.formContainer}>
+                  <Input
+                    style={styles.textInput}
+                    textStyle={{ minHeight: 30, textAlignVertical: "center" }}
+                    placeholder="Group name*"
+                    onBlur={handleBlur("name")}
+                    onChangeText={handleChange("name")}
+                    value={values.name}
+                  />
+                  {errors.name && touched.name ? (
+                    <Text style={styles.errorText}>{errors.name}</Text>
+                  ) : null}
+                  <Input
+                    style={styles.textArea}
+                    textStyle={{ minHeight: 70, textAlignVertical: "top" }}
+                    placeholder="Instructions"
+                    onChangeText={handleChange("instructions")}
+                    value={values.instructions}
+                    multiline={true}
+                    maxLength={500}
+                  />
+                  <Input
+                    style={styles.textArea}
+                    textStyle={{ minHeight: 70, textAlignVertical: "top" }}
+                    placeholder="Disclaimer"
+                    onChangeText={handleChange("disclaimer")}
+                    value={values.disclaimer}
+                    multiline={true}
+                    maxLength={500}
+                  />
+                  <Input
+                    style={styles.textArea}
+                    textStyle={{ minHeight: 70 }}
+                    placeholder="Agreement"
+                    onChangeText={handleChange("agreement")}
+                    value={values.agreement}
+                    multiline={true}
+                    maxLength={500}
+                  />
+
+                  <View style={styles.buttonSettings}>
+                    <LinearGradientButton
                       disabled={!isValid}
                       onPress={handleSubmit}
                     >
-                      <Text style={styles.button}>
-                        {route?.params ? "Edit Members" : "Add Members"}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View
-                    style={[
-                      styles.background,
-                      {
-                        backgroundColor:
-                          //   values?.name?.length < 3 || values?.name?.length > 20
-                          //   !
-                          Colors.primary,
-                      },
-                    ]}
-                  >
-                    <TouchableOpacity
-                      style={[styles.background]}
-                      //   disabled={!isValid}
-                      onPress={() => navigation.navigate("InstructorActivity")}
-                    >
-                      <Text style={styles.button}>Cancel</Text>
-                    </TouchableOpacity>
+                      {route?.params ? "Edit Members" : "Add Members"}
+                    </LinearGradientButton>
                   </View>
                 </View>
-              </View>
-            </>
-          )}
-        </Formik>
-      </View>
-    </ScrollView>
+              </>
+            )}
+          </Formik>
+        </View>
+      </ScrollView>
+    </BackgroundLayout>
   );
 };
 
@@ -247,6 +205,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     paddingTop: 20,
+    backgroundColor: Colors.newBackgroundColor,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
   mainLayout: {
     flex: 1,
@@ -286,12 +247,39 @@ const styles = StyleSheet.create({
     marginTop: 20,
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "center",
+    width: "70%",
+    alignSelf: "center",
+  },
+  textInput: {
+    marginTop: 10,
+    alignSelf: "center",
+    width: "95%",
+    // marginLeft: "5%",
+    borderRadius: 8,
+    elevation: 2,
+  },
+  textArea: {
+    marginTop: 10,
+
+    borderRadius: 10,
+    elevation: 2,
+    width: "95%",
+    alignSelf: "center",
   },
   errorText: {
     fontSize: 10,
     color: "red",
     marginLeft: 20,
     marginTop: 10,
+  },
+  LinearGradient: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 20,
+    width: "90%",
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -22,10 +22,12 @@ const ChildrenSelectionModal = ({
   setSelectedChild,
   activity,
   children,
+  acceptModal,
 }: {
   setSelectedChild: (item: any) => void;
   activity: any;
   children: any[];
+  acceptModal: any;
 }) => {
   const { Layout } = useTheme();
   const [selectedAmountIndex, setSelectedAmountIndex] =
@@ -78,13 +80,18 @@ const ChildrenSelectionModal = ({
                 <TouchableOpacity
                   style={{ paddingVertical: 5 }}
                   onPress={() => {
+                    setSelectedChild(child);
                     dispatch(
                       ChangeModalState.action({
-                        approveActivityModalVisibility: true,
+                        approveActivityModalVisibility: acceptModal
+                          ? true
+                          : false,
                         childrenSelectionModalVisibility: false,
+                        declineActivityModalVisibility: acceptModal
+                          ? false
+                          : true,
                       })
                     );
-                    setSelectedChild(child);
                   }}
                 >
                   <Text style={{ fontSize: 15 }}>

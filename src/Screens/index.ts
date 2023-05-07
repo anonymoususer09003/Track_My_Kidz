@@ -65,3 +65,4 @@ export { default as NotificationsScreen } from "./Main/Settings/NotificationsScr
 export { default as PaymentInfoScreen } from "./PaymentInfo/PaymentInfoScreen";
 export { default as ReportProblemScreen } from "./Main/Settings/ReportProblemScreen";
 export { default as ContactUsScreen } from "./Main/Settings/ContactUsScreen";
+export { default as InstructorActivityDetailScreen } from "./Main/InstructorActivity/InstructorActivityDetailScreen";

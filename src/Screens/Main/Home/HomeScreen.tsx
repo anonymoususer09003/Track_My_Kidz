@@ -221,7 +221,6 @@ const HomeScreen = () => {
       const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
       stompClient = Stomp.over(socket);
       stompClient.connect({ token }, () => {
-        console.log("Connected");
         deviceIds.map((item) => {
           stompClient.subscribe(`/device/${item}`, subscriptionCallback);
         });
@@ -444,7 +443,8 @@ const HomeScreen = () => {
         />
       )}
       <AppHeader
-        title="Home"
+        // title="Home"
+        onAddPress={() => navigation.navigate("CreateParentActivity")}
         thumbnail={thumbnail}
         setThumbnail={(value) => setThumbnail(value)}
         hideCalendar={thumbnail ? false : true}
@@ -709,7 +709,7 @@ const HomeScreen = () => {
 
                   return (
                     <>
-                      {item?.childTrackHistory && (
+                      {item?.toggleAlert && (
                         <Circle
                           key={index}
                           center={{
@@ -910,24 +910,6 @@ const HomeScreen = () => {
           //   </MapView>
           // )
         }
-        <TouchableOpacity
-          style={[
-            styles.floatButton,
-            { elevation: children.length == 0 ? 0 : 5 },
-          ]}
-          onPress={() => {
-            children.length == 0
-              ? Alert.alert(
-                  "Add Activities",
-                  "Please add a dependant to your profile before creating an activity",
-                  [{ text: "OK" }]
-                )
-              : navigation.navigate("CreateParentActivity");
-          }}
-          disabled={false}
-        >
-          <AntDesign name="pluscircle" size={50} color={Colors.primary} />
-        </TouchableOpacity>
       </View>
     </>
   );
@@ -975,19 +957,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  floatButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    shadowColor: Colors.primary,
-    shadowOffset: {
-      height: 10,
-      width: 10,
-    },
-    shadowOpacity: 0.9,
-    shadowRadius: 50,
-    elevation: 5,
-  },
+
   buttonText: {
     flex: 1,
     borderRadius: 8,
