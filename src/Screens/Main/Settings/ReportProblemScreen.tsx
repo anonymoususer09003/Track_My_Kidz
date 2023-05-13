@@ -25,13 +25,14 @@ import { ReportAProblem } from "../../../Services/SettingsServies";
 import LinearGradient from "react-native-linear-gradient";
 import * as yup from "yup";
 import { Formik } from "formik";
-import { AppHeader } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import { useHeaderHeight } from "react-native-screens/native-stack";
 import { ScrollView } from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Colors from "@/Theme/Colors";
 import { loadUserId } from "@/Storage/MainAppStorage";
 import CreateReport from "@/Services/Settings/CreateReport";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 const Divider = () => (
   <View
     style={{
@@ -66,85 +67,30 @@ const RadioOptions = ({
         selectedIndex={selectedIndex}
         onChange={(index) => setSelectedIndex(index)}
       >
-        <Radio
-          style={{
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
-            paddingLeft: 20,
-            marginVertical: 15,
-          }}
-        >
-          {(evaProps) => (
-            <Text {...evaProps} style={{ fontSize: 14 }}>
-              {" "}
-              User interface issues
-            </Text>
-          )}
-        </Radio>
-        <Divider />
-        <Radio
-          style={{
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
-            paddingLeft: 20,
-            marginVertical: 15,
-          }}
-        >
-          {(evaProps) => (
-            <Text {...evaProps} style={{ fontSize: 14, marginLeft: 4 }}>
-              App performance and response
-            </Text>
-          )}
-        </Radio>
-        <Divider />
-        <Radio
-          style={{
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
-            paddingLeft: 20,
-            marginVertical: 15,
-          }}
-        >
-          {(evaProps) => (
-            <Text {...evaProps} style={{ fontSize: 14 }}>
-              {" "}
-              Functionality missing or not working properly
-            </Text>
-          )}
-        </Radio>
-        <Divider />
-        <Radio
-          style={{
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
-            paddingLeft: 20,
-            marginVertical: 15,
-          }}
-        >
-          {(evaProps) => (
-            <Text {...evaProps} style={{ fontSize: 14 }}>
-              {" "}
-              Device compatibility
-            </Text>
-          )}
-        </Radio>
-        <Divider />
-        <Radio
-          style={{
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
-            paddingLeft: 20,
-            marginVertical: 15,
-          }}
-        >
-          {(evaProps) => (
-            <Text {...evaProps} style={{ fontSize: 14 }}>
-              {" "}
-              Other
-            </Text>
-          )}
-        </Radio>
-        <Divider />
+        {issues.map((item, index) => {
+          if (item != "") {
+            return (
+              <Radio
+                key={index}
+                style={[
+                  styles.radio,
+                  index == selectedIndex && {
+                    borderColor: Colors.primaryTint,
+                    borderWidth: 1.5,
+                  },
+                ]}
+              >
+                {(evaProps) => (
+                  <Text {...evaProps} style={styles.radioText}>
+                    {item}
+                  </Text>
+                )}
+              </Radio>
+            );
+          } else {
+            return <></>;
+          }
+        })}
       </RadioGroup>
     </React.Fragment>
   );
@@ -177,17 +123,17 @@ const ReportProblemScreen = ({ navigation }) => {
 
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   return (
-    <>
-      <AppHeader title="Report a Problem" isBack />
+    <BackgroundLayout title="Report a Problem">
+      <AppHeader hideCalendar={true} hideCenterIcon={true} />
       <KeyboardAwareScrollView
         extraHeight={10}
         enableOnAndroid={true}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView style={{ flex: 1 }}>
           <View style={styles.layout}>
-            <View style={[styles.mainLayout, { paddingLeft: 20 }]}>
+            <View style={[styles.mainLayout]}>
               {isSent ? (
                 <View style={styles.sppinerContainer}>
                   <Text style={styles.sent}>
@@ -202,141 +148,117 @@ const ReportProblemScreen = ({ navigation }) => {
                 //   </View>
                 // )
                 <>
-                  <Text style={{ marginBottom: 15 }}>
-                    Report the problem you are experiencing.
-                  </Text>
                   <RadioOptions
                     selectedIndex={selectedIndex}
                     setSelectedIndex={setSelectedIndex}
                   />
-                  <Text
-                    style={{
-                      marginVertical: 20,
-                      fontSize: 15,
-                      fontWeight: "800",
-                    }}
-                  >
-                    Explain (Min 20 & Max 200 Characters)
-                  </Text>
-                  <Formik
-                    validationSchema={reportAProblemValidationSchema}
-                    validateOnMount={true}
-                    initialValues={{ message: "" }}
-                    onSubmit={(values, { resetForm }) => {
-                      setisSending(true);
-                      setisSent(true);
-                      let objectToPass = {
-                        userId: userId,
-                        subject: issues[selectedIndex],
-                        description: values.message,
-                      };
-                      CreateReport(objectToPass)
-                        .then((response: any) => {
-                          console.log("res", response.status);
-                          if (response.status == 201) {
-                            setisSent(true);
-                            setTimeout(() => {
-                              setisSent(false);
+                  <View style={styles.formikContainer}>
+                    <Text
+                      style={{
+                        marginVertical: 20,
+                        fontSize: 13,
+                        fontWeight: "600",
+                      }}
+                    >
+                      Explain (Min 20 & Max 200 Characters)
+                    </Text>
+                    <Formik
+                      validationSchema={reportAProblemValidationSchema}
+                      validateOnMount={true}
+                      initialValues={{ message: "" }}
+                      onSubmit={(values, { resetForm }) => {
+                        setisSending(true);
+                        setisSent(true);
+                        let objectToPass = {
+                          userId: userId,
+                          subject: issues[selectedIndex],
+                          description: values.message,
+                        };
+                        CreateReport(objectToPass)
+                          .then((response: any) => {
+                            console.log("res", response.status);
+                            if (response.status == 201) {
+                              setisSent(true);
+                              setTimeout(() => {
+                                setisSent(false);
 
-                              setisSending(false);
-                            }, 400);
-                          }
-                        })
-                        .catch((error: any) => {
-                          Alert.alert(
-                            error.data.title,
+                                setisSending(false);
+                              }, 400);
+                            }
+                          })
+                          .catch((error: any) => {
+                            Alert.alert(
+                              error.data.title,
 
-                            error.message,
-                            [{ text: "OK", style: "cancel" }]
-                          );
-                          setisSending(false);
-                        });
-                      resetForm();
-                      setSelectedIndex(0);
-                    }}
-                  >
-                    {({
-                      handleChange,
-                      handleSubmit,
-                      values,
-                      errors,
-                      isValid,
-                    }) => (
-                      <>
-                        <View style={styles.formContainer}>
-                          <Input
-                            style={{
-                              marginRight: 20,
-                              textAlignVertical: "top",
-                              // minHeight: 200,
-                            }}
-                            textStyle={{
-                              minHeight: 200,
-                              marginLeft: -1,
-                              textAlignVertical: "top",
-                            }}
-                            placeholder="Type your feedback"
-                            onChangeText={handleChange("message")}
-                            value={values.message}
-                            multiline={true}
-                            maxLength={500}
-                            status={isTouched && errors.message ? "danger" : ""}
-                          />
-                          {errors.message && isTouched ? (
-                            <Text style={styles.errorText}>
-                              {errors.message}
-                            </Text>
-                          ) : null}
-                          <View style={styles.buttonSettings}>
-                            <View
-                              style={[
-                                styles.background,
-                                {
-                                  backgroundColor:
-                                    values.message.length < 20 ||
-                                    values.message.length > 200
-                                      ? Colors.lightgray
-                                      : Colors.primary,
-                                },
-                              ]}
-                            >
-                              <TouchableOpacity
-                                style={[
-                                  styles.background,
-                                  {
-                                    backgroundColor:
-                                      values.message.length < 20 ||
-                                      values.message.length > 200
-                                        ? Colors.lightgray
-                                        : Colors.primary,
-                                  },
-                                ]}
-                                disabled={!isValid}
-                                onPress={handleSubmit}
-                              >
-                                <Text style={styles.button}>Send</Text>
-                              </TouchableOpacity>
+                              error.message,
+                              [{ text: "OK", style: "cancel" }]
+                            );
+                            setisSending(false);
+                          });
+                        resetForm();
+                        setSelectedIndex(0);
+                      }}
+                    >
+                      {({
+                        handleChange,
+                        handleSubmit,
+                        values,
+                        errors,
+                        isValid,
+                      }) => (
+                        <>
+                          <View style={styles.formContainer}>
+                            <Input
+                              style={styles.textInput}
+                              textStyle={styles.textArea}
+                              placeholder="Type your feedback"
+                              onChangeText={handleChange("message")}
+                              value={values.message}
+                              multiline={true}
+                              maxLength={500}
+                              status={
+                                isTouched && errors.message ? "danger" : ""
+                              }
+                            />
+                            {errors.message && isTouched ? (
+                              <Text style={styles.errorText}>
+                                {errors.message}
+                              </Text>
+                            ) : null}
+                            <View style={styles.buttonSettings}>
+                              <View style={{ width: "90%" }}>
+                                <LinearGradientButton
+                                  disabled={!isValid}
+                                  onPress={handleSubmit}
+                                >
+                                  Send
+                                </LinearGradientButton>
+                              </View>
+
+                              <View style={styles.cancelBackground}>
+                                <TouchableOpacity
+                                  style={styles.cancelBackground}
+                                  onPress={() => navigation.goBack()}
+                                >
+                                  <Text style={styles.cancelButton}>
+                                    Cancel
+                                  </Text>
+                                </TouchableOpacity>
+                              </View>
                             </View>
-                            <View style={styles.cancelBackground}>
-                              <TouchableOpacity
-                                style={styles.cancelBackground}
-                                onPress={() => navigation.goBack()}
-                              >
-                                <Text style={styles.cancelButton}>Cancel</Text>
-                              </TouchableOpacity>
-                            </View>
+                            <View style={{ height: 100 }} />
                           </View>
-                        </View>
-                      </>
-                    )}
-                  </Formik>
+                        </>
+                      )}
+                    </Formik>
+                  </View>
                 </>
               )}
             </View>
           </View>
         </ScrollView>
       </KeyboardAwareScrollView>
-    </>
+    </BackgroundLayout>
   );
 };
 
@@ -345,12 +267,47 @@ export default ReportProblemScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    justifyContent: "space-around",
-    backgroundColor: Colors.white,
+    flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
   },
   mainLayout: {
     flex: 1,
     marginTop: 40,
+  },
+  radio: {
+    flexDirection: "row",
+
+    // paddingLeft: 20,
+    marginVertical: 5,
+
+    borderRadius: 10,
+    paddingVertical: 10,
+    width: "90%",
+    paddingHorizontal: 20,
+    alignSelf: "center",
+    backgroundColor: Colors.white,
+  },
+  radioText: {
+    fontSize: 14,
+    marginLeft: 10,
+  },
+  formikContainer: {
+    width: "100%",
+    paddingLeft: 20,
+  },
+  textInput: {
+    marginRight: 20,
+    textAlignVertical: "top",
+    // minHeight: 200,
+    borderRadius: 10,
+    elevation: 1,
+  },
+  textArea: {
+    minHeight: 100,
+
+    marginLeft: -1,
+    textAlignVertical: "top",
   },
   sppinerContainer: {
     flex: 1,

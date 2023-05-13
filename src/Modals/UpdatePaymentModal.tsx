@@ -127,42 +127,39 @@ const ParentPaymentModal = ({ onPay, onCancel, isVisible }) => {
           />
         </View>
         <View style={styles.bottom}>
-          <View style={styles.buttonText}>
-            <LinearGradientButton
-              style={{
-                borderRadius: 25,
-                flex: 1,
-              }}
-              appearance="ghost"
-              size="medium"
-              status="control"
-              onPress={() => {
-                onCancel();
-              }}
-            >
-              Cancel
-            </LinearGradientButton>
-          </View>
-          <View style={styles.buttonText}>
-            <LinearGradientButton
-              disabled={isValid ? false : true}
-              style={{
-                borderRadius: 25,
-                flex: 1,
-                // backgroundColor: "red",
-              }}
-              appearance="ghost"
-              size="medium"
-              status="control"
-              onPress={() => {
-                onPay(cardData);
-                // createStripeToken(cardData);
-                // onPay();
-              }}
-            >
-              save
-            </LinearGradientButton>
-          </View>
+          <LinearGradientButton
+            style={{
+              borderRadius: 25,
+              flex: 1,
+            }}
+            appearance="ghost"
+            size="medium"
+            status="control"
+            onPress={() => {
+              onCancel();
+            }}
+          >
+            Cancel
+          </LinearGradientButton>
+          <View style={{ marginTop: 20 }} />
+          <LinearGradientButton
+            disabled={isValid ? false : true}
+            style={{
+              borderRadius: 25,
+              flex: 1,
+              // backgroundColor: "red",
+            }}
+            appearance="ghost"
+            size="medium"
+            status="control"
+            onPress={() => {
+              onPay(cardData);
+              // createStripeToken(cardData);
+              // onPay();
+            }}
+          >
+            save
+          </LinearGradientButton>
         </View>
       </Card>
     </Modal>
@@ -197,7 +194,7 @@ const styles = StyleSheet.create({
   },
   bottom: {
     flex: 1,
-    flexDirection: "row",
+
     minHeight: 50,
     // maxHeight: 58,
     marginTop: 10,

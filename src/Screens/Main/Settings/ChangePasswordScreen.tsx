@@ -24,9 +24,10 @@ import { UserState } from "@/Store/User";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { ChangePassword } from "@/Services/LoginServices";
 import LogoutStore from "@/Store/Authentication/LogoutStore";
-import { AppHeader } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import Colors from "@/Theme/Colors";
 import { navigationRef } from "@/Navigators/Functions";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 
 const ChangePasswordScreen = () => {
   const { Layout } = useTheme();
@@ -157,8 +158,8 @@ const ChangePasswordScreen = () => {
   };
 
   return (
-    <>
-      <AppHeader title="Reset Password" isBack />
+    <BackgroundLayout title="Reset Password">
+      <AppHeader hideCalendar={true} hideCenterIcon={true} />
       {isLoading ? (
         <View style={styles.sppinerContainer}>
           <View style={styles.sppinerContainer}>
@@ -167,7 +168,7 @@ const ChangePasswordScreen = () => {
         </View>
       ) : (
         <ScrollView style={styles.container}>
-          <View style={[[Layout.column, Layout.justifyContentCenter]]}>
+          <View>
             <Formik
               validationSchema={
                 showCodeField ? CodeValidationSchema : loginValidationSchema
@@ -259,14 +260,12 @@ const ChangePasswordScreen = () => {
                     <>
                       <View style={styles.inputSettings}>
                         <Input
-                          textStyle={{ fontSize: 16 }}
+                          style={styles.textInput}
                           disabled={verificationMode}
                           autoCapitalize="none"
                           secureTextEntry={!oldPasswordVisible}
                           label={(evaProps) => (
-                            <Text {...evaProps} style={{ fontSize: 16 }}>
-                              Old password
-                            </Text>
+                            <Text style={styles.inputLabels}>Old password</Text>
                           )}
                           placeholder="Old password"
                           accessoryRight={renderOldPasswordIcon}
@@ -282,14 +281,12 @@ const ChangePasswordScreen = () => {
                       </View>
                       <View style={styles.inputSettings}>
                         <Input
-                          textStyle={{ fontSize: 16 }}
+                          style={styles.textInput}
                           disabled={verificationMode}
                           autoCapitalize="none"
                           secureTextEntry={!passwordVisible}
                           label={(evaProps) => (
-                            <Text {...evaProps} style={{ fontSize: 16 }}>
-                              New password
-                            </Text>
+                            <Text style={styles.inputLabels}>New password</Text>
                           )}
                           placeholder="New password"
                           accessoryRight={renderPasswordIcon}
@@ -305,12 +302,12 @@ const ChangePasswordScreen = () => {
                       </View>
                       <View style={styles.inputSettings}>
                         <Input
-                          textStyle={{ fontSize: 16 }}
+                          style={styles.textInput}
                           disabled={verificationMode}
                           autoCapitalize="none"
                           secureTextEntry={!newPasswordVisible}
                           label={(evaProps) => (
-                            <Text {...evaProps} style={{ fontSize: 16 }}>
+                            <Text style={styles.inputLabels}>
                               Confirm new password
                             </Text>
                           )}
@@ -351,43 +348,22 @@ const ChangePasswordScreen = () => {
                         </View>
                       )}
                       {!showCodeField && (
-                        <View style={styles.background}>
-                          <TouchableOpacity
-                            style={styles.background}
-                            onPress={handleSubmit}
-                          >
-                            <Text style={styles.button}>
-                              Send Activation Code
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity
+                          style={{ marginBottom: 10 }}
+                          onPress={handleSubmit}
+                        >
+                          <LinearGradientButton>
+                            Send Activation Code
+                          </LinearGradientButton>
+                        </TouchableOpacity>
                       )}
                       {showCodeField && (
-                        <View
-                          style={[
-                            styles.background,
-                            {
-                              backgroundColor: !isValid
-                                ? Colors.gray
-                                : Colors.primary,
-                            },
-                          ]}
+                        <TouchableOpacity
+                          disabled={!isValid ? true : false}
+                          onPress={handleSubmit}
                         >
-                          <TouchableOpacity
-                            style={[
-                              styles.background,
-                              {
-                                backgroundColor: !isValid
-                                  ? Colors.gray
-                                  : Colors.primary,
-                              },
-                            ]}
-                            disabled={!isValid ? true : false}
-                            onPress={handleSubmit}
-                          >
-                            <Text style={styles.button}>Verify</Text>
-                          </TouchableOpacity>
-                        </View>
+                          <LinearGradientButton>Verify</LinearGradientButton>
+                        </TouchableOpacity>
                       )}
                     </>
                   )}
@@ -395,17 +371,14 @@ const ChangePasswordScreen = () => {
               )}
             </Formik>
             {!verificationMode && (
-              <TouchableOpacity
-                style={styles.backgroundTextButton}
-                onPress={() => getActivationCode()}
-              >
+              <TouchableOpacity onPress={() => getActivationCode()}>
                 <Text style={styles.buttonText}>Resend Activation Code</Text>
               </TouchableOpacity>
             )}
           </View>
         </ScrollView>
       )}
-    </>
+    </BackgroundLayout>
   );
 };
 
@@ -417,7 +390,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 30,
     marginBottom: 10,
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
+    paddingTop: 20,
     //backgroundColor: 'background-basic-color-1',
+  },
+  inputLabels: {
+    color: Colors.black,
+    fontSize: 14,
+    marginBottom: 5,
   },
   layout: {
     flex: 1,
@@ -426,6 +407,14 @@ const styles = StyleSheet.create({
   mainLayout: {
     flex: 9,
     marginTop: 40,
+  },
+  textInput: {
+    marginTop: 4,
+    alignSelf: "center",
+    width: "100%",
+
+    borderRadius: 8,
+    elevation: 2,
   },
   profileAvatar: {
     width: 116,
@@ -490,11 +479,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   buttonText: {
-    paddingVertical: 5,
-    fontSize: 16,
+    paddingTop: 5,
+    fontSize: 15,
     color: Colors.primary,
-    borderRadius: 10,
-    fontWeight: "bold",
+    textAlign: "center",
   },
   sppinerContainer: {
     flex: 1,
@@ -505,6 +493,8 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 11,
     color: "red",
+    marginLeft: 5,
+    marginTop: 10,
   },
   editField: {
     paddingLeft: 20,

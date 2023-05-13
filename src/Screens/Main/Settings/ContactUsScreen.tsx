@@ -5,7 +5,7 @@ import {
   Alert,
   TouchableOpacity,
 } from "react-native";
-import { AppHeader } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import {
   Button,
   Input,
@@ -22,6 +22,8 @@ import { Formik } from "formik";
 import Colors from "@/Theme/Colors";
 import { useIsFocused } from "@react-navigation/native";
 import { loadId } from "@/Storage/MainAppStorage";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import LinearGradient from "react-native-linear-gradient";
 
 const ContactUsScreen = () => {
   const isFocuesed = useIsFocused();
@@ -44,119 +46,99 @@ const ContactUsScreen = () => {
   }, [isFocuesed]);
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
-      <AppHeader title="Contact us" isBack />
+    <BackgroundLayout title="Contact us">
       <View style={styles.layout}>
-        <View style={styles.mainLayout}>
-          <Formik
-            validationSchema={contactUsValidationSchema}
-            validateOnMount={true}
-            initialValues={{ message: "" }}
-            onSubmit={async (values, { resetForm }) => {
-              setisSending(true);
-              const userId = await loadId();
-              console.log("userid", userId);
-              let objectToPass = {
-                id: 0,
-                userId: userId,
-                message: values.message,
-              };
-              ContactUs(objectToPass)
-                .then((response: any) => {
-                  console.log("res", response);
-                  if (response.status == 200) {
-                    setisSent(true);
-                    setTimeout(() => {
-                      setisSent(false);
+        <KeyboardAvoidingView style={styles.container}>
+          <AppHeader hideCalendar={true} hideCenterIcon={true} />
 
-                      setisSending(false);
-                    }, 3000);
-                  }
-                })
-                .catch((error: any) => {
-                  console.log(error);
-                  Alert.alert("An error occured", "Please try again", [
-                    { text: "OK", style: "cancel" },
-                  ]);
+          <View style={styles.mainLayout}>
+            <Formik
+              validationSchema={contactUsValidationSchema}
+              validateOnMount={true}
+              initialValues={{ message: "" }}
+              onSubmit={async (values, { resetForm }) => {
+                setisSending(true);
+                const userId = await loadId();
 
-                  setisSending(false);
-                });
-              resetForm();
-            }}
-          >
-            {({ handleChange, handleSubmit, values, errors, isValid }) => (
-              <>
-                {isSending ? (
-                  isSent ? (
-                    <View style={styles.sppinerContainer}>
-                      <Text style={styles.sent}>
-                        Your message has been successfully submited.{"\n"}Thank
-                        you for contacting us!
-                      </Text>
-                    </View>
+                let objectToPass = {
+                  id: 0,
+                  userId: userId,
+                  message: values.message,
+                };
+                ContactUs(objectToPass)
+                  .then((response: any) => {
+                    console.log("res", response);
+                    if (response.status == 200) {
+                      setisSent(true);
+                      setTimeout(() => {
+                        setisSent(false);
+
+                        setisSending(false);
+                      }, 3000);
+                    }
+                  })
+                  .catch((error: any) => {
+                    console.log(error);
+                    Alert.alert("An error occured", "Please try again", [
+                      { text: "OK", style: "cancel" },
+                    ]);
+
+                    setisSending(false);
+                  });
+                resetForm();
+              }}
+            >
+              {({ handleChange, handleSubmit, values, errors, isValid }) => (
+                <>
+                  {isSending ? (
+                    isSent ? (
+                      <View style={styles.sppinerContainer}>
+                        <Text style={styles.sent}>
+                          Your message has been successfully submited.{"\n"}
+                          Thank you for contacting us!
+                        </Text>
+                      </View>
+                    ) : (
+                      <View style={styles.sppinerContainer}>
+                        <Spinner status="primary" />
+                      </View>
+                    )
                   ) : (
-                    <View style={styles.sppinerContainer}>
-                      <Spinner status="primary" />
+                    <View style={styles.formContainer}>
+                      <Input
+                        style={styles.textInput}
+                        textStyle={styles.textArea}
+                        placeholder="Add your message here"
+                        onChangeText={handleChange("message")}
+                        onBlur={() => {
+                          setisTouched(true);
+                          setShowErrors(true);
+                        }}
+                        value={values.message}
+                        multiline={true}
+                        maxLength={500}
+                        status={isTouched && errors.message ? "danger" : ""}
+                      />
+                      <Text style={styles.message}>Min 50 characters</Text>
+                      {errors.message && isTouched && showErrors ? (
+                        <Text style={styles.errorText}>{errors.message}</Text>
+                      ) : null}
+
+                      <TouchableOpacity
+                        disabled={!isValid}
+                        onPress={handleSubmit}
+                      >
+                        <LinearGradientButton>Send</LinearGradientButton>
+                      </TouchableOpacity>
                     </View>
-                  )
-                ) : (
-                  <Layout style={styles.formContainer}>
-                    <Input
-                      style={{ marginTop: 20, fontSize: 20 }}
-                      textStyle={{
-                        minHeight: 200,
-                        marginLeft: -1,
-                        fontSize: 18,
-                        textAlignVertical: "top",
-                      }}
-                      placeholder="Add your message here"
-                      onChangeText={handleChange("message")}
-                      onBlur={() => {
-                        setisTouched(true);
-                        setShowErrors(true);
-                      }}
-                      value={values.message}
-                      multiline={true}
-                      maxLength={500}
-                      status={isTouched && errors.message ? "danger" : ""}
-                    />
-                    <Text style={styles.message}>Min 50 characters</Text>
-                    {errors.message && isTouched && showErrors ? (
-                      <Text style={styles.errorText}>{errors.message}</Text>
-                    ) : null}
-                    <Layout style={styles.buttonSettings}>
-                      {isValid ? (
-                        <View style={styles.background}>
-                          <TouchableOpacity
-                            style={styles.background}
-                            disabled={!isValid}
-                            onPress={handleSubmit}
-                          >
-                            <Text style={styles.button}>Send</Text>
-                          </TouchableOpacity>
-                        </View>
-                      ) : (
-                        <View style={styles.disabledBackground}>
-                          <TouchableOpacity
-                            style={styles.disabledBackground}
-                            disabled={!isValid}
-                            onPress={handleSubmit}
-                          >
-                            <Text style={[styles.button, { color: "#fff" }]}>
-                              Send
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      )}
-                    </Layout>
-                  </Layout>
-                )}
-              </>
-            )}
-          </Formik>
-        </View>
+                  )}
+                </>
+              )}
+            </Formik>
+          </View>
+        </KeyboardAvoidingView>
       </View>
-    </KeyboardAvoidingView>
+    </BackgroundLayout>
   );
 };
 
@@ -166,15 +148,33 @@ const themedStyles = StyleService.create({
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
   },
   mainLayout: {
     flex: 9,
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
+  },
+  textInput: {
+    textAlignVertical: "top",
+    // minHeight: 200,
+    borderRadius: 10,
+    elevation: 1,
+  },
+  textArea: {
+    minHeight: 100,
+
+    textAlignVertical: "top",
   },
   container: {
     flex: 2,
     flexDirection: "column",
-    backgroundColor: "background-basic-color-1",
+
     justifyContent: "flex-start",
+
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
   },
   headerContainer: {
     flex: 2,
@@ -183,6 +183,10 @@ const themedStyles = StyleService.create({
   },
   formContainer: {
     flex: 1,
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
+
+    padding: 20,
   },
   buttonSettings: {
     marginTop: 20,
@@ -203,10 +207,13 @@ const themedStyles = StyleService.create({
     marginTop: 10,
   },
   message: {
-    fontSize: 10,
-    color: "#000000",
+    fontSize: 13,
+
     marginLeft: 10,
     marginTop: 10,
+
+    fontWeight: "600",
+    marginBottom: 20,
   },
   socialIcons: {
     flex: 1,

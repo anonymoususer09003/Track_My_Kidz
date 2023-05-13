@@ -29,11 +29,13 @@ import Toast from "react-native-toast-message";
 import DeactivateTwoFAService from "@/Services/TwoFAServices/DeactivateTwoFAService";
 import ReactivateTwoFA from "@/Services/TwoFAServices/ReactivateTwoFA";
 import Colors from "@/Theme/Colors";
-import { AppHeader } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import { TwoFactorAuthenticationModal, VerifyYourselfModal } from "@/Modals";
 import LogoutStore from "@/Store/Authentication/LogoutStore";
 import { loadId, loadUserId } from "@/Storage/MainAppStorage";
 import { DeleteUser } from "@/Services/SettingsServies";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import LinearGradient from "react-native-linear-gradient";
 
 const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
   const dispatch = useDispatch();
@@ -81,8 +83,8 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
   };
 
   return (
-    <>
-      <AppHeader title="Settings" hideCalendar={true} />
+    <BackgroundLayout title="Settings">
+      <AppHeader hideCalendar={true} />
       <TwoFactorAuthenticationModal />
       <VerifyYourselfModal
         isActivationCode={verifyType === "activation-code"}
@@ -163,10 +165,16 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
+                styles.firstItem,
               ],
             ]}
           >
             <Text style={{ fontSize: 16 }}>Your Profile</Text>
+            <Icon
+              style={styles.icon}
+              fill={Colors.gray}
+              name="chevron-right-outline"
+            />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("ChangePassword")}
@@ -175,11 +183,16 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
-                { marginTop: 15 },
+                styles.otherItems,
               ],
             ]}
           >
             <Text style={{ fontSize: 16 }}>Reset Password</Text>
+            <Icon
+              style={styles.icon}
+              fill={Colors.gray}
+              name="chevron-right-outline"
+            />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("OrganizationInfo")}
@@ -188,7 +201,7 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
-                { marginTop: 15 },
+                styles.otherItems,
               ],
             ]}
           >
@@ -207,7 +220,7 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
-                { marginTop: 15 },
+                styles.otherItems,
               ],
             ]}
           >
@@ -225,7 +238,7 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
-                { marginTop: 15 },
+                styles.otherItems,
               ],
             ]}
           >
@@ -243,7 +256,7 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
-                { marginTop: 15 },
+                styles.otherItems,
               ],
             ]}
           >
@@ -261,7 +274,7 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
-                { marginTop: 15 },
+                styles.lastItem,
               ],
             ]}
           >
@@ -274,49 +287,31 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
           </TouchableOpacity>
           <View style={styles.buttonsContainer}>
             <View style={{ marginVertical: 15 }}>
-              <View style={styles.background}>
-                <TouchableOpacity
-                  style={styles.background}
-                  onPress={() => {
-                    dispatch(
-                      ChangeUserState.action({
-                        userType: "",
-                      })
-                    );
+              <LinearGradientButton
+                onPress={() => {
+                  dispatch(
+                    ChangeUserState.action({
+                      userType: "",
+                    })
+                  );
 
-                    dispatch(LogoutStore.action());
-                  }}
-                >
-                  <Text style={styles.button}>Log out</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={{ marginTop: 15 }}>
-              <View
-              // style={[styles.background, { backgroundColor: 'transparent', borderWidth: 1, borderColor: Colors.primary, paddingBottom: 10 }]}
+                  dispatch(LogoutStore.action());
+                }}
               >
-                <TouchableOpacity
-                  style={[
-                    styles.background,
-                    {
-                      backgroundColor: "transparent",
-                      borderWidth: 1,
-                      borderColor: Colors.primary,
-                      paddingBottom: 10,
-                    },
-                  ]}
-                  onPress={() => setopenDeactivateModal(true)}
-                >
-                  <Text style={[styles.button, { color: Colors.primary }]}>
-                    Delete account
-                  </Text>
-                </TouchableOpacity>
-              </View>
+                Log out
+              </LinearGradientButton>
             </View>
+            <TouchableOpacity
+              style={styles.deleteBackground}
+              onPress={() => setopenDeactivateModal(true)}
+            >
+              <Text style={styles.deleteButton}> Delete account</Text>
+            </TouchableOpacity>
           </View>
+          <View style={{ height: 50 }} />
         </View>
       </View>
-    </>
+    </BackgroundLayout>
   );
 };
 
@@ -326,6 +321,38 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
+  },
+
+  lastItem: {
+    backgroundColor: Colors.white,
+    borderWidth: 0.5,
+    elevation: 1,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    borderColor: Colors.lightgray,
+    paddingLeft: 10,
+    paddingVertical: 5,
+    borderTopWidth: 0,
+  },
+  firstItem: {
+    backgroundColor: Colors.white,
+    borderWidth: 0.5,
+    elevation: 1,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderColor: Colors.lightgray,
+    paddingLeft: 10,
+    paddingVertical: 5,
+  },
+  otherItems: {
+    backgroundColor: Colors.white,
+    borderBottomWidth: 0.5,
+    elevation: 1,
+    borderColor: Colors.lightgray,
+    paddingLeft: 10,
+    paddingVertical: 5,
   },
   mainLayout: {
     flex: 9,
@@ -397,6 +424,23 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 10,
     fontWeight: "bold",
+    color: Colors.primary,
+    textAlign: "center",
+  },
+  deleteBackground: {
+    width: "100%",
+    borderRadius: 10,
+    paddingBottom: 7,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    marginBottom: 35,
+  },
+
+  deleteButton: {
+    paddingTop: 5,
+    fontSize: 15,
     color: Colors.primary,
     textAlign: "center",
   },

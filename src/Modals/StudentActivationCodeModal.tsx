@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   inputSettings: {
     marginTop: 7,
   },
-  modal: { borderRadius: 10 },
+  modal: { borderRadius: 10, backgroundColor: Colors.newBackgroundColor },
   header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
   body: { flex: 3 },
   background: {

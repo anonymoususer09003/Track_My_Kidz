@@ -30,7 +30,7 @@ import Toast from "react-native-toast-message";
 import DeactivateTwoFAService from "@/Services/TwoFAServices/DeactivateTwoFAService";
 import ReactivateTwoFA from "@/Services/TwoFAServices/ReactivateTwoFA";
 import Colors from "@/Theme/Colors";
-import { AppHeader } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import { TwoFactorAuthenticationModal, VerifyYourselfModal } from "@/Modals";
 import LogoutStore from "@/Store/Authentication/LogoutStore";
 import BackgroundLayout from "@/Components/BackgroundLayout";
@@ -83,6 +83,7 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
 
   return (
     <BackgroundLayout title="Settings">
+      <AppHeader hideCenterIcon={true} hideCalendar={true} />
       <TwoFactorAuthenticationModal />
       <VerifyYourselfModal
         isActivationCode={verifyType === "activation-code"}
@@ -152,10 +153,16 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
+                styles.firstItem,
               ],
             ]}
           >
             <Text style={{ fontSize: 16 }}>Your Profile</Text>
+            <Icon
+              style={styles.icon}
+              fill={Colors.gray}
+              name="chevron-right-outline"
+            />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("ChangePassword")}
@@ -164,11 +171,16 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
-                { marginTop: 15 },
+                styles.otherItems,
               ],
             ]}
           >
             <Text style={{ fontSize: 16 }}>Reset Password</Text>
+            <Icon
+              style={styles.icon}
+              fill={Colors.gray}
+              name="chevron-right-outline"
+            />
           </TouchableOpacity>
           {/* <TouchableOpacity
                         onPress={() => navigation.navigate('Notifications')}
@@ -209,7 +221,7 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
-                { marginTop: 15 },
+                styles.otherItems,
               ],
             ]}
           >
@@ -227,7 +239,7 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
-                { marginTop: 15 },
+                styles.otherItems,
               ],
             ]}
           >
@@ -245,7 +257,7 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
-                { marginTop: 15 },
+                styles.otherItems,
               ],
             ]}
           >
@@ -263,7 +275,7 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
                 Layout.row,
                 Layout.justifyContentBetween,
                 Layout.alignItemsCenter,
-                { marginTop: 15 },
+                styles.lastItem,
               ],
             ]}
           >
@@ -276,22 +288,19 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
           </TouchableOpacity>
           <View style={styles.buttonsContainer}>
             <View style={{ marginVertical: 15 }}>
-              <View style={styles.background}>
-                <TouchableOpacity
-                  style={styles.background}
-                  onPress={async () => {
-                    dispatch(
-                      ChangeUserState.action({
-                        userType: "",
-                      })
-                    );
-                    await BackgroundService.stop();
-                    dispatch(LogoutStore.action());
-                  }}
-                >
-                  <Text style={styles.button}>Log out</Text>
-                </TouchableOpacity>
-              </View>
+              <LinearGradientButton
+                onPress={async () => {
+                  dispatch(
+                    ChangeUserState.action({
+                      userType: "",
+                    })
+                  );
+                  await BackgroundService.stop();
+                  dispatch(LogoutStore.action());
+                }}
+              >
+                Log out
+              </LinearGradientButton>
             </View>
             <View style={{ marginVertical: 15 }}>
               <Text style={[styles.button, { color: Colors.primary }]}>
@@ -311,6 +320,38 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
+  },
+
+  lastItem: {
+    backgroundColor: Colors.white,
+    borderWidth: 0.5,
+    elevation: 1,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    borderColor: Colors.lightgray,
+    paddingLeft: 10,
+    paddingVertical: 5,
+    borderTopWidth: 0,
+  },
+  firstItem: {
+    backgroundColor: Colors.white,
+    borderWidth: 0.5,
+    elevation: 1,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderColor: Colors.lightgray,
+    paddingLeft: 10,
+    paddingVertical: 5,
+  },
+  otherItems: {
+    backgroundColor: Colors.white,
+    borderBottomWidth: 0.5,
+    elevation: 1,
+    borderColor: Colors.lightgray,
+    paddingLeft: 10,
+    paddingVertical: 5,
   },
   mainLayout: {
     flex: 9,

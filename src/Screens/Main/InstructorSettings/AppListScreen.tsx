@@ -69,7 +69,6 @@ const AppListScreen = () => {
 
   return (
     <>
-      <AppHeader title="Our Other Apps" />
       <View style={{ flex: 1 }}>
         <FlatList
           data={apps}

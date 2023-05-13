@@ -6,6 +6,7 @@ import {
   View,
   Keyboard,
   Alert,
+  Image,
 } from "react-native";
 import { useTheme } from "@/Theme";
 import { ProfileAvatarPicker } from "@/Components";
@@ -38,7 +39,9 @@ import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
 import FetchOne from "@/Store/User/FetchOne";
 import Colors from "@/Theme/Colors";
 import { CountryDTO } from "@/Models/CountryDTOs";
-
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import { LinearGradientButton } from "@/Components";
+import FA5 from "react-native-vector-icons/FontAwesome5";
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -50,6 +53,10 @@ const filterCities = (item: string, query: string) => {
 };
 
 const PersonalProfileScreen = () => {
+  const userIcon = require("@/Assets/Images/approval_icon2.png");
+  const phone = require("@/Assets/Images/phone.png");
+  const marker = require("@/Assets/Images/marker.png");
+  const email = require("@/Assets/Images/email.png");
   const { Layout } = useTheme();
   const isFocused = useIsFocused();
   const countries = useSelector(
@@ -132,6 +139,45 @@ const PersonalProfileScreen = () => {
       style: [buttonElement.props.style, styles.editButton],
     });
   };
+
+  const renderPersonIcon = (props: any) => (
+    <Image
+      source={userIcon}
+      style={{ height: 18, width: 18, marginRight: 10 }}
+      resizeMode="contain"
+    />
+  );
+  const renderLocationIcon = (props: any) => (
+    <Image
+      source={marker}
+      style={{ height: 20, width: 20 }}
+      resizeMode="contain"
+    />
+  );
+  const renderEmailIcon = (props: any) => (
+    <Image
+      source={email}
+      style={{ height: 18, width: 18, marginRight: 12 }}
+      resizeMode="contain"
+    />
+  );
+  const renderPhoneIcon = (props: any) => (
+    <Image
+      source={phone}
+      style={{ height: 20, width: 20, marginRight: 10 }}
+      resizeMode="contain"
+    />
+  );
+  const renderSchoolIcon = (props: any) => (
+    <FA5
+      name="school"
+      size={20}
+      style={{ height: 20, width: 20, marginRight: 10 }}
+      color={Colors.secondaryDark}
+      resizeMode="contain"
+    />
+  );
+
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -174,41 +220,7 @@ const PersonalProfileScreen = () => {
           close={() => setVisible(false)}
         />
       )}
-      <AppHeader title="Profile" isBack />
-
-      <View style={{ width: "100%" }}>
-        {(selectedImage != "" || currentUser?.imageurl?.length > 0) && (
-          <ProfileAvatarPicker
-            style={styles.profileImage}
-            // resizeMode='center'
-            source={{
-              uri:
-                selectedImage ||
-                currentUser?.imageurl + "?time" + new Date().getTime(),
-              headers: { Pragma: "no-cache" },
-            }}
-            editButton={isEditMode ? renderEditAvatarButton : null}
-          />
-        )}
-        {currentUser?.imageurl == null && selectedImage == "" && (
-          <View
-            style={[
-              styles.profileImage,
-              {
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: Colors.lightgray,
-              },
-            ]}
-          >
-            <Text style={{ fontSize: 30 }}>
-              {currentUser?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
-              {currentUser?.lastname?.substring(0, 1)?.toUpperCase()}
-            </Text>
-            {isEditMode && renderEditButtonElement()}
-          </View>
-        )}
-      </View>
+      <AppHeader hideCenterIcon hideCalendar={true} />
 
       {isLoading ? (
         <View style={styles.sppinerContainer}>
@@ -217,350 +229,463 @@ const PersonalProfileScreen = () => {
           </View>
         </View>
       ) : (
-        <KeyboardAwareScrollView style={{ flex: 1 }} extraScrollHeight={250}>
-          <View style={[[Layout.column, Layout.justifyContentCenter]]}>
-            {isFocused && (
-              <Formik
-                validateOnMount={true}
-                initialValues={{
-                  username: currentUser?.username || "",
-                  firstName: currentUser?.firstname || "",
-                  lastName: currentUser?.lastname || "",
-                  address: currentUser?.address || "",
-                  country: currentUser?.country || "",
-                  email: currentUser?.email || "",
-                  zipcode: currentUser?.zipcode || "",
-                  city: currentUser?.city || "",
-                  state: currentUser?.state || "",
-                  phone: currentUser?.phone || "",
-                  selectedCountry: "",
-                  selectedState: "",
-                  selectedCity: "",
-                  schoolName: currentUser?.schoolName || "",
+        <BackgroundLayout title="Profile">
+          <View style={{ width: "100%", marginBottom: 20 }}>
+            {(selectedImage != "" || currentUser?.imageurl?.length > 0) && (
+              <ProfileAvatarPicker
+                style={styles.profileImage}
+                // resizeMode='center'
+                source={{
+                  uri:
+                    selectedImage ||
+                    currentUser?.imageurl + "?time" + new Date().getTime(),
+                  headers: { Pragma: "no-cache" },
                 }}
-                onSubmit={(values, { resetForm }) => {
-                  setisSending(true);
-                  let objectToPass = {
-                    firstname: values.firstName,
-                    lastname: values.lastName,
-                    id: currentUser?.instructorId,
-                    address: values.address,
-                    state: values.state,
-                    country: values.country,
-                    city: values.city,
-                    zipcode: values.zipcode,
-                    phone: values.phone,
-                    schoolName: values?.schoolName || "",
-                    schoolId: values.schoolId,
-                    term: true,
-                    grades: [],
-                    isAdmin: currentUser?.isAdmin,
-                  };
-
-                  let formData = new FormData();
-                  formData.append(
-                    "image",
-                    uploadedImage
-                      ? {
-                          uri: uploadedImage?.path,
-                          name: uploadedImage.mime,
-                          type: uploadedImage.mime,
-                        }
-                      : {
-                          uri:
-                            currentUser?.imageurl ||
-                            "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
-                          name: "avatar",
-                          type: "image/png",
-                        }
-                  );
-                  formData.append("firstname", values.firstName);
-                  formData.append("lastname", values.lastName);
-
-                  formData.append("address", values?.schoolName || "");
-                  formData.append("email", currentUser?.email || "");
-                  formData.append("state", values.state);
-                  formData.append("city", values.city);
-                  formData.append("country", values.country);
-                  formData.append("zipcode", values.zipcode);
-
-                  formData.append("term", true);
-                  formData.append("isAdmin", currentUser?.isAdmin);
-                  formData.append("id", currentUser?.instructorId);
-                  formData.append("schoolId", currentUser?.schoolId || "");
-                  formData.append("orgId", currentUser?.orgId || "");
-                  console.log("form data", JSON.stringify(formData));
-                  UpdateUser(formData, "instructor")
-                    .then(async (response: any) => {
-                      if (response.status == 200) {
-                        // setisSent(true)
-                        setisEditMode(false);
-                        setisSending(false);
-                        getUserId();
-                      }
-                      let res = await fetchOneUserService();
-                      console.log("res", res);
-                      // if (!res?.childTrackHistory) {
-                      //   // await BackgroundService.stop();
-                      // }
-                      // await BackgroundService.stop();
-                      dispatch(
-                        ChangeUserState.action({
-                          item: res,
-                          fetchOne: { loading: false, error: null },
-                        })
-                      );
-                    })
-                    .catch((error: any) => {
-                      console.log("Error", error);
-                      // Alert.alert(
-                      //   error?.data.title,
-                      //   error?.data.detail,
-                      //   [{ text: 'OK', style: 'cancel' }],
-                      // )
-                      // setisSent(true)
-                      setisSending(false);
-                      setisEditMode(!isEditMode);
-                    });
-                }}
+                editButton={isEditMode ? renderEditAvatarButton : null}
+              />
+            )}
+            {currentUser?.imageurl == null && selectedImage == "" && (
+              <View
+                style={[
+                  styles.profileImage,
+                  {
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: Colors.lightgray,
+                  },
+                ]}
               >
-                {({
-                  handleChange,
-                  handleSubmit,
-                  setFieldValue,
-                  values,
-                  errors,
-                  touched,
-                }) => (
-                  <>
-                    {isSending ? (
-                      <View style={styles.sppinerContainer}>
-                        <Spinner status="primary" />
-                      </View>
-                    ) : (
-                      <>
-                        <View style={{ flexDirection: "column" }}>
-                          <Text style={styles.editLabel}>Email</Text>
-                          <Text style={styles.editField}>{values.email}</Text>
+                <Text style={{ fontSize: 30 }}>
+                  {currentUser?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
+                  {currentUser?.lastname?.substring(0, 1)?.toUpperCase()}
+                </Text>
+                {isEditMode && renderEditButtonElement()}
+              </View>
+            )}
+          </View>
+          <KeyboardAwareScrollView
+            style={styles.layout}
+            extraScrollHeight={250}
+          >
+            <View style={[[Layout.column, Layout.justifyContentCenter]]}>
+              {isFocused && (
+                <Formik
+                  validateOnMount={true}
+                  initialValues={{
+                    username: currentUser?.username || "",
+                    firstName: currentUser?.firstname || "",
+                    lastName: currentUser?.lastname || "",
+                    address: currentUser?.address || "",
+                    country: currentUser?.country || "",
+                    email: currentUser?.email || "",
+                    zipcode: currentUser?.zipcode || "",
+                    city: currentUser?.city || "",
+                    state: currentUser?.state || "",
+                    phone: currentUser?.phone || "",
+                    selectedCountry: "",
+                    selectedState: "",
+                    selectedCity: "",
+                    schoolName: currentUser?.schoolName || "",
+                  }}
+                  onSubmit={(values, { resetForm }) => {
+                    setisSending(true);
+                    let objectToPass = {
+                      firstname: values.firstName,
+                      lastname: values.lastName,
+                      id: currentUser?.instructorId,
+                      address: values.address,
+                      state: values.state,
+                      country: values.country,
+                      city: values.city,
+                      zipcode: values.zipcode,
+                      phone: values.phone,
+                      schoolName: values?.schoolName || "",
+                      schoolId: values.schoolId,
+                      term: true,
+                      grades: [],
+                      isAdmin: currentUser?.isAdmin,
+                    };
+
+                    let formData = new FormData();
+                    formData.append(
+                      "image",
+                      uploadedImage
+                        ? {
+                            uri: uploadedImage?.path,
+                            name: uploadedImage.mime,
+                            type: uploadedImage.mime,
+                          }
+                        : {
+                            uri:
+                              currentUser?.imageurl ||
+                              "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
+                            name: "avatar",
+                            type: "image/png",
+                          }
+                    );
+                    formData.append("firstname", values.firstName);
+                    formData.append("lastname", values.lastName);
+
+                    formData.append("address", values?.schoolName || "");
+                    formData.append("email", currentUser?.email || "");
+                    formData.append("state", values.state);
+                    formData.append("city", values.city);
+                    formData.append("country", values.country);
+                    formData.append("zipcode", values.zipcode);
+
+                    formData.append("term", true);
+                    formData.append("isAdmin", currentUser?.isAdmin);
+                    formData.append("id", currentUser?.instructorId);
+                    formData.append("schoolId", currentUser?.schoolId || "");
+                    formData.append("orgId", currentUser?.orgId || "");
+                    console.log("form data", JSON.stringify(formData));
+                    UpdateUser(formData, "instructor")
+                      .then(async (response: any) => {
+                        if (response.status == 200) {
+                          // setisSent(true)
+                          setisEditMode(false);
+                          setisSending(false);
+                          getUserId();
+                        }
+                        let res = await fetchOneUserService();
+                        console.log("res", res);
+                        // if (!res?.childTrackHistory) {
+                        //   // await BackgroundService.stop();
+                        // }
+                        // await BackgroundService.stop();
+                        dispatch(
+                          ChangeUserState.action({
+                            item: res,
+                            fetchOne: { loading: false, error: null },
+                          })
+                        );
+                      })
+                      .catch((error: any) => {
+                        console.log("Error", error);
+                        // Alert.alert(
+                        //   error?.data.title,
+                        //   error?.data.detail,
+                        //   [{ text: 'OK', style: 'cancel' }],
+                        // )
+                        // setisSent(true)
+                        setisSending(false);
+                        setisEditMode(!isEditMode);
+                      });
+                  }}
+                >
+                  {({
+                    handleChange,
+                    handleSubmit,
+                    setFieldValue,
+                    values,
+                    errors,
+                    touched,
+                  }) => (
+                    <>
+                      {isSending ? (
+                        <View style={styles.sppinerContainer}>
+                          <Spinner status="primary" />
                         </View>
-
-                        {!isEditMode ? (
+                      ) : (
+                        <>
                           <View style={{ flexDirection: "column" }}>
-                            <Text style={styles.editLabel}>First Name</Text>
-                            <Text style={styles.editField}>
-                              {values.firstName}
-                            </Text>
+                            <Text style={styles.editLabel}>Email</Text>
+                            <View style={styles.editField}>
+                              {renderEmailIcon()}
+                              <Text style={{ fontSize: 15 }}>
+                                {values.email}
+                              </Text>
+                            </View>
                           </View>
-                        ) : (
-                          <Input
-                            style={styles.inputSettings}
-                            autoCapitalize="none"
-                            label={(evaProps) => (
-                              <Text {...evaProps}>First Name</Text>
-                            )}
-                            value={values.firstName}
-                            onChangeText={handleChange("firstName")}
-                          />
-                        )}
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              width: "100%",
+                            }}
+                          >
+                            {!isEditMode ? (
+                              <View
+                                style={{
+                                  flexDirection: "column",
+                                  width: "45%",
+                                }}
+                              >
+                                <Text style={styles.editLabel}>First Name</Text>
 
-                        {!isEditMode ? (
-                          <View style={{ flexDirection: "column" }}>
-                            <Text style={styles.editLabel}>Last Name</Text>
-                            <Text style={styles.editField}>
-                              {values.lastName}
-                            </Text>
+                                <View style={styles.editField}>
+                                  {renderPersonIcon()}
+                                  <Text style={{ fontSize: 15 }}>
+                                    {" "}
+                                    {values.firstName}
+                                  </Text>
+                                </View>
+                              </View>
+                            ) : (
+                              <Input
+                                accessoryLeft={renderPersonIcon}
+                                style={[styles.inputSettings, { width: "45%" }]}
+                                autoCapitalize="none"
+                                label={(evaProps) => (
+                                  <Text {...evaProps}>First Name</Text>
+                                )}
+                                value={values.firstName}
+                                onChangeText={handleChange("firstName")}
+                              />
+                            )}
+
+                            {!isEditMode ? (
+                              <View
+                                style={{
+                                  flexDirection: "column",
+                                  width: "45%",
+                                }}
+                              >
+                                <Text style={styles.editLabel}>Last Name</Text>
+
+                                <View style={styles.editField}>
+                                  {renderPersonIcon()}
+                                  <Text style={{ fontSize: 15 }}>
+                                    {values.lastName}
+                                  </Text>
+                                </View>
+                              </View>
+                            ) : (
+                              <Input
+                                accessoryLeft={renderPersonIcon}
+                                style={[styles.inputSettings, { width: "45%" }]}
+                                autoCapitalize="none"
+                                label={(evaProps) => (
+                                  <Text {...evaProps}>Last Name</Text>
+                                )}
+                                value={values.lastName}
+                                onChangeText={handleChange("lastName")}
+                              />
+                            )}
                           </View>
-                        ) : (
-                          <Input
-                            style={styles.inputSettings}
-                            autoCapitalize="none"
-                            label={(evaProps) => (
-                              <Text {...evaProps}>Last Name</Text>
-                            )}
-                            value={values.lastName}
-                            onChangeText={handleChange("lastName")}
-                          />
-                        )}
 
-                        {!isEditMode ? (
-                          <View style={{ flexDirection: "column" }}>
-                            <Text style={styles.editLabel}>Phone Number</Text>
-                            <Text style={styles.editField}>{values.phone}</Text>
-                          </View>
-                        ) : (
-                          <Input
-                            keyboardType="number-pad"
-                            style={styles.inputSettings}
-                            autoCapitalize="none"
-                            label={(evaProps) => (
-                              <Text {...evaProps}>Phone Number</Text>
-                            )}
-                            value={values.phone}
-                            onChangeText={handleChange("phone")}
-                          />
-                        )}
+                          {!isEditMode ? (
+                            <View style={{ flexDirection: "column" }}>
+                              <Text style={styles.editLabel}>Phone Number</Text>
+                              <View style={styles.editField}>
+                                {renderPhoneIcon()}
+                                <Text style={{ fontSize: 15 }}>
+                                  {values.phone}
+                                </Text>
+                              </View>
+                            </View>
+                          ) : (
+                            <Input
+                              keyboardType="number-pad"
+                              style={styles.inputSettings}
+                              autoCapitalize="none"
+                              label={(evaProps) => (
+                                <Text {...evaProps}>Phone Number</Text>
+                              )}
+                              value={values.phone}
+                              onChangeText={handleChange("phone")}
+                            />
+                          )}
 
-                        {!isEditMode ? (
-                          <View style={{ flexDirection: "column" }}>
-                            <Text style={styles.editLabel}>Street Address</Text>
-                            <Text style={styles.editField}>
-                              {values.address}
-                            </Text>
-                          </View>
-                        ) : (
-                          <Input
-                            style={[styles.inputSettings, { marginBottom: 5 }]}
-                            autoCapitalize="none"
-                            label={(evaProps) => (
-                              <Text {...evaProps}>Street Address</Text>
-                            )}
-                            value={values.address}
-                            onChangeText={handleChange("address")}
-                          />
-                        )}
+                          {!isEditMode ? (
+                            <View style={{ flexDirection: "column" }}>
+                              <Text style={styles.editLabel}>
+                                {" "}
+                                Street Address
+                              </Text>
+                              <View style={styles.editField}>
+                                {renderLocationIcon()}
+                                <Text style={{ fontSize: 15 }}>
+                                  {values.address}
+                                </Text>
+                              </View>
+                            </View>
+                          ) : (
+                            <Input
+                              style={[
+                                styles.inputSettings,
+                                { marginBottom: 5 },
+                              ]}
+                              accessoryLeft={renderLocationIcon}
+                              autoCapitalize="none"
+                              label={(evaProps) => (
+                                <Text {...evaProps}>Street Address</Text>
+                              )}
+                              value={values.address}
+                              onChangeText={handleChange("address")}
+                            />
+                          )}
 
-                        {!isEditMode ? (
-                          <View style={{ flexDirection: "column" }}>
-                            <Text style={styles.editLabel}>School Name</Text>
-                            <Text style={styles.editField}>
-                              {values.schoolName}
-                            </Text>
-                          </View>
-                        ) : (
-                          <Input
-                            style={styles.inputSettings}
-                            autoCapitalize="none"
-                            label={(evaProps) => (
-                              <Text {...evaProps}>School Name</Text>
-                            )}
-                            value={values.schoolName}
-                            onChangeText={handleChange("schoolName")}
-                          />
-                        )}
+                          {!isEditMode ? (
+                            <View style={{ flexDirection: "column" }}>
+                              <Text style={styles.editLabel}>School Name</Text>
+                              <View style={styles.editField}>
+                                {renderSchoolIcon()}
+                                <Text style={{ fontSize: 15 }}>
+                                  {values.schoolName}
+                                </Text>
+                              </View>
+                            </View>
+                          ) : (
+                            <Input
+                              accessoryLeft={renderSchoolIcon()}
+                              style={styles.inputSettings}
+                              autoCapitalize="none"
+                              label={(evaProps) => (
+                                <Text {...evaProps}>School Name</Text>
+                              )}
+                              value={values.schoolName}
+                              onChangeText={handleChange("schoolName")}
+                            />
+                          )}
 
-                        {!isEditMode ? (
-                          <View style={{ flexDirection: "column" }}>
-                            <Text style={styles.editLabel}>Zip/Post code</Text>
-                            <Text style={styles.editField}>
-                              {values.zipcode}
-                            </Text>
-                          </View>
-                        ) : (
-                          <Input
-                            style={styles.inputSettings}
-                            autoCapitalize="none"
-                            label={(evaProps) => (
-                              <Text {...evaProps}>Zip/Post code</Text>
-                            )}
-                            value={values.zipcode}
-                            onChangeText={handleChange("zipcode")}
-                          />
-                        )}
+                          <Autocomplete
+                            placeholder="Enter Country*"
+                            value={values.country}
+                            placement={placement}
+                            style={{
+                              marginVertical: 5,
+                              backgroundColor: Colors.white,
+                              borderRadius: 12,
+                              elevation: 1,
+                              marginTop: 10,
+                            }}
+                            accessoryLeft={renderLocationIcon}
+                            onChangeText={(query) => {
+                              setFieldValue("country", query);
+                              setCountriesData(
+                                countries.filter((item) =>
+                                  filterCountries(item, query)
+                                )
+                              );
+                            }}
+                            onSelect={(query) => {
+                              const selectedCountry = countriesData[query];
+                              setFieldValue("country", selectedCountry.name);
+                              setFieldValue(
+                                "selectedCountry",
+                                selectedCountry.name
+                              );
+                              setFieldValue("selectedState", "");
+                              setFieldValue("state", "");
+                              setFieldValue("city", "");
+                              setStates([]);
+                              GetAllStates(selectedCountry.name.trim()).then(
+                                (res) => {
+                                  setStates(res.data);
+                                  setStatesData(states);
+                                }
+                              );
+                            }}
+                          >
+                            {countriesData.map((item, index) => {
+                              return (
+                                <AutocompleteItem
+                                  key={index}
+                                  title={item.name}
+                                />
+                              );
+                            })}
+                          </Autocomplete>
+                          <Autocomplete
+                            placeholder="Enter State*"
+                            value={values.state}
+                            placement={placement}
+                            style={{
+                              marginVertical: 5,
+                              backgroundColor: Colors.white,
+                              borderRadius: 12,
+                              elevation: 1,
+                            }}
+                            accessoryLeft={renderLocationIcon}
+                            // label={evaProps => <Text {...evaProps}>State</Text>}
+                            onChangeText={(query) => {
+                              setFieldValue("state", query);
+                              setStatesData(
+                                states.filter((item) =>
+                                  filterStates(item, query)
+                                )
+                              );
+                            }}
+                            onSelect={(query) => {
+                              const selectedState = statesData[query];
+                              setFieldValue("state", selectedState);
+                              setFieldValue("selectedState", selectedState);
+                              setFieldValue("selectedCity", "");
+                              setFieldValue("city", "");
+                              setCities([]);
+                              GetAllCities(
+                                values.selectedCountry.trim(),
+                                selectedState.trim()
+                              ).then((res) => {
+                                setCities(res.data);
+                              });
+                            }}
+                          >
+                            {statesData.map((item, index) => {
+                              return (
+                                <AutocompleteItem key={index} title={item} />
+                              );
+                            })}
+                          </Autocomplete>
+                          <Autocomplete
+                            placeholder="Enter City"
+                            value={values.city}
+                            placement={placement}
+                            style={{
+                              marginVertical: 5,
+                              backgroundColor: Colors.white,
+                              borderRadius: 12,
+                              elevation: 1,
+                            }}
+                            accessoryLeft={renderLocationIcon}
+                            // label={evaProps => <Text {...evaProps}>City</Text>}
+                            onChangeText={(query) => {
+                              setFieldValue("city", query);
+                              setCitiesData(
+                                cities.filter((item) =>
+                                  filterCities(item, query)
+                                )
+                              );
+                            }}
+                            onSelect={(query) => {
+                              setFieldValue("city", citiesData[query]);
+                              setFieldValue("selectedCity", citiesData[query]);
+                            }}
+                          >
+                            {citiesData.map((item, index) => {
+                              return (
+                                <AutocompleteItem key={index} title={item} />
+                              );
+                            })}
+                          </Autocomplete>
 
-                        <Autocomplete
-                          placeholder="Enter Country*"
-                          value={values.country}
-                          placement={placement}
-                          style={{
-                            marginVertical: 5,
-                            backgroundColor: Colors.white,
-                          }}
-                          onChangeText={(query) => {
-                            setFieldValue("country", query);
-                            setCountriesData(
-                              countries.filter((item) =>
-                                filterCountries(item, query)
-                              )
-                            );
-                          }}
-                          onSelect={(query) => {
-                            const selectedCountry = countriesData[query];
-                            setFieldValue("country", selectedCountry.name);
-                            setFieldValue(
-                              "selectedCountry",
-                              selectedCountry.name
-                            );
-                            setFieldValue("selectedState", "");
-                            setFieldValue("state", "");
-                            setFieldValue("city", "");
-                            setStates([]);
-                            GetAllStates(selectedCountry.name.trim()).then(
-                              (res) => {
-                                setStates(res.data);
-                                setStatesData(states);
-                              }
-                            );
-                          }}
-                        >
-                          {countriesData.map((item, index) => {
-                            return (
-                              <AutocompleteItem key={index} title={item.name} />
-                            );
-                          })}
-                        </Autocomplete>
-                        <Autocomplete
-                          placeholder="Enter State*"
-                          value={values.state}
-                          placement={placement}
-                          style={{
-                            marginVertical: 5,
-                            backgroundColor: Colors.white,
-                          }}
-                          // label={evaProps => <Text {...evaProps}>State</Text>}
-                          onChangeText={(query) => {
-                            setFieldValue("state", query);
-                            setStatesData(
-                              states.filter((item) => filterStates(item, query))
-                            );
-                          }}
-                          onSelect={(query) => {
-                            const selectedState = statesData[query];
-                            setFieldValue("state", selectedState);
-                            setFieldValue("selectedState", selectedState);
-                            setFieldValue("selectedCity", "");
-                            setFieldValue("city", "");
-                            setCities([]);
-                            GetAllCities(
-                              values.selectedCountry.trim(),
-                              selectedState.trim()
-                            ).then((res) => {
-                              setCities(res.data);
-                            });
-                          }}
-                        >
-                          {statesData.map((item, index) => {
-                            return (
-                              <AutocompleteItem key={index} title={item} />
-                            );
-                          })}
-                        </Autocomplete>
-                        <Autocomplete
-                          placeholder="Enter City"
-                          value={values.city}
-                          placement={placement}
-                          style={{
-                            marginVertical: 5,
-                            backgroundColor: Colors.white,
-                          }}
-                          // label={evaProps => <Text {...evaProps}>City</Text>}
-                          onChangeText={(query) => {
-                            setFieldValue("city", query);
-                            setCitiesData(
-                              cities.filter((item) => filterCities(item, query))
-                            );
-                          }}
-                          onSelect={(query) => {
-                            setFieldValue("city", citiesData[query]);
-                            setFieldValue("selectedCity", citiesData[query]);
-                          }}
-                        >
-                          {citiesData.map((item, index) => {
-                            return (
-                              <AutocompleteItem key={index} title={item} />
-                            );
-                          })}
-                        </Autocomplete>
-                        {/* {!isEditMode ? (
+                          {!isEditMode ? (
+                            <View style={{ flexDirection: "column" }}>
+                              <Text style={styles.editLabel}>
+                                {" "}
+                                Zip/Post code
+                              </Text>
+                              <View style={styles.editField}>
+                                {renderLocationIcon()}
+                                <Text style={{ fontSize: 15, marginLeft: 10 }}>
+                                  {values.zipcode}
+                                </Text>
+                              </View>
+                            </View>
+                          ) : (
+                            <Input
+                              accessoryLeft={renderLocationIcon}
+                              style={styles.inputSettings}
+                              autoCapitalize="none"
+                              label={(evaProps) => (
+                                <Text {...evaProps}>Zip/Post code</Text>
+                              )}
+                              value={values.zipcode}
+                              onChangeText={handleChange("zipcode")}
+                            />
+                          )}
+                          {/* {!isEditMode ? (
                           <View style={{ flexDirection: "column" }}>
                             <Text style={styles.editLabel}>Zip code</Text>
                             <Text style={styles.editField}>
@@ -578,53 +703,54 @@ const PersonalProfileScreen = () => {
                             onChangeText={handleChange("zipcode")}
                           />
                         )} */}
-                        {isEditMode ? (
-                          <View style={{ marginTop: 10 }}>
-                            <View style={styles.background}>
+                          {isEditMode ? (
+                            <View style={{ marginVertical: 10 }}>
+                              <LinearGradientButton onPress={handleSubmit}>
+                                Submit
+                              </LinearGradientButton>
+
                               <TouchableOpacity
-                                style={styles.background}
-                                onPress={handleSubmit}
+                                onPress={() => {
+                                  setFieldValue("firstName", user?.firstname);
+                                  setFieldValue("lastName", user?.lastname);
+                                  setFieldValue("country", user?.country);
+                                  setFieldValue("state", user?.state);
+                                  setFieldValue("city", user?.city);
+                                  setisEditMode(false);
+                                }}
+                                style={{ width: "100%", marginTop: 10 }}
                               >
-                                <Text style={styles.button}>Submit</Text>
+                                <Text
+                                  style={{
+                                    color: Colors.primary,
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  Cancel
+                                </Text>
                               </TouchableOpacity>
                             </View>
-                            <Button
-                              size="small"
-                              appearance="outline"
-                              onPress={() => {
-                                setFieldValue("firstName", user?.firstname);
-                                setFieldValue("lastName", user?.lastname);
-                                setFieldValue("country", user?.country);
-                                setFieldValue("state", user?.state);
-                                setFieldValue("city", user?.city);
-                                setisEditMode(false);
-                              }}
-                              style={{ borderRadius: 10, width: "100%" }}
-                            >
-                              Cancel
-                            </Button>
-                          </View>
-                        ) : (
-                          <View style={{ marginTop: 10 }}>
-                            <View style={styles.background}>
-                              <TouchableOpacity
-                                style={styles.background}
+                          ) : (
+                            <View style={{ marginTop: 10 }}>
+                              <LinearGradientButton
                                 onPress={() => setisEditMode(true)}
                               >
-                                <Text style={styles.button}>Edit</Text>
-                              </TouchableOpacity>
+                                Edit
+                              </LinearGradientButton>
+                              <View style={styles.background}></View>
                             </View>
-                          </View>
-                        )}
-                      </>
-                    )}
-                  </>
-                )}
-              </Formik>
-            )}
-            {isKeyboardVisible && <View style={{ height: 400 }} />}
-          </View>
-        </KeyboardAwareScrollView>
+                          )}
+                          <View style={{ height: 100 }} />
+                        </>
+                      )}
+                    </>
+                  )}
+                </Formik>
+              )}
+              {isKeyboardVisible && <View style={{ height: 400 }} />}
+            </View>
+          </KeyboardAwareScrollView>
+        </BackgroundLayout>
       )}
     </>
   );
@@ -638,11 +764,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 10,
     marginBottom: 10,
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
     //backgroundColor: 'background-basic-color-1',
   },
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
+    padding: 20,
   },
   mainLayout: {
     flex: 9,
@@ -705,11 +836,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   editField: {
-    paddingLeft: 20,
+    paddingLeft: 10,
     backgroundColor: Colors.white,
-    borderRadius: 5,
+    elevation: 2,
     paddingVertical: 10,
-    fontSize: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 10,
   },
   editLabel: {
     fontSize: 15,

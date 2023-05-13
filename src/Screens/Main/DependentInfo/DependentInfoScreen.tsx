@@ -41,6 +41,7 @@ import moment from "moment";
 import TrackStudent from "@/Services/Parent/TrackStudent";
 import Geolocation from "@react-native-community/geolocation";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 
 const DependentInfoScreen = () => {
   const navigation = useNavigation();
@@ -148,112 +149,6 @@ const DependentInfoScreen = () => {
     prevOpenedRow = row[index];
   };
 
-  const RightActions = (dragX: any, item: any, index: number) => {
-    const scale = dragX.interpolate({
-      inputRange: [-100, 0],
-      outputRange: [1, 0],
-      extrapolate: "clamp",
-    });
-    return (
-      <View
-        style={{
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            padding: 5,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onPress={() => {
-            setSelectedActivationCode(item);
-            prevOpenedRow?.close();
-          }}
-        >
-          <MaterialIcon size={23} color={Colors.primary} name="qrcode-scan" />
-        </TouchableOpacity>
-        {false && (
-          <TouchableOpacity
-            style={{
-              padding: 5,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            onPress={() => {
-              setSelectedStudentVisibility(item);
-
-              if (prevOpenedRow) {
-                prevOpenedRow?.close();
-              }
-            }}
-          >
-            <Entypo size={23} color={Colors.primary} name="eye" />
-          </TouchableOpacity>
-        )}
-        {/* <TouchableOpacity
-          style={{
-            padding: 5,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onPress={() => {
-            setSelectedStudentVisibility(item);
-            prevOpenedRow?.close();
-          }}
-        >
-          <Entypo size={23} color={Colors.primary} name="eye" />
-        </TouchableOpacity> */}
-        <TouchableOpacity
-          onPress={() => {
-            setSelectedDependent(item);
-            prevOpenedRow?.close();
-          }}
-          style={{
-            padding: 5,
-            alignItems: "center",
-            justifyContent: "center",
-            marginVertical: 12,
-          }}
-        >
-          <Icon
-            style={{ width: 23, height: 23 }}
-            fill={Colors.primary}
-            name="edit-2"
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            padding: 5,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onPress={() => {
-            // DeleteStudent(item?.studentId).then((response) => {
-            //     loadUserDetails();
-            //     if (prevOpenedRow) {
-            //         prevOpenedRow?.close();
-            //     }
-            // }).catch(error => console.log(error))
-            prevOpenedRow?.close();
-            navigation.navigate("ParentDeletePermission", {
-              dependentId: item?.studentId,
-              parentId: user?.parentId,
-            });
-          }}
-        >
-          <Icon
-            style={{ width: 23, height: 23 }}
-            fill={Colors.primary}
-            name="trash"
-          />
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
   const handleTrackHistory = async (
     status: boolean,
     id: any,
@@ -262,10 +157,9 @@ const DependentInfoScreen = () => {
   ) => {
     try {
       const _date = moment(new Date()).format("YYYY-MM-DD");
-      console.log("coordinates", coordinates);
+
       const _data = [...children];
-      console.log("0000_data", _data);
-      console.log("index", index);
+
       const item = _data[index];
 
       item.childTrackHistory = status ? true : false;
@@ -305,7 +199,7 @@ const DependentInfoScreen = () => {
   ) => {
     let _data = [...children];
     const item = _data[index];
-    console.log("item", item);
+
     item.toggleAlert = status;
     _data[index] = item;
     setChildren(_data);
@@ -326,14 +220,7 @@ const DependentInfoScreen = () => {
         }
       );
       setVisible(false);
-      // const res = await TrackStudent(
-      //   id,
-      //   coordinates?.latitude || position?.latitude,
-      //   coordinates?.logitude || position?.longitude,
-      //   status,
-      //   distanceAllowed,
-      //   kilometers
-      // );
+
       if (res && status) {
         Toast.show({
           type: "success",
@@ -342,11 +229,6 @@ const DependentInfoScreen = () => {
         });
       }
     } catch (err) {
-      // Toast.show({
-      //   type: "info",
-      //   text2: "An error occured in track.",
-      // });
-
       console.log(
         "err7289727878278927878293879289932676267267867267276276762",
         err
@@ -354,19 +236,7 @@ const DependentInfoScreen = () => {
     }
   };
 
-  // const handleToggle=(item,)=>{
-  //                           handleTrackStudent(
-  //                           item?.studentId,
-  //                           value,
-  //                           true,
-  //                           30,
-  //                           index
-  //                         );
-  //                         handleTrackHistory(value, item?.studentId, index);
-  // }
-
   const onSubmit = (values) => {
-    console.log("values----", values);
     setVisible(false);
     handleTrackStudent(
       dependent?.studentId,
@@ -382,14 +252,19 @@ const DependentInfoScreen = () => {
       dependent?.index,
       values?.location
     );
-    console.log("values----", values);
   };
 
   return (
-    <>
+    <BackgroundLayout title="Dependent Information">
       <AppHeader
-        title={isVisible ? "Add Dependent" : "Dependent Info"}
-        isBack
+        hideCalendar={true}
+        onAddPress={() => {
+          dispatch(
+            ChangeModalState.action({
+              dependentAddImport: true,
+            })
+          );
+        }}
       />
       {visible && (
         <DistanceAlert
@@ -425,12 +300,27 @@ const DependentInfoScreen = () => {
       <View style={styles.layout}>
         <View style={{ padding: 10 }}>
           {children.length > 0 ? (
-            <Text style={{ fontSize: 16, fontWeight: "600", width: "100%" }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "600",
+                width: "100%",
+                letterSpacing: 1.5,
+                marginTop: 15,
+              }}
+            >
               Have your dependent enter reference code or scan the QR code
               corresponding to his/her name
             </Text>
           ) : (
-            <Text style={{ fontSize: 16, fontWeight: "600", width: "100%" }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "600",
+                width: "100%",
+                textAlign: "center",
+              }}
+            >
               Add a dependant to get started
             </Text>
           )}
@@ -439,80 +329,26 @@ const DependentInfoScreen = () => {
           data={children}
           style={{ padding: 10, width: "100%" }}
           renderItem={({ item, index }) => (
-            <Swipeable
-              ref={(ref) => (row[index] = ref)}
-              onSwipeableOpen={() => closeRow(index)}
-              renderRightActions={(e) => RightActions(e, item, index)}
-            >
-              <View
-                style={[
-                  styles.item,
-                  {
-                    backgroundColor: !item.approve
-                      ? "#fff"
-                      : index % 3 === 0
-                      ? "lightgreen"
-                      : index % 2 === 0
-                      ? "#F6DDCC"
-                      : "#fff",
-                  },
-                ]}
-                onPress={() =>
-                  navigation.navigate("Activity", {
-                    dependent: item,
-                  })
-                }
-              >
-                <View style={[styles.row, { justifyContent: "space-between" }]}>
-                  <Text style={[styles.text, { fontWeight: "600" }]}>{`${
-                    item?.firstname || ""
-                  } ${item?.lastname || ""}`}</Text>
-                  {false && (
-                    <View style={styles.row}>
-                      <TouchableOpacity
-                        style={[styles.button, { borderRightWidth: 0.5 }]}
-                      >
-                        <FontAwesome
-                          name="group"
-                          color={Colors.primary}
-                          size={20}
-                        />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[
-                          styles.button,
-                          { borderLeftWidth: 0.5, borderRightWidth: 0.5 },
-                        ]}
-                      >
-                        <FontAwesome
-                          name="user"
-                          color={Colors.primary}
-                          size={20}
-                        />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[
-                          styles.button,
-                          { borderLeftWidth: 0.5, borderRightWidth: 0.5 },
-                        ]}
-                      >
-                        <Text style={styles.textButton}>Me</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.button, { borderLeftWidth: 0.5 }]}
-                      >
-                        <Text style={styles.textButton}>Off</Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                </View>
+            <>
+              <View style={[styles.row, { justifyContent: "space-between" }]}>
+                <Text
+                  style={[
+                    styles.text,
+                    {
+                      fontWeight: "600",
+                      marginBottom: 10,
+                      color: Colors.primary,
+                      marginLeft: 10,
+                    },
+                  ]}
+                >{`${item?.firstname || ""} ${item?.lastname || ""}`}</Text>
+              </View>
+
+              <View style={[styles.item]}>
                 <Text style={styles.text}>{`${
                   (item?.childSchool ? item.childSchool : "") || ""
                 }`}</Text>
 
-                {/* {item?.status && (
-                  <Text style={styles.text}>{`Status: ${item.status}`}</Text>
-                )} */}
                 <View
                   style={{
                     flexDirection: "row",
@@ -526,9 +362,10 @@ const DependentInfoScreen = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       width: "45%",
+                      flexDirection: "column-reverse",
                     }}
                   >
-                    <Text style={{ color: Colors.primary, fontSize: 16 }}>
+                    <Text style={{ fontSize: 16, marginTop: 10 }}>
                       Track History?
                     </Text>
                     <Toggle
@@ -556,9 +393,10 @@ const DependentInfoScreen = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       width: "45%",
+                      flexDirection: "column-reverse",
                     }}
                   >
-                    <Text style={{ color: Colors.primary, fontSize: 16 }}>
+                    <Text style={{ fontSize: 16, marginTop: 10 }}>
                       Set Boundary
                     </Text>
 
@@ -599,25 +437,51 @@ const DependentInfoScreen = () => {
                     />
                   </View>
                 </View>
+                <View style={styles.cardFooter}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedActivationCode(item);
+                    }}
+                  >
+                    <Image
+                      style={styles.cardImage}
+                      source={require("@/Assets/Images/qr.png")}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedDependent(item);
+                    }}
+                  >
+                    <Image
+                      style={[styles.cardImage]}
+                      source={require("@/Assets/Images/editIcon.png")}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("ParentDeletePermission", {
+                        dependentId: item?.studentId,
+                        parentId: user?.parentId,
+                      });
+                    }}
+                  >
+                    <Image
+                      style={styles.cardImage}
+                      source={require("@/Assets/Images/deleteIcon.png")}
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
-            </Swipeable>
+
+              {/* {item?.status && (
+                  <Text style={styles.text}>{`Status: ${item.status}`}</Text>
+                )} */}
+            </>
           )}
         />
       </View>
-      <TouchableOpacity
-        style={styles.floatButton}
-        onPress={() => {
-          // dispatch(ChangeModalState.action({ addStudentModal: true }))
-          dispatch(
-            ChangeModalState.action({
-              dependentAddImport: true,
-            })
-          );
-        }}
-      >
-        <AntDesign name="pluscircle" size={50} color={Colors.primary} />
-      </TouchableOpacity>
-    </>
+    </BackgroundLayout>
   );
 };
 
@@ -626,24 +490,49 @@ export default DependentInfoScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
-    paddingTop: 50,
+    paddingHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 10,
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
   },
   item: {
     borderRadius: 10,
     width: "96%",
     backgroundColor: "#fff",
-    marginVertical: 10,
+    marginBottom: 10,
     marginHorizontal: "2%",
-    padding: 10,
+    paddingVertical: 10,
+    elevation: 2,
+    overflow: "hidden",
+    height: 170,
+  },
+  cardFooter: {
+    borderTopWidth: 1,
+    borderColor: Colors.textInputBorderColor,
+    marginTop: 20,
+    paddingHorizontal: 20,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    height: 20,
+    paddingTop: 15,
+  },
+  cardImage: {
+    height: 20,
+    width: 20,
+    resizeMode: "stretch",
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
   },
   text: {
-    fontSize: 16,
+    fontSize: 18,
     marginVertical: 4,
+    textAlign: "center",
+    marginBottom: 10,
   },
   button: {
     padding: 5,
@@ -660,7 +549,7 @@ const styles = StyleSheet.create({
   },
   floatButton: {
     position: "absolute",
-    bottom: 20,
+    bottom: 60,
     right: 20,
     shadowColor: Colors.primary,
     shadowOffset: {

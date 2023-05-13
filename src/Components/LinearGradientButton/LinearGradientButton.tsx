@@ -6,7 +6,7 @@ import Colors from "@/Theme/Colors";
 
 const LinearGradientButton = (props: any) => {
   // if (props.disabled) return <Button {...props}>{props.children}</Button>;
-  console.log("props", props.textStyle);
+
   return (
     <TouchableOpacity
       style={{ width: "100%", alignItems: "center" }}

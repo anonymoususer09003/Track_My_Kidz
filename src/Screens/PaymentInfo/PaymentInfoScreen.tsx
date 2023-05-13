@@ -13,7 +13,7 @@ import { StyleSheet, View } from "react-native";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { UserState } from "@/Store/User";
 import { useTheme } from "@/Theme";
-import { LinearGradientButton } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import ChangeSelectedState from "@/Store/Selected/ChangeSelectedState";
 import Toast from "react-native-toast-message";
 import {
@@ -30,6 +30,7 @@ import {
 } from "@stripe/stripe-react-native";
 import { FlatList, TouchableOpacity } from "react-native";
 import { UpdatePaymentModal } from "@/Modals";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 const PaymentInformationScreen = ({ navigation }) => {
   const { createPaymentMethod } = useStripe();
   const user = useSelector((state: { user: UserState }) => state.user.item);
@@ -86,11 +87,19 @@ const PaymentInformationScreen = ({ navigation }) => {
           selectedIndex={selectedIndex}
           onChange={(index) => setSelectedIndex(index)}
         >
-          {availableAmounts.map((it) => {
+          {availableAmounts.map((it, index) => {
             return (
               <Radio
                 key={it.amount}
-                style={{ paddingLeft: 20, marginVertical: 15 }}
+                style={[
+                  styles.radioButton,
+                  {
+                    borderColor:
+                      selectedIndex == index
+                        ? Colors.primaryTint
+                        : "transparent",
+                  },
+                ]}
               >
                 {(evaProps) => (
                   <Text {...evaProps} style={{ fontSize: 20, paddingLeft: 15 }}>
@@ -156,106 +165,75 @@ const PaymentInformationScreen = ({ navigation }) => {
     }
   };
   return (
-    <View
-      style={styles.container}
-      backdropStyle={styles.backdrop}
-      onBackdropPress={() => {
-        // onCancel();
-        // dispatch(
-        //     ChangeModalState.action({ parentPaymentModalVisibility: false }),
-        // )
-      }}
-    >
-      <UpdatePaymentModal
-        onPay={async (data: any) => {
-          console.log("data", data);
-          // const pm = await createPaymentMethod({ paymentMethodType: "Card",paymentMethodData:{
-          //   email:user?.email
-          // } });
-          // console.log("pm", pm);
-          fetchPaymentIntentClientSecret(data);
+    <BackgroundLayout title="Payment Information">
+      <AppHeader hideCalendar={true} hideCenterIcon={true} />
+      <View style={styles.container}>
+        <UpdatePaymentModal
+          onPay={async (data: any) => {
+            fetchPaymentIntentClientSecret(data);
 
-          // setIsVisible(false)
-        }}
-        onCancel={() => {
-          setIsVisible(false);
-        }}
-        isVisible={isVisible}
-      />
-      <View style={styles.modal} disabled={true}>
-        <View style={styles.body}>
-          <View style={{ paddingBottom: 10, paddingTop: 10 }}>
+            // setIsVisible(false)
+          }}
+          onCancel={() => {
+            setIsVisible(false);
+          }}
+          isVisible={isVisible}
+        />
+        <View style={styles.modal} disabled={true}>
+          <View style={styles.body}>
+            <RadioOptions
+              selectedIndex={selectedIndex}
+              setSelectedIndex={setSelectedIndex}
+            />
+          </View>
+        </View>
+
+        <View>
+          {cardDetail && (
+            <View style={styles.card}>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={{ fontWeight: "bold" }}>{"Card Number: "}</Text>
+                <Text>{`xxxx-xxxx-xxxx-${cardDetail?.last4}`}</Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={{ fontWeight: "bold" }}>{"CVC: "}</Text>
+                <Text>***</Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={{ fontWeight: "bold" }}>{"Exp Date: "}</Text>
+                <Text>{`${cardDetail?.expiryMonth < 10 ? "0" : ""}${
+                  cardDetail?.expiryMonth
+                }/20${cardDetail?.expiryYear}`}</Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={{ fontWeight: "bold" }}>
+                  {"Zip (Postal) Code: "}
+                </Text>
+                <Text>{cardDetail?.postalCode}</Text>
+              </View>
+            </View>
+          )}
+
+          {!cardDetail && (
             <Text
-              textBreakStrategy={"highQuality"}
               style={{
-                textAlign: "center",
-                color: "#606060",
-                fontSize: 18,
+                marginTop: 30,
+                alignSelf: "center",
+                color: Colors.fieldLabel,
+                fontSize: 20,
               }}
             >
-              Payment Info
+              No Card Information
             </Text>
-          </View>
-          <RadioOptions
-            selectedIndex={selectedIndex}
-            setSelectedIndex={setSelectedIndex}
-          />
+          )}
         </View>
-      </View>
 
-      <View>
-        {cardDetail && (
-          <View style={styles.card}>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={{ fontWeight: "bold" }}>{"Card Number: "}</Text>
-              <Text>{`xxxx-xxxx-xxxx-${cardDetail?.last4}`}</Text>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={{ fontWeight: "bold" }}>{"CVC: "}</Text>
-              <Text>***</Text>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={{ fontWeight: "bold" }}>{"Exp Date: "}</Text>
-              <Text>{`${cardDetail?.expiryMonth < 10 ? "0" : ""}${
-                cardDetail?.expiryMonth
-              }/20${cardDetail?.expiryYear}`}</Text>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={{ fontWeight: "bold" }}>
-                {"Zip (Postal) Code: "}
-              </Text>
-              <Text>{cardDetail?.postalCode}</Text>
-            </View>
-          </View>
-        )}
-
-        {!cardDetail && (
-          <Text style={{ marginTop: 30, alignSelf: "center" }}>
-            No Card Information
-          </Text>
-        )}
+        <View style={{ marginTop: 30 }} />
+        <LinearGradientButton onPress={() => setIsVisible(true)}>
+          {cardDetail ? "Update" : "Add"}
+        </LinearGradientButton>
       </View>
-      <View
-        style={{
-          flex: 1,
-          // backgroundColor: "red",
-          justifyContent: "flex-end",
-          alignItems: "center",
-        }}
-      >
-        <TouchableOpacity onPress={() => setIsVisible(true)} style={styles.btn}>
-          <Text style={{ textAlign: "center", color: Colors.white }}>
-            {cardDetail ? "Update" : "Add"}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={[styles.btn, { marginVertical: 10 }]}
-        >
-          <Text style={{ textAlign: "center", color: Colors.white }}>Exit</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </BackgroundLayout>
   );
 };
 export default PaymentInformationScreen;
@@ -265,13 +243,23 @@ const styles = StyleSheet.create({
     // minHeight: 192,
     flex: 1,
 
-    // flexDirection: "column",
-    // justifyContent: "center",
+    flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
+    padding: 30,
+  },
+  radioButton: {
     width: "100%",
+    height: 50,
+    borderRadius: 8,
+    borderWidth: 2,
+    backgroundColor: Colors.white,
+    elevation: 2,
+    paddingLeft: 10,
   },
   card: {
     minHeight: 100,
-    padding: 10,
+
     width: "100%",
     marginBottom: 5,
     // borderWidth: 2,

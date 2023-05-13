@@ -32,6 +32,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Colors from "@/Theme/Colors";
 import { loadUserId } from "@/Storage/MainAppStorage";
 import CreateReport from "@/Services/Settings/CreateReport";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 
 const Divider = () => (
   <View
@@ -178,8 +179,7 @@ const ReportProblemScreen = ({ navigation }) => {
 
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   return (
-    <>
-      <AppHeader title="Report a Problem" isBack />
+    <BackgroundLayout title="Report a Problem">
       <KeyboardAwareScrollView
         extraHeight={10}
         enableOnAndroid={true}
@@ -329,7 +329,7 @@ const ReportProblemScreen = ({ navigation }) => {
           </View>
         </ScrollView>
       </KeyboardAwareScrollView>
-    </>
+    </BackgroundLayout>
   );
 };
 

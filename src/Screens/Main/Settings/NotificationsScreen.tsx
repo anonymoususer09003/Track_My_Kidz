@@ -20,6 +20,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { useIsFocused } from "@react-navigation/native";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 const NotificationsScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const isFocused = useIsFocused();
@@ -92,63 +93,56 @@ const NotificationsScreen = () => {
       getNotifications();
     }
   }, [isFocused]);
+
   return (
-    <>
-      <AppHeader title="Notifications" isBack />
-
-      {notifications.length > 0 && (
-        <View>
-          <FlatList
-            data={notifications}
+    <BackgroundLayout title="Notifications">
+      <AppHeader hideCalendar={true} hideCenterIcon={true} />
+      <View style={styles.layout}>
+        {notifications.length > 0 && (
+          <View>
+            <FlatList
+              data={notifications}
+              style={{
+                padding: 10,
+                width: "100%",
+                marginTop: 10,
+                marginBottom: 20,
+              }}
+              keyExtractor={(item, index) => item.notificationId}
+              renderItem={({ item, index }) => {
+                return (
+                  <Swipeable
+                    ref={(ref) => (row[index] = ref)}
+                    // ref={swipeableRef}
+                    onSwipeableOpen={() => closeRow(index)}
+                    renderRightActions={(e) => RightActions(e, item, index)}
+                  >
+                    <View style={styles.card}>
+                      <Text style={styles.text}>
+                        {item?.dateTime?.split(" ")[0]}
+                      </Text>
+                      <Text style={styles.text}>{item?.title}</Text>
+                      <Text style={styles.text}>{item?.message}</Text>
+                    </View>
+                  </Swipeable>
+                );
+              }}
+            />
+          </View>
+        )}
+        {notifications && notifications.length === 0 && (
+          <Text
             style={{
-              padding: 10,
-              width: "100%",
-              marginTop: 10,
-              marginBottom: 20,
+              marginTop: 30,
+              alignSelf: "center",
+              color: Colors.textInputPlaceholderColor,
             }}
-            keyExtractor={(item, index) => item.notificationId}
-            renderItem={({ item, index }) => {
-              return (
-                <Swipeable
-                  ref={(ref) => (row[index] = ref)}
-                  // ref={swipeableRef}
-                  onSwipeableOpen={() => closeRow(index)}
-                  renderRightActions={(e) => RightActions(e, item, index)}
-                >
-                  <View style={styles.card}>
-                    <Text style={{ fontWeight: "bold" }}>
-                      {item?.dateTime?.split(" ")[0]}
-                    </Text>
-                    <Text>{item?.title}</Text>
-                    <Text>{item?.message}</Text>
-                  </View>
-                </Swipeable>
-              );
-            }}
-            // onEndReached={async () => {
-            //   console.log("logs", originalActivities.result.length);
-
-            //   console.log("logs", totalRecords);
-            //   if (totalRecords > originalActivities.result.length) {
-            //     console.log("logs");
-            //     const userId = await loadUserId();
-            //     user?.isAdmin
-            //       ? getActivities(true)
-            //       : getActivitiesByUser(userId);
-            //   }
-            // }}
-            // refreshing={false}
-            // onRefresh={() => null}
-          />
-
-          {notifications && notifications.length === 0 && (
-            <Text style={{ marginTop: 30, alignSelf: "center" }}>
-              No notifications yet
-            </Text>
-          )}
-        </View>
-      )}
-    </>
+          >
+            No notifications yet
+          </Text>
+        )}
+      </View>
+    </BackgroundLayout>
   );
 };
 
@@ -158,18 +152,24 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
   },
   mainLayout: {
     flex: 9,
     marginTop: 40,
   },
   card: {
-    minHeight: 200,
+    minHeight: 100,
     width: "100%",
     marginBottom: 5,
     // borderWidth: 2,
     backgroundColor: Colors.white,
     borderRadius: 10,
     paddingHorizontal: 10,
+    elevation: 2,
+  },
+  text: {
+    fontSize: 14,
   },
 });

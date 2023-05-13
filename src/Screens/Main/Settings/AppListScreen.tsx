@@ -17,6 +17,7 @@ import GetApps from "@/Services/Settings/GetApps";
 import FastImage from "react-native-fast-image";
 import Colors from "@/Theme/Colors";
 import { AppHeader } from "@/Components";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 const AppListScreen = () => {
   const [apps, setapps] = useState([]);
   useEffect(() => {
@@ -30,11 +31,25 @@ const AppListScreen = () => {
         Alert.alert("Apps not loaded", "", [{ text: "OK", style: "cancel" }]);
       });
   }, []);
+
   const renderItem = ({ item }: { item: any }) => (
     <View key={item?.id} style={styles.appContainer}>
       <View style={styles.topContainer}>
         <Text style={styles.appName}>{item?.appName}</Text>
-        <View style={styles.background}>
+      </View>
+      <FastImage
+        source={{ uri: item?.appImage }}
+        style={{ width: "95%", height: 60, marginLeft: 10 }}
+        resizeMode={"contain"}
+      />
+      <Text style={styles.appDescription}>{item?.appDescription}</Text>
+      <TouchableOpacity>
+        <LinearGradient
+          colors={[Colors.primary, "#EC5ADD"]}
+          start={{ x: 0, y: 1 }}
+          end={{ x: 1, y: 1 }}
+          style={{ width: "100%", height: 50, justifyContent: "center" }}
+        >
           {!item?.comingSoon ? (
             <TouchableOpacity
               style={styles.button}
@@ -56,28 +71,23 @@ const AppListScreen = () => {
               <Text style={styles.button}>Coming soon...</Text>
             </TouchableOpacity>
           )}
-        </View>
-      </View>
-      <FastImage
-        source={{ uri: item?.appImage }}
-        style={{ width: "95%", height: 200, marginLeft: 10 }}
-        resizeMode={"contain"}
-      />
-      <Text style={styles.appDescription}>{item?.appDescription}</Text>
+        </LinearGradient>
+      </TouchableOpacity>
     </View>
   );
 
   return (
-    <>
-      <AppHeader title="Our Other Apps" isBack />
-      <View style={{ flex: 1 }}>
+    <BackgroundLayout title="Our Other Apps">
+      <AppHeader hideCalendar={true} hideCenterIcon={true} />
+      <View style={styles.layout}>
         <FlatList
           data={apps}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
         />
+        <View style={{ height: 50 }} />
       </View>
-    </>
+    </BackgroundLayout>
   );
 };
 
@@ -87,23 +97,27 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
+    padding: 20,
   },
   mainLayout: {
     flex: 9,
   },
   appContainer: {
-    borderBottomColor: "#A9A9A9",
-    borderBottomWidth: 2,
-
     marginBottom: 10,
     marginTop: 30,
+    borderRadius: 20,
+    backgroundColor: Colors.white,
+    overflow: "hidden",
   },
   appName: {
     color: "#404040",
     fontWeight: "bold",
     fontSize: 24,
-    marginLeft: 10,
+
     width: "40%",
+    textAlign: "center",
   },
   appDescription: {
     fontSize: 16,
@@ -111,14 +125,8 @@ const styles = StyleSheet.create({
     marginVertical: 30,
   },
   button: {
-    paddingVertical: 7,
-    fontSize: 15,
-    textTransform: "uppercase",
-    width: 150,
-    borderRadius: 10,
     textAlign: "center",
     color: Colors.white,
-    backgroundColor: Colors.primary,
   },
   topContainer: {
     flexDirection: "row",

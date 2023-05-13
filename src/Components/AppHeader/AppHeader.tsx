@@ -52,8 +52,8 @@ const AppHeader = ({ showGlobe, ...props }) => {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-between",
-            width: "85%",
+            justifyContent: props.showGlobe ? "space-between" : "flex-end",
+            width: props.showGlobe || user_type != "student" ? "85%" : "100%",
           }}
         >
           {props.showGlobe && user_type == "student" && (

@@ -6,6 +6,7 @@ import {
   Switch,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from "react-native";
 import Share from "react-native-share";
 import { useTheme } from "@/Theme";
@@ -36,7 +37,8 @@ import { DeleteUser } from "@/Services/SettingsServies";
 import { loadId, loadUserId } from "@/Storage/MainAppStorage";
 import FetchOne from "@/Store/User/FetchOne";
 import { useIsFocused } from "@react-navigation/native";
-
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import { LinearGradientButton } from "@/Components";
 const SettingsScreen = ({ navigation }: { navigation: any }) => {
   const isFocuesed = useIsFocused();
   const dispatch = useDispatch();
@@ -95,8 +97,8 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
   }, [isFocuesed]);
 
   return (
-    <>
-      <AppHeader title="Settings" hideCalendar={true} />
+    <BackgroundLayout title="Settings">
+      <AppHeader title="" hideCalendar={true} hideCenterIcon={true} />
       <TwoFactorAuthenticationModal />
       <VerifyYourselfModal
         isActivationCode={verifyType === "activation-code"}
@@ -166,47 +168,64 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
           )}
         </Card>
       </Modal>
-      <View style={styles.layout}>
-        <View style={[styles.mainLayout, { paddingHorizontal: 20 }]}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("PersonalProfile")}
-            style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-              ],
-            ]}
-          >
-            <Text style={{ fontSize: 16 }}>Your Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("ChangePassword")}
-            style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-                { marginTop: 15 },
-              ],
-            ]}
-          >
-            <Text style={{ fontSize: 16 }}>Reset Password</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Notifications")}
-            style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-                { marginTop: 15 },
-              ],
-            ]}
-          >
-            <Text style={{ fontSize: 16 }}>Notifications</Text>
-          </TouchableOpacity>
-          {/* <View style={[[Layout.row, Layout.justifyContentBetween, Layout.alignItemsCenter, { marginTop: 15 }]]}>
+      <ScrollView style={{ flex: 1 }}>
+        <View style={styles.layout}>
+          <View style={[styles.mainLayout, { paddingHorizontal: 20 }]}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("PersonalProfile")}
+              style={[
+                [
+                  Layout.row,
+                  Layout.justifyContentBetween,
+                  Layout.alignItemsCenter,
+                  styles.firstItem,
+                ],
+              ]}
+            >
+              <Text style={{ fontSize: 16 }}>Your Profile</Text>
+              <Icon
+                style={styles.icon}
+                fill={Colors.gray}
+                name="chevron-right-outline"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ChangePassword")}
+              style={[
+                [
+                  Layout.row,
+                  Layout.justifyContentBetween,
+                  Layout.alignItemsCenter,
+                  styles.otherItems,
+                ],
+              ]}
+            >
+              <Text style={{ fontSize: 16 }}>Reset Password</Text>
+              <Icon
+                style={styles.icon}
+                fill={Colors.gray}
+                name="chevron-right-outline"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Notifications")}
+              style={[
+                [
+                  Layout.row,
+                  Layout.justifyContentBetween,
+                  Layout.alignItemsCenter,
+                  styles.otherItems,
+                ],
+              ]}
+            >
+              <Text style={{ fontSize: 16 }}>Notifications</Text>
+              <Icon
+                style={styles.icon}
+                fill={Colors.gray}
+                name="chevron-right-outline"
+              />
+            </TouchableOpacity>
+            {/* <View style={[[Layout.row, Layout.justifyContentBetween, Layout.alignItemsCenter, { marginTop: 15 }]]}>
                         <Text style={{ fontSize: 16 }}>2 Factor Authentication</Text>
                         <Switch
                             trackColor={{ false: Colors.gray, true: Colors.primary }}
@@ -233,137 +252,142 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
                             name='chevron-right-outline'
                         />
                     </TouchableOpacity>)} */}
-          <TouchableOpacity
-            onPress={() => navigation.navigate("ActivationCode")}
-            style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-                { marginTop: 15 },
-              ],
-            ]}
-          >
-            <Text style={{ fontSize: 16 }}>Your Reference Code</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("DependentInfo")}
-            style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-                { marginTop: 15 },
-              ],
-            ]}
-          >
-            <Text style={{ fontSize: 16 }}>Dependent Information</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("PaymentInfo")}
-            style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-                { marginTop: 15 },
-              ],
-            ]}
-          >
-            <Text style={{ fontSize: 16 }}>Payment Information</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("ReportProblem")}
-            style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-                { marginTop: 15 },
-              ],
-            ]}
-          >
-            <Text style={{ fontSize: 16 }}>Report a problem</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("ContactUs")}
-            style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-                { marginTop: 15 },
-              ],
-            ]}
-          >
-            <Text style={{ fontSize: 16 }}>Contact Us</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={onShare}
-            style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-                { marginTop: 15 },
-              ],
-            ]}
-          >
-            <Text style={{ fontSize: 16 }}>Share with Friends</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("AppList")}
-            style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-                { marginTop: 15 },
-              ],
-            ]}
-          >
-            <Text style={{ fontSize: 16 }}>Our Other Apps</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
-          </TouchableOpacity>
-          <View style={styles.buttonsContainer}>
-            <View style={{ marginVertical: 15 }}>
-              <View style={styles.background}>
-                <TouchableOpacity
-                  style={styles.background}
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ActivationCode")}
+              style={[
+                [
+                  Layout.row,
+                  Layout.justifyContentBetween,
+                  Layout.alignItemsCenter,
+                  styles.otherItems,
+                ],
+              ]}
+            >
+              <Text style={{ fontSize: 16 }}>Your Reference Code</Text>
+              <Icon
+                style={styles.icon}
+                fill={Colors.gray}
+                name="chevron-right-outline"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("DependentInfo")}
+              style={[
+                [
+                  Layout.row,
+                  Layout.justifyContentBetween,
+                  Layout.alignItemsCenter,
+                  styles.otherItems,
+                ],
+              ]}
+            >
+              <Text style={{ fontSize: 16 }}>Dependent Information</Text>
+              <Icon
+                style={styles.icon}
+                fill={Colors.gray}
+                name="chevron-right-outline"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("PaymentInfo")}
+              style={[
+                [
+                  Layout.row,
+                  Layout.justifyContentBetween,
+                  Layout.alignItemsCenter,
+                  styles.otherItems,
+                ],
+              ]}
+            >
+              <Text style={{ fontSize: 16 }}>Payment Information</Text>
+              <Icon
+                style={styles.icon}
+                fill={Colors.gray}
+                name="chevron-right-outline"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ReportProblem")}
+              style={[
+                [
+                  Layout.row,
+                  Layout.justifyContentBetween,
+                  Layout.alignItemsCenter,
+                  styles.otherItems,
+                ],
+              ]}
+            >
+              <Text style={{ fontSize: 16 }}>Report a problem</Text>
+              <Icon
+                style={styles.icon}
+                fill={Colors.gray}
+                name="chevron-right-outline"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ContactUs")}
+              style={[
+                [
+                  Layout.row,
+                  Layout.justifyContentBetween,
+                  Layout.alignItemsCenter,
+                  styles.otherItems,
+                ],
+              ]}
+            >
+              <Text style={{ fontSize: 16 }}>Contact Us</Text>
+              <Icon
+                style={styles.icon}
+                fill={Colors.gray}
+                name="chevron-right-outline"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={onShare}
+              style={[
+                [
+                  Layout.row,
+                  Layout.justifyContentBetween,
+                  Layout.alignItemsCenter,
+                  styles.otherItems,
+                ],
+              ]}
+            >
+              <Text style={{ fontSize: 16 }}>Share with Friends</Text>
+              <Icon
+                style={styles.icon}
+                fill={Colors.gray}
+                name="chevron-right-outline"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AppList")}
+              style={[
+                [
+                  Layout.row,
+                  Layout.justifyContentBetween,
+                  Layout.alignItemsCenter,
+                  styles.lastItem,
+                ],
+              ]}
+            >
+              <Text style={{ fontSize: 16 }}>Our Other Apps</Text>
+              <Icon
+                style={styles.icon}
+                fill={Colors.gray}
+                name="chevron-right-outline"
+              />
+            </TouchableOpacity>
+            <View style={styles.buttonsContainer}>
+              <View style={{ marginVertical: 15 }}>
+                <LinearGradientButton
+                  style={{
+                    borderRadius: 25,
+                    flex: 1,
+                  }}
+                  appearance="ghost"
+                  size="medium"
+                  status="control"
                   onPress={() => {
                     dispatch(
                       ChangeUserState.action({
@@ -374,32 +398,22 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
                     dispatch(LogoutStore.action());
                   }}
                 >
-                  <Text style={styles.button}>Log out</Text>
-                </TouchableOpacity>
+                  Log out
+                </LinearGradientButton>
               </View>
-            </View>
-            <View style={{ marginTop: 15 }}>
+
               <TouchableOpacity
-                style={[
-                  styles.background,
-                  {
-                    backgroundColor: "transparent",
-                    borderWidth: 1,
-                    borderColor: Colors.primary,
-                    paddingBottom: 10,
-                  },
-                ]}
+                style={styles.deleteBackground}
                 onPress={() => setopenDeactivateModal(true)}
               >
-                <Text style={[styles.button, { color: Colors.primary }]}>
-                  Delete account
-                </Text>
+                <Text style={styles.deleteButton}> Delete account</Text>
               </TouchableOpacity>
             </View>
+            <View style={{ height: 50 }} />
           </View>
         </View>
-      </View>
-    </>
+      </ScrollView>
+    </BackgroundLayout>
   );
 };
 
@@ -409,10 +423,41 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
   },
   mainLayout: {
     flex: 9,
     marginTop: 40,
+  },
+  lastItem: {
+    backgroundColor: Colors.white,
+    borderWidth: 0.5,
+    elevation: 1,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    borderColor: Colors.lightgray,
+    paddingLeft: 10,
+    paddingVertical: 5,
+    borderTopWidth: 0,
+  },
+  firstItem: {
+    backgroundColor: Colors.white,
+    borderWidth: 0.5,
+    elevation: 1,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderColor: Colors.lightgray,
+    paddingLeft: 10,
+    paddingVertical: 5,
+  },
+  otherItems: {
+    backgroundColor: Colors.white,
+    borderBottomWidth: 0.5,
+    elevation: 1,
+    borderColor: Colors.lightgray,
+    paddingLeft: 10,
+    paddingVertical: 5,
   },
   icon: {
     width: 32,
@@ -480,6 +525,23 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 10,
     fontWeight: "bold",
+    color: Colors.primary,
+    textAlign: "center",
+  },
+  deleteBackground: {
+    width: "100%",
+    borderRadius: 10,
+    paddingBottom: 7,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    marginBottom: 35,
+  },
+
+  deleteButton: {
+    paddingTop: 5,
+    fontSize: 15,
     color: Colors.primary,
     textAlign: "center",
   },

@@ -10,6 +10,8 @@ import { UserState } from "@/Store/User";
 import Colors from "@/Theme/Colors";
 import { GetParent } from "@/Services/Parent";
 import { loadUserId } from "@/Storage/MainAppStorage";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import { ScrollView } from "react-native-gesture-handler";
 
 const ActivationCodeScreen = () => {
   const [activationCode, setActivationCode] = useState("");
@@ -26,60 +28,70 @@ const ActivationCodeScreen = () => {
   }, []);
 
   return (
-    <>
-      <AppHeader title="Parent Reference Code" isBack />
+    <BackgroundLayout title="Parent's Reference Code">
+      <AppHeader hideCalendar={true} hideCenterIcon={true} />
+
       <View style={styles.layout}>
-        <Text style={{ fontSize: 16, fontWeight: "600", width: "100%" }}>
-          Share ALL your dependents' information with partner using the
-          reference code or have him/her scan the QR code
-        </Text>
-        <View style={{ marginTop: 30, width: "100%" }}>
-          <Text
-            style={{ fontSize: 18, fontWeight: "bold", alignSelf: "center" }}
-          >
-            {activationCode || ""}
-          </Text>
-          <TouchableOpacity>
-            <View style={{ marginVertical: 15, alignItems: "center" }}>
-              <QRCode
-                value={activationCode || "test"}
-                color={"#000"}
-                backgroundColor="transparent"
-                size={300}
-                logoMargin={2}
-                logoSize={20}
-                logoBorderRadius={10}
-                logoBackgroundColor="transparent"
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={{ marginTop: 20 }}>
+        <ScrollView style={{ flex: 1 }}>
           <Text
             style={{
               fontSize: 16,
               fontWeight: "600",
               width: "100%",
-              color: "red",
+              letterSpacing: 1.5,
             }}
           >
-            To share a particular dependent's information, have partner scan
-            only that dependent's QR code.
+            Share ALL your dependents' information with partner using the
+            reference code or have him/her scan the QR code
           </Text>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              width: "100%",
-              color: "red",
-              marginTop: 10,
-            }}
-          >
-            Go to "Dependent Information" in settings.
-          </Text>
-        </View>
+          <View style={{ marginTop: 30, width: "100%" }}>
+            <Text
+              style={{ fontSize: 18, fontWeight: "bold", alignSelf: "center" }}
+            >
+              {activationCode || ""}
+            </Text>
+            <TouchableOpacity>
+              <View style={{ marginVertical: 15, alignItems: "center" }}>
+                <QRCode
+                  value={activationCode || "test"}
+                  color={"#000"}
+                  backgroundColor="transparent"
+                  size={300}
+                  logoMargin={2}
+                  logoSize={20}
+                  logoBorderRadius={10}
+                  logoBackgroundColor="transparent"
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View style={{ marginTop: 20 }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "600",
+                width: "100%",
+                color: "red",
+              }}
+            >
+              To share a particular dependent's information, have partner scan
+              only that dependent's QR code.
+            </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "600",
+                width: "100%",
+                color: "red",
+                marginTop: 10,
+              }}
+            >
+              Go to "Dependent Information" in settings.
+            </Text>
+          </View>
+        </ScrollView>
       </View>
-    </>
+    </BackgroundLayout>
   );
 };
 
@@ -91,6 +103,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     padding: 10,
     paddingTop: 50,
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
   },
   item: {
     borderRadius: 10,
