@@ -6,7 +6,13 @@ import {
   TopNavigationAction,
   Icon,
 } from "@ui-kitten/components";
-import { StyleSheet, View, FlatList, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Colors from "@/Theme/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -14,6 +20,7 @@ import { ModalState } from "@/Store/Modal";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Modal from "react-native-modal";
 import PreviewBusInformation from "./PreviewBusInformation";
+import { LinearGradientButton } from "@/Components";
 
 const AddBusInformation = ({
   activity,
@@ -110,8 +117,14 @@ const AddBusInformation = ({
         );
       }}
     >
-      <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }}>
-        <>
+      <KeyboardAwareScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          flex: 1,
+          backgroundColor: Colors.newBackgroundColor,
+        }}
+      >
+        <ScrollView contentContainerStyle={{ flex: 1 }}>
           {isVisiblePreview && (
             <PreviewBusInformation
               fromActivity={fromActivity}
@@ -136,62 +149,86 @@ const AddBusInformation = ({
           <View
             style={{
               flex: 1,
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.newBackgroundColor,
               borderTopLeftRadius: 10,
               borderTopRightRadius: 10,
+              overflow: "hidden",
             }}
           >
             <View style={styles.layout}>
               <View style={{ flex: 1, paddingHorizontal: 20 }}>
                 <View style={{ marginTop: 10 }}>
                   <Input
-                    style={{ margin: 5 }}
+                    style={styles.textInput}
                     autoCapitalize="none"
                     placeholder="Give your bus a name"
                     value={busName}
                     onChangeText={(val) => setBusName(val)}
+                    label={(evaProps: any) => (
+                      <Text style={styles.inputLabels}>Bus Name</Text>
+                    )}
                   />
                 </View>
                 <View style={{ marginTop: 10, maxHeight: 150 }}>
                   <View style={styles.row}>
-                    <Text>Number of row</Text>
                     <Input
-                      style={{ margin: 5 }}
+                      style={styles.textInput}
                       autoCapitalize="none"
                       keyboardType="number-pad"
                       value={numberOfRows}
                       onChangeText={(val) => setNumberOfRows(val)}
+                      label={(evaProps: any) => (
+                        <Text style={styles.inputLabels}>Number of row</Text>
+                      )}
                     />
                   </View>
                   <View style={styles.row}>
-                    <View>
-                      <Text>Number of seats per row</Text>
-                      <Text style={{ color: "red", fontSize: 12 }}>
-                        (add all seats of both sides of isle)
-                      </Text>
-                    </View>
                     <Input
-                      style={{ margin: 5 }}
+                      style={styles.textInput}
                       autoCapitalize="none"
                       keyboardType="number-pad"
                       value={numberOfSeatsPerRow}
                       onChangeText={(val) => setNumberOfSeatsPerRow(val)}
+                      label={(evaProps: any) => (
+                        <>
+                          <Text
+                            style={[styles.inputLabels, { marginBottom: 2 }]}
+                          >
+                            Number of seats per row
+                          </Text>
+                          <Text
+                            style={{
+                              color: "red",
+                              fontSize: 12,
+                              marginBottom: 10,
+                            }}
+                          >
+                            (add all seats of both sides of isle)
+                          </Text>
+                        </>
+                      )}
                     />
                   </View>
                   <View style={styles.row}>
-                    <Text>Number of kids per seat</Text>
                     <Input
-                      style={{ margin: 5 }}
+                      style={styles.textInput}
                       autoCapitalize="none"
                       keyboardType="number-pad"
                       value={numberOfKidsPerSeat}
                       onChangeText={(val) => setNumberOfKidsPerSeat(val)}
+                      label={(evaProps: any) => (
+                        <Text style={styles.inputLabels}>
+                          Number of kids per seat
+                        </Text>
+                      )}
                     />
                   </View>
                   <View style={styles.row}>
-                    <Text>Do you have a rear long seat?</Text>
+                    <Text style={[styles.inputLabels, { marginLeft: 12 }]}>
+                      Do you have a rear long seat?
+                    </Text>
                     <CheckBox
-                      style={{ marginRight: 20 }}
+                      style={{ marginRight: 2 }}
                       checked={isLongSeat}
                       onChange={() => setIsLongSeat(!isLongSeat)}
                     >
@@ -200,13 +237,17 @@ const AddBusInformation = ({
                   </View>
                   {isLongSeat && (
                     <View style={styles.row}>
-                      <Text>Number of seats on long seat</Text>
                       <Input
-                        style={{ margin: 5 }}
+                        style={styles.textInput}
                         autoCapitalize="none"
                         keyboardType="number-pad"
                         value={numberOfKidsLongSeat}
                         onChangeText={(val) => setNumberOfKidsLongSeat(val)}
+                        label={(evaProps: any) => (
+                          <Text style={styles.inputLabels}>
+                            Number of seats on long seat
+                          </Text>
+                        )}
                       />
                     </View>
                   )}
@@ -214,46 +255,49 @@ const AddBusInformation = ({
               </View>
               <View
                 style={{
-                  position: "absolute",
-                  bottom: 30,
-                  left: 0,
-                  right: 0,
                   alignItems: "center",
-                  width: "100%",
+                  width: "90%",
+                  marginTop: 30,
+                  justifyContent: "center",
+                  alignSelf: "center",
                 }}
               >
-                <View style={styles.bottomButton}>
-                  <TouchableOpacity
-                    style={styles.bottomButton}
-                    onPress={() =>
-                      dispatch(
-                        ChangeModalState.action({
-                          previewButInformationModalVisibility: true,
-                        })
-                      )
-                    }
-                  >
-                    <Text style={styles.button}>Preview</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.bottomButton}>
-                  <TouchableOpacity
-                    style={styles.bottomButton}
-                    onPress={() => {
-                      dispatch(
-                        ChangeModalState.action({
-                          addButInformationModalVisibility: false,
-                        })
-                      );
+                <LinearGradientButton
+                  onPress={() =>
+                    dispatch(
+                      ChangeModalState.action({
+                        previewButInformationModalVisibility: true,
+                      })
+                    )
+                  }
+                >
+                  Preview
+                </LinearGradientButton>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(
+                      ChangeModalState.action({
+                        addButInformationModalVisibility: false,
+                      })
+                    );
+                  }}
+                  style={{ marginVertical: 10 }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      textAlign: "center",
+                      color: Colors.primaryTint,
                     }}
                   >
-                    <Text style={styles.button}>I'll do it later</Text>
-                  </TouchableOpacity>
-                </View>
+                    I'll do it later
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
-        </>
+        </ScrollView>
       </KeyboardAwareScrollView>
     </Modal>
   );
@@ -271,6 +315,15 @@ const styles = StyleSheet.create({
   modal: { borderRadius: 10 },
   header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
   body: { flex: 3 },
+  textInput: {
+    marginTop: 10,
+    alignSelf: "center",
+    width: "95%",
+
+    borderRadius: 8,
+    elevation: 2,
+    marginLeft: 13,
+  },
   background: {
     flex: 0,
     color: Colors.white,
@@ -278,6 +331,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
+  },
+  inputLabels: {
+    color: Colors.black,
+    fontSize: 14,
+    marginBottom: 10,
   },
   topNav: {
     color: Colors.white,

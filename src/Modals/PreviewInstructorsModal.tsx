@@ -11,6 +11,7 @@ import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Modal from "react-native-modal";
 import { Instructor } from "@/Models/UserDTOs";
 import EditInstructorsModal from "./EditInstructorModal";
+import { LinearGradientButton } from "@/Components";
 interface InstructorModal {
   instructors: Array<Instructor>;
   setInstructors: (data: Array<Instructor>) => {};
@@ -76,7 +77,7 @@ const PreviewInstructorsModal = ({
         <View
           style={{
             flex: 1,
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.newBackgroundColor,
             borderTopLeftRadius: 10,
             borderTopRightRadius: 10,
           }}
@@ -152,62 +153,57 @@ const PreviewInstructorsModal = ({
                 width: "100%",
               }}
             >
-              <View style={styles.bottomButton}>
-                <TouchableOpacity
-                  style={styles.bottomButton}
-                  onPress={() => {
+              <LinearGradientButton
+                onPress={() => {
+                  dispatch(
+                    ChangeModalState.action({
+                      addInstructorModalVisibility: false,
+                      previewInstructorModalVisibility: false,
+                    })
+                  );
+                  setTimeout(() => {
                     dispatch(
                       ChangeModalState.action({
-                        addInstructorModalVisibility: false,
-                        previewInstructorModalVisibility: false,
+                        addButInformationModalVisibility: true,
+                        // addInstructorModalVisibility: false,
+                        // previewInstructorModalVisibility: false,
                       })
                     );
-                    setTimeout(() => {
-                      dispatch(
-                        ChangeModalState.action({
-                          addButInformationModalVisibility: true,
-                          // addInstructorModalVisibility: false,
-                          // previewInstructorModalVisibility: false,
-                        })
-                      );
-                    }, 200);
-                  }}
-                >
-                  <Text style={styles.button}>Add Bus Information</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.bottomButton}>
-                <TouchableOpacity
-                  style={styles.bottomButton}
-                  onPress={() => {
-                    dispatch(
-                      ChangeModalState.action({
-                        previewInstructorModalVisibility: false,
-                        addInstructorModalVisibility: false,
-                      })
-                    );
-                  }}
-                >
-                  <Text style={styles.button}>
-                    Continue without Bus Information
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.bottomButton}>
-                <TouchableOpacity
-                  style={styles.bottomButton}
-                  onPress={() => {
-                    dispatch(
-                      ChangeModalState.action({
-                        previewInstructorModalVisibility: false,
-                        addInstructorModalVisibility: false,
-                      })
-                    );
-                  }}
-                >
-                  <Text style={styles.button}>Back</Text>
-                </TouchableOpacity>
-              </View>
+                  }, 200);
+                }}
+              >
+                Add Bus Information
+              </LinearGradientButton>
+              <View style={{ marginVertical: 10 }} />
+
+              <LinearGradientButton
+                gradient={["#EC5ADD", Colors.primary]}
+                onPress={() => {
+                  dispatch(
+                    ChangeModalState.action({
+                      previewInstructorModalVisibility: false,
+                      addInstructorModalVisibility: false,
+                    })
+                  );
+                }}
+              >
+                Continue without Bus Information
+              </LinearGradientButton>
+
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch(
+                    ChangeModalState.action({
+                      previewInstructorModalVisibility: false,
+                      addInstructorModalVisibility: false,
+                    })
+                  );
+                }}
+              >
+                <Text style={{ color: Colors.primary, fontSize: 16 }}>
+                  Back
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>

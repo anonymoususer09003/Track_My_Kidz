@@ -31,6 +31,7 @@ import { loadUserId } from "@/Storage/MainAppStorage";
 import { GetSchool, UpdateSchool } from "@/Services/School";
 import { AppHeader } from "@/Components";
 import EditOrgInstructorsModal from "@/Modals/EditOrganizationInstructorModal";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 const height = Dimensions.get("screen").height;
 
 const OrgInstructorListFormModal = ({ route }: any) => {
@@ -131,22 +132,9 @@ const OrgInstructorListFormModal = ({ route }: any) => {
     switch (index) {
       case 4:
         return (
-          <Text style={{ fontSize: 14 }}>{data ? "Admin" : " "}</Text>
-          // <Select
-          //   style={styles.selectSettings}
-          //   value={data ? "Admin" : "Non-Admin"}
-          //   disabled={true}
-          //   style={{ width: "100%" }}
-          //   onSelect={(index: any) => {
-          //     // setFieldValue("city", cities[index.row]);
-          //     // setFieldValue("selectedCity", cities[index.row]);
-          //   }}
-          //   // label={(evaProps) => <Text {...evaProps}>City</Text>}
-          // >
-          //   {[data ? "Non-Admin" : "Admin"]?.map((city, index) => {
-          //     return <SelectItem key={index} title={city} />;
-          //   })}
-          // </Select>
+          <Text style={{ fontSize: 13, marginLeft: 5 }}>
+            {data ? "Admin" : " "}
+          </Text>
         );
         break;
       default:
@@ -157,15 +145,21 @@ const OrgInstructorListFormModal = ({ route }: any) => {
               setVisible(true);
             }}
           >
-            <Icon name="dots-three-vertical" size={20} />
+            <Icon name="dots-three-vertical" size={15} />
           </TouchableOpacity>
         );
     }
   };
   const updateInstructor = () => {};
   return (
-    <View style={{ flex: 1 }}>
-      <AppHeader isBack={true} goBack={true} title="Instructors List" />
+    <BackgroundLayout title="Instructors List">
+      <AppHeader
+        hideCalendar={true}
+        hideApproval={true}
+        onAddPress={() => {
+          setaddEditVisible(true);
+        }}
+      />
       {addEditVisible && (
         <EditOrgInstructorsModal
           userId={userId}
@@ -237,21 +231,22 @@ const OrgInstructorListFormModal = ({ route }: any) => {
         }}
         getInstructor={() => null}
       />
-      <TouchableOpacity
-        style={styles.floatButton}
-        onPress={() => {
-          setaddEditVisible(true);
-          // dispatch(ChangeModalState.action({ addStudentModal: true }))
-          null;
+
+      <View
+        style={{
+          paddingRight: 19,
+
+          backgroundColor: Colors.newBackgroundColor,
+          flex: 1,
+          borderRadius: 20,
         }}
       >
-        <AntDesign name="pluscircle" size={50} color={Colors.primary} />
-      </TouchableOpacity>
-      <View style={{ paddingRight: 19, marginTop: 10 }}>
         <ScrollView
           contentContainerStyle={{
-            height: height * 0.7,
+            height: height * 0.55,
             overflow: "hidden",
+            marginTop: 50,
+            marginLeft: 15,
           }}
           horizontal={true}
         >
@@ -323,7 +318,10 @@ const OrgInstructorListFormModal = ({ route }: any) => {
                           {item.map((cellData, cellIndex) => {
                             return (
                               <Cell
-                                style={styles.cellView}
+                                style={{
+                                  marginLeft: cellIndex < 2 ? 5 : 0,
+                                  textAlign: "center",
+                                }}
                                 width={
                                   cellIndex == 0 || cellIndex == 1
                                     ? 60
@@ -358,15 +356,12 @@ const OrgInstructorListFormModal = ({ route }: any) => {
             </View>
           </View>
         </ScrollView>
-        {true && (
-          <Text
-            style={[styles.errorText, { textAlign: "center", fontSize: 18 }]}
-          >
-            {"Scroll to the right"}
-          </Text>
-        )}
+
+        <Text style={[styles.errorText, { textAlign: "center", fontSize: 18 }]}>
+          {"Scroll to the right"}
+        </Text>
       </View>
-    </View>
+    </BackgroundLayout>
   );
 };
 export default OrgInstructorListFormModal;
@@ -452,6 +447,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 10,
     color: "red",
+    marginBottom: 80,
   },
   formView: {
     flex: 9,

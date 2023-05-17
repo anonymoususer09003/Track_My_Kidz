@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
-  Text,
   Input,
   Layout,
   Button,
@@ -14,7 +13,7 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  Linking,
+  Text,
 } from "react-native";
 import * as yup from "yup";
 import { Formik } from "formik";
@@ -35,6 +34,7 @@ import {
 import { UpdateUser } from "@/Services/SettingsServies";
 import { OrganisationInstructor } from "@/Models/UserDTOs";
 import CreateMultipleInstructor from "@/Services/Instructor/CreateMultipleInstructor";
+import { LinearGradientButton } from "@/Components";
 interface InstructorModal {
   instructors: Array<OrganisationInstructor>;
   //   setInstructors: (data: Array<OrganisationInstructor>) => {};
@@ -78,7 +78,6 @@ const EditOrgInstructorsModal = ({
   const handleDelete = () => {
     DeleteInstructor(instructors?.instructorId)
       .then((res) => {
-        console.log("res=========", res);
         setVisible(false, instructors?.instructorId);
       })
       .catch((err) => [console.log("err", err)]);
@@ -115,7 +114,6 @@ const EditOrgInstructorsModal = ({
     )
       .then((_res) => {
         dispatch(ChangeModalState.action({ loading: false }));
-        console.log("res", _res);
 
         if (addOneMore) {
           // setAdd(values);
@@ -139,22 +137,9 @@ const EditOrgInstructorsModal = ({
           position: "top",
           text1: `Error occured`,
         });
-        // setRerender(values, "add");
-        // setAdd(values);
-        // resetForm();
-        // console.log("err", err);
       });
   };
-  // console.log("instrutcor", instructors);
-  // @ts-ignore
-  // const getUserId = async () => {
-  //   const userId = await loadId();
-  //   console.log("userId", userId);
-  // };
 
-  // React.useEffect(() => {
-  //   getUserId();
-  // }, []);
   return (
     <Modal
       propagateSwipe={true}
@@ -182,17 +167,14 @@ const EditOrgInstructorsModal = ({
         <ScrollView
           style={{
             flex: 1,
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.newBackgroundColor,
             paddingHorizontal: 10,
             borderRadius: 5,
             paddingTop: 20,
           }}
         >
           <Text
-            style={[
-              styles.heading,
-              { textAlign: "center", marginVertical: 30 },
-            ]}
+            style={[{ textAlign: "center", marginVertical: 30, fontSize: 18 }]}
           >
             Instructor Information
           </Text>
@@ -233,85 +215,92 @@ const EditOrgInstructorsModal = ({
               resetForm,
             }) => (
               <>
-                <Layout style={styles.formContainer} level="1">
-                  <Text style={styles.heading}>First Name</Text>
-                  <Input
-                    value={values.firstName}
-                    style={{ marginTop: 10 }}
-                    placeholder="First Name"
-                    onChangeText={handleChange("firstName")}
-                  />
-                  {errors.firstName && touched.firstName && (
-                    <Text style={styles.errorText}>{errors.firstName}</Text>
+                <Input
+                  value={values.firstName}
+                  style={styles.textInput}
+                  placeholder="First Name"
+                  onChangeText={handleChange("firstName")}
+                  label={(evaProps: any) => (
+                    <Text style={styles.inputLabels}>First Name</Text>
                   )}
-                  <Text style={styles.heading}>Last Name</Text>
-                  <Input
-                    value={values.lastName}
-                    style={{ marginTop: 10 }}
-                    placeholder="Last Name"
-                    onChangeText={handleChange("lastName")}
-                  />
-                  {errors.lastName && touched.lastName && (
-                    <Text style={styles.errorText}>{errors.lastName}</Text>
-                  )}
-                  <Text style={styles.heading}>Email</Text>
-                  <Input
-                    value={values.email}
-                    style={{ marginTop: 10 }}
-                    placeholder="Email"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    onChangeText={handleChange("email")}
-                  />
-                  {errors.email && touched.email && (
-                    <Text style={styles.errorText}>{errors.email}</Text>
-                  )}
+                />
+                {errors.firstName && touched.firstName && (
+                  <Text style={styles.errorText}>{errors.firstName}</Text>
+                )}
 
-                  <Text style={styles.heading}>Phone</Text>
-                  <Input
-                    value={values.phoneNumber}
-                    style={{ marginTop: 10 }}
-                    placeholder="Phone"
-                    keyboardType="number-pad"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    onChangeText={handleChange("phoneNumber")}
-                  />
-                  {errors.phoneNumber && touched.phoneNumber && (
-                    <Text style={styles.errorText}>{errors.phoneNumber}</Text>
+                <Input
+                  value={values.lastName}
+                  style={styles.textInput}
+                  placeholder="Last Name"
+                  onChangeText={handleChange("lastName")}
+                  label={(evaProps: any) => (
+                    <Text style={styles.inputLabels}>Last Name</Text>
                   )}
-                  <View
-                    style={{
-                      width: "100%",
-                      flexDirection: "row",
-                      marginTop: 10,
-                      // justifyContent: "space-between",
+                />
+                {errors.lastName && touched.lastName && (
+                  <Text style={styles.errorText}>{errors.lastName}</Text>
+                )}
+
+                <Input
+                  value={values.email}
+                  style={styles.textInput}
+                  placeholder="Email"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  onChangeText={handleChange("email")}
+                  label={(evaProps: any) => (
+                    <Text style={styles.inputLabels}>Email</Text>
+                  )}
+                />
+                {errors.email && touched.email && (
+                  <Text style={styles.errorText}>{errors.email}</Text>
+                )}
+
+                <Input
+                  value={values.phoneNumber}
+                  style={styles.textInput}
+                  placeholder="Phone"
+                  keyboardType="number-pad"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  onChangeText={handleChange("phoneNumber")}
+                  label={(evaProps: any) => (
+                    <Text style={styles.inputLabels}>Phone</Text>
+                  )}
+                />
+                {errors.phoneNumber && touched.phoneNumber && (
+                  <Text style={styles.errorText}>{errors.phoneNumber}</Text>
+                )}
+                <View
+                  style={{
+                    width: "100%",
+                    flexDirection: "row",
+                    marginTop: 10,
+                    // justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={[styles.inputLabels, { margin: 10 }]}>
+                    Admin
+                  </Text>
+                  <Toggle
+                    checked={values.isAdmin ? true : false}
+                    onChange={(value) => {
+                      setFieldValue("isAdmin", value);
                     }}
-                  >
-                    <Text style={{ marginRight: 10 }}>Admin</Text>
-                    <Toggle
-                      checked={values.isAdmin ? true : false}
-                      onChange={(value) => {
-                        setFieldValue("isAdmin", value);
-                      }}
-                    ></Toggle>
-                  </View>
-                </Layout>
+                  ></Toggle>
+                </View>
+
                 <View
                   style={{ marginTop: 40, width: "100%", alignItems: "center" }}
                 >
-                  <Button
-                    style={styles.modalButton}
-                    size="large"
-                    onPress={handleSubmit}
-                  >
+                  <LinearGradientButton onPress={handleSubmit}>
                     I'm done
-                  </Button>
+                  </LinearGradientButton>
+                  <View style={{ height: 15 }} />
                   {!isEdit && (
-                    <Button
-                      style={styles.modalButton}
-                      size="large"
+                    <LinearGradientButton
+                      gradient={["#EC5ADD", Colors.primary]}
                       onPress={async () => {
                         if (isValid) {
                           isEdit
@@ -321,25 +310,17 @@ const EditOrgInstructorsModal = ({
                       }}
                     >
                       Add one more
-                    </Button>
+                    </LinearGradientButton>
                   )}
+
                   {isEdit && (
-                    <Button
-                      style={styles.modalButton}
-                      size="large"
-                      onPress={handleDelete}
-                    >
-                      {/* instructorId */}
+                    <LinearGradientButton onPress={handleDelete}>
                       Delete
-                    </Button>
+                    </LinearGradientButton>
                   )}
-                  <Button
-                    style={styles.modalButton}
-                    size="large"
-                    onPress={() => setVisible(false, null)}
-                  >
-                    Cancel
-                  </Button>
+                  <TouchableOpacity onPress={() => setVisible(false, null)}>
+                    <Text style={styles.button}>Cancel</Text>
+                  </TouchableOpacity>
                 </View>
               </>
             )}
@@ -418,13 +399,16 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingTop: 5,
-    fontSize: 15,
-    color: Colors.white,
+    fontSize: 18,
+    color: Colors.primaryTint,
     borderRadius: 10,
+    marginVertical: 7,
   },
   errorText: {
-    fontSize: 13,
+    fontSize: 10,
     color: "red",
+    marginLeft: 10,
+    marginTop: 10,
   },
   modalButton: {
     width: "95%",
@@ -432,5 +416,18 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  textInput: {
+    marginTop: 10,
+    alignSelf: "center",
+    width: "95%",
+
+    borderRadius: 8,
+    elevation: 2,
+  },
+  inputLabels: {
+    color: Colors.black,
+    fontSize: 14,
+    marginBottom: 10,
   },
 });

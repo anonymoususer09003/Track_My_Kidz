@@ -524,235 +524,131 @@ const HomeScreen = () => {
               ))}
           </Select>
         )}
-        {
-          thumbnail ? (
-            <>
-              {children.length == 0 && (
-                <View
-                  style={{
-                    minHeight: 50,
-                    width: "95%",
-                    marginTop: 5,
-                    alignSelf: "center",
-                  }}
-                >
-                  <View style={styles.buttonText}>
-                    <LinearGradientButton
-                      style={{
-                        borderRadius: 25,
-                        flex: 1,
-                      }}
-                      appearance="ghost"
-                      size="medium"
-                      status="control"
-                      onPress={() => {
-                        dispatch(
-                          ChangeModalState.action({
-                            addStudentModal: true,
-                          })
-                        );
-                      }}
-                    >
-                      Click here to add a child's profile
-                    </LinearGradientButton>
-                  </View>
-                </View>
-                // <TouchableOpacity
-                //   onPress={() => {
-                //     dispatch(
-                //       ChangeModalState.action({
-                //         addStudentModal: true,
-                //       })
-                //     );
-                //   }}
-                // >
-                //   <Text
-                //     style={{
-                //       fontSize: 16,
-                //       textAlign: "center",
-                //       marginTop: 20,
-                //       color: Colors.primary,
-                //     }}
-                //   >
-                //     Click here to add a child's profile
-                //   </Text>
-                // </TouchableOpacity>
-              )}
-
-              <FlatList
-                data={children}
-                style={{ padding: 10, width: "100%" }}
-                renderItem={({ item, index }) => (
-                  <Swipeable
-                    ref={(ref) => (row[index] = ref)}
-                    onSwipeableOpen={() => closeRow(index)}
-                    renderRightActions={(e) => RightActions(e, item, index)}
-                  >
-                    {/* {console.log("chidldren0000000", item.studentId + item.email)} */}
-                    <TouchableOpacity
-                      style={[
-                        styles.item,
-                        {
-                          backgroundColor: !item.approve
-                            ? "#fff"
-                            : index % 3 === 0
-                            ? "lightgreen"
-                            : index % 2 === 0
-                            ? "#F6DDCC"
-                            : "#fff",
-                        },
-                      ]}
-                      onPress={() => {
-                        _dispatch({
-                          type: actions.SET_SELECTED_CHILD,
-                          payload: item,
-                        });
-                        navigation.navigate("Activity", {
-                          dependent: item,
-                        });
-                      }}
-                    >
-                      <View
-                        style={[
-                          styles.row,
-                          { justifyContent: "space-between" },
-                        ]}
-                      >
-                        <Text
-                          style={[styles.text, { fontWeight: "600" }]}
-                        >{`${item.firstname} ${item.lastname}`}</Text>
-                      </View>
-                      <Text style={styles.text}>{`${
-                        (!!item.chidlSchool && item.childSchool) || ""
-                      }`}</Text>
-
-                      {item?.status ? (
-                        <Text
-                          style={styles.text}
-                        >{`Status: ${item.status}`}</Text>
-                      ) : (
-                        <Text style={styles.text}>{`Status: No Activity`}</Text>
-                      )}
-                    </TouchableOpacity>
-                  </Swipeable>
-                )}
-              />
-
-              {false && children.length > 0 && activities.length == 0 && (
-                <TouchableOpacity
-                  onPress={() => {
-                    dispatch(
-                      ChangeModalState.action({
-                        addStudentModal: true,
-                      })
-                    );
-                  }}
-                >
-                  <Text
+        {thumbnail ? (
+          <View style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}>
+            {children.length == 0 && (
+              <View
+                style={{
+                  minHeight: 50,
+                  width: "95%",
+                  marginTop: 5,
+                  alignSelf: "center",
+                }}
+              >
+                <View style={styles.buttonText}>
+                  <LinearGradientButton
                     style={{
-                      fontSize: 16,
-                      textAlign: "center",
-                      marginTop: 20,
-                      color: Colors.primary,
+                      borderRadius: 25,
+                      flex: 1,
+                    }}
+                    appearance="ghost"
+                    size="medium"
+                    status="control"
+                    onPress={() => {
+                      dispatch(
+                        ChangeModalState.action({
+                          addStudentModal: true,
+                        })
+                      );
                     }}
                   >
-                    You don't have any activities approved for any dependant
-                  </Text>
-                </TouchableOpacity>
+                    Click here to add a child's profile
+                  </LinearGradientButton>
+                </View>
+              </View>
+            )}
+
+            <FlatList
+              data={children}
+              style={{ padding: 10, width: "100%" }}
+              renderItem={({ item, index }) => (
+                <Swipeable
+                  ref={(ref) => (row[index] = ref)}
+                  onSwipeableOpen={() => closeRow(index)}
+                  renderRightActions={(e) => RightActions(e, item, index)}
+                >
+                  {/* {console.log("chidldren0000000", item.studentId + item.email)} */}
+                  <TouchableOpacity
+                    style={[
+                      styles.item,
+                      {
+                        backgroundColor: !item.approve
+                          ? "#fff"
+                          : index % 3 === 0
+                          ? "lightgreen"
+                          : index % 2 === 0
+                          ? "#F6DDCC"
+                          : "#fff",
+                      },
+                    ]}
+                    onPress={() => {
+                      _dispatch({
+                        type: actions.SET_SELECTED_CHILD,
+                        payload: item,
+                      });
+                      navigation.navigate("Activity", {
+                        dependent: item,
+                      });
+                    }}
+                  >
+                    <View
+                      style={[styles.row, { justifyContent: "space-between" }]}
+                    >
+                      <Text
+                        style={[styles.text, { fontWeight: "600" }]}
+                      >{`${item.firstname} ${item.lastname}`}</Text>
+                    </View>
+                    <Text style={styles.text}>{`${
+                      (!!item.chidlSchool && item.childSchool) || ""
+                    }`}</Text>
+
+                    {item?.status ? (
+                      <Text
+                        style={styles.text}
+                      >{`Status: ${item.status}`}</Text>
+                    ) : (
+                      <Text style={styles.text}>{`Status: No Activity`}</Text>
+                    )}
+                  </TouchableOpacity>
+                </Swipeable>
               )}
+            />
+          </View>
+        ) : (
+          <MapView
+            ref={ref}
+            onLayout={() => {
+              let temp = studentsEmails.filter((item) => item.latitude != null);
 
-              {/* {console.log(activities)} */}
-            </>
-          ) : (
-            <MapView
-              ref={ref}
-              // onRegionChange={(region) => setRegion(region)}
-              // zoomEnabled
-              // region={region}
-              // initialRegion={{
-              //   latitude: children[0]?.latitude
-              //     ? parseFloat(children[0]?.latitude)
-              //     : parseFloat(10),
-              //   longitude: children[0]?.longititude
-              //     ? parseFloat(children[0]?.longititude)
-              //     : parseFloat(10),
-              //   latitudeDelta: 0.0922 + width / height,
-              //   longitudeDelta: 0.0421,
-              // }}
-              onLayout={() => {
-                let temp = studentsEmails.filter(
-                  (item) => item.latitude != null
-                );
+              ref?.current?.fitToCoordinates(temp, {
+                edgePadding: {
+                  top: 10,
+                  right: 10,
+                  bottom: 10,
+                  left: 10,
+                },
+                animated: true,
+              });
+            }}
+            style={{ flex: 1 }}
+          >
+            {console.log("children", children)}
+            {children
+              .filter(
+                (item) =>
+                  trackingList[item.childDevice]?.lat != "undefined" &&
+                  trackingList[item.childDevice]?.lat != null
+              )
+              .map((item, index) => {
+                let latitude = trackingList[item.childDevice]?.lat;
+                let longititude = trackingList[item.childDevice]?.lang;
 
-                ref?.current?.fitToCoordinates(temp, {
-                  edgePadding: {
-                    top: 10,
-                    right: 10,
-                    bottom: 10,
-                    left: 10,
-                  },
-                  animated: true,
-                });
-              }}
-              style={{ flex: 1 }}
-            >
-              {console.log("children", children)}
-              {children
-                .filter(
-                  (item) =>
-                    trackingList[item.childDevice]?.lat != "undefined" &&
-                    trackingList[item.childDevice]?.lat != null
-                )
-                .map((item, index) => {
-                  let latitude = trackingList[item.childDevice]?.lat;
-                  let longititude = trackingList[item.childDevice]?.lang;
-
-                  return (
-                    <>
-                      {item?.toggleAlert && (
-                        <Circle
-                          key={index}
-                          center={{
-                            latitude: latitude
-                              ? parseFloat(latitude)
-                              : parseFloat(10),
-                            longitude: longititude
-                              ? parseFloat(longititude)
-                              : parseFloat(10),
-                            // latitude: parentLatLong?.location[0]?.parentLat
-                            //   ? parseFloat(parentLatLong?.location[0]?.parentLat)
-                            //   : parseFloat(10),
-                            // longitude: parentLatLong?.location[0]?.parentLong
-                            //   ? parseFloat(parentLatLong?.location[0]?.parentLong)
-                            //   : parseFloat(10),
-                          }}
-                          radius={item?.allowedDistance || 50}
-                          strokeWidth={10}
-                          strokeColor={"red"}
-                          fillColor={"rgba(230,238,255,0.5)"}
-                        />
-                      )}
-
-                      <Marker
-                        onSelect={() => console.log("pressed")}
-                        onPress={() => {
-                          ref.current.fitToSuppliedMarkers(
-                            [
-                              {
-                                latitude: latitude
-                                  ? parseFloat(latitude)
-                                  : parseFloat(10),
-                                longitude: longititude
-                                  ? parseFloat(longititude)
-                                  : parseFloat(10),
-                              },
-                            ]
-                            // false, // not animated
-                          );
-                        }}
-                        identifier={item?.email}
+                return (
+                  <>
+                    {item?.toggleAlert && (
+                      <Circle
                         key={index}
-                        coordinate={{
+                        center={{
                           latitude: latitude
                             ? parseFloat(latitude)
                             : parseFloat(10),
@@ -760,156 +656,98 @@ const HomeScreen = () => {
                             ? parseFloat(longititude)
                             : parseFloat(10),
                         }}
-                      >
-                        <View style={{}}>
-                          <View
-                            style={{
-                              height: 30,
-                              width: 30,
-                              borderRadius: 80,
-                              overflow: "hidden",
-                              // top: 33,
-                              // zIndex: 10,
-                            }}
-                          >
-                            {item?.studentImage == "" && (
-                              <View
-                                style={{
-                                  height: "100%",
-                                  width: "100%",
-                                  borderRadius: 80,
-                                  backgroundColor: Colors.primary,
-                                  justifyContent: "center",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Text style={{ color: Colors.white }}>
-                                  {item?.firstname
-                                    ?.substring(0, 1)
-                                    ?.toUpperCase() || ""}
-                                  {item?.lastname
-                                    ?.substring(0, 1)
-                                    ?.toUpperCase() || ""}
-                                </Text>
-                              </View>
-                            )}
-                            {item?.studentImage != "" && (
-                              <Image
-                                source={{
-                                  uri: item?.studentImage,
-                                }}
-                                style={{
-                                  height: "100%",
-                                  width: "100%",
-                                  borderRadius: 80,
-                                  aspectRatio: 1.5,
-                                }}
-                                resizeMode="contain"
-                              />
-                            )}
-                          </View>
-                          {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
-                        </View>
-                        {/* <TouchableOpacity
-                          onPress={() => console.log("pressed")}
-                          style={{ alignItems: "center" }}
-                        >
-                          <Text>{item?.firstname}</Text>
-                          <Text style={{ marginBottom: 2 }}>
-                            {item?.lastname}
-                          </Text>
-                          <Fontisto
-                            name="map-marker-alt"
-                            size={25}
-                            color="red"
-                          />
-                        </TouchableOpacity> */}
-                      </Marker>
-                    </>
-                    // </>
-                    // </Circle>
-                  );
-                })}
-            </MapView>
-          )
-          // ) : (
-          //   <MapView
-          //     ref={ref}
-          //     initialRegion={{
-          //       latitude: 37.78825,
-          //       longitude: -122.4324,
-          //       latitudeDelta: 0.0922 + width / height,
-          //       longitudeDelta: 0.0421,
-          //     }}
-          //     style={{ width: "100%", height: "100%" }}
-          //   >
-          //     {children.map((item, index) => {
-          //       // console.log("item", item);
-          //       return (
-          //         <View style={{ flex: 1 }}>
-          //           {true && (
-          //             <Circle
-          //               key={index}
-          //               center={{
-          //                 latitude: parentLatLong?.location[0]?.parentLat
-          //                   ? parseFloat(parentLatLong?.location[0]?.parentLat)
-          //                   : parseFloat(10),
-          //                 longitude: parentLatLong?.location[0]?.parentLong
-          //                   ? parseFloat(parentLatLong?.location[0]?.parentLong)
-          //                   : parseFloat(10),
-          //               }}
-          //               radius={item?.allowedDistance || 100}
-          //               strokeWidth={2}
-          //               strokeColor={"#1a66ff"}
-          //               fillColor={"rgba(230,238,255,0.5)"}
-          //             />
-          //           )}
+                        radius={item?.allowedDistance || 50}
+                        strokeWidth={10}
+                        strokeColor={"red"}
+                        fillColor={"rgba(230,238,255,0.5)"}
+                      />
+                    )}
 
-          //           <Marker
-          //             onSelect={() => console.log("pressed")}
-          //             onPress={() => {
-          //               console.log("ref", ref);
-          //               ref.current.fitToSuppliedMarkers(
-          //                 [
-          //                   {
-          //                     latitude: item?.latitude
-          //                       ? parseFloat(item?.latitude)
-          //                       : parseFloat(10),
-          //                     longitude: item?.longititude
-          //                       ? parseFloat(item?.longititude)
-          //                       : parseFloat(10),
-          //                   },
-          //                 ]
-          //                 // false, // not animated
-          //               );
-          //             }}
-          //             key={index}
-          //             coordinate={{
-          //               latitude: item?.latitude
-          //                 ? parseFloat(item?.latitude)
-          //                 : parseFloat(10),
-          //               longitude: item?.longititude
-          //                 ? parseFloat(item?.longititude)
-          //                 : parseFloat(10),
-          //             }}
-          //           >
-          //             <TouchableOpacity
-          //               onPress={() => console.log("pressed")}
-          //               style={{ alignItems: "center" }}
-          //             >
-          //               <Text>{item?.firstname}</Text>
-          //               <Text style={{ marginBottom: 2 }}>{item?.lastname}</Text>
-          //               <Fontisto name="map-marker-alt" size={25} color="red" />
-          //             </TouchableOpacity>
-          //           </Marker>
-          //         </View>
-          //         // </>
-          //         // </Circle>
-          //       );
-          //     })}
-          //   </MapView>
-          // )
-        }
+                    <Marker
+                      onSelect={() => console.log("pressed")}
+                      onPress={() => {
+                        ref.current.fitToSuppliedMarkers(
+                          [
+                            {
+                              latitude: latitude
+                                ? parseFloat(latitude)
+                                : parseFloat(10),
+                              longitude: longititude
+                                ? parseFloat(longititude)
+                                : parseFloat(10),
+                            },
+                          ]
+                          // false, // not animated
+                        );
+                      }}
+                      identifier={item?.email}
+                      key={index}
+                      coordinate={{
+                        latitude: latitude
+                          ? parseFloat(latitude)
+                          : parseFloat(10),
+                        longitude: longititude
+                          ? parseFloat(longititude)
+                          : parseFloat(10),
+                      }}
+                    >
+                      <View style={{}}>
+                        <View
+                          style={{
+                            height: 30,
+                            width: 30,
+                            borderRadius: 80,
+                            overflow: "hidden",
+                            // top: 33,
+                            // zIndex: 10,
+                          }}
+                        >
+                          {item?.studentImage == "" && (
+                            <View
+                              style={{
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: 80,
+                                backgroundColor: Colors.primary,
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Text style={{ color: Colors.white }}>
+                                {item?.firstname
+                                  ?.substring(0, 1)
+                                  ?.toUpperCase() || ""}
+                                {item?.lastname
+                                  ?.substring(0, 1)
+                                  ?.toUpperCase() || ""}
+                              </Text>
+                            </View>
+                          )}
+                          {item?.studentImage != "" && (
+                            <Image
+                              source={{
+                                uri: item?.studentImage,
+                              }}
+                              style={{
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: 80,
+                                aspectRatio: 1.5,
+                              }}
+                              resizeMode="contain"
+                            />
+                          )}
+                        </View>
+                        {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+                      </View>
+                    </Marker>
+                  </>
+                  // </>
+                  // </Circle>
+                );
+              })}
+          </MapView>
+        )}
       </View>
     </>
   );
@@ -921,6 +759,7 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
   },
   item: {
     borderRadius: 10,

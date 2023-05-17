@@ -28,6 +28,7 @@ const ActivityNavigator = ({ route }) => {
   const TopTabBar = ({ navigation, state, navRoutes }) => {
     return (
       <TabBar
+        style={{ backgroundColor: Colors.newBackgroundColor }}
         selectedIndex={state.index}
         indicatorStyle={{ display: "none" }}
         onSelect={(index) => navigation.navigate(state.routeNames[index])}

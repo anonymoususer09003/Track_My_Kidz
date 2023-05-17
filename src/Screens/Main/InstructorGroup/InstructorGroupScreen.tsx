@@ -319,71 +319,70 @@ const InstructorGroupScreen = ({ route }) => {
           justifyContent: "center",
         }}
       >
-        {true && (
-          <View
+        <View
+          style={{
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <TouchableOpacity
             style={{
-              flexDirection: "column",
+              padding: 5,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onPress={() => {
+              prevOpenedRow?.close();
+              dispatch(
+                ChangeModalState.action({
+                  requestPermissionModalGroupVisibility: true,
+                })
+              );
+              setSelectedActivity(item);
+            }}
+          >
+            <FontAwesome5 size={25} name="reply-all" color={Colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              padding: 5,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onPress={() => {
+              prevOpenedRow?.close();
+              navigation.navigate("CreateActivity", {
+                groupId: item?.groupId,
+              });
+            }}
+          >
+            <MaterialCommunity
+              size={25}
+              color={Colors.primary}
+              name="timetable"
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              prevOpenedRow?.close();
+              navigation.navigate("CreateGroup", {
+                data: item,
+              });
+            }}
+            style={{
+              padding: 5,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <TouchableOpacity
-              style={{
-                padding: 5,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              onPress={() => {
-                prevOpenedRow?.close();
-                dispatch(
-                  ChangeModalState.action({
-                    requestPermissionModalGroupVisibility: true,
-                  })
-                );
-                setSelectedActivity(item);
-              }}
-            >
-              <FontAwesome5 size={25} name="reply-all" color={Colors.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                padding: 5,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              onPress={() => {
-                prevOpenedRow?.close();
-                navigation.navigate("CreateActivity", {
-                  groupId: item?.groupId,
-                });
-              }}
-            >
-              <MaterialCommunity
-                size={25}
-                color={Colors.primary}
-                name="timetable"
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                prevOpenedRow?.close();
-                navigation.navigate("CreateGroup", {
-                  data: item,
-                });
-              }}
-              style={{
-                padding: 5,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Icon
-                style={{ width: 25, height: 25 }}
-                fill={Colors.primary}
-                name="edit-2"
-              />
-            </TouchableOpacity>
-            {/* <TouchableOpacity
+            <Icon
+              style={{ width: 25, height: 25 }}
+              fill={Colors.primary}
+              name="edit-2"
+            />
+          </TouchableOpacity>
+          {/* <TouchableOpacity
               style={{
                 padding: 5,
                 alignItems: "center",
@@ -395,9 +394,8 @@ const InstructorGroupScreen = ({ route }) => {
                 fill={Colors.primary}
                 name="trash"
               /> */}
-            {/* </TouchableOpacity> */}
-          </View>
-        )}
+          {/* </TouchableOpacity> */}
+        </View>
 
         <TouchableOpacity
           onPress={() => {
@@ -661,65 +659,6 @@ const InstructorGroupScreen = ({ route }) => {
         />
       )}
       <View style={styles.layout}>
-        {/* <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Input
-            //@ts-ignore
-            value={searchParam}
-            style={{
-              width: user?.isAdmin ? "45%" : "90%",
-              marginTop: 10,
-              marginLeft: user && user?.isAdmin ? "0%" : 10,
-            }}
-            placeholder="Search"
-            accessoryLeft={renderIcon}
-            onChangeText={(nextValue) => {
-              //@ts-ignore
-              // search(nextValue);
-              setSearchParam(nextValue);
-            }}
-          />
-
-          {user?.isAdmin && (
-            <Select
-              style={{ width: "50%", marginTop: -10 }}
-              value={selectedGroup}
-              placeholder="Select Name"
-              onSelect={(index: any) => {
-                if (index.row === 0) {
-                  setSelectedInstructor(null);
-                  setSelectedInstructorGroup(null);
-                } else {
-                  setSelectedInstructor(
-                    instructors?.result[index.row]?.firstname +
-                      " " +
-                      instructors?.result[index.row]?.lastname
-                  );
-                  getGroupByInstructor(
-                    instructors?.result[index.row]?.instructorId
-                  );
-                }
-              }}
-              label={(evaProps: any) => <Text {...evaProps}></Text>}
-            >
-              <SelectItem title="All" />
-              {instructors &&
-                instructors?.result &&
-                instructors?.result?.map((item) => (
-                  <SelectItem
-                    key={item?.instructorId}
-                    title={item?.firstname + " " + item?.lastname}
-                  />
-                ))}
-            </Select>
-          )}
-        </View> */}
-
         {groups.length == 0 && (
           <Text style={{ textAlign: "center", marginTop: 5 }}>
             You currently do not have any groups
@@ -746,7 +685,15 @@ const InstructorGroupScreen = ({ route }) => {
                 onSwipeableOpen={() => closeRow(index)}
                 renderRightActions={(e) => RightActions(e, item)}
               >
-                <View style={[styles.item, { backgroundColor: "#fff" }]}>
+                <View
+                  style={[
+                    styles.item,
+                    {
+                      backgroundColor: "#fff",
+                      marginBottom: index + 1 == groups.length ? 50 : 0,
+                    },
+                  ]}
+                >
                   <Text
                     style={[
                       styles.text,

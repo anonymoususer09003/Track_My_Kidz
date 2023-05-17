@@ -344,27 +344,18 @@ const InstructorActivityModal = ({
             <Entypo size={30} color={Colors.primary} name="circle-with-cross" />
             <Text style={styles.textStyle}>End Activity</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.buttonStyle,
-              {
-                marginTop: 10,
-                backgroundColor: Colors.primary,
-                justifyContent: "center",
-                paddingLeft: 0,
-              },
-            ]}
-            onPress={() => {
-              if (prevOpenedRow) {
-                prevOpenedRow?.close();
-              }
-              hide();
-            }}
-          >
-            {/* <Feather size={25} color={Colors.primary} name="copy" /> */}
-            <Text style={styles.textStyle}>Close</Text>
-          </TouchableOpacity>
+          <View style={{ width: "100%" }}>
+            <LinearGradientButton
+              onPress={() => {
+                if (prevOpenedRow) {
+                  prevOpenedRow?.close();
+                }
+                hide();
+              }}
+            >
+              Close
+            </LinearGradientButton>
+          </View>
         </View>
       </Card>
     </Modal>
@@ -379,8 +370,10 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     width: "90%",
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 10,
   },
-  modal: { borderRadius: 10 },
+  modal: { borderRadius: 10, backgroundColor: Colors.newBackgroundColor },
   header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
   body: { flex: 3 },
   background: {
@@ -424,8 +417,8 @@ const styles = StyleSheet.create({
     width: "75%",
     // backgroundColor: "red",
     textAlign: "center",
-    color: Colors.white,
-    fontWeight: "bold",
+    color: Colors.black,
+    fontWeight: "600",
   },
   buttonStyle: {
     padding: 5,
@@ -434,11 +427,12 @@ const styles = StyleSheet.create({
     //   padding: 5,
     width: "100%",
     height: 50,
-    backgroundColor: Colors.tintgray,
-    borderRadius: 4,
+    backgroundColor: Colors.white,
+    borderRadius: 10,
     flexDirection: "row",
     paddingLeft: 20,
     marginBottom: 10,
+    elevation: 1.5,
   },
   backdrop: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",

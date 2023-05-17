@@ -322,7 +322,7 @@ const RequestPermissionModal = ({}) => {
             accessoryRight={RightDrawerAction}
           />
         </View>
-        <View style={{ flex: 1, backgroundColor: Colors.white }}>
+        <View style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}>
           <View style={styles.layout}>
             {/* <View
               style={{
@@ -388,7 +388,11 @@ const RequestPermissionModal = ({}) => {
                   <CheckBox checked={selectAll} onChange={handleSelectAll}>
                     {""}
                   </CheckBox>
-                  <Text style={{ marginLeft: 10 }}>Select All</Text>
+                  <Text
+                    style={{ marginLeft: 10, fontSize: 13, fontWeight: "bold" }}
+                  >
+                    Select All
+                  </Text>
                 </View>
               )}
               <View style={{ marginTop: 10, maxHeight: 250 }}>
@@ -462,7 +466,7 @@ const RequestPermissionModal = ({}) => {
                             style={{ marginHorizontal: 5 }}
                           />
                           <Text
-                            style={{ marginLeft: 5 }}
+                            style={{ marginLeft: 5, fontSize: 13 }}
                           >{`${item.firstName} ${item.lastName}`}</Text>
                         </View>
                         <CheckBox
@@ -493,7 +497,7 @@ const RequestPermissionModal = ({}) => {
             )}
             {selectedStatus !== "approved" && (
               <View style={{ marginVertical: 5 }}>
-                <Text style={{ textAlign: "center" }}>
+                <Text style={{ textAlign: "center", fontSize: 13 }}>
                   These are yet to respond to your invitation. Select to resend
                   permission request
                 </Text>
@@ -501,60 +505,38 @@ const RequestPermissionModal = ({}) => {
             )}
             <View style={styles.buttonSettings}>
               {selectedStatus !== "approved" && (
-                <View
-                  style={[
-                    styles.bottomButton,
-                    {
-                      backgroundColor:
-                        students?.filter((i) => i.selected).length === 0 &&
-                        instructors?.filter((i) => i.selected).length === 0
-                          ? Colors.lightgray
-                          : Colors.primary,
-                    },
-                  ]}
+                <LinearGradientButton
+                  disabled={
+                    students?.filter((i) => i.selected).length === 0 &&
+                    instructors?.filter((i) => i.selected).length === 0
+                  }
+                  onPress={handleSubmit}
                 >
-                  <TouchableOpacity
-                    style={[
-                      styles.bottomButton,
-                      {
-                        backgroundColor:
-                          students?.filter((i) => i.selected == true).length ===
-                            0 &&
-                          instructors?.filter((i) => i.selected == true)
-                            .length === 0
-                            ? Colors.lightgray
-                            : Colors.primary,
-                      },
-                    ]}
-                    disabled={
-                      students?.filter((i) => i.selected).length === 0 &&
-                      instructors?.filter((i) => i.selected).length === 0
-                    }
-                    onPress={handleSubmit}
-                  >
-                    <Text style={styles.button}>Resend Permission Request</Text>
-                  </TouchableOpacity>
-                </View>
+                  Resend Permission Request
+                </LinearGradientButton>
               )}
-              <View style={styles.bottomButton}>
-                <TouchableOpacity
-                  style={styles.bottomButton}
-                  onPress={() => {
-                    dispatch(
-                      ChangeModalState.action({
-                        requestPermissionModalVisibility: false,
-                      })
-                    );
-                    setSelectAll(false);
-                    _dispatch({
-                      type: actions.SET_SELECTED_ACTIVITY,
-                      payload: null,
-                    });
-                  }}
-                >
-                  <Text style={styles.button}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
+              <View style={{ marginTop: 15 }} />
+              <LinearGradientButton
+                gradient={["#EC5ADD", Colors.primary]}
+                disabled={
+                  students?.filter((i) => i.selected).length === 0 &&
+                  instructors?.filter((i) => i.selected).length === 0
+                }
+                onPress={() => {
+                  dispatch(
+                    ChangeModalState.action({
+                      requestPermissionModalVisibility: false,
+                    })
+                  );
+                  setSelectAll(false);
+                  _dispatch({
+                    type: actions.SET_SELECTED_ACTIVITY,
+                    payload: null,
+                  });
+                }}
+              >
+                Cancel
+              </LinearGradientButton>
             </View>
           </View>
         </View>
@@ -653,5 +635,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     marginBottom: 10,
+    width: "90%",
+    alignSelf: "center",
   },
 });

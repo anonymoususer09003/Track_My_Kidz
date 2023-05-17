@@ -23,6 +23,7 @@ import FastImage from "react-native-fast-image";
 import Colors from "@/Theme/Colors";
 import { GetActivationCode } from "@/Services/ActivationCode";
 import { ChangePassword } from "@/Services/LoginServices";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 // @ts-ignore
 const ForgotPasswordScreen = ({ navigation }) => {
   const styles = useStyleSheet(themedStyles);
@@ -40,190 +41,142 @@ const ForgotPasswordScreen = ({ navigation }) => {
     navigation && navigation.navigate("Login");
   };
   // @ts-ignore
-  const renderPersonIcon = (props: any) => (
-    <Icon {...props} name="person-outline" />
-  );
+
   const forgotPassValidationSchema = yup.object().shape({
     email: yup
       .string()
       .email("Please enter valid email")
       .required("Email is required"),
   });
-
+  const renderPersonIcon = (props: any) => (
+    <Image
+      source={require("@/Assets/Images/email.png")}
+      style={{ height: 20, width: 20 }}
+      resizeMode="contain"
+    />
+  );
   return (
-    <KeyboardAvoidingView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Image
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            maxHeight: Normalize(160),
-            maxWidth: Normalize(160),
-          }}
-          source={require("@/Assets/Images/new-logo.png")}
-          resizeMode="contain"
-        />
-      </View>
-      <Formik
-        validationSchema={forgotPassValidationSchema}
-        validateOnMount={true}
-        initialValues={{ email: "", user_type: "" }}
-        onSubmit={(values, { resetForm }) => {
-          let resetPasswordObject = {
-            email: values.email,
-            type: values.user_type.toLowerCase(),
-            // activationNumber: values.activationCode,
-            // password: values.password,
-          };
-          dispatch(ChangeModalState.action({ loading: true }));
-          ChangePassword(resetPasswordObject)
-            .then((response) => {
-              console.log("response", response.data);
+    <BackgroundLayout>
+      <KeyboardAvoidingView style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Image
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              maxHeight: Normalize(160),
+              maxWidth: Normalize(160),
+            }}
+            source={require("@/Assets/Images/logo1.png")}
+            resizeMode="contain"
+          />
 
-              navigation.navigate("ResetPassword", {
-                emailAddress: values.email,
-                user_type: values.user_type,
+          <Text style={styles.logoText}>Forgot Password</Text>
+        </View>
+
+        <Formik
+          validationSchema={forgotPassValidationSchema}
+          validateOnMount={true}
+          initialValues={{ email: "", user_type: "" }}
+          onSubmit={(values, { resetForm }) => {
+            let resetPasswordObject = {
+              email: values.email,
+              type: values.user_type.toLowerCase(),
+              // activationNumber: values.activationCode,
+              // password: values.password,
+            };
+            dispatch(ChangeModalState.action({ loading: true }));
+            ChangePassword(resetPasswordObject)
+              .then((response) => {
+                console.log("response", response.data);
+
+                navigation.navigate("ResetPassword", {
+                  emailAddress: values.email,
+                  user_type: values.user_type,
+                });
+              })
+              .finally(() => {
+                dispatch(ChangeModalState.action({ loading: false }));
               });
-            })
-            .finally(() => {
-              dispatch(ChangeModalState.action({ loading: false }));
-            });
-
-          // GetActivationCode({ email: values.email }, values.user_type)
-          //   .then((res) => {
-          //     console.log("res----", res);
-          //     // navigation.navigate("EmailConfirmation", {
-          //     //   emailAddress: values.email,
-          //     //   user_type: values.user_type,
-          //     // });
-          //     navigation.navigate("ResetPassword", {
-          //       emailAddress: values.email,
-          //       user_type: values.user_type,
-          //       code: res?.activation_code,
-          //     });
-          //     // setActivationCode(res?.activation_code);
-          //   })
-          //   .catch((err) => {
-          //     console.log("err", err);
-          //     Toast.show({
-          //       type: "info",
-          //       position: "top",
-          //       text1: "Info",
-          //       text2: "Please check your email address and try again ",
-          //       visibilityTime: 4000,
-          //       autoHide: true,
-          //       topOffset: 30,
-          //       bottomOffset: 40,
-          //       onShow: () => {},
-          //       onHide: () => {},
-          //       onPress: () => {},
-          //     });
-          //   })
-          //   .finally(() => {
-          //     dispatch(ChangeModalState.action({ loading: false }));
-          //   });
-          // ForgotPassword(emailObject)
-          //   .then((response: any) => {
-          //     if (response.status == 200) {
-          //       navigation.navigate("ResetPassword", {
-          //         emailAddress: values.email,
-          //       });
-          //     }
-          //   })
-          //   .catch((err) => {
-          //     Toast.show({
-          //       type: "info",
-          //       position: "top",
-          //       text1: "Info",
-          //       text2: "Please check your email address and try again ",
-          //       visibilityTime: 4000,
-          //       autoHide: true,
-          //       topOffset: 30,
-          //       bottomOffset: 40,
-          //       onShow: () => {},
-          //       onHide: () => {},
-          //       onPress: () => {},
-          //     });
-          //   })
-          //   .finally(() => {
-          //     dispatch(ChangeModalState.action({ loading: false }));
-          //   });
-          // resetForm();
-        }}
-      >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          setFieldValue,
-          values,
-          errors,
-          touched,
-          isValid,
-        }) => (
-          <>
-            <Layout style={styles.formContainer}>
-              <Select
-                style={{ marginBottom: 18 }}
-                value={values.user_type}
-                placeholder="Select User"
-                onSelect={(index: any) => {
-                  setFieldValue("user_type", user_type[index.row].value);
-                  setSelectedUserType(user_type[index.row].value);
-                }}
-                label={(evaProps: any) => <Text {...evaProps}></Text>}
-              >
-                {user_type.map((type, index) => {
-                  return <SelectItem key={index} title={type?.label} />;
-                })}
-              </Select>
-              <Input
-                placeholder="Email"
-                autoCapitalize="none"
-                autoCorrect={false}
-                accessoryRight={renderPersonIcon}
-                onChangeText={handleChange("email")}
-                onBlur={handleBlur("email")}
-                value={values.email}
-                keyboardType="email-address"
-              />
-              {errors.email && touched.email && (
-                <Text style={styles.errorText}>{errors.email}</Text>
-              )}
-              <View style={styles.resetButtonContainer}>
-                <LinearGradientButton
-                  style={styles.resetButton}
-                  appearance="filled"
-                  size="medium"
-                  onPress={handleSubmit}
-                  disabled={!isValid}
+          }}
+        >
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            setFieldValue,
+            values,
+            errors,
+            touched,
+            isValid,
+          }) => (
+            <>
+              <Layout style={styles.formContainer}>
+                <Select
+                  style={{ marginBottom: 18 }}
+                  value={values.user_type}
+                  placeholder="Select User"
+                  onSelect={(index: any) => {
+                    setFieldValue("user_type", user_type[index.row].value);
+                    setSelectedUserType(user_type[index.row].value);
+                  }}
+                  label={(evaProps: any) => <Text {...evaProps}></Text>}
                 >
-                  Reset Password
-                </LinearGradientButton>
+                  {user_type.map((type, index) => {
+                    return <SelectItem key={index} title={type?.label} />;
+                  })}
+                </Select>
+                <Input
+                  textStyle={{ color: Colors.white }}
+                  style={styles.selectSettings}
+                  placeholderTextColor={Colors.white}
+                  placeholder="Email"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  accessoryLeft={renderPersonIcon}
+                  onChangeText={handleChange("email")}
+                  onBlur={handleBlur("email")}
+                  value={values.email}
+                  keyboardType="email-address"
+                />
+                {errors.email && touched.email && (
+                  <Text style={styles.errorText}>{errors.email}</Text>
+                )}
+                <View style={styles.resetButtonContainer}>
+                  <LinearGradientButton
+                    gradient={[Colors.secondaryTint, Colors.primaryLight]}
+                    style={styles.resetButton}
+                    appearance="filled"
+                    size="medium"
+                    onPress={handleSubmit}
+                    disabled={!isValid}
+                  >
+                    Reset Password
+                  </LinearGradientButton>
+                </View>
+              </Layout>
+              <View style={styles.bottomView}>
+                <Button
+                  appearance="ghost"
+                  status="basic"
+                  size="small"
+                  onPress={onLoginButtonPress}
+                >
+                  {() => <Text style={styles.buttonMessage}>Login</Text>}
+                </Button>
+                <Button
+                  appearance="ghost"
+                  status="basic"
+                  size="small"
+                  onPress={onSignUpButtonPress}
+                >
+                  {() => <Text style={styles.buttonMessage}>Sign Up</Text>}
+                </Button>
               </View>
-            </Layout>
-            <View style={styles.bottomView}>
-              <Button
-                appearance="ghost"
-                status="basic"
-                size="small"
-                onPress={onLoginButtonPress}
-              >
-                {() => <Text style={styles.buttonMessage}>Login</Text>}
-              </Button>
-              <Button
-                appearance="ghost"
-                status="basic"
-                size="small"
-                onPress={onSignUpButtonPress}
-              >
-                {() => <Text style={styles.buttonMessage}>Sign Up</Text>}
-              </Button>
-            </View>
-          </>
-        )}
-      </Formik>
-    </KeyboardAvoidingView>
+            </>
+          )}
+        </Formik>
+      </KeyboardAvoidingView>
+    </BackgroundLayout>
   );
 };
 export default ForgotPasswordScreen;
@@ -231,16 +184,17 @@ const themedStyles = StyleService.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: "background-basic-color-1",
   },
   headerContainer: {
-    marginTop: 10,
-    justifyContent: "flex-start",
-    alignItems: "center",
     flex: 1,
-    backgroundColor: "#fff",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 70,
   },
   formContainer: {
+    backgroundColor: "transparent",
+    paddingHorizontal: 20,
     // flex: 1,
   },
   welcomeMessage: {
@@ -266,7 +220,7 @@ const themedStyles = StyleService.create({
   },
 
   buttonMessage: {
-    color: Colors.primary,
+    color: Colors.white,
     fontSize: 17,
   },
 
@@ -276,5 +230,17 @@ const themedStyles = StyleService.create({
   errorText: {
     fontSize: 10,
     color: "red",
+  },
+  logoText: {
+    color: Colors.white,
+    fontSize: 30,
+  },
+  selectSettings: {
+    marginVertical: 15,
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.white,
+    color: Colors.white,
   },
 });

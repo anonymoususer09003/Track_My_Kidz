@@ -20,6 +20,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import AddInstructorFormModal from "./AddInstructorFormModal";
 import EditInstructorsModal from "./EditInstructorModal";
 import { Instructor } from "@/Models/UserDTOs";
+import { LinearGradientButton } from "@/Components";
 interface InstructorModal {
   instructors: Array<Instructor>;
   setInstructors: (data: Array<Instructor>) => {};
@@ -80,7 +81,7 @@ const AddInstructorsModal = ({
         <View
           style={{
             flex: 1,
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.newBackgroundColor,
             borderTopLeftRadius: 10,
             borderTopRightRadius: 10,
           }}
@@ -96,13 +97,15 @@ const AddInstructorsModal = ({
                 }}
               >
                 <View style={{ width: "93%" }}>
-                  <Text>{`Click the Plus button to add instructors. (Or use webapp for bulk import after registration)`}</Text>
+                  <Text
+                    style={{ fontSize: 14 }}
+                  >{`Click the Plus button to add instructors. (Or use webapp for bulk import after registration)`}</Text>
                 </View>
                 <AntDesign
                   name="pluscircle"
                   style={{ marginLeft: 10 }}
                   size={25}
-                  color={Colors.primary}
+                  color={Colors.secondaryDark}
                   onPress={() =>
                     dispatch(
                       ChangeModalState.action({
@@ -314,35 +317,31 @@ const AddInstructorsModal = ({
                 paddingHorizontal: "5%",
               }}
             >
-              <View style={styles.bottomButton}>
-                <TouchableOpacity
-                  style={styles.bottomButton}
-                  onPress={() => {
-                    dispatch(
-                      ChangeModalState.action({
-                        // previewInstructorModalVisibility: false,
-                        previewInstructorModalVisibility: true,
-                      })
-                    );
-                  }}
-                >
-                  <Text style={styles.button}>Preview</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.bottomButton}>
-                <TouchableOpacity
-                  style={styles.bottomButton}
-                  onPress={() => {
-                    dispatch(
-                      ChangeModalState.action({
-                        addInstructorModalVisibility: false,
-                      })
-                    );
-                  }}
-                >
-                  <Text style={styles.button}>I'll do it later</Text>
-                </TouchableOpacity>
-              </View>
+              <LinearGradientButton
+                gradient={[Colors.primaryLight, Colors.primary]}
+                onPress={() => {
+                  dispatch(
+                    ChangeModalState.action({
+                      // previewInstructorModalVisibility: false,
+                      previewInstructorModalVisibility: true,
+                    })
+                  );
+                }}
+              >
+                Preview
+              </LinearGradientButton>
+              <View style={{ marginVertical: 10 }} />
+              <LinearGradientButton
+                onPress={() => {
+                  dispatch(
+                    ChangeModalState.action({
+                      addInstructorModalVisibility: false,
+                    })
+                  );
+                }}
+              >
+                I'll do it later
+              </LinearGradientButton>
             </View>
           </View>
         </View>

@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Text, Input, TopNavigationAction, Icon } from "@ui-kitten/components";
-import { StyleSheet, View, TouchableOpacity, ScrollView,Dimensions } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Colors from "@/Theme/Colors";
 import { ModalState } from "@/Store/Modal";
@@ -10,6 +16,7 @@ import { CreateBus, PutBus } from "@/Services/BusConfiguration";
 import { UserState } from "@/Store/User";
 import FetchOne from "@/Services/User/FetchOne";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradientButton } from "@/Components";
 const PreviewBusInformation = ({
   isLongSeat,
   numberOfKidsLongSeat,
@@ -46,7 +53,7 @@ const PreviewBusInformation = ({
   activity?: any;
   selectedItem: any;
 }) => {
-  const deviceWidth = Dimensions.get("screen").width
+  const deviceWidth = Dimensions.get("screen").width;
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [rearSeats, setRearSeats] = useState([]);
@@ -122,20 +129,20 @@ const PreviewBusInformation = ({
         <View
           style={{
             flex: 1,
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.newBackgroundColor,
             borderTopLeftRadius: 10,
             borderTopRightRadius: 10,
           }}
         >
           <View style={styles.layout}>
-            <ScrollView style={{ flex: 1}}>
+            <ScrollView style={{ flex: 1 }}>
               <View horizontal style={{ flex: 1, paddingBottom: 5 }}>
                 <View
                   style={{
                     width: "100%",
                     alignSelf: "center",
                     flexDirection: "row",
-                    justifyContent:"space-between"
+                    justifyContent: "space-between",
                   }}
                 >
                   {isLongSeat &&
@@ -146,45 +153,55 @@ const PreviewBusInformation = ({
                           // alignItems: "center",
                           // justifyContent: "space-between",
                           // marginRight: 10,
-                        
                         }}
                       >
-                        <View style={{margin: 5,
-                        height:40,width:'12%',
-                        borderWidth:1,
-                        borderRadius:10,
+                        <View
+                          style={{
+                            margin: 5,
+                            height: 40,
+                            width: "12%",
+                            borderWidth: 1,
+                            borderRadius: 10,
                             borderColor: "#000",
-                            padding:20,
-                            backgroundColor:Colors.textInputBackgroundColor
-                            }}/>
-                    
+                            padding: 20,
+                            backgroundColor: Colors.textInputBackgroundColor,
+                          }}
+                        />
                       </View>
                     ))}
                 </View>
               </View>
 
               <View horizontal style={{ flex: 1, paddingBottom: 5 }}>
-                <View style={{ width: "100%"}}>
-                  {seats.map((item,index) => {
-                   let width='10%'
-                    return(
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      {item &&
-                        item?.length > 0 &&
-                        item.map((innerItem,index) => (
-                          
-                          <View style={{borderWidth:1,margin:3,width:width,height:40,borderRadius:10,
-                          backgroundColor:Colors.textInputBackgroundColor}}  >
-                            </View>
-                        ))}
-                    </View>
-                  )})}
+                <View style={{ width: "100%" }}>
+                  {seats.map((item, index) => {
+                    let width = "10%";
+                    return (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        {item &&
+                          item?.length > 0 &&
+                          item.map((innerItem, index) => (
+                            <View
+                              style={{
+                                elevation: 2,
+                                margin: 3,
+                                width: width,
+                                height: 40,
+                                borderRadius: 10,
+                                backgroundColor:
+                                  Colors.textInputBackgroundColor,
+                              }}
+                            ></View>
+                          ))}
+                      </View>
+                    );
+                  })}
                 </View>
               </View>
               <Text
@@ -193,29 +210,67 @@ const PreviewBusInformation = ({
                   fontWeight: "bold",
                   fontSize: 24,
                   alignSelf: "center",
-                  
                 }}
               >
                 Front
               </Text>
-              <View style={{height:70}}/>
+              <View style={{ height: 70 }} />
             </ScrollView>
             <View
               style={{
-                position: "absolute",
-                bottom: 30,
-                left: 0,
-                right: 0,
                 alignItems: "center",
-                width: "100%",
+                width: "90%",
+                alignSelf: "center",
               }}
             >
-              <View style={styles.bottomButton}>
-                <TouchableOpacity
-                  style={styles.bottomButton}
-                  onPress={() => {
-                    console.log({
+              <LinearGradientButton
+                onPress={() => {
+                  if (selectedItem) {
+                    PutBus({
                       id: selectedItem.busId,
+                      busName: busName,
+                      numberOfRows: numberOfRows,
+                      numberOfSeatsPerRow: numberOfSeatsPerRow,
+                      numberOfKidsPerSeat: numberOfKidsInRow,
+                      longSeat: isLongSeat,
+                      studentsOnLongSeat: numberOfKidsLongSeat,
+                      activityId: activity?.activityId || null,
+                      schoolId: currentUser?.schoolId || null,
+                      orgId: currentUser?.orgId || null,
+                      instructorId: currentUser?.instructorId || null,
+                    })
+                      .then((res) => {
+                        console.log(res.data);
+                        const data =
+                          buses && buses?.length > 0 ? [...buses] : [];
+                        let index = data.findIndex(
+                          (item) => item?.busId == selectedItem?.busId
+                        );
+                        let temp = [...data];
+
+                        temp[index] = res?.data;
+
+                        // data.push(res?.data);
+                        setBuses(temp);
+                        setBusName("");
+                        setNumberOfRows("");
+                        setNumberOfSeatsPerRow("");
+                        setNumberOfKidsPerSeat("");
+                        setIsLongSeat(false);
+                        setNumberOfKidsLongSeat("");
+
+                        dispatch(
+                          ChangeModalState.action({
+                            previewButInformationModalVisibility: false,
+                            addButInformationModalVisibility: false,
+                          })
+                        );
+                      })
+                      .catch((err) => {
+                        console.log("err", err);
+                      });
+                  } else {
+                    CreateBus({
                       busName: busName,
                       numberOfRows: numberOfRows,
                       numberOfSeatsPerRow: numberOfSeatsPerRow,
@@ -226,215 +281,154 @@ const PreviewBusInformation = ({
                       schoolId: currentUser?.schoolId || 0,
                       orgId: currentUser?.orgId || 0,
                       instructorId: currentUser?.instructorId || 0,
-                    });
-                    if (selectedItem) {
-                      PutBus({
-                        id: selectedItem.busId,
-                        busName: busName,
-                        numberOfRows: numberOfRows,
-                        numberOfSeatsPerRow: numberOfSeatsPerRow,
-                        numberOfKidsPerSeat: numberOfKidsInRow,
-                        longSeat: isLongSeat,
-                        studentsOnLongSeat: numberOfKidsLongSeat,
-                        activityId: activity?.activityId || null,
-                        schoolId: currentUser?.schoolId || null,
-                        orgId: currentUser?.orgId || null,
-                        instructorId: currentUser?.instructorId || null,
+                    })
+                      .then((res) => {
+                        console.log(res.data);
+                        const data =
+                          buses && buses?.length > 0 ? [...buses] : [];
+                        data.push(res?.data);
+                        setBuses(data);
+                        setBusName("");
+                        setNumberOfRows("");
+                        setNumberOfSeatsPerRow("");
+                        setNumberOfKidsPerSeat("");
+                        setIsLongSeat(false);
+                        setNumberOfKidsLongSeat("");
+
+                        dispatch(
+                          ChangeModalState.action({
+                            previewButInformationModalVisibility: false,
+                            addButInformationModalVisibility: false,
+                          })
+                        );
                       })
-                        .then((res) => {
-                          console.log(res.data);
-                          const data =
-                            buses && buses?.length > 0 ? [...buses] : [];
-                          let index = data.findIndex(
-                            (item) => item?.busId == selectedItem?.busId
-                          );
-                          let temp = [...data];
+                      .catch((err) => {
+                        setBusName("");
+                        setNumberOfRows("");
+                        setNumberOfSeatsPerRow("");
+                        setNumberOfKidsPerSeat("");
+                        setIsLongSeat(false);
+                        setNumberOfKidsLongSeat("");
 
-                          temp[index] = res?.data;
+                        dispatch(
+                          ChangeModalState.action({
+                            previewButInformationModalVisibility: false,
+                            addButInformationModalVisibility: false,
+                          })
+                        );
+                        console.log("err", err);
+                      });
+                  }
+                }}
+              >
+                I'm done
+              </LinearGradientButton>
+              <View style={{ marginVertical: 10 }} />
+              <LinearGradientButton
+                gradient={["#EC5ADD", Colors.primary]}
+                onPress={() => {
+                  if (selectedItem) {
+                    PutBus({
+                      id: selectedItem.busId,
+                      busName: busName,
+                      numberOfRows: numberOfRows,
+                      numberOfSeatsPerRow: numberOfSeatsPerRow,
+                      numberOfKidsPerSeat: numberOfKidsInRow,
+                      longSeat: isLongSeat,
+                      studentsOnLongSeat: numberOfKidsLongSeat,
+                      activityId: activity?.activityId || null,
+                      schoolId: currentUser?.schoolId || null,
+                      orgId: currentUser?.orgId || null,
+                      instructorId: currentUser?.instructorId || null,
+                    })
+                      .then((res) => {
+                        console.log(res.data);
+                        const data =
+                          buses && buses?.length > 0 ? [...buses] : [];
+                        let index = data.findIndex(
+                          (item) => item?.busId == selectedItem?.busId
+                        );
+                        let temp = [...data];
 
-                          // data.push(res?.data);
-                          setBuses(temp);
-                          setBusName("");
-                          setNumberOfRows("");
-                          setNumberOfSeatsPerRow("");
-                          setNumberOfKidsPerSeat("");
-                          setIsLongSeat(false);
-                          setNumberOfKidsLongSeat("");
+                        temp[index] = res?.data;
 
-                          dispatch(
-                            ChangeModalState.action({
-                              previewButInformationModalVisibility: false,
-                              addButInformationModalVisibility: false,
-                            })
-                          );
-                        })
-                        .catch((err) => {
-                          console.log("err", err);
-                        });
-                    } else {
-                      CreateBus({
-                        busName: busName,
-                        numberOfRows: numberOfRows,
-                        numberOfSeatsPerRow: numberOfSeatsPerRow,
-                        numberOfKidsPerSeat: numberOfKidsInRow,
-                        longSeat: isLongSeat,
-                        studentsOnLongSeat: numberOfKidsLongSeat,
-                        activityId: activity?.activityId || 0,
-                        schoolId: currentUser?.schoolId || 0,
-                        orgId: currentUser?.orgId || 0,
-                        instructorId: currentUser?.instructorId || 0,
+                        // data.push(res?.data);
+                        setBuses(temp);
+                        setBusName("");
+                        setNumberOfRows("");
+                        setNumberOfSeatsPerRow("");
+                        setNumberOfKidsPerSeat("");
+                        setIsLongSeat(false);
+                        setNumberOfKidsLongSeat("");
+
+                        dispatch(
+                          ChangeModalState.action({
+                            previewButInformationModalVisibility: false,
+                            addButInformationModalVisibility: false,
+                          })
+                        );
                       })
-                        .then((res) => {
-                          console.log(res.data);
-                          const data =
-                            buses && buses?.length > 0 ? [...buses] : [];
-                          data.push(res?.data);
-                          setBuses(data);
-                          setBusName("");
-                          setNumberOfRows("");
-                          setNumberOfSeatsPerRow("");
-                          setNumberOfKidsPerSeat("");
-                          setIsLongSeat(false);
-                          setNumberOfKidsLongSeat("");
-
+                      .catch((err) => {
+                        console.log("err", err);
+                      });
+                  } else {
+                    CreateBus({
+                      busName: busName,
+                      numberOfRows: numberOfRows,
+                      numberOfSeatsPerRow: numberOfSeatsPerRow,
+                      numberOfKidsPerSeat: numberOfKidsInRow,
+                      longSeat: isLongSeat,
+                      studentsOnLongSeat: numberOfKidsLongSeat,
+                      activityId: activity?.activityId || 0,
+                      schoolId: currentUser?.schoolId || 0,
+                      orgId: currentUser?.orgId || 0,
+                      instructorId: currentUser?.instructorId || 0,
+                    })
+                      .then((res) => {
+                        console.log(res.data);
+                        // console.log("data", data);
+                        console.log("buses", buses);
+                        const data =
+                          buses && buses?.length > 0 ? [...buses] : [];
+                        console.log("data", data);
+                        // console.log("data",data)
+                        // console.log("buses",buses)
+                        data.push(res?.data);
+                        if (fromActivity) {
+                          navigation.navigate("DragDropStudent", {
+                            bus: data?.busId,
+                            activity: activity,
+                          });
                           dispatch(
                             ChangeModalState.action({
-                              previewButInformationModalVisibility: false,
-                              addButInformationModalVisibility: false,
+                              setupVehicleModal: false,
                             })
                           );
-                        })
-                        .catch((err) => {
-                          setBusName("");
-                          setNumberOfRows("");
-                          setNumberOfSeatsPerRow("");
-                          setNumberOfKidsPerSeat("");
-                          setIsLongSeat(false);
-                          setNumberOfKidsLongSeat("");
+                        }
+                        setBuses(data);
+                        setBusName("");
+                        setNumberOfRows("");
+                        setNumberOfSeatsPerRow("");
+                        setNumberOfKidsPerSeat("");
+                        setIsLongSeat(false);
+                        setNumberOfKidsLongSeat("");
 
-                          dispatch(
-                            ChangeModalState.action({
-                              previewButInformationModalVisibility: false,
-                              addButInformationModalVisibility: false,
-                            })
-                          );
-                          console.log("err", err);
-                        });
-                    }
-                  }}
-                >
-                  <Text style={styles.button}>I'm done</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.bottomButton}>
+                        dispatch(
+                          ChangeModalState.action({
+                            previewButInformationModalVisibility: false,
+                          })
+                        );
+                      })
+                      .catch((err) => {
+                        console.log("err", err);
+                      });
+                  }
+                }}
+              >
+                Save and add another Bus
+              </LinearGradientButton>
+              <View style={{ marginVertical: 15 }}>
                 <TouchableOpacity
-                  style={styles.bottomButton}
-                  onPress={() => {
-                    console.log(activity);
-                    if (selectedItem) {
-                      PutBus({
-                        id: selectedItem.busId,
-                        busName: busName,
-                        numberOfRows: numberOfRows,
-                        numberOfSeatsPerRow: numberOfSeatsPerRow,
-                        numberOfKidsPerSeat: numberOfKidsInRow,
-                        longSeat: isLongSeat,
-                        studentsOnLongSeat: numberOfKidsLongSeat,
-                        activityId: activity?.activityId || null,
-                        schoolId: currentUser?.schoolId || null,
-                        orgId: currentUser?.orgId || null,
-                        instructorId: currentUser?.instructorId || null,
-                      })
-                        .then((res) => {
-                          console.log(res.data);
-                          const data =
-                            buses && buses?.length > 0 ? [...buses] : [];
-                          let index = data.findIndex(
-                            (item) => item?.busId == selectedItem?.busId
-                          );
-                          let temp = [...data];
-
-                          temp[index] = res?.data;
-
-                          // data.push(res?.data);
-                          setBuses(temp);
-                          setBusName("");
-                          setNumberOfRows("");
-                          setNumberOfSeatsPerRow("");
-                          setNumberOfKidsPerSeat("");
-                          setIsLongSeat(false);
-                          setNumberOfKidsLongSeat("");
-
-                          dispatch(
-                            ChangeModalState.action({
-                              previewButInformationModalVisibility: false,
-                              addButInformationModalVisibility: false,
-                            })
-                          );
-                        })
-                        .catch((err) => {
-                          console.log("err", err);
-                        });
-                    } else {
-                      CreateBus({
-                        busName: busName,
-                        numberOfRows: numberOfRows,
-                        numberOfSeatsPerRow: numberOfSeatsPerRow,
-                        numberOfKidsPerSeat: numberOfKidsInRow,
-                        longSeat: isLongSeat,
-                        studentsOnLongSeat: numberOfKidsLongSeat,
-                        activityId: activity?.activityId || 0,
-                        schoolId: currentUser?.schoolId || 0,
-                        orgId: currentUser?.orgId || 0,
-                        instructorId: currentUser?.instructorId || 0,
-                      })
-                        .then((res) => {
-                          console.log(res.data);
-                          // console.log("data", data);
-                          console.log("buses", buses);
-                          const data =
-                            buses && buses?.length > 0 ? [...buses] : [];
-                          console.log("data", data);
-                          // console.log("data",data)
-                          // console.log("buses",buses)
-                          data.push(res?.data);
-                          if (fromActivity) {
-                            navigation.navigate("DragDropStudent", {
-                              bus: data?.busId,
-                              activity: activity,
-                            });
-                            dispatch(
-                              ChangeModalState.action({
-                                setupVehicleModal: false,
-                              })
-                            );
-                          }
-                          setBuses(data);
-                          setBusName("");
-                          setNumberOfRows("");
-                          setNumberOfSeatsPerRow("");
-                          setNumberOfKidsPerSeat("");
-                          setIsLongSeat(false);
-                          setNumberOfKidsLongSeat("");
-
-                          dispatch(
-                            ChangeModalState.action({
-                              previewButInformationModalVisibility: false,
-                            })
-                          );
-                        })
-                        .catch((err) => {
-                          console.log("err", err);
-                        });
-                    }
-                  }}
-                >
-                  <Text style={styles.button}>Save and add another Bus</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.bottomButton}>
-                <TouchableOpacity
-                  style={styles.bottomButton}
                   onPress={() => {
                     dispatch(
                       ChangeModalState.action({
@@ -443,7 +437,14 @@ const PreviewBusInformation = ({
                     );
                   }}
                 >
-                  <Text style={styles.button}>Back</Text>
+                  <Text
+                    style={[
+                      styles.button,
+                      { color: Colors.primaryTint, fontSize: 17 },
+                    ]}
+                  >
+                    Back
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>

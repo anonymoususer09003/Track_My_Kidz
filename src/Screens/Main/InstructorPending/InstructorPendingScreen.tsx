@@ -343,9 +343,10 @@ const InstructorGroupPendingScreen = ({ route }) => {
             }}
           />
         )}
+
         {activities.length === 0 && groups.length == 0 && (
-          <View style={{ margin: 10 }}>
-            <Text style={[styles.text, { textAlign: "center" }]}>
+          <View style={{ backgroundColor: Colors.newBackgroundColor }}>
+            <Text style={[styles.text, { textAlign: "center", marginTop: 20 }]}>
               You do not have any pending activities or groups
             </Text>
           </View>

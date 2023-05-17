@@ -26,6 +26,7 @@ import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { LinearGradientButton } from "@/Components";
 import FastImage from "react-native-fast-image";
 import Colors from "@/Theme/Colors";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 
 const user_types = [
   { id: 1, label: "Parent", value: "Parent" },
@@ -85,151 +86,163 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
   }, []);
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Image
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            maxHeight: Normalize(160),
-            maxWidth: Normalize(160),
-          }}
-          source={require("@/Assets/Images/new-logo.png")}
-          resizeMode="contain"
-        />
-      </View>
+    <BackgroundLayout>
+      <KeyboardAvoidingView style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Image
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              maxHeight: Normalize(160),
+              maxWidth: Normalize(160),
+            }}
+            source={require("@/Assets/Images/logo1.png")}
+            resizeMode="contain"
+          />
 
-      <Formik
-        validationSchema={
-          user_type == "Student"
-            ? codeValidationSchemaStudents
-            : codeValidationSchema
-        }
-        initialValues={{
-          code: user_type == "Student" && activationCode ? activationCode : "",
-        }}
-        validateOnMount={true}
-        onSubmit={(values, { resetForm }) => {
-          console.log("isDesignatedAdmin", isDesignatedAdmin);
-          if (isDesignatedAdmin) {
-            console.log("isDesignatedAdmin console");
-            if (activationCode == values.code) {
-              navigation.navigate("FinalOrgRegistrationScreen", {
-                emailAddress: emailAddress,
-                registrationId: "test",
-                user_type: user_type,
-                activation_code: activationCode,
-              });
-            }
-            resetForm();
-          } else {
-            if (!reactivate) {
-              if (activationCode == values.code) {
-                navigation &&
-                  navigation.navigate("FinalRegistrationScreen", {
-                    emailAddress: emailAddress,
-                    registrationId: "test",
-                    user_type: user_type,
-                    activation_code: activation_code,
-                    student: student,
-                  });
-              }
-            } else {
-              let object = {
-                activationCode: values.code,
-                email: emailAddress,
-              };
-            }
-            resetForm();
+          <Text style={styles.logoText}>Email Confirmation</Text>
+        </View>
+
+        <Formik
+          validationSchema={
+            user_type == "Student"
+              ? codeValidationSchemaStudents
+              : codeValidationSchema
           }
-        }}
-      >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          setFieldValue,
-          values,
-          errors,
-          touched,
-          isValid,
-        }) => (
-          <>
-            <Layout style={styles.formContainer}>
-              <Select
-                style={{ marginTop: 18 }}
-                value={user_type}
-                selectedIndex={user_types.findIndex(
-                  (u) => u.id === user_type?.id
+          initialValues={{
+            code:
+              user_type == "Student" && activationCode ? activationCode : "",
+          }}
+          validateOnMount={true}
+          onSubmit={(values, { resetForm }) => {
+            console.log("isDesignatedAdmin", isDesignatedAdmin);
+            if (isDesignatedAdmin) {
+              console.log("isDesignatedAdmin console");
+              if (activationCode == values.code) {
+                navigation.navigate("FinalOrgRegistrationScreen", {
+                  emailAddress: emailAddress,
+                  registrationId: "test",
+                  user_type: user_type,
+                  activation_code: activationCode,
+                });
+              }
+              resetForm();
+            } else {
+              if (!reactivate) {
+                if (activationCode == values.code) {
+                  navigation &&
+                    navigation.navigate("FinalRegistrationScreen", {
+                      emailAddress: emailAddress,
+                      registrationId: "test",
+                      user_type: user_type,
+                      activation_code: activation_code,
+                      student: student,
+                    });
+                }
+              } else {
+                let object = {
+                  activationCode: values.code,
+                  email: emailAddress,
+                };
+              }
+              resetForm();
+            }
+          }}
+        >
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            setFieldValue,
+            values,
+            errors,
+            touched,
+            isValid,
+          }) => (
+            <>
+              <Layout style={styles.formContainer}>
+                <Select
+                  style={{ marginTop: 18 }}
+                  value={user_type}
+                  selectedIndex={user_types.findIndex(
+                    (u) => u.id === user_type?.id
+                  )}
+                  placeholder="Select User"
+                  disabled
+                  label={(evaProps: any) => <Text {...evaProps}></Text>}
+                >
+                  {user_types.map((type, index) => {
+                    return <SelectItem key={index} title={type?.label} />;
+                  })}
+                </Select>
+                <Input
+                  placeholderTextColor={Colors.white}
+                  placeholder="Reference Code"
+                  value={values.code}
+                  onChangeText={handleChange("code")}
+                  onBlur={handleBlur("code")}
+                  keyboardType="numeric"
+                  textStyle={{ color: Colors.white }}
+                  style={styles.selectSettings}
+                />
+                {errors.code && touched.code && (
+                  <Text style={styles.errorText}>{errors.code}</Text>
                 )}
-                placeholder="Select User"
-                disabled
-                label={(evaProps: any) => <Text {...evaProps}></Text>}
-              >
-                {user_types.map((type, index) => {
-                  return <SelectItem key={index} title={type?.label} />;
-                })}
-              </Select>
-              <Input
-                placeholder="Reference Code"
-                value={values.code}
-                onChangeText={handleChange("code")}
-                onBlur={handleBlur("code")}
-                keyboardType="numeric"
-              />
-              {errors.code && touched.code && (
-                <Text style={styles.errorText}>{errors.code}</Text>
-              )}
-              <LinearGradientButton
-                style={styles.signUpButton}
-                size="medium"
-                onPress={handleSubmit}
-                disabled={!isValid || values.code.length === 0}
-              >
-                Confirm
-              </LinearGradientButton>
-            </Layout>
-          </>
-        )}
-      </Formik>
+                <LinearGradientButton
+                  gradient={[Colors.secondary, Colors.primaryLight]}
+                  style={styles.signUpButton}
+                  size="medium"
+                  onPress={handleSubmit}
+                  disabled={!isValid || values.code.length === 0}
+                >
+                  Confirm
+                </LinearGradientButton>
+              </Layout>
+            </>
+          )}
+        </Formik>
 
-      {resendCode && (
-        <Text
-          style={[styles.buttonMessage, { textAlign: "center", color: "red" }]}
-        >
-          {" "}
-          Check email for activation code*
-        </Text>
-      )}
-      <View style={styles.bottomView}>
-        <Button
-          appearance="ghost"
-          status="basic"
-          size="medium"
-          onPress={openLogin}
-        >
-          {() => <Text style={styles.buttonMessage}> Login </Text>}
-        </Button>
-        <Button
-          appearance="ghost"
-          status="basic"
-          size="medium"
-          onPress={openSignUp}
-        >
-          {() => <Text style={styles.buttonMessage}> Register </Text>}
-        </Button>
-        {emailAddress.length > 0 && (
+        {resendCode && (
+          <Text
+            style={[
+              styles.buttonMessage,
+              { textAlign: "center", color: "red" },
+            ]}
+          >
+            {" "}
+            Check email for activation code*
+          </Text>
+        )}
+        <View style={styles.bottomView}>
           <Button
             appearance="ghost"
             status="basic"
             size="medium"
-            onPress={onResendButtonPress}
+            onPress={openLogin}
           >
-            {() => <Text style={styles.buttonMessage}> Resend Code </Text>}
+            {() => <Text style={styles.buttonMessage}> Login </Text>}
           </Button>
-        )}
-      </View>
-    </KeyboardAvoidingView>
+          <Button
+            appearance="ghost"
+            status="basic"
+            size="medium"
+            onPress={openSignUp}
+          >
+            {() => <Text style={styles.buttonMessage}> Register </Text>}
+          </Button>
+          {emailAddress.length > 0 && (
+            <Button
+              appearance="ghost"
+              status="basic"
+              size="medium"
+              onPress={onResendButtonPress}
+            >
+              {() => <Text style={styles.buttonMessage}> Resend Code </Text>}
+            </Button>
+          )}
+        </View>
+      </KeyboardAvoidingView>
+    </BackgroundLayout>
   );
 };
 export default EmailConfirmationScreen;
@@ -237,19 +250,21 @@ const themedStyles = StyleService.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: "background-basic-color-1",
   },
   headerContainer: {
-    marginTop: 10,
-    justifyContent: "flex-start",
+    flex: 1,
+    width: "100%",
     alignItems: "center",
-    flex: 2,
-    backgroundColor: "#fff",
+    justifyContent: "center",
+    marginBottom: 30,
+  },
+  logoText: {
+    color: Colors.white,
+    fontSize: 30,
   },
   formContainer: {
-    flex: 3,
-    paddingHorizontal: 16,
-    justifyContent: "space-evenly",
+    backgroundColor: "transparent",
+    paddingHorizontal: 20,
   },
   welcomeMessage: {
     marginTop: 16,
@@ -268,7 +283,16 @@ const themedStyles = StyleService.create({
     marginTop: 20,
   },
   buttonMessage: {
-    color: "color-primary-default",
+    color: Colors.white,
     fontSize: 17,
+  },
+  selectSettings: {
+    marginTop: 18,
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.white,
+    color: Colors.white,
+    marginBottom: 50,
   },
 });

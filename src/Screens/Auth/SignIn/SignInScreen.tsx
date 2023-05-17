@@ -21,6 +21,7 @@ import {
   Select,
   SelectItem,
   CheckBox,
+  Theme,
 } from "@ui-kitten/components";
 import { Formik } from "formik";
 
@@ -150,7 +151,7 @@ const SignInScreen = ({ navigation }) => {
   );
   const renderPersonIcon = (props: any) => (
     <Image
-      source={require("@/Assets/Images/person.png")}
+      source={require("@/Assets/Images/email.png")}
       style={{ height: 20, width: 20 }}
       resizeMode="contain"
     />
@@ -289,9 +290,9 @@ const SignInScreen = ({ navigation }) => {
                   <>
                     <Layout style={styles.formContainer}>
                       <Select
+                        appearance={{ backgroundColor: "red" }}
                         style={{
                           width: "100%",
-                          backgroundColor: "rgba(255, 0, 0, 0.8)",
                         }}
                         value={values.user_type}
                         placeholder="Select User"
@@ -306,6 +307,7 @@ const SignInScreen = ({ navigation }) => {
                       </Select>
 
                       <Input
+                        placeholderTextColor={Colors.white}
                         placeholder="Email"
                         style={styles.selectSettings}
                         accessoryLeft={renderPersonIcon}
@@ -314,12 +316,14 @@ const SignInScreen = ({ navigation }) => {
                         value={values.email}
                         keyboardType="email-address"
                         autoCapitalize="none"
+                        textStyle={{ color: Colors.white }}
                         autoCorrect={false}
                       />
                       {errors.email && touched.email && (
                         <Text style={styles.errorText}>{errors.email}</Text>
                       )}
                       <Input
+                        placeholderTextColor={Colors.white}
                         autoCapitalize="none"
                         style={styles.passwordInput}
                         placeholder="Password"
@@ -328,13 +332,33 @@ const SignInScreen = ({ navigation }) => {
                         onBlur={handleBlur("password")}
                         value={values.password}
                         secureTextEntry={!passwordVisible}
+                        textStyle={{ color: Colors.white }}
                       />
                       {errors.password && touched.password && (
                         <Text style={styles.errorText}>{errors.password}</Text>
                       )}
-
+                      <Button
+                        style={{ alignSelf: "flex-end", marginTop: 10 }}
+                        appearance="ghost"
+                        status="basic"
+                        size="small"
+                        onPress={onForgotPasswordButtonPress}
+                      >
+                        {() => (
+                          <Text
+                            style={[
+                              styles.buttonMessage,
+                              { textAlign: "right" },
+                            ]}
+                          >
+                            {" "}
+                            Forgot Password{" "}
+                          </Text>
+                        )}
+                      </Button>
                       <Layout style={styles.buttonSettings}>
                         <LinearGradientButton
+                          gradient={[Colors.secondaryTint, Colors.primaryLight]}
                           style={styles.signInButton}
                           size="medium"
                           onPress={handleSubmit}
@@ -342,15 +366,6 @@ const SignInScreen = ({ navigation }) => {
                         >
                           Login
                         </LinearGradientButton>
-                        <View style={{ marginTop: 20 }}>
-                          <LinearGradientButton
-                            style={styles.registerButton}
-                            size="medium"
-                            onPress={OnRegisterButtonPress}
-                          >
-                            Create Account
-                          </LinearGradientButton>
-                        </View>
                       </Layout>
                     </Layout>
                   </>
@@ -358,17 +373,7 @@ const SignInScreen = ({ navigation }) => {
               </Formik>
             )}
             <View style={styles.bottomView}>
-              <Button
-                appearance="ghost"
-                status="basic"
-                size="small"
-                onPress={onForgotPasswordButtonPress}
-              >
-                {() => (
-                  <Text style={styles.buttonMessage}> Forgot Password </Text>
-                )}
-              </Button>
-              <Button
+              {/* <Button
                 appearance="ghost"
                 status="basic"
                 size="small"
@@ -380,20 +385,30 @@ const SignInScreen = ({ navigation }) => {
                     Resend Activation Code{" "}
                   </Text>
                 )}
-              </Button>
-              {/* <Button
-            appearance="ghost"
-            status="basic"
-            size="small"
-            onPress={() => onResendActivationButtonPress(false)}
-          >
-            {() => (
-              <Text style={styles.buttonMessage}> Enter Activation Code </Text>
-            )}
-          </Button> */}
+              </Button> */}
             </View>
           </View>
         </KeyboardAwareScrollView>
+        <View
+          style={{
+            paddingBottom: 20,
+          }}
+        >
+          <Button
+            appearance="ghost"
+            status="basic"
+            size="small"
+            onPress={OnRegisterButtonPress}
+          >
+            {() => (
+              <Text style={styles.buttonMessage}>
+                {" "}
+                Don't have an account?{" "}
+                <Text style={{ color: Colors.secondary }}>Sign up</Text>
+              </Text>
+            )}
+          </Button>
+        </View>
       </ImageBackground>
     </View>
   );
@@ -406,16 +421,20 @@ const themedStyles = StyleService.create({
     backgroundColor: "background-basic-color-1",
     justifyContent: "flex-start",
   },
+  background: {
+    backgroundColor: Colors.green,
+  },
   headerContainer: {
     // flex: 2,
     height: screenHeight * 0.25,
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 20,
+    marginVertical: 20,
   },
   formContainer: {
     backgroundColor: "transparent",
+    paddingHorizontal: 20,
     // flex: 4,
   },
   buttonSettings: {
@@ -464,6 +483,7 @@ const themedStyles = StyleService.create({
     borderWidth: 0,
     borderBottomWidth: 2,
     borderBottomColor: Colors.white,
+    color: Colors.white,
   },
   row: {
     flexDirection: "row",

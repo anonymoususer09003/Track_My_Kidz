@@ -5,6 +5,7 @@ import {
   View,
   Linking,
   Dimensions,
+  ImageBackground,
 } from "react-native";
 import {
   Button,
@@ -39,6 +40,7 @@ import {
 } from "@/Services/Student";
 import MaskInput from "react-native-mask-input";
 import { ReferenceCodeRegex, ReferenceCodeStyle } from "@/Theme/Variables";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 
 const user_type = [
   { id: 1, label: "Parent", value: "Parent" },
@@ -59,9 +61,7 @@ const FirstSignUpScreen = ({ navigation }) => {
   const [isDesignatedAdmin, setIsDesignatedAdmin] = useState(false);
 
   // @ts-ignore
-  const renderPersonIcon = (props: any) => (
-    <Icon {...props} name="person-outline" />
-  );
+
   const emailValidationSchema = yup.object().shape({
     email: yup
       .string()
@@ -97,6 +97,15 @@ const FirstSignUpScreen = ({ navigation }) => {
         dispatch(ChangeModalState.action({ loading: false }));
       });
   };
+
+  const renderPersonIcon = (props: any) => (
+    <Image
+      source={require("@/Assets/Images/email.png")}
+      style={{ height: 20, width: 20 }}
+      resizeMode="contain"
+    />
+  );
+
   useEffect(() => {
     // return () => setInitialValues(intitialValues);
     if (!isFocuesed) {
@@ -111,315 +120,349 @@ const FirstSignUpScreen = ({ navigation }) => {
     // MainNavigator = null;
   }, [isFocuesed]);
   return (
-    <KeyboardAvoidingView style={styles.container}>
-      {!showQR ? (
-        <>
-          <View style={styles.headerContainer}>
-            <Image
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                maxHeight: Normalize(160),
-                maxWidth: Normalize(160),
-              }}
-              source={require("@/Assets/Images/new-logo.png")}
-              resizeMode="contain"
-            />
-          </View>
+    <BackgroundLayout>
+      <KeyboardAvoidingView style={styles.container}>
+        {!showQR ? (
+          <>
+            <View style={styles.headerContainer}>
+              <Image
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  maxHeight: Normalize(160),
+                  maxWidth: Normalize(160),
+                }}
+                source={require("@/Assets/Images/logo1.png")}
+                resizeMode="contain"
+              />
 
-          <Formik
-            validationSchema={
-              selectedUserType === "Student"
-                ? activationCodeValidationSchema
-                : emailValidationSchema
-            }
-            initialValues={initialValues}
-            validateOnMount={true}
-            onSubmit={(values, { resetForm }) => {
-              // navigation && navigation.navigate('EmailConfirmation', { emailAddress: values.email, user_type: values.user_type, activation_code: '' })
-              let emailObject = {
-                email: values.email,
-                user_type: values.user_type,
-              };
-              if (emailObject.user_type === "Student") {
-                dispatch(ChangeModalState.action({ loading: true }));
+              <Text style={styles.logoText}>Register</Text>
+            </View>
+            {isFocuesed && (
+              <Formik
+                validationSchema={
+                  selectedUserType === "Student"
+                    ? activationCodeValidationSchema
+                    : emailValidationSchema
+                }
+                initialValues={initialValues}
+                validateOnMount={true}
+                onSubmit={(values, { resetForm }) => {
+                  // navigation && navigation.navigate('EmailConfirmation', { emailAddress: values.email, user_type: values.user_type, activation_code: '' })
+                  let emailObject = {
+                    email: values.email,
+                    user_type: values.user_type,
+                  };
+                  if (emailObject.user_type === "Student") {
+                    dispatch(ChangeModalState.action({ loading: true }));
 
-                getStudentQrApiCall(emailObject.email, values.user_type);
-                // GetAuthStudentByActivationCode(emailObject.email)
-                //   .then((res) => {
-                //     navigation &&
-                //       navigation.navigate("FinalRegistrationScreen", {
-                //         student: res,
-                //         registrationId: "test",
-                //         user_type: values.user_type,
-                //         activation_code: values.email,
-                //       });
-                //   })
-                //   .catch((err) => {
-                //     console.log("Student Error", err);
-                //     Toast.show({
-                //       type: "info",
-                //       position: "top",
-                //       text1: `Invalid Reference code`,
-                //     });
-                //   })
-                //   .finally(() => {
-                //     dispatch(ChangeModalState.action({ loading: false }));
-                //   });
-              } else {
-                dispatch(ChangeModalState.action({ loading: true }));
-                StartRegistration(emailObject.email, emailObject.user_type)
-                  .then((res) => {
-                    console.log("res", res.data);
-                    if (isDesignatedAdmin) {
-                      navigation &&
-                        navigation.navigate("EmailConfirmation", {
-                          emailAddress: values.email,
-                          user_type: values.user_type,
-                          activation_code: res.data?.activation_code,
-                          isDesignatedAdmin: true,
-                        });
-                      // navigation.navigate('FinalOrgRegistrationScreen', {
-                      //     emailAddress: values.email,
-                      //     registrationId: 'test',
-                      //     user_type: user_type,
-                      //     activation_code: res.data?.activation_code
-                      // })
-                    } else if (values.user_type.toLowerCase() === "student") {
-                      navigation &&
-                        navigation.navigate("FinalRegistrationScreen", {
-                          emailAddress: "",
-                          registrationId: "test",
-                          user_type: values.user_type,
-                          activation_code: values.email,
-                        });
-                    } else {
-                      navigation &&
-                        navigation.navigate("EmailConfirmation", {
-                          emailAddress: values.email,
-                          user_type: values.user_type,
-                          activation_code: res.data?.activation_code,
-                        });
-                    }
-                    // resetForm();
-                  })
-                  .catch((err) => {
-                    console.log("err", err);
-                    Toast.show({
-                      type: "info",
-                      position: "top",
+                    getStudentQrApiCall(emailObject.email, values.user_type);
+                    // GetAuthStudentByActivationCode(emailObject.email)
+                    //   .then((res) => {
+                    //     navigation &&
+                    //       navigation.navigate("FinalRegistrationScreen", {
+                    //         student: res,
+                    //         registrationId: "test",
+                    //         user_type: values.user_type,
+                    //         activation_code: values.email,
+                    //       });
+                    //   })
+                    //   .catch((err) => {
+                    //     console.log("Student Error", err);
+                    //     Toast.show({
+                    //       type: "info",
+                    //       position: "top",
+                    //       text1: `Invalid Reference code`,
+                    //     });
+                    //   })
+                    //   .finally(() => {
+                    //     dispatch(ChangeModalState.action({ loading: false }));
+                    //   });
+                  } else {
+                    dispatch(ChangeModalState.action({ loading: true }));
+                    StartRegistration(emailObject.email, emailObject.user_type)
+                      .then((res) => {
+                        console.log("res", res.data);
+                        if (isDesignatedAdmin) {
+                          navigation &&
+                            navigation.navigate("EmailConfirmation", {
+                              emailAddress: values.email,
+                              user_type: values.user_type,
+                              activation_code: res.data?.activation_code,
+                              isDesignatedAdmin: true,
+                            });
+                          // navigation.navigate('FinalOrgRegistrationScreen', {
+                          //     emailAddress: values.email,
+                          //     registrationId: 'test',
+                          //     user_type: user_type,
+                          //     activation_code: res.data?.activation_code
+                          // })
+                        } else if (
+                          values.user_type.toLowerCase() === "student"
+                        ) {
+                          navigation &&
+                            navigation.navigate("FinalRegistrationScreen", {
+                              emailAddress: "",
+                              registrationId: "test",
+                              user_type: values.user_type,
+                              activation_code: values.email,
+                            });
+                        } else {
+                          navigation &&
+                            navigation.navigate("EmailConfirmation", {
+                              emailAddress: values.email,
+                              user_type: values.user_type,
+                              activation_code: res.data?.activation_code,
+                            });
+                        }
+                        // resetForm();
+                      })
+                      .catch((err) => {
+                        console.log("err", err);
+                        Toast.show({
+                          type: "info",
+                          position: "top",
 
-                      text1: err.data?.message
-                        ? err.data?.message
-                        : "Please try again later",
-                      visibilityTime: 2000,
-                      autoHide: true,
-                      topOffset: 30,
-                      bottomOffset: 40,
-                      onShow: () => {},
-                      onHide: () => {},
-                      onPress: () => {},
-                    });
-                  })
-                  .finally(() => {
-                    dispatch(ChangeModalState.action({ loading: false }));
-                  });
-              }
-              resetForm();
-            }}
-          >
-            {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              setFieldValue,
-              values,
-              errors,
-              touched,
-              isValid,
-            }) => (
-              <>
-                <Layout style={styles.formContainer}>
-                  <Select
-                    style={{ marginTop: 18 }}
-                    value={values.user_type}
-                    placeholder="Select User"
-                    onSelect={(index: any) => {
-                      setFieldValue("user_type", user_type[index.row].value);
-                      setSelectedUserType(user_type[index.row].value);
-                    }}
-                    label={(evaProps: any) => <Text {...evaProps}></Text>}
-                  >
-                    {user_type.map((type, index) => {
-                      return <SelectItem key={index} title={type?.label} />;
-                    })}
-                  </Select>
-                  {values.user_type === "Student" && (
-                    <View style={{ marginVertical: 10 }}>
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          fontWeight: "600",
-                          marginTop: 10,
+                          text1: err.data?.message
+                            ? err.data?.message
+                            : "Please try again later",
+                          visibilityTime: 2000,
+                          autoHide: true,
+                          topOffset: 30,
+                          bottomOffset: 40,
+                          onShow: () => {},
+                          onHide: () => {},
+                          onPress: () => {},
+                        });
+                      })
+                      .finally(() => {
+                        dispatch(ChangeModalState.action({ loading: false }));
+                      });
+                  }
+                  resetForm();
+                }}
+              >
+                {({
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  setFieldValue,
+                  values,
+                  errors,
+                  touched,
+                  isValid,
+                }) => (
+                  <>
+                    <Layout style={styles.formContainer}>
+                      <Select
+                        style={{ marginTop: 18 }}
+                        value={values.user_type}
+                        placeholder="Select User"
+                        onSelect={(index: any) => {
+                          setFieldValue(
+                            "user_type",
+                            user_type[index.row].value
+                          );
+                          setSelectedUserType(user_type[index.row].value);
                         }}
+                        label={(evaProps: any) => <Text {...evaProps}></Text>}
                       >
-                        Enter your 32-digit reference code from your parent's
-                        Dependent Information or scan the QR code corresponding
-                        to your name.
-                      </Text>
-                    </View>
-                  )}
-                  {!(values.user_type.toLowerCase() === "student") && (
-                    <Input
-                      placeholder={"Email"}
-                      accessoryRight={renderPersonIcon}
-                      onChangeText={handleChange("email")}
-                      onBlur={handleBlur("email")}
-                      value={values.email}
-                      keyboardType={"email-address"}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      style={{ marginTop: 20 }}
-                    />
-                  )}
-                  {values.user_type.toLowerCase() === "student" && (
-                    <MaskInput
-                      value={values.email}
-                      placeholderTextColor={Colors.textInputPlaceholderColor}
-                      style={ReferenceCodeStyle}
-                      onChangeText={(masked, unmasked) => {
-                        setFieldValue("email", masked); // you can use the unmasked value as well
-                      }}
-                      mask={ReferenceCodeRegex}
-                    />
-                  )}
-                  {errors.email &&
-                    touched.email &&
-                    values.user_type === "Student" && (
-                      <Text style={[styles.errorText, { marginTop: 20 }]}>
-                        Reference Code is required
-                      </Text>
-                    )}
-                  {errors.email &&
-                    touched.email &&
-                    values.user_type !== "Student" && (
-                      <Text style={styles.errorText}>{errors.email}</Text>
-                    )}
-                  <View style={{ marginTop: 10 }}>
-                    {values.user_type === "Student" && (
-                      <View
-                        style={{
-                          marginVertical: 5,
-                          marginBottom: 20,
-                          width: "100%",
-                          alignItems: "flex-end",
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        <Entypo
-                          name="camera"
-                          size={30}
-                          color={Colors.primary}
-                          onPress={() => setShowQR(true)}
+                        {user_type.map((type, index) => {
+                          return <SelectItem key={index} title={type?.label} />;
+                        })}
+                      </Select>
+                      {values.user_type === "Student" && (
+                        <View style={{ marginVertical: 10 }}>
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              fontWeight: "600",
+                              marginTop: 10,
+                              color: Colors.white,
+                            }}
+                          >
+                            Enter your 32-digit reference code from your
+                            parent's Dependent Information or scan the QR code
+                            corresponding to your name.
+                          </Text>
+                        </View>
+                      )}
+                      {!(values.user_type.toLowerCase() === "student") && (
+                        <Input
+                          placeholderTextColor={Colors.white}
+                          placeholder={"Email"}
+                          accessoryLeft={renderPersonIcon}
+                          onChangeText={handleChange("email")}
+                          onBlur={handleBlur("email")}
+                          value={values.email}
+                          keyboardType={"email-address"}
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          textStyle={{ color: Colors.white }}
+                          style={styles.selectSettings}
                         />
+                      )}
+                      {values.user_type.toLowerCase() === "student" && (
+                        <MaskInput
+                          value={values.email}
+                          placeholderTextColor={
+                            Colors.textInputPlaceholderColor
+                          }
+                          style={ReferenceCodeStyle}
+                          onChangeText={(masked, unmasked) => {
+                            setFieldValue("email", masked); // you can use the unmasked value as well
+                          }}
+                          mask={ReferenceCodeRegex}
+                        />
+                      )}
+                      {errors.email &&
+                        touched.email &&
+                        values.user_type === "Student" && (
+                          <Text style={[styles.errorText, { marginTop: 20 }]}>
+                            Reference Code is required
+                          </Text>
+                        )}
+                      {errors.email &&
+                        touched.email &&
+                        values.user_type !== "Student" && (
+                          <Text style={styles.errorText}>{errors.email}</Text>
+                        )}
+                      <View style={{ marginTop: 10 }}>
+                        {values.user_type === "Student" && (
+                          <View
+                            style={{
+                              marginVertical: 5,
+                              marginBottom: 20,
+                              width: "100%",
+                              alignItems: "flex-end",
+                              justifyContent: "flex-end",
+                            }}
+                          >
+                            <Entypo
+                              name="camera"
+                              size={30}
+                              color={Colors.white}
+                              onPress={() => setShowQR(true)}
+                            />
+                          </View>
+                        )}
+                        {values.user_type === "Instructor" && (
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              marginVertical: 20,
+                            }}
+                          >
+                            <CheckBox
+                              checked={isDesignatedAdmin}
+                              onChange={() =>
+                                setIsDesignatedAdmin(!isDesignatedAdmin)
+                              }
+                            >
+                              {""}
+                            </CheckBox>
+                            <Text
+                              style={{
+                                marginLeft: 20,
+                                width: "90%",
+                                color: Colors.white,
+                              }}
+                            >
+                              I am designated admin for my organisation
+                            </Text>
+                          </View>
+                        )}
                       </View>
-                    )}
-                    {values.user_type === "Instructor" && (
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          marginVertical: 20,
-                        }}
+                      <View style={{ height: 20 }} />
+                      <LinearGradientButton
+                        gradient={[Colors.secondaryTint, Colors.primaryLight]}
+                        style={[styles.signUpButton]}
+                        size="medium"
+                        onPress={handleSubmit}
+                        disabled={!isValid}
                       >
-                        <CheckBox
-                          checked={isDesignatedAdmin}
-                          onChange={() =>
-                            setIsDesignatedAdmin(!isDesignatedAdmin)
+                        Sign Up
+                      </LinearGradientButton>
+                    </Layout>
+                    {values.user_type !== "Student" ? (
+                      <View style={styles.bottomView}>
+                        <Button
+                          appearance="ghost"
+                          status="basic"
+                          size="medium"
+                          onPress={
+                            () => navigation.navigate("Login")
+                            // openActivationCode(values.email, values.user_type)
                           }
                         >
-                          {""}
-                        </CheckBox>
-                        <Text style={{ marginLeft: 20, width: "90%" }}>
-                          I am designated admin for my organisation
-                        </Text>
+                          {() => (
+                            <Text style={styles.buttonMessage}>
+                              {" "}
+                              Alread have an aacount?{" "}
+                              <Text style={{ color: Colors.secondaryTint }}>
+                                Login
+                              </Text>
+                            </Text>
+                          )}
+                        </Button>
                       </View>
+                    ) : (
+                      <View style={styles.bottomView}></View>
                     )}
-                  </View>
-                  <LinearGradientButton
-                    style={[styles.signUpButton]}
-                    size="medium"
-                    onPress={handleSubmit}
-                    disabled={!isValid}
-                  >
-                    Sign Up
-                  </LinearGradientButton>
-                </Layout>
-                {values.user_type !== "Student" ? (
-                  <View style={styles.bottomView}>
-                    <Button
-                      appearance="ghost"
-                      status="basic"
-                      size="medium"
-                      onPress={
-                        () => navigation.navigate("Login")
-                        // openActivationCode(values.email, values.user_type)
-                      }
-                    >
-                      {() => <Text style={styles.buttonMessage}> Log in</Text>}
-                    </Button>
-                  </View>
-                ) : (
-                  <View style={styles.bottomView}></View>
+                  </>
                 )}
-              </>
+              </Formik>
             )}
-          </Formik>
-        </>
-      ) : (
-        <QRCodeScanner
-          onRead={(e) => {
-            console.log("edata", e);
-            dispatch(ChangeModalState.action({ loading: true }));
-            getStudentQrApiCall(e.data, "Student");
-          }}
-          flashMode={RNCamera.Constants.FlashMode.torch}
-          bottomContent={
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                paddingHorizontal: "5%",
-              }}
-            >
-              <View style={{ width: "48%" }}>
-                <LinearGradientButton style={styles.signUpButton} size="medium">
-                  Rescan
-                </LinearGradientButton>
+          </>
+        ) : (
+          <QRCodeScanner
+            onRead={(e) => {
+              console.log("edata", e);
+              dispatch(ChangeModalState.action({ loading: true }));
+              getStudentQrApiCall(e.data, "Student");
+            }}
+            flashMode={RNCamera.Constants.FlashMode.torch}
+            bottomContent={
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  paddingHorizontal: "5%",
+                }}
+              >
+                <View style={{ width: "48%" }}>
+                  <LinearGradientButton
+                    style={styles.signUpButton}
+                    size="medium"
+                  >
+                    Rescan
+                  </LinearGradientButton>
+                </View>
+                <View style={{ width: "48%" }}>
+                  <LinearGradientButton
+                    style={styles.signUpButton}
+                    size="medium"
+                    onPress={() => {
+                      navigation &&
+                        navigation.navigate("EmailConfirmation", {
+                          emailAddress: "",
+                          user_type: selectedUserType,
+                        });
+                      setShowQR(false);
+                    }}
+                  >
+                    Continue
+                  </LinearGradientButton>
+                </View>
               </View>
-              <View style={{ width: "48%" }}>
-                <LinearGradientButton
-                  style={styles.signUpButton}
-                  size="medium"
-                  onPress={() => {
-                    navigation &&
-                      navigation.navigate("EmailConfirmation", {
-                        emailAddress: "",
-                        user_type: selectedUserType,
-                      });
-                    setShowQR(false);
-                  }}
-                >
-                  Continue
-                </LinearGradientButton>
-              </View>
-            </View>
-          }
-        />
-      )}
-    </KeyboardAvoidingView>
+            }
+          />
+        )}
+      </KeyboardAvoidingView>
+    </BackgroundLayout>
   );
 };
 export default FirstSignUpScreen;
@@ -427,24 +470,21 @@ const themedStyles = StyleService.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: "background-basic-color-1",
+    backgroundColor: "transparent",
   },
   headerContainer: {
-    marginTop: 10,
-    justifyContent: "flex-start",
-    alignItems: "center",
+    // flex: 2,
     height: screenHeight * 0.25,
     width: "100%",
-    // flex: 2,
-    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   formContainer: {
     // flex: 3,
-    paddingHorizontal: 16,
-    justifyContent: "space-evenly",
+    backgroundColor: "transparent",
+    paddingHorizontal: 20,
   },
   welcomeMessage: {
-    marginTop: 16,
     color: "color-primary-default",
   },
   signUpButton: {
@@ -457,10 +497,12 @@ const themedStyles = StyleService.create({
   },
   bottomView: {
     flex: 3.7,
+    justifyContent: "flex-end",
+    paddingBottom: 15,
   },
   buttonMessage: {
-    color: "color-primary-default",
-    fontSize: 17,
+    marginTop: 16,
+    color: Colors.white,
   },
   centerText: {
     flex: 1,
@@ -478,5 +520,17 @@ const themedStyles = StyleService.create({
   },
   buttonTouchable: {
     padding: 16,
+  },
+  logoText: {
+    color: Colors.white,
+    fontSize: 30,
+  },
+  selectSettings: {
+    marginTop: 18,
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.white,
+    color: Colors.white,
   },
 });

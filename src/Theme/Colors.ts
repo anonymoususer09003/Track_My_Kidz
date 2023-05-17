@@ -17,6 +17,7 @@ export default {
   primaryDark: "#511980",
   primaryTint: "#B560FA",
   primaryGray: "#967BAC",
+  primaryLight: "#EC5ADD",
   secondary: "#0cd1e8",
   secondaryDark: "#0BB8CC",
   secondaryTint: "#24d6ea",

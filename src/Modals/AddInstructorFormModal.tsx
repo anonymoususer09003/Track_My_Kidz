@@ -3,13 +3,15 @@ import { Input, Text, Layout, Button } from "@ui-kitten/components";
 import { useDispatch, useSelector } from "react-redux";
 import { ModalState } from "@/Store/Modal";
 import React, { useState } from "react";
-import { StyleSheet, View, ScrollView } from "react-native";
+import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { Formik } from "formik";
 import * as yup from "yup";
 import Colors from "@/Theme/Colors";
 import { Instructor } from "@/Models/UserDTOs";
 import { Modal } from "react-native";
+import LinearGradient from "react-native-linear-gradient";
+import { LinearGradientButton } from "@/Components";
 
 interface InstructorModal {
   instructors: Array<Instructor>;
@@ -84,44 +86,50 @@ const AddInstructorFormModal = ({
             }) => (
               <>
                 <Layout style={styles.formContainer} level="1">
-                  <Text style={styles.heading}>First Name</Text>
                   <Input
                     value={values.firstName}
-                    style={{ marginTop: 10 }}
+                    style={styles.textInput}
                     placeholder="First Name"
+                    label={(evaProps: any) => (
+                      <Text style={styles.inputLabels}>First Name</Text>
+                    )}
                     onChangeText={handleChange("firstName")}
                   />
-                  <Text style={styles.heading}>Last Name</Text>
+
                   <Input
                     value={values.lastName}
-                    style={{ marginTop: 10 }}
+                    style={styles.textInput}
                     placeholder="Last Name"
                     onChangeText={handleChange("lastName")}
+                    label={(evaProps: any) => (
+                      <Text style={styles.inputLabels}>Last Name</Text>
+                    )}
                   />
-                  <Text style={styles.heading}>Email</Text>
+
                   <Input
                     value={values.email}
-                    style={{ marginTop: 10 }}
+                    style={styles.textInput}
                     placeholder="Email"
                     keyboardType="email-address"
                     autoCapitalize="none"
                     autoCorrect={false}
                     onChangeText={handleChange("email")}
+                    label={(evaProps: any) => (
+                      <Text style={styles.inputLabels}>Email</Text>
+                    )}
                   />
                 </Layout>
                 <View
                   style={{ marginTop: 40, width: "100%", alignItems: "center" }}
                 >
-                  <Button
-                    style={styles.modalButton}
-                    size="small"
+                  <LinearGradientButton
                     onPress={handleSubmit}
+                    gradient={["#EC5ADD", Colors.primary]}
                   >
                     Add one more
-                  </Button>
-                  <Button
-                    style={styles.modalButton}
-                    size="small"
+                  </LinearGradientButton>
+                  <View style={{ height: 20 }} />
+                  <LinearGradientButton
                     onPress={() => {
                       handleSubmit();
                       dispatch(
@@ -132,16 +140,9 @@ const AddInstructorFormModal = ({
                     }}
                   >
                     I'm Done
-                  </Button>
-                  <Button
-                    style={[
-                      styles.modalButton,
-                      {
-                        backgroundColor: Colors.lightgray,
-                        borderColor: Colors.primary,
-                      },
-                    ]}
-                    size="small"
+                  </LinearGradientButton>
+
+                  <TouchableOpacity
                     onPress={() => {
                       dispatch(
                         ChangeModalState.action({
@@ -150,8 +151,8 @@ const AddInstructorFormModal = ({
                       );
                     }}
                   >
-                    Cancel
-                  </Button>
+                    <Text style={styles.button}>Cancel</Text>
+                  </TouchableOpacity>
                 </View>
               </>
             )}
@@ -292,12 +293,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginVertical: 20,
   },
-  button: {
-    paddingTop: 5,
-    fontSize: 15,
-    color: Colors.white,
-    borderRadius: 10,
-  },
+
   backgroundButton: {
     width: "80%",
     borderRadius: 10,
@@ -324,5 +320,25 @@ const styles = StyleSheet.create({
   },
   selectSettings: {
     marginTop: 18,
+  },
+  textInput: {
+    marginTop: 10,
+    alignSelf: "center",
+    width: "95%",
+
+    borderRadius: 8,
+    elevation: 2,
+  },
+  inputLabels: {
+    color: Colors.black,
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  button: {
+    paddingTop: 5,
+    fontSize: 18,
+    color: Colors.primaryTint,
+    borderRadius: 10,
+    marginVertical: 7,
   },
 });

@@ -126,44 +126,16 @@ const InstructionsModal = ({
           </View>
         </View>
         <View style={{ marginTop: 10 }}>
-          <Text style={{ fontWeight: "600", fontSize: 16 }}>Instructions</Text>
-          <ScrollView
-            style={{
-              padding: 5,
-              borderWidth: 1,
-              borderColor: Colors.primary,
-              marginTop: 10,
-              minHeight: 100,
-            }}
-          >
+          <Text style={styles.inputLabels}>Instructions</Text>
+          <ScrollView style={styles.textArea}>
             <Text style={{ fontSize: 15 }}>{infomation?.instructions}</Text>
           </ScrollView>
-          <Text style={{ fontWeight: "600", fontSize: 16, marginTop: 20 }}>
-            Disclaimer
-          </Text>
-          <ScrollView
-            style={{
-              padding: 5,
-              borderWidth: 1,
-              borderColor: Colors.primary,
-              marginTop: 10,
-              minHeight: 100,
-            }}
-          >
+          <Text style={styles.inputLabels}>Disclaimer</Text>
+          <ScrollView style={styles.textArea}>
             <Text style={{ fontSize: 15 }}>{infomation?.disclaimer}</Text>
           </ScrollView>
-          <Text style={{ fontWeight: "600", fontSize: 16, marginTop: 20 }}>
-            Agreement
-          </Text>
-          <ScrollView
-            style={{
-              padding: 5,
-              borderWidth: 1,
-              borderColor: Colors.primary,
-              marginTop: 10,
-              minHeight: 100,
-            }}
-          >
+          <Text style={styles.inputLabels}>Agreement</Text>
+          <ScrollView style={styles.textArea}>
             <Text style={{ fontSize: 15 }}>{infomation?.agreement}</Text>
           </ScrollView>
         </View>
@@ -201,7 +173,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "90%",
   },
-  modal: { borderRadius: 10 },
+  textArea: {
+    marginRight: 20,
+    marginTop: 10,
+    borderRadius: 10,
+    elevation: 1,
+    backgroundColor: Colors.white,
+    width: "100%",
+
+    minHeight: 100,
+    marginBottom: 10,
+  },
+  inputLabels: {
+    color: Colors.black,
+    fontSize: 14,
+  },
+  modal: {
+    borderRadius: 10,
+    flex: 1,
+    backgroundColor: Colors.newBackgroundColor,
+  },
   header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
   body: { flex: 3 },
   background: {

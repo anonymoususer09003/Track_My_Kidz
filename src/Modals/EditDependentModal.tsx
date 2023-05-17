@@ -11,7 +11,7 @@ import {
   Icon,
   Button,
 } from "@ui-kitten/components";
-import { Image } from "react-native";
+import { Dimensions } from "react-native";
 import { Spinner } from "@/Components";
 import * as yup from "yup";
 import { ImagePickerModal } from "@/Modals";
@@ -49,7 +49,7 @@ const filterStates = (item: string, query: string) => {
 const filterCities = (item: string, query: string) => {
   return item?.toLowerCase().includes(query.toLowerCase());
 };
-
+const screenHeight = Dimensions.get("screen").height;
 const EditDependentModal = ({
   selectedDependent,
   setSelectedDependent,
@@ -248,7 +248,7 @@ const EditDependentModal = ({
         contentContainerStyle={{ flex: 1 }}
       >
         {isFocused && (
-          <ScrollView>
+          <ScrollView style={{ flex: 1 }}>
             <Card style={styles.modal} disabled={true}>
               <View style={styles.body}>
                 <View style={{ paddingBottom: 10, paddingTop: 10 }}>
@@ -277,8 +277,6 @@ const EditDependentModal = ({
                       // source={{ uri: selectedImage }}
                       editButton={false ? () => renderEditAvatarButton() : null}
                     />
-                    {false && renderEditButtonElement()}
-                    {/* {renderEditAvatarButton()} */}
                   </View>
                 )}
                 {!selectedImage && !selectedDependent?.studentImage && (
@@ -344,28 +342,7 @@ const EditDependentModal = ({
                 }}
                 onSubmit={async (values, { resetForm }) => {
                   const userId = await loadUserId();
-                  // const data = {
-                  //   parentId: parseInt(userId),
-                  //   id: parseInt(student?.studentId),
-                  //   firstname: values.firstName,
-                  //   lastname: values.lastName,
-                  //   phone: values.phoneNumber,
-                  //   email: values.email,
-                  //   school:
-                  //     values.selectedSchool != ""
-                  //       ? values.selectedSchool
-                  //       : values.school,
-                  //   grade: values.grade,
-                  //   // "grade": "string",
-                  //   status: "",
-                  //   latitude: "",
-                  //   longititude: "",
-                  //   country: values.selectedCountry,
-                  //   city: values.selectedCity,
-                  //   state: values.selectedState,
-                  //   parentemail1: currentUser.email,
-                  //   parentemail2: "",
-                  // };
+
                   setLoading(true);
                   let formData = new FormData();
                   formData.append(
@@ -437,25 +414,6 @@ const EditDependentModal = ({
                     .finally(() => {
                       setLoading(false);
                     });
-                  // CreateStudent(data)
-                  //   .then((response) => {
-                  //     console.log("response", response);
-                  //     Toast.show({
-                  //       type: "success",
-                  //       position: "top",
-                  //       text1: `Dependent has been successfully added`,
-                  //     });
-                  //     resetForm();
-                  //     //   dispatch(
-                  //     //     ChangeModalState.action({ addStudentModal: false })
-                  //     //   );
-                  //   })
-                  //   .catch((err) => {
-                  //     Toast.show({
-                  //       type: "info",
-                  //       position: "top",
-                  //       text1: `An error occured`,
-                  //     });
                 }}
               >
                 {({
@@ -469,7 +427,7 @@ const EditDependentModal = ({
                   isValid,
                 }) => (
                   <>
-                    <View style={{ marginTop: 30, padding: 20 }}>
+                    <View style={{ marginTop: 30, padding: 10 }}>
                       <View
                         style={{
                           flexDirection: "row",
@@ -477,7 +435,15 @@ const EditDependentModal = ({
                           alignItems: "center",
                         }}
                       >
-                        <Text style={{ marginRight: 20, marginTop: 10 }}>
+                        <Text
+                          style={{
+                            marginRight: 20,
+                            marginTop: 10,
+                            color: Colors.black,
+                            fontSize: 14,
+                            marginLeft: 5,
+                          }}
+                        >
                           Use my address
                         </Text>
                         <CheckBox
@@ -522,7 +488,7 @@ const EditDependentModal = ({
                         ></CheckBox>
                       </View>
                       <Input
-                        style={styles.inputSettings}
+                        style={styles.textInput}
                         autoCapitalize="none"
                         autoCorrect={false}
                         placeholder={`First Name`}
@@ -540,7 +506,7 @@ const EditDependentModal = ({
                         <Text style={styles.errorText}>{errors.firstName}</Text>
                       )}
                       <Input
-                        style={styles.inputSettings}
+                        style={styles.textInput}
                         autoCapitalize="none"
                         autoCorrect={false}
                         placeholder={`Last Name`}
@@ -559,7 +525,7 @@ const EditDependentModal = ({
                         <Text style={styles.errorText}>{errors.lastName}</Text>
                       )}
                       <Input
-                        style={styles.inputSettings}
+                        style={styles.textInput}
                         autoCapitalize="none"
                         autoCorrect={false}
                         value={values.email}
@@ -580,7 +546,7 @@ const EditDependentModal = ({
                         <Text style={styles.errorText}>{errors.email}</Text>
                       )}
                       <Input
-                        style={styles.inputSettings}
+                        style={styles.textInput}
                         autoCapitalize="none"
                         autoCorrect={false}
                         placeholder={`Phone # (Optional)`}
@@ -599,14 +565,7 @@ const EditDependentModal = ({
                         placeholder="Country*"
                         value={values?.country}
                         placement="bottom"
-                        style={{ marginVertical: 5 }}
-                        // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                        // onChangeText={(query) => {
-                        //   // setFieldValue("country", query);
-                        //   setCountriesData(
-                        //     countries.filter((item) => filterCountries(item, query))
-                        //   );
-                        // }}
+                        style={styles.textInput}
                         onChangeText={(query) => {
                           setFieldValue("country", query);
                           setCountriesData(
@@ -615,21 +574,6 @@ const EditDependentModal = ({
                             )
                           );
                         }}
-                        // onSelect={(query) => {
-                        //   const selectedCountry = countriesData[query];
-                        //   // setFieldValue("country", selectedCountry.name);
-                        //   // setFieldValue("selectedCountry", selectedCountry.name);
-                        //   // setFieldValue("selectedState", "");
-                        //   // setFieldValue("state", "");
-                        //   setStates([]);
-                        //   GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
-                        //     (res) => {
-                        //       setStates(res.data);
-                        //       setStatesData(states);
-                        //     }
-                        //   );
-                        //   getSchoolsByFilter(selectedCountry.name);
-                        // }}
                         onSelect={(query) => {
                           const selectedCountry = countriesData[query];
                           setFieldValue("country", selectedCountry.name);
@@ -651,7 +595,11 @@ const EditDependentModal = ({
                       >
                         {countriesData.map((item, index) => {
                           return (
-                            <AutocompleteItem key={index} title={item.name} />
+                            <AutocompleteItem
+                              style={styles.autoCompleteItem}
+                              key={index}
+                              title={item.name}
+                            />
                           );
                         })}
                       </Autocomplete>
@@ -663,30 +611,8 @@ const EditDependentModal = ({
                         value={values.state}
                         // value={student?.state}
                         placement="bottom"
-                        style={{ marginVertical: 5 }}
+                        style={styles.textInput}
                         disabled={!values.selectedCountry}
-                        // disabled={!student?.selectedCountry}
-                        // label={evaProps => <Text {...evaProps}>State</Text>}
-                        // onChangeText={(query) => {
-                        //   // setFieldValue("state", query);
-                        //   setStatesData(
-                        //     states.filter((item) => filterStates(item, query))
-                        //   );
-                        // }}
-                        // onSelect={(query) => {
-                        //   const selectedState = statesData[query];
-                        //   // setFieldValue("state", selectedState);
-                        //   // setFieldValue("selectedState", selectedState);
-                        //   // setFieldValue("selectedCity", "");
-                        //   // setFieldValue("city", "");
-                        //   setCities([]);
-                        //   GetAllCities(values.selectedCountry, selectedState).then(
-                        //     (res) => {
-                        //       setCities(res.data);
-                        //     }
-                        //   );
-                        //   getSchoolsByFilter("", selectedState);
-                        // }}
                         onChangeText={(query) => {
                           setFieldValue("state", query);
                           setStatesData(
@@ -710,7 +636,13 @@ const EditDependentModal = ({
                         }}
                       >
                         {statesData.map((item, index) => {
-                          return <AutocompleteItem key={index} title={item} />;
+                          return (
+                            <AutocompleteItem
+                              style={styles.autoCompleteItem}
+                              key={index}
+                              title={item}
+                            />
+                          );
                         })}
                       </Autocomplete>
 
@@ -723,20 +655,7 @@ const EditDependentModal = ({
                         placement="bottom"
                         disabled={!values.selectedState}
                         // disabled={!student?.selectedState}
-                        style={{ marginVertical: 5 }}
-                        // label={evaProps => <Text {...evaProps}>City</Text>}
-                        // onChangeText={(query) => {
-                        //   // setFieldValue("city", query);
-                        //   setCitiesData(
-                        //     cities.filter((item) => filterCities(item, query))
-                        //   );
-                        // }}
-                        // onSelect={(query) => {
-                        //   const selectedCity = citiesData[query];
-                        //   // setFieldValue("city", selectedCity);
-                        //   // setFieldValue("selectedCity", selectedCity);
-                        //   getSchoolsByFilter("", "", selectedCity);
-                        // }}
+                        style={styles.textInput}
                         onChangeText={(query) => {
                           setFieldValue("city", query);
                           // setFieldValue("selectedCity", query);
@@ -752,7 +671,13 @@ const EditDependentModal = ({
                         }}
                       >
                         {citiesData.map((item, index) => {
-                          return <AutocompleteItem key={index} title={item} />;
+                          return (
+                            <AutocompleteItem
+                              style={styles.autoCompleteItem}
+                              key={index}
+                              title={item}
+                            />
+                          );
                         })}
                       </Autocomplete>
                       {/* {console.log("values", values)} */}
@@ -763,31 +688,13 @@ const EditDependentModal = ({
                         placement="bottom"
                         onBlur={() => setSchoolsData(schools)}
                         // disabled={!values.selectedState}
-                        style={{ marginVertical: 5 }}
+                        style={styles.textInput}
                         onChangeText={(query) => {
                           console.log("query", query);
                           setFieldValue("school", query);
                           if (values.school.length > 4) {
                             getSchoolsByFilter("", "", "", query);
                           }
-                          // let schoolList = schools.filter((item: any) =>
-                          //   item?.name?.includes(query)
-                          // );
-                          // if (schoolList.length > 0) {
-                          //   setSchoolsData(schoolList);
-                          // } else {
-                          //   setSchoolsData([
-                          //     {
-                          //       schoolId: 0,
-                          //       name: "Other",
-                          //     },
-                          //   ]);
-                          // }
-                          // setSchoolsData(
-                          //   schools.filter((item) =>
-                          //     filterSchools(item?.name, query)
-                          //   )
-                          // );
                         }}
                         onSelect={(query) => {
                           const selectedSchool = schoolsData[query];
@@ -799,7 +706,8 @@ const EditDependentModal = ({
                           schoolsData.length > 0 &&
                           schoolsData.map((school, index) => {
                             return (
-                              <SelectItem
+                              <AutocompleteItem
+                                style={styles.autoCompleteItem}
                                 key={index}
                                 title={school?.name || ""}
                               />
@@ -825,48 +733,6 @@ const EditDependentModal = ({
                             )}
                         </>
                       )}
-
-                      {/* <Select
-                    value={student?.school}
-                    placeholder="School"
-                    label={(evaProps: any) => <Text {...evaProps}>School</Text>}
-                    onSelect={(index: any) => {
-                      setStudent({
-                        ...student,
-                        school: schools[index.row]?.name,
-                      });
-                      setFieldValue("school", schools[index.row]?.name);
-                    }}
-                  >
-                    {schools &&
-                      schools.length > 0 &&
-                      schools.map((school, index) => {
-                        return (
-                          <SelectItem
-                            key={school?.schoolId}
-                            title={school?.name || ""}
-                          />
-                        );
-                      })}
-                  </Select> */}
-                      {/* <Select
-              value={student?.grade}
-              placeholder="Grade"
-              label={(evaProps: any) => <Text {...evaProps}>Grade</Text>}
-              onSelect={(index: any) => {
-                setStudent({
-                  ...student,
-                  grade: grades[index.row]?.name,
-                });
-              }}
-            >
-              {grades &&
-                grades.map((item, index) => {
-                  return (
-                    <SelectItem key={item?.gradeId} title={item?.name || ""} />
-                  );
-                })}
-            </Select> */}
                     </View>
                     {!loading ? (
                       <View style={styles.buttonText}>
@@ -927,23 +793,25 @@ export default EditDependentModal;
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: 192,
+    maxHeight: screenHeight * 0.85,
     flex: 1,
     flexDirection: "column",
     justifyContent: "center",
     width: "90%",
+    backgroundColor: Colors.newBackgroundColor,
   },
   inputSettings: {
     marginTop: 7,
   },
-  modal: { borderRadius: 10 },
+  modal: { borderRadius: 10, backgroundColor: Colors.newBackgroundColor },
   header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 1,
     flexDirection: "row",
-    color: Colors.white,
+
     zIndex: -1,
+    backgroundColor: Colors.newBackgroundColor,
   },
   topNav: {
     color: Colors.white,
@@ -974,10 +842,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     alignItems: "center",
     flexDirection: "row",
+    marginTop: 10,
   },
   errorText: {
-    fontSize: 13,
     color: "red",
+
+    fontSize: 12,
+    marginLeft: 10,
+    marginTop: 5,
   },
   backdrop: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -1007,8 +879,26 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     position: "absolute",
     top: 70,
-    right: 70,
+    right: 90,
     // alignSelf: "center",
     // marginRight: -50,
+  },
+  textInput: {
+    marginTop: 10,
+    alignSelf: "center",
+    width: "100%",
+
+    borderRadius: 8,
+    elevation: 2,
+  },
+  autoCompleteItem: {
+    // elevation: 2,
+    backgroundColor: "transparent",
+    width: "100%",
+  },
+  inputLabels: {
+    color: Colors.black,
+    fontSize: 14,
+    marginBottom: 10,
   },
 });

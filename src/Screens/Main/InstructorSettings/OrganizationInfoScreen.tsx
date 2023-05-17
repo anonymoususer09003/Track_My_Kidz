@@ -51,7 +51,7 @@ import {
   FindInstructorBySchoolOrg,
 } from "@/Services/Instructor";
 
-import { AppHeader } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import { UserState } from "@/Store/User";
 import { GetSchool, UpdateSchool } from "@/Services/School";
 import { loadUserId } from "@/Storage/MainAppStorage";
@@ -64,10 +64,17 @@ import Icon from "react-native-vector-icons/Entypo";
 import { navigationRef } from "@/Navigators/Functions";
 
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
+const filterStates = (item: string, query: string) => {
+  return item?.toLowerCase().includes(query.toLowerCase());
+};
 
+const filterCities = (item: string, query: string) => {
+  return item?.toLowerCase().includes(query.toLowerCase());
+};
 const Divider = () => (
   <View
     style={{
@@ -151,143 +158,26 @@ const OrganizationInfoScreen = ({ navigation }) => {
 
   const handleGetOrganizationInfo = async () => {
     const userId = await loadUserId();
-    console.log("userId", userId);
+
     let res = await GetInstructor(userId);
     if (res.schoolId || res.orgId) {
       GetSchool(res.schoolId)
         .then((org) => {
           setOrgInfo(org);
-          let temp = { ...tableData };
-          let row = [];
-          let rowItem = [];
-          // org?.instructors?.map((item, index) => {
-          //   let { firstname, lastname, email, phone, isAdmin, state } = item;
-          //   row.push([
-          //     firstname,
-          //     lastname,
-          //     email,
-          //     phone ? phone : "",
-          //     isAdmin,
-          //     state,
-          //   ]);
-          //   rowItem.push(item);
-          // });
-          // console.log("row", row);
-          // temp.tableData = row;
-          // temp.item = rowItem;
-          // setTableData(temp);
-          // console.log("res", res);
 
-          // setInstructors(res);
           setInstructors({ result: org?.instructors });
-          // FindInstructorBySchoolOrg({
-          //   schoolId: res?.schoolId,
-          //   orgId: res?.orgId,
-          // })
-          //   .then((res) => {
-          //     let temp = { ...tableData };
-          //     let row = [];
-          //     let rowItem = [];
-          //     res.map((item, index) => {
-          //       let { firstname, lastname, email, phone, isAdmin, state } =
-          //         item;
-          //       row.push([
-          //         firstname,
-          //         lastname,
-          //         email,
-          //         phone ? phone : "",
-          //         isAdmin,
-          //         state,
-          //       ]);
-          //       rowItem.push(item);
-          //     });
-          //     console.log("row", row);
-          //     temp.tableData = row;
-          //     temp.item = rowItem;
-          //     setTableData(temp);
-          //     // console.log("res", res);
-
-          //     // setInstructors(res);
-          //     setInstructors({ result: res });
-          //     // setOrgInfo(org);
-          //   })
-          // .catch((err) => console.log(err));
         })
         .catch((err) => console.log(err));
     }
-    // GetInstructor(userId).then((res) => {
-    //   if (res.schoolId) {
-    //     console.log(
-    //       "res----------------------------------------------------------------",
-    //       res.schoolId + " " + userId
-    //     );
-    //     GetSchool(res.schoolId)
-    //       .then((org) => {
-    //         setOrgInfo(org);
-    //         let temp = { ...tableData };
-    //         let row = [];
-    //         let rowItem = [];
-    //         // org?.instructors?.map((item, index) => {
-    //         //   let { firstname, lastname, email, phone, isAdmin, state } = item;
-    //         //   row.push([
-    //         //     firstname,
-    //         //     lastname,
-    //         //     email,
-    //         //     phone ? phone : "",
-    //         //     isAdmin,
-    //         //     state,
-    //         //   ]);
-    //         //   rowItem.push(item);
-    //         // });
-    //         // console.log("row", row);
-    //         // temp.tableData = row;
-    //         // temp.item = rowItem;
-    //         // setTableData(temp);
-    //         // console.log("res", res);
-
-    //         // setInstructors(res);
-    //         setInstructors({ result: org?.instructors });
-    //         // FindInstructorBySchoolOrg({
-    //         //   schoolId: res?.schoolId,
-    //         //   orgId: res?.orgId,
-    //         // })
-    //         //   .then((res) => {
-    //         //     let temp = { ...tableData };
-    //         //     let row = [];
-    //         //     let rowItem = [];
-    //         //     res.map((item, index) => {
-    //         //       let { firstname, lastname, email, phone, isAdmin, state } =
-    //         //         item;
-    //         //       row.push([
-    //         //         firstname,
-    //         //         lastname,
-    //         //         email,
-    //         //         phone ? phone : "",
-    //         //         isAdmin,
-    //         //         state,
-    //         //       ]);
-    //         //       rowItem.push(item);
-    //         //     });
-    //         //     console.log("row", row);
-    //         //     temp.tableData = row;
-    //         //     temp.item = rowItem;
-    //         //     setTableData(temp);
-    //         //     // console.log("res", res);
-
-    //         //     // setInstructors(res);
-    //         //     setInstructors({ result: res });
-    //         //     // setOrgInfo(org);
-    //         //   })
-    //         // .catch((err) => console.log(err));
-    //       })
-    //       .catch((err) => console.log(err));
-    //   }
-    // });
   };
 
   useEffect(() => {
     // getInstructors();
-    handleGetOrganizationInfo();
+    if (isFocused) {
+      handleGetOrganizationInfo();
+    } else {
+      setisEditMode(false);
+    }
   }, [isFocused]);
 
   const admin1 =
@@ -299,52 +189,10 @@ const OrganizationInfoScreen = ({ navigation }) => {
       ? orgInfo.instructors[1]
       : {};
 
-  const elements = (index, data, item) => {
-    switch (index) {
-      case 4:
-        return (
-          <Text style={{ fontSize: 14 }}>{data ? "Admin" : " "}</Text>
-          // <Select
-          //   style={styles.selectSettings}
-          //   value={data ? "Admin" : "Non-Admin"}
-          //   disabled={true}
-          //   style={{ width: "100%" }}
-          //   onSelect={(index: any) => {
-          //     // setFieldValue("city", cities[index.row]);
-          //     // setFieldValue("selectedCity", cities[index.row]);
-          //   }}
-          //   // label={(evaProps) => <Text {...evaProps}>City</Text>}
-          // >
-          //   {[data ? "Non-Admin" : "Admin"]?.map((city, index) => {
-          //     return <SelectItem key={index} title={city} />;
-          //   })}
-          // </Select>
-        );
-        break;
-      default:
-        return (
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedInstructor(item);
-              setVisible(true);
-            }}
-          >
-            <Icon name="dots-three-vertical" size={20} />
-          </TouchableOpacity>
-        );
-    }
-  };
-  // React.useEffect(() => {
-  //   if (visible) {
-  //     getInstructors();
-  //   }
-  // }, [visible]);
-  // console.log("org", orgInfo);
   return (
-    <>
+    <BackgroundLayout title="Organization Information">
       {!orgInfo && (
         <>
-          <AppHeader title="Organization Information" />
           <ActivityIndicator style={{ marginTop: 50 }} color={Colors.primary} />
         </>
       )}
@@ -358,11 +206,7 @@ const OrganizationInfoScreen = ({ navigation }) => {
         />
       )} */}
           {/* <AddInstructorOrgModal /> */}
-          <AppHeader
-            hideCalendar={true}
-            title="Organization Information"
-            hideApproval={true}
-          />
+          <AppHeader hideCalendar={true} hideCenterIcon={true} />
 
           <KeyboardAwareScrollView
             extraHeight={10}
@@ -370,7 +214,7 @@ const OrganizationInfoScreen = ({ navigation }) => {
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ flex: 1 }}
           >
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <ScrollView style={{ flex: 1 }}>
               <View style={styles.layout}>
                 <View style={[styles.mainLayout, { paddingLeft: 20 }]}>
                   <>
@@ -463,21 +307,21 @@ const OrganizationInfoScreen = ({ navigation }) => {
                         <>
                           <View style={styles.formContainer}>
                             <Input
-                              style={{ marginRight: 20, marginTop: 10 }}
+                              style={styles.textInput}
                               placeholder="School Name"
                               onChangeText={handleChange("name")}
                               value={values.name}
                               disabled={!isEditMode}
                             />
                             <Input
-                              style={{ marginRight: 20, marginTop: 10 }}
+                              style={styles.textInput}
                               placeholder="School Address"
                               onChangeText={handleChange("address")}
                               value={values.address}
                               disabled={!isEditMode}
                             />
                             <Input
-                              style={{ marginRight: 20, marginTop: 10 }}
+                              style={styles.textInput}
                               placeholder="Zip/Post Code"
                               onChangeText={handleChange("zipcode")}
                               value={values.zipcode}
@@ -486,12 +330,9 @@ const OrganizationInfoScreen = ({ navigation }) => {
                             <Autocomplete
                               placeholder="Select your country"
                               value={values.country}
-                              style={{ width: "95%" }}
+                              style={styles.textInput}
                               placement={placement}
                               disabled={!isEditMode}
-                              label={(evaProps) => (
-                                <Text {...evaProps}>Country*</Text>
-                              )}
                               onChangeText={(query) => {
                                 setFieldValue("country", query);
                                 setCountriesData(
@@ -521,17 +362,25 @@ const OrganizationInfoScreen = ({ navigation }) => {
                               {countriesData.map((item, index) => {
                                 return (
                                   <AutocompleteItem
+                                    style={styles.autoCompleteItem}
                                     key={index}
                                     title={item.name}
                                   />
                                 );
                               })}
                             </Autocomplete>
-                            <Select
-                              style={styles.selectSettings}
+                            <Autocomplete
+                              style={styles.textInput}
                               value={values.state}
-                              style={{ width: "95%" }}
                               disabled={!isEditMode}
+                              onChangeText={(query) => {
+                                setFieldValue("state", query);
+                                setStatesData(
+                                  states.filter((item) =>
+                                    filterStates(item, query)
+                                  )
+                                );
+                              }}
                               onSelect={(query: IndexPath) => {
                                 const selectedState = states[query.row];
                                 setFieldValue("state", selectedState);
@@ -546,20 +395,30 @@ const OrganizationInfoScreen = ({ navigation }) => {
                                   setCities(res.data);
                                 });
                               }}
-                              label={(evaProps) => (
-                                <Text {...evaProps}>State</Text>
-                              )}
                             >
                               {states?.map((state, index) => {
-                                return <SelectItem key={index} title={state} />;
+                                return (
+                                  <AutocompleteItem
+                                    style={styles.autoCompleteItem}
+                                    key={index}
+                                    title={state}
+                                  />
+                                );
                               })}
-                            </Select>
+                            </Autocomplete>
 
-                            <Select
-                              style={styles.selectSettings}
+                            <Autocomplete
+                              style={styles.textInput}
                               value={values.city}
                               disabled={!isEditMode}
-                              style={{ width: "95%" }}
+                              onChangeText={(query) => {
+                                setFieldValue("city", query);
+                                setCitiesData(
+                                  cities.filter((item) =>
+                                    filterCities(item, query)
+                                  )
+                                );
+                              }}
                               onSelect={(index: any) => {
                                 setFieldValue("city", cities[index.row]);
                                 setFieldValue(
@@ -567,35 +426,33 @@ const OrganizationInfoScreen = ({ navigation }) => {
                                   cities[index.row]
                                 );
                               }}
-                              label={(evaProps) => (
-                                <Text {...evaProps}>City</Text>
-                              )}
                             >
                               {cities.length > 0
                                 ? cities?.map((city, index) => {
                                     return (
-                                      <SelectItem key={index} title={city} />
+                                      <AutocompleteItem
+                                        style={styles.autoCompleteItem}
+                                        key={index}
+                                        title={city}
+                                      />
                                     );
                                   })
                                 : []}
-                            </Select>
+                            </Autocomplete>
                             <TouchableOpacity
                               onPress={() =>
                                 navigation.navigate("InstructorList", {
                                   data: orgInfo,
                                 })
                               }
-                              style={{
-                                justifyContent: "space-between",
-                                flexDirection: "row",
-                                paddingRight: 15,
-                                marginTop: 20,
-                              }}
+                              style={styles.bottomButtons}
                             >
-                              <Text>Instructor List</Text>
+                              <Text style={styles.bottomButtonsText}>
+                                Instructor List
+                              </Text>
                               <Icon
                                 // style={styles.icon}
-                                size={25}
+                                size={22}
                                 // fill={Colors.gray}
                                 name="chevron-right"
                               />
@@ -606,162 +463,25 @@ const OrganizationInfoScreen = ({ navigation }) => {
                                   data: orgInfo,
                                 })
                               }
-                              style={{
-                                justifyContent: "space-between",
-                                flexDirection: "row",
-                                paddingRight: 15,
-                                marginTop: 20,
-                              }}
+                              style={styles.bottomButtons}
                             >
-                              <Text>Bus Information</Text>
+                              <Text style={styles.bottomButtonsText}>
+                                Bus Information
+                              </Text>
                               <Icon
                                 // style={styles.icon}
-                                size={25}
+                                size={22}
                                 // fill={Colors.gray}
                                 name="chevron-right"
                               />
                             </TouchableOpacity>
 
-                            {/* <Input
-                                                    style={{ marginRight: 20, marginTop: 10 }}
-                                                    placeholder="Zipcode"
-                                                    onChangeText={handleChange('zipCode')}
-                                                    value={values.zipcode}
-                                                    disabled={!isEditMode}
-                                                /> */}
-                            {/* <Text style={{ marginTop: 10 }}>
-                          School Representative - 1
-                        </Text>
-                        <View
-                          style={{
-                            marginVertical: 10,
-                            padding: 10,
-                            borderWidth: 1,
-                            borderColor: Colors.primary,
-                            width: "95%",
-                          }}
-                        >
-                          <Input
-                            style={{ marginRight: 20, marginTop: 10 }}
-                            placeholder="First Name"
-                            onChangeText={handleChange("firstName1")}
-                            value={values.firstName1}
-                            disabled={!isEditMode}
-                          />
-                          <Input
-                            style={{ marginRight: 20, marginTop: 10 }}
-                            placeholder="Last Name"
-                            onChangeText={handleChange("lastName1")}
-                            value={values.lastName1}
-                            disabled={!isEditMode}
-                          />
-                          <Input
-                            style={{ marginRight: 20, marginTop: 10 }}
-                            placeholder="Email"
-                            onChangeText={handleChange("email1")}
-                            value={values.email1}
-                            disabled={!isEditMode}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                          />
-                          <Input
-                            style={{ marginRight: 20, marginTop: 10 }}
-                            placeholder="Phone Number"
-                            keyboardType="number-pad"
-                            onChangeText={handleChange("phone1")}
-                            value={values.phone1}
-                            disabled={!isEditMode}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                          />
-                          <View style={{ flexDirection: "row", padding: 5 }}>
-                            <CheckBox
-                              checked={values.newRepresentative1}
-                              onChange={() =>
-                                setFieldValue(
-                                  "newRepresentative1",
-                                  !values.newRepresentative1
-                                )
-                              }
+                            <View
+                              style={{ marginVertical: 30, marginRight: 20 }}
                             >
-                              {""}
-                            </CheckBox>
-                            <Text style={styles.terms}>
-                              New Representative?
-                            </Text>
-                          </View>
-                        </View>
-                        <Text>School Representative - 2</Text>
-                        <View
-                          style={{
-                            marginVertical: 10,
-                            padding: 10,
-                            borderWidth: 1,
-                            borderColor: Colors.primary,
-                            width: "95%",
-                          }}
-                        >
-                          <Input
-                            style={{ marginRight: 20, marginTop: 10 }}
-                            placeholder="First Name"
-                            onChangeText={handleChange("firstName2")}
-                            value={values.firstName2}
-                            disabled={!isEditMode}
-                          />
-                          <Input
-                            style={{ marginRight: 20, marginTop: 10 }}
-                            placeholder="Last Name"
-                            onChangeText={handleChange("lastName2")}
-                            value={values.lastName2}
-                            disabled={!isEditMode}
-                          />
-                          <Input
-                            style={{ marginRight: 20, marginTop: 10 }}
-                            placeholder="Email"
-                            onChangeText={handleChange("email2")}
-                            value={values.email2}
-                            disabled={!isEditMode}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                          />
-                          <Input
-                            style={{ marginRight: 20, marginTop: 10 }}
-                            placeholder="Phone Number"
-                            keyboardType="number-pad"
-                            onChangeText={handleChange("phone2")}
-                            value={values.phone2}
-                            disabled={!isEditMode}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                          />
-                          <View style={{ flexDirection: "row", padding: 5 }}>
-                            <CheckBox
-                              checked={values.newRepresentative2}
-                              onChange={() =>
-                                setFieldValue(
-                                  "newRepresentative2",
-                                  !values.newRepresentative2
-                                )
-                              }
-                            >
-                              {""}
-                            </CheckBox>
-                            <Text style={styles.terms}>
-                              New Representative?
-                            </Text>
-                          </View>
-                        </View> */}
-                            <View style={styles.buttonSettings}>
-                              <View style={[styles.background]}>
-                                <TouchableOpacity
-                                  style={[styles.background]}
-                                  onPress={handleSubmit}
-                                >
-                                  <Text style={styles.button}>
-                                    {isEditMode ? "Submit" : "Edit"}
-                                  </Text>
-                                </TouchableOpacity>
-                              </View>
+                              <LinearGradientButton onPress={handleSubmit}>
+                                {isEditMode ? "Submit" : "Edit"}
+                              </LinearGradientButton>
                             </View>
                           </View>
                         </>
@@ -770,11 +490,12 @@ const OrganizationInfoScreen = ({ navigation }) => {
                   </>
                 </View>
               </View>
+              <View style={{ height: 80 }} />
             </ScrollView>
           </KeyboardAwareScrollView>
         </>
       )}
-    </>
+    </BackgroundLayout>
   );
 };
 
@@ -784,7 +505,8 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1,
     justifyContent: "space-around",
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
   },
   mainLayout: {
     flex: 1,
@@ -826,16 +548,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     marginLeft: -20,
-    marginBottom: 10,
+    marginBottom: 60,
   },
   selectSettings: {
     marginTop: 18,
   },
   errorText: {
-    fontSize: 10,
     color: "red",
+
+    fontSize: 12,
     marginLeft: 10,
-    marginTop: 10,
+    marginTop: 5,
   },
   terms: {
     color: "text-hint-color",
@@ -944,5 +667,30 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
 
     alignItems: "center",
+  },
+  textInput: {
+    marginTop: 10,
+    alignSelf: "center",
+    width: "95%",
+
+    borderRadius: 8,
+    elevation: 2,
+    marginLeft: "-5%",
+    color: Colors.black,
+  },
+  autoCompleteItem: {
+    // elevation: 2,
+    backgroundColor: "transparent",
+    width: "90%",
+  },
+  bottomButtons: {
+    justifyContent: "space-between",
+    flexDirection: "row",
+    paddingRight: 15,
+    marginTop: 20,
+  },
+  bottomButtonsText: {
+    fontSize: 14,
+    fontWeight: "bold",
   },
 });

@@ -14,7 +14,7 @@ import {
   Icon,
   Card,
 } from "@ui-kitten/components";
-import { Spinner } from "@/Components";
+import { LinearGradientButton, Spinner } from "@/Components";
 import { PersonIcon, PhoneIcon } from "@/Components/SignUp/icons";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,6 +37,7 @@ import { photoUpload } from "@/AWS/aws-upload-service";
 import ProfileAvatarPicker from "@/Components/ProfileAvatar";
 import ProfileIcon from "react-native-vector-icons/EvilIcons";
 import * as yup from "yup";
+import LinearGradient from "react-native-linear-gradient";
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -211,7 +212,8 @@ const AddStudentModal = () => {
       style={{
         width: "100%",
         height: "100%",
-        marginTop: 50,
+        backgroundColor: Colors.newBackgroundColor,
+        // marginTop: 50,
       }}
       onBackdropPress={() => {
         dispatch(ChangeModalState.action({ addStudentModal: false }));
@@ -225,11 +227,13 @@ const AddStudentModal = () => {
             close={() => setVisible(false)}
           />
         )}
-        <KeyboardAwareScrollView style={{ flex: 1 }}>
+        <KeyboardAwareScrollView
+          style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}
+        >
           <View
             style={{
               flex: 1,
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.newBackgroundColor,
               borderTopLeftRadius: 10,
               borderTopRightRadius: 10,
             }}
@@ -376,7 +380,7 @@ const AddStudentModal = () => {
                           />
                         )}
 
-                        {true && renderEditButtonElement()}
+                        {renderEditButtonElement()}
                         {!selectedImage && (
                           <View
                             style={[
@@ -412,7 +416,15 @@ const AddStudentModal = () => {
                           alignItems: "center",
                         }}
                       >
-                        <Text style={{ marginRight: 20, marginTop: 10 }}>
+                        <Text
+                          style={{
+                            marginRight: 20,
+                            marginTop: 10,
+                            color: Colors.black,
+                            fontSize: 14,
+                            marginLeft: 10,
+                          }}
+                        >
                           Use My address
                         </Text>
                         <CheckBox
@@ -457,7 +469,7 @@ const AddStudentModal = () => {
                         ></CheckBox>
                       </View>
                       <Input
-                        style={styles.inputSettings}
+                        style={styles.textInput}
                         autoCapitalize="words"
                         autoCorrect={false}
                         placeholder={`Child's First Name*`}
@@ -470,7 +482,7 @@ const AddStudentModal = () => {
                         <Text style={styles.errorText}>{errors.firstName}</Text>
                       )}
                       <Input
-                        style={styles.inputSettings}
+                        style={styles.textInput}
                         autoCapitalize="words"
                         autoCorrect={false}
                         placeholder={`Child's Last Name*`}
@@ -486,7 +498,7 @@ const AddStudentModal = () => {
                         placeholder="Country*"
                         value={values.country}
                         placement="bottom"
-                        style={{ marginVertical: 5 }}
+                        style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>Country*</Text>}
                         onChangeText={(query) => {
                           setFieldValue("country", query);
@@ -517,7 +529,11 @@ const AddStudentModal = () => {
                       >
                         {countriesData.map((item, index) => {
                           return (
-                            <AutocompleteItem key={index} title={item.name} />
+                            <AutocompleteItem
+                              style={styles.autoCompleteItem}
+                              key={index}
+                              title={item.name}
+                            />
                           );
                         })}
                       </Autocomplete>
@@ -528,7 +544,7 @@ const AddStudentModal = () => {
                         placeholder="State*"
                         value={values.state}
                         placement="bottom"
-                        style={{ marginVertical: 5 }}
+                        style={styles.textInput}
                         disabled={!values.selectedCountry}
                         // label={evaProps => <Text {...evaProps}>State</Text>}
                         onChangeText={(query) => {
@@ -557,7 +573,13 @@ const AddStudentModal = () => {
                         }}
                       >
                         {statesData.map((item, index) => {
-                          return <AutocompleteItem key={index} title={item} />;
+                          return (
+                            <AutocompleteItem
+                              style={styles.autoCompleteItem}
+                              key={index}
+                              title={item}
+                            />
+                          );
                         })}
                       </Autocomplete>
                       {errors.state && touched.state && (
@@ -568,7 +590,7 @@ const AddStudentModal = () => {
                         value={values.city}
                         placement="bottom"
                         disabled={!values.selectedState}
-                        style={{ marginVertical: 5 }}
+                        style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>City</Text>}
                         onChangeText={(query) => {
                           setFieldValue("city", query);
@@ -584,7 +606,13 @@ const AddStudentModal = () => {
                         }}
                       >
                         {citiesData.map((item, index) => {
-                          return <AutocompleteItem key={index} title={item} />;
+                          return (
+                            <AutocompleteItem
+                              style={styles.autoCompleteItem}
+                              key={index}
+                              title={item}
+                            />
+                          );
                         })}
                       </Autocomplete>
                       <Autocomplete
@@ -593,7 +621,7 @@ const AddStudentModal = () => {
                         placement="bottom"
                         onBlur={() => setSchoolsData(schools)}
                         // disabled={!values.selectedState}
-                        style={{ marginVertical: 5 }}
+                        style={styles.textInput}
                         onChangeText={(query) => {
                           setFieldValue("school", query);
                           // let schoolList = schools.filter((item: any) =>
@@ -628,7 +656,8 @@ const AddStudentModal = () => {
                           schoolsData.length > 0 &&
                           schoolsData.map((school, index) => {
                             return (
-                              <SelectItem
+                              <AutocompleteItem
+                                style={styles.autoCompleteItem}
                                 key={index}
                                 title={school?.name || ""}
                               />
@@ -660,7 +689,7 @@ const AddStudentModal = () => {
                       )}
 
                       <Input
-                        style={styles.inputSettings}
+                        style={styles.textInput}
                         autoCapitalize="none"
                         accessoryRight={PersonIcon}
                         value={values.email}
@@ -682,7 +711,7 @@ const AddStudentModal = () => {
                         account.
                       </Text>
                       <Input
-                        style={[styles.inputSettings, { marginBottom: 50 }]}
+                        style={styles.textInput}
                         autoCapitalize="none"
                         autoCorrect={false}
                         placeholder="Phone Number"
@@ -703,77 +732,36 @@ const AddStudentModal = () => {
                             // right: 0,
                             height: "100%",
                             alignItems: "center",
-                            width: "100%",
+                            width: "90%",
                             paddingBottom: 30,
+                            alignSelf: "center",
                           }}
                         >
-                          <View
-                            style={[
-                              styles.bottomButton,
-                              {
-                                backgroundColor:
-                                  isValid && selectedImage != ""
-                                    ? Colors.primary
-                                    : Colors.gray,
-                              },
-                            ]}
+                          <View style={{ height: 20 }} />
+                          <LinearGradientButton
+                            onPress={() => {
+                              if (selectedImage != "") {
+                                setFieldValue("addMore", false);
+                                handleSubmit();
+                              }
+                            }}
                           >
-                            <TouchableOpacity
-                              style={[
-                                styles.bottomButton,
-                                {
-                                  backgroundColor:
-                                    isValid && selectedImage != ""
-                                      ? Colors.primary
-                                      : Colors.gray,
-                                },
-                              ]}
-                              onPress={() => {
-                                if (selectedImage != "") {
-                                  setFieldValue("addMore", false);
-                                  handleSubmit();
-                                }
-                              }}
-                            >
-                              <Text style={styles.button}>I'm done</Text>
-                            </TouchableOpacity>
-                          </View>
-                          <View
-                            style={[
-                              styles.bottomButton,
-                              {
-                                backgroundColor:
-                                  isValid && selectedImage != ""
-                                    ? Colors.primary
-                                    : Colors.gray,
-                              },
-                            ]}
+                            I'm done
+                          </LinearGradientButton>
+                          <View style={{ height: 20 }} />
+                          <LinearGradientButton
+                            onPress={() => {
+                              if (selectedImage != "") {
+                                setFieldValue("addMore", true);
+                                handleSubmit(true);
+                              }
+                            }}
                           >
+                            Add one more
+                          </LinearGradientButton>
+                          <View style={{ height: 10 }} />
+                          <View style={[{ marginBottom: 50 }]}>
                             <TouchableOpacity
-                              style={[
-                                styles.bottomButton,
-                                {
-                                  backgroundColor:
-                                    isValid && selectedImage != ""
-                                      ? Colors.primary
-                                      : Colors.gray,
-                                },
-                              ]}
-                              onPress={() => {
-                                if (selectedImage != "") {
-                                  setFieldValue("addMore", true);
-                                  handleSubmit(true);
-                                }
-                              }}
-                            >
-                              <Text style={styles.button}>Add one more</Text>
-                            </TouchableOpacity>
-                          </View>
-                          <View
-                            style={[styles.bottomButton, { marginBottom: 50 }]}
-                          >
-                            <TouchableOpacity
-                              style={styles.bottomButton}
                               onPress={() =>
                                 dispatch(
                                   ChangeModalState.action({
@@ -829,6 +817,7 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
   },
   item: {
     borderTopLeftRadius: 10,
@@ -870,8 +859,8 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingTop: 5,
-    fontSize: 15,
-    color: Colors.white,
+    fontSize: 18,
+    color: Colors.primaryTint,
     borderRadius: 10,
   },
   backdrop: {
@@ -902,7 +891,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     position: "absolute",
-    right: 100,
+    right: 130,
     top: 80,
     zIndex: 2,
   },
@@ -910,6 +899,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 32,
     paddingHorizontal: 16,
+    backgroundColor: Colors.newBackgroundColor,
   },
   inputSettings: {
     marginTop: 7,
@@ -936,8 +926,11 @@ const styles = StyleSheet.create({
     marginTop: 18,
   },
   errorText: {
-    fontSize: 13,
     color: "red",
+
+    fontSize: 12,
+    marginLeft: 10,
+    marginTop: 5,
   },
   textArea: {
     marginTop: 10,
@@ -995,5 +988,23 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignSelf: "flex-end",
     bottom: 0,
+  },
+  textInput: {
+    marginTop: 10,
+    alignSelf: "center",
+    width: "95%",
+
+    borderRadius: 8,
+    elevation: 2,
+  },
+  autoCompleteItem: {
+    // elevation: 2,
+    backgroundColor: "transparent",
+    width: "90%",
+  },
+  inputLabels: {
+    color: Colors.black,
+    fontSize: 14,
+    marginBottom: 10,
   },
 });

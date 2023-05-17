@@ -27,104 +27,56 @@ const AuthStack = () => (
         name="SignUp1"
         component={FirstSignUpScreen}
         options={{
-          header: ({ navigation }) => (
-            <AuthStackHeader
-              navigation={navigation}
-              title="Registration"
-              back={true}
-            />
-          ),
+          headerShown: false,
         }}
       />
       <AuthNavigator.Screen
         name="EmailConfirmation"
         component={EmailConfirmationScreen}
         options={{
-          header: ({ navigation }) => (
-            <AuthStackHeader
-              navigation={navigation}
-              title="Email Confirmation"
-              back={true}
-            />
-          ),
+          headerShown: false,
         }}
       />
       <AuthNavigator.Screen
         name="FinalRegistrationScreen"
         component={FinalRegistrationScreen}
         options={{
-          header: ({ navigation }) => (
-            <AuthStackHeader
-              navigation={navigation}
-              title="Registration"
-              back={true}
-            />
-          ),
+          headerShown: false,
         }}
       />
       <AuthNavigator.Screen
         name="FinalOrgRegistrationScreen"
         component={FinalOrgRegistrationScreen}
         options={{
-          header: ({ navigation }) => (
-            <AuthStackHeader
-              navigation={navigation}
-              title="Registration"
-              back={true}
-            />
-          ),
+          headerShown: false,
         }}
       />
       <AuthNavigator.Screen
         name="ForgotPassword"
         component={ForgotPasswordScreen}
         options={{
-          header: ({ navigation }) => (
-            <AuthStackHeader
-              navigation={navigation}
-              title="Forgot Password"
-              back={true}
-            />
-          ),
+          headerShown: false,
         }}
       />
       <AuthNavigator.Screen
         name="ResendConfirmation"
         component={ResendConfirmationScreen}
         options={{
-          header: ({ navigation }) => (
-            <AuthStackHeader
-              navigation={navigation}
-              title="Resend Confirmation"
-              back={true}
-            />
-          ),
+          headerShown: false,
         }}
       />
       <AuthNavigator.Screen
         name="ReactivateAccount"
         component={ReactivateAccountScreen}
         options={{
-          header: ({ navigation }) => (
-            <AuthStackHeader
-              navigation={navigation}
-              title="Reactivate Account"
-              back={true}
-            />
-          ),
+          headerShown: false,
         }}
       />
       <AuthNavigator.Screen
         name="ResetPassword"
         component={ResetPasswordScreen}
         options={{
-          header: ({ navigation }) => (
-            <AuthStackHeader
-              navigation={navigation}
-              title="Reset Password"
-              back={true}
-            />
-          ),
+          headerShown: false,
         }}
       />
     </AuthNavigator.Navigator>

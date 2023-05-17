@@ -77,25 +77,6 @@ const DependentInfoScreen = () => {
     });
   }, [focused]);
 
-  // const loadUserDetails = async () => {
-  //   const id = await loadUserId();
-  //   setUser({ parentId: id });
-  //   GetParent(parseInt(id, 0)).then((response) => {
-  //     console.log("response", response);
-  //     fetchChildrens(response?.referenceCode);
-  //   });
-  //   // FetchOne().then((res) => {
-  //   //   setUser(res);
-  //   //   console.log("res---", res.students);
-  //   //   setChildren(res.students);
-  //   // });
-  // };
-  // const fetchChildrens = async (referenceCode: any) => {
-  //   FetchOne(referenceCode).then((res) => {
-  //     // setUser(res);
-  //     console.log("res-children--", res);
-  //     setChildren(res);
-  //   });
   // };
   const getChildrens = async (referCode: string) => {
     try {
@@ -140,14 +121,6 @@ const DependentInfoScreen = () => {
       );
     }
   }, [selectedStudentVisibility]);
-
-  const closeRow = (index) => {
-    console.log(index);
-    if (prevOpenedRow && prevOpenedRow !== row[index]) {
-      prevOpenedRow.close();
-    }
-    prevOpenedRow = row[index];
-  };
 
   const handleTrackHistory = async (
     status: boolean,
@@ -229,10 +202,7 @@ const DependentInfoScreen = () => {
         });
       }
     } catch (err) {
-      console.log(
-        "err7289727878278927878293879289932676267267867267276276762",
-        err
-      );
+      console.log("err", err);
     }
   };
 

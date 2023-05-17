@@ -3,7 +3,7 @@ import Modal from "react-native-modal";
 import { useDispatch, useSelector } from "react-redux";
 import { ModalState } from "@/Store/Modal";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, ScrollView } from "react-native";
+import { StyleSheet, View, ScrollView, Image } from "react-native";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -15,15 +15,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 // import Icon from "react-native-vector-icons/Entypo";
 
 // import { useTheme } from "@/Theme";
-import {
-  Table,
-  TableWrapper,
-  Row,
-  Rows,
-  Col,
-  Cols,
-  Cell,
-} from "react-native-table-component";
+
 import {
   GetInstructor,
   FindInstructorBySchoolOrg,
@@ -34,6 +26,7 @@ import { AppHeader } from "@/Components";
 import AddBusInformation from "@/Modals/AddBusInformation";
 import ViewBusInformation from "@/Modals/ViewBusInformation";
 import EditOrgInstructorsModal from "@/Modals/EditOrganizationInstructorModal";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 const height = Dimensions.get("screen").height;
 
 const OrgBusDetail = ({ route }: any) => {
@@ -70,8 +63,7 @@ const OrgBusDetail = ({ route }: any) => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <AppHeader isBack={true} goBack={true} title="Bus Information" />
+    <BackgroundLayout title="Bus Information">
       {/* {selectedItem && ( */}
       {showAddModal && (
         <AddBusInformation
@@ -92,85 +84,83 @@ const OrgBusDetail = ({ route }: any) => {
           numberOfSeatsPerRow={selectedItem?.numberOfSeatsPerRow}
         />
       )}
-      {/* )} */}
-      <ScrollView style={{ flex: 1 }}>
-        <View style={{ flex: 1 }}>
-          <TouchableOpacity
-            style={styles.floatButton}
-            onPress={() => {
-              setSelectedItem(null);
-              dispatch(
-                ChangeModalState.action({
-                  addButInformationModalVisibility: true,
-                })
-              );
 
-              // dispatch(ChangeModalState.action({ addStudentModal: true }))
-            }}
-          >
-            <AntDesign name="pluscircle" size={30} color={Colors.primary} />
-          </TouchableOpacity>
-          {buses.map((item, index) => {
-            return (
-              <View
-                key={index}
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  paddingHorizontal: 15,
-                  marginTop: 15,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectedItem(item);
-                    dispatch(
-                      ChangeModalState.action({
-                        viewBusInformationModal: true,
-                      })
-                    );
-                  }}
-                  style={{ width: "50%" }}
-                >
-                  <Text>{item.busName}</Text>
-                </TouchableOpacity>
-                <View style={{ flexDirection: "row" }}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      deleteBus(item.busId, index);
-                    }}
-                  >
-                    <Icon
-                      style={{ width: 25, height: 25 }}
-                      fill={Colors.primary}
-                      name="trash"
-                    />
-                  </TouchableOpacity>
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          style={{
+            paddingRight: 19,
+
+            backgroundColor: Colors.newBackgroundColor,
+            flex: 1,
+            borderRadius: 20,
+          }}
+        >
+          <View style={{ flex: 1 }}>
+            {buses.map((item, index) => {
+              return (
+                <View key={index} style={styles.card}>
                   <TouchableOpacity
                     onPress={() => {
                       setSelectedItem(item);
                       dispatch(
                         ChangeModalState.action({
-                          addButInformationModalVisibility: true,
+                          viewBusInformationModal: true,
                         })
                       );
-                      // dispatch(ChangeModalState.action({ addStudentModal: true }))
                     }}
-                    style={{ marginLeft: 10 }}
+                    style={{ width: "50%" }}
                   >
-                    <Icon
-                      style={{ width: 25, height: 25 }}
-                      fill={Colors.primary}
-                      name="edit-2"
-                    />
+                    <Text>{item.busName}</Text>
                   </TouchableOpacity>
+                  <View style={{ flexDirection: "row" }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        deleteBus(item.busId, index);
+                      }}
+                    >
+                      <Image
+                        style={styles.cardImage}
+                        source={require("@/Assets/Images/deleteIcon.png")}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setSelectedItem(item);
+                        dispatch(
+                          ChangeModalState.action({
+                            addButInformationModalVisibility: true,
+                          })
+                        );
+                        // dispatch(ChangeModalState.action({ addStudentModal: true }))
+                      }}
+                      style={{ marginLeft: 10 }}
+                    >
+                      <Image
+                        style={[styles.cardImage]}
+                        source={require("@/Assets/Images/editIcon.png")}
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
+              );
+            })}
+          </View>
+        </ScrollView>
+        <AppHeader
+          hideCalendar={true}
+          onAddPress={() => {
+            setSelectedItem(null);
+            dispatch(
+              ChangeModalState.action({
+                addButInformationModalVisibility: true,
+              })
             );
-          })}
-        </View>
-      </ScrollView>
-    </View>
+
+            // dispatch(ChangeModalState.action({ addStudentModal: true }))
+          }}
+        />
+      </View>
+    </BackgroundLayout>
   );
 };
 export default OrgBusDetail;
@@ -192,6 +182,26 @@ const styles = StyleSheet.create({
     zIndex: 166,
 
     // marginTop: "13%",
+  },
+  card: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 15,
+    marginTop: 15,
+    alignItems: "center",
+
+    borderRadius: 10,
+    height: 50,
+    backgroundColor: Colors.white,
+    elevation: 2,
+    alignSelf: "center",
+    width: "95%",
+    marginLeft: "4%",
+  },
+  cardImage: {
+    height: 20,
+    width: 20,
+    resizeMode: "stretch",
   },
   background: {
     flex: 1,

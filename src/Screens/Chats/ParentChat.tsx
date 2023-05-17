@@ -476,7 +476,7 @@ const SingleChatScreen = ({ route, navigation }) => {
   // );
 
   return (
-    <BackgroundLayout title={`${route?.params?.title} Chat`}>
+    <View style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}>
       <GiftedChat
         renderLoading={renderLoading}
         messages={messages}
@@ -591,7 +591,7 @@ const SingleChatScreen = ({ route, navigation }) => {
           </Button>
         </Card>
       </Modal>
-    </BackgroundLayout>
+    </View>
   );
 };
 
