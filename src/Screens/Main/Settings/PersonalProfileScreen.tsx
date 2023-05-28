@@ -553,6 +553,7 @@ const PersonalProfileScreen = () => {
                   )}
                 </Formik>
               </View>
+              <View style={{ height: 80 }} />
             </ScrollView>
           </KeyboardAwareScrollView>
         </BackgroundLayout>

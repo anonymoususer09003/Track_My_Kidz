@@ -4,14 +4,15 @@
  *
  * @format
  */
-const MetroConfig = require('@ui-kitten/metro-config');
-const blacklist = require('metro-config/src/defaults/exclusionList');
+
+const MetroConfig = require("@ui-kitten/metro-config");
+const blacklist = require("metro-config/src/defaults/exclusionList");
 const evaConfig = {
-  evaPackage: '@eva-design/eva',
-  customMappingPath: './mapping.json',
+  evaPackage: "@eva-design/eva",
+  customMappingPath: "./mapping.json",
 };
 
-module.exports = MetroConfig.create(evaConfig,{
+module.exports = MetroConfig.create(evaConfig, {
   resolver: {
     blacklistRE: blacklist([
       /ios\/Pods\/JitsiMeetSDK\/Frameworks\/JitsiMeet.framework\/assets\/node_modules\/react-native\/.*/,

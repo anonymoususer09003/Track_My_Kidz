@@ -2184,9 +2184,7 @@ const CreateActivityScreen = ({ route }) => {
 
                       <TouchableOpacity
                         style={{ width: "100%", alignItems: "center" }}
-                        disabled={
-                          values?.name?.length < 3 || values?.name?.length > 20
-                        }
+                        // disabled={values?.name?.length < 3}
                         onPress={handleSubmit}
                       >
                         <LinearGradient

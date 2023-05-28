@@ -671,7 +671,7 @@ const AddStudentModal = () => {
                       {values.school == "Other" && (
                         <>
                           <Input
-                            style={styles.inputSettings}
+                            style={styles.textInput}
                             autoCapitalize="words"
                             // accessoryRight={PersonIcon}
                             value={values.selectedSchool}

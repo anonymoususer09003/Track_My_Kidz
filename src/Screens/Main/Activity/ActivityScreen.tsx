@@ -16,7 +16,7 @@ import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import Colors from "@/Theme/Colors";
 import Entypo from "react-native-vector-icons/Entypo";
-import { LinearGradientButton } from "@/Components";
+import Fontisto from "react-native-vector-icons/Fontisto";
 import { InstructionsModal, ShowInstructorsStudentsModal } from "@/Modals";
 import { GetActivityByStudentId, GetActivitesCount } from "@/Services/Activity";
 import { ParticipantLocation } from "@/Services/Activity";
@@ -27,9 +27,10 @@ import moment from "moment";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import SetChatParam from "@/Store/chat/SetChatParams";
 import axios from "axios";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import SockJS from "sockjs-client";
 import * as Stomp from "stompjs";
+import { GroupParticipantsModal } from "@/Modals";
 const ActivityScreen = ({ route }) => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
@@ -65,7 +66,10 @@ const ActivityScreen = ({ route }) => {
   const [getParticipantsIds, setParticipantsIds] = useState([]);
   const [partcipants, setParticipants] = useState([]);
   const [selectedActivity, setSelectedActivity] = useState();
-
+  const [groups, setGroups] = useState({});
+  const [showModal, setModal] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [newParticipnatsArr, setnewParticipnatsArr] = useState([]);
   const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
@@ -152,7 +156,7 @@ const ActivityScreen = ({ route }) => {
       let res = await ParticipantLocation(activityId);
       let deviceIds = [];
       res.map((item) => {
-        item.deviceId && deviceIds.push(item.deviceId);
+        item?.childDeviceId && deviceIds.push(item?.childDeviceId);
       });
 
       setParticipantsIds(deviceIds);
@@ -266,8 +270,105 @@ const ActivityScreen = ({ route }) => {
       setActivities(originalActivities);
     }
   }, [searchBarValue]);
+
+  useEffect(() => {
+    let temp = [];
+    let groups = {};
+    let trackingListKeys = Object.keys(trackingList);
+    trackingListKeys.map((item, index) => {
+      let latitude1 = trackingList[item]?.lat;
+      let longititude1 = trackingList[item]?.lang;
+      for (let j = index + 1; j < trackingListKeys.length - 1; j++) {
+        let nextParticipant = trackingList[trackingListKeys[j]];
+        let latitude2 = nextParticipant?.lat;
+        let longititude2 = nextParticipant?.lang;
+        let distance = calculateDistance(
+          latitude1,
+          longititude1,
+          latitude2,
+          longititude2
+        );
+        const isUnderEqual100Meters = distance <= 100;
+        let participant = partcipants.find(
+          (pers) => pers.childDeviceId == nextParticipant.childDeviceId
+        );
+        if (isUnderEqual100Meters) {
+          participant["group"] = true;
+          participant["groupName"] = index + 1;
+          temp.push(participant);
+          if (groups[index + 1]) {
+            let tempValue = { ...groups[index + 1] };
+
+            tempValue.participants = [...tempValue.participants, participant];
+            groups[index + 1] = tempValue;
+          } else {
+            groups[index + 1] = {
+              id: index + 1,
+              participants: [participant],
+            };
+          }
+        } else {
+          temp.push(participant);
+        }
+      }
+
+      let firstPers = partcipants.find(
+        (firPer) => firPer?.childDeviceId == item
+      );
+
+      let isAnyParticipantExist = temp.find(
+        (temMember) => temMember?.groupName == index + 1
+      );
+      if (isAnyParticipantExist) {
+        firstPers["group"] = true;
+        firstPers["groupName"] = index + 1;
+        temp.push(firstPers);
+
+        if (groups[index + 1]) {
+          let tempValue = { ...groups[index + 1] };
+          tempValue.participants = [...tempValue.participants, firstPers];
+          groups[index + 1] = tempValue;
+        }
+
+        // }
+        else {
+          groups[index + 1] = {
+            id: index + 1,
+            participants: [firstPers],
+          };
+        }
+      } else {
+        temp.push(firstPers);
+      }
+    });
+
+    setGroups(groups);
+    let groupedArray = [];
+    let groupNames = [];
+
+    temp.forEach((item) => {
+      if (!item?.groupName || !groupNames.includes(item?.groupName)) {
+        groupedArray.push(item);
+        if (item?.groupName) {
+          groupNames.push(item?.groupName);
+        }
+      }
+    });
+
+    console.log("grouped", groupedArray);
+    setnewParticipnatsArr(groupedArray);
+    setParticipants(temp);
+  }, [trackingList]);
+
   return (
     <>
+      {selectedGroup && showModal && (
+        <GroupParticipantsModal
+          isVisible={showModal}
+          setIsVisible={() => setModal(false)}
+          participants={groups[selectedGroup]?.participants}
+        />
+      )}
       {selectedInstructions && (
         <InstructionsModal
           selectedInstructions={selectedInstructions}
@@ -550,48 +651,93 @@ const ActivityScreen = ({ route }) => {
         ) : (
           <MapView style={{ flex: 1 }}>
             {partcipants.map((item, index) => {
+              let latitude = trackingList[item.childDeviceId]?.lat;
+              let longititude = trackingList[item.childDeviceId]?.lang;
               // console.log("item", item);
               return (
                 <View style={{ flex: 1 }}>
-                  <Marker
-                    onSelect={() => console.log("pressed")}
-                    onPress={() => {
-                      let latitude = trackingList[item.deviceId].lat;
-                      let longititude = trackingList[item.deviceId].lang;
-                      ref.current.fitToSuppliedMarkers(
-                        [
-                          {
-                            latitude: latitude
-                              ? parseFloat(latitude)
-                              : parseFloat(10),
-                            longitude: longititude
-                              ? parseFloat(longititude)
-                              : parseFloat(10),
-                          },
-                        ]
-                        // false, // not animated
-                      );
-                    }}
-                    identifier={item?.email}
-                    key={index}
-                    coordinate={{
-                      latitude: latitude
-                        ? parseFloat(latitude)
-                        : parseFloat(10),
-                      longitude: longititude
-                        ? parseFloat(longititude)
-                        : parseFloat(10),
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => console.log("pressed")}
-                      style={{ alignItems: "center" }}
+                  {latitude && longititude && (
+                    <Marker
+                      onSelect={() => console.log("pressed")}
+                      onPress={() => {
+                        if (!item?.group) {
+                          ref.current.fitToSuppliedMarkers(
+                            [
+                              {
+                                latitude: latitude
+                                  ? parseFloat(latitude)
+                                  : parseFloat(10),
+                                longitude: longititude
+                                  ? parseFloat(longititude)
+                                  : parseFloat(10),
+                              },
+                            ]
+                            // false, // not animated
+                          );
+                        } else {
+                          setModal(true);
+                          setSelectedGroup(item?.groupName);
+                        }
+                      }}
+                      identifier={item?.email}
+                      key={index}
+                      coordinate={{
+                        latitude: latitude
+                          ? parseFloat(latitude)
+                          : parseFloat(10),
+                        longitude: longititude
+                          ? parseFloat(longititude)
+                          : parseFloat(10),
+                      }}
                     >
-                      <Text>{item?.firstName}</Text>
-                      <Text style={{ marginBottom: 2 }}>{item?.lastName}</Text>
-                      <Fontisto name="map-marker-alt" size={25} color="red" />
-                    </TouchableOpacity>
-                  </Marker>
+                      {!item?.group && (
+                        <TouchableOpacity
+                          onPress={() => console.log("pressed")}
+                          style={{ alignItems: "center" }}
+                        >
+                          <Text>{item?.firstName}</Text>
+                          <Text style={{ marginBottom: 2 }}>
+                            {item?.lastName}
+                          </Text>
+                          <Fontisto
+                            name="map-marker-alt"
+                            size={25}
+                            color="red"
+                          />
+                        </TouchableOpacity>
+                      )}
+
+                      {item?.group && (
+                        <TouchableOpacity
+                          style={{
+                            alignItems: "center",
+                          }}
+                        >
+                          <View
+                            style={{
+                              // position: "absolute",
+                              zIndex: 10,
+                              bottom: 2,
+                              // height: 80,
+                              // width: 80,
+                              // backgroundColor: Colors.primary,
+                              // opacity: 0.7,
+                            }}
+                          >
+                            <Text style={{ fontWeight: "bold" }}>
+                              {groups[item?.groupName]?.participants?.length}
+                            </Text>
+                          </View>
+
+                          <Fontisto
+                            name="map-marker-alt"
+                            size={25}
+                            color="red"
+                          />
+                        </TouchableOpacity>
+                      )}
+                    </Marker>
+                  )}
                 </View>
                 // </>
                 // </Circle>

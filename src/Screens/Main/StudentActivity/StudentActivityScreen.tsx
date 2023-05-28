@@ -20,12 +20,14 @@ import { useDispatch, useSelector } from "react-redux";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import Colors from "@/Theme/Colors";
+import axios from "axios";
 import { InstructionsModal } from "@/Modals";
 import {
   GetActivityByStudentId,
   GetAllActivity,
   GetActivitesCount,
 } from "@/Services/Activity";
+import Fontisto from "react-native-vector-icons/Fontisto";
 import { AwsLocationTracker } from "@/Services/TrackController";
 import Geolocation from "@react-native-community/geolocation";
 import { UserState } from "@/Store/User";
@@ -47,6 +49,7 @@ import { StudentState } from "@/Store/StudentActivity";
 import firestore from "@react-native-firebase/firestore";
 import BackgroundService from "react-native-background-actions";
 import SetChatParam from "@/Store/chat/SetChatParams";
+import { GroupParticipantsModal } from "@/Modals";
 const StudentActivityScreen = ({ route }) => {
   const navigation = useNavigation();
 
@@ -54,6 +57,8 @@ const StudentActivityScreen = ({ route }) => {
   const searchBarValue = useSelector(
     (state: any) => state.header.searchBarValue
   );
+  const cancelToken = axios.CancelToken;
+  const source = cancelToken.source();
   const [originalActivities, setOriginalActivities] = useState<Activity[]>([]);
   const [activitiesCount, setActivitiesCount] = useState({});
   const [children, setChildren] = useState([]);
@@ -73,6 +78,10 @@ const StudentActivityScreen = ({ route }) => {
   const [selectedActivity, setSelectedActivity] = useState();
   const [trackerName, setTrackerName] = useState();
   const [trackingList, setTrackingList] = useState({});
+  const [newParticipnatsArr, setnewParticipnatsArr] = useState([]);
+  const [showModal, setModal] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [groups, setGroups] = useState({});
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
@@ -313,6 +322,61 @@ const StudentActivityScreen = ({ route }) => {
     // await BackgroundService.stop();
   };
 
+  const getParticipantLocation = async (activityId) => {
+    try {
+      let res = await ParticipantLocation(activityId);
+      let deviceIds = [];
+      res.map((item) => {
+        item?.childDeviceId && deviceIds.push(item?.childDeviceId);
+      });
+
+      setParticipantsIds(deviceIds);
+      deviceIds.length > 0 &&
+        turnOnParticipantsTracker(activityId, deviceIds, "activity");
+      console.log("res", res);
+      setParticipants(res);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
+  const turnOnParticipantsTracker = async (
+    id: any,
+    deviceIds: any,
+    from: any
+  ) => {
+    try {
+      console.log("deviceids", deviceIds);
+      const token = await loadToken();
+
+      const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+      stompClient = Stomp.over(socket);
+      stompClient.connect({ token }, () => {
+        console.log("Connected");
+        deviceIds.map((item) => {
+          stompClient.subscribe(
+            `/device/${item}`,
+            participantSubscriptionCallback
+          );
+        });
+      });
+    } catch (err) {
+      console.log("Error:", err);
+    }
+  };
+  const participantSubscriptionCallback = (subscriptionMessage: any) => {
+    const messageBody = JSON.parse(subscriptionMessage.body);
+
+    setTrackingList({
+      ...trackingList,
+      [messageBody.deviceId]: {
+        lat: messageBody?.latitude,
+        lang: messageBody?.longitude,
+      },
+    });
+    console.log("Update Received", messageBody);
+  };
+
   useEffect(() => {
     locationPermission();
     // return () => backgroundCall();
@@ -342,7 +406,7 @@ const StudentActivityScreen = ({ route }) => {
               showParticipantMap: true,
             })
           );
-          // getParticipantLocation(item?.activityId);
+          getParticipantLocation(item?.activityId);
         }}
       >
         <Entypo size={45} color={Colors.primary} name="location-pin" />
@@ -527,6 +591,101 @@ const StudentActivityScreen = ({ route }) => {
       setActivities(originalActivities);
     }
   }, [searchBarValue]);
+
+  useEffect(() => {
+    let temp = [];
+    let groups = {};
+    let trackingListKeys = Object.keys(trackingList);
+    trackingListKeys.map((item, index) => {
+      let latitude1 = trackingList[item]?.lat;
+      let longititude1 = trackingList[item]?.lang;
+      for (let j = index + 1; j < trackingListKeys.length - 1; j++) {
+        let nextParticipant = trackingList[trackingListKeys[j]];
+        let latitude2 = nextParticipant?.lat;
+        let longititude2 = nextParticipant?.lang;
+        let distance = calculateDistance(
+          latitude1,
+          longititude1,
+          latitude2,
+          longititude2
+        );
+        const isUnderEqual100Meters = distance <= 100;
+        let participant = partcipants.find(
+          (pers) => pers.childDeviceId == nextParticipant.childDeviceId
+        );
+        if (isUnderEqual100Meters) {
+          console.log("participnat", participant);
+          participant["group"] = true;
+          participant["groupName"] = index + 1;
+          temp.push(participant);
+          if (groups[index + 1]) {
+            let tempValue = { ...groups[index + 1] };
+            console.log("participant--", participant);
+            console.log("tempvalue-------3", tempValue);
+            tempValue.participants = [...tempValue.participants, participant];
+            groups[index + 1] = tempValue;
+          } else {
+            console.log("else", [participant]);
+            groups[index + 1] = {
+              id: index + 1,
+              participants: [participant],
+            };
+          }
+        } else {
+          console.log("participant", participant);
+          temp.push(participant);
+        }
+      }
+      console.log("groups", groups);
+      let firstPers = partcipants.find(
+        (firPer) => firPer?.childDeviceId == item
+      );
+
+      let isAnyParticipantExist = temp.find(
+        (temMember) => temMember?.groupName == index + 1
+      );
+      if (isAnyParticipantExist) {
+        firstPers["group"] = true;
+        firstPers["groupName"] = index + 1;
+        temp.push(firstPers);
+        console.log("groups", groups);
+        if (groups[index + 1]) {
+          let tempValue = { ...groups[index + 1] };
+          tempValue.participants = [...tempValue.participants, firstPers];
+          groups[index + 1] = tempValue;
+          console.log("tempvalue", tempValue);
+        }
+
+        // }
+        else {
+          groups[index + 1] = {
+            id: index + 1,
+            participants: [firstPers],
+          };
+        }
+      } else {
+        temp.push(firstPers);
+      }
+    });
+
+    setGroups(groups);
+    let groupedArray = [];
+    let groupNames = [];
+
+    temp.forEach((item) => {
+      if (!item?.groupName || !groupNames.includes(item?.groupName)) {
+        groupedArray.push(item);
+        if (item?.groupName) {
+          groupNames.push(item?.groupName);
+        }
+      }
+    });
+
+    console.log("grouped", groupedArray);
+    setnewParticipnatsArr(groupedArray);
+    setParticipants(temp);
+  }, [trackingList]);
+
   return (
     <>
       {selectedInstructions && (
@@ -535,6 +694,15 @@ const StudentActivityScreen = ({ route }) => {
           setSelectedInstructions={setSelectedInstructions}
         />
       )}
+
+      {selectedGroup && showModal && (
+        <GroupParticipantsModal
+          isVisible={showModal}
+          setIsVisible={() => setModal(false)}
+          participants={groups[selectedGroup]?.participants}
+        />
+      )}
+
       {!showFamilyMap && !showParticipantMap ? (
         <View style={styles.layout}>
           {activities.length > 0 && (
@@ -809,45 +977,67 @@ const StudentActivityScreen = ({ route }) => {
         <MapView style={{ flex: 1 }}>
           {partcipants.map((item, index) => {
             // console.log("item", item);
+            let latitude = trackingList[item.childDeviceId]?.lat;
+            let longititude = trackingList[item.childDeviceId]?.lang;
+            console.log("latitiude-------", longititude);
             return (
               <View style={{ flex: 1 }}>
-                <Marker
-                  onSelect={() => console.log("pressed")}
-                  onPress={() => {
-                    let latitude = trackingList[item.childDevice]?.lat;
-                    let longititude = trackingList[item.childDevice]?.lang;
-                    ref.current.fitToSuppliedMarkers(
-                      [
-                        {
-                          latitude: latitude
-                            ? parseFloat(latitude)
-                            : parseFloat(10),
-                          longitude: longititude
-                            ? parseFloat(longititude)
-                            : parseFloat(10),
-                        },
-                      ]
-                      // false, // not animated
-                    );
-                  }}
-                  identifier={item?.email}
-                  key={index}
-                  coordinate={{
-                    latitude: latitude ? parseFloat(latitude) : parseFloat(10),
-                    longitude: longititude
-                      ? parseFloat(longititude)
-                      : parseFloat(10),
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => console.log("pressed")}
-                    style={{ alignItems: "center" }}
+                {latitude && longititude && (
+                  <Marker
+                    onSelect={() => console.log("pressed")}
+                    onPress={() => {
+                      if (item?.group) {
+                        setModal(true);
+                        setSelectedGroup(item?.groupName);
+                      }
+                    }}
+                    identifier={item?.email}
+                    key={index}
+                    coordinate={{
+                      latitude,
+                      longitude: longititude,
+                    }}
                   >
-                    <Text>{item?.firstName}</Text>
-                    <Text style={{ marginBottom: 2 }}>{item?.lastName}</Text>
-                    <Fontisto name="map-marker-alt" size={25} color="red" />
-                  </TouchableOpacity>
-                </Marker>
+                    {!item?.group && (
+                      <TouchableOpacity
+                        onPress={() => console.log("pressed")}
+                        style={{ alignItems: "center" }}
+                      >
+                        <Text>{item?.firstName}</Text>
+                        <Text style={{ marginBottom: 2 }}>
+                          {item?.lastName}
+                        </Text>
+                        <Fontisto name="map-marker-alt" size={25} color="red" />
+                      </TouchableOpacity>
+                    )}
+
+                    {item?.group && (
+                      <TouchableOpacity
+                        style={{
+                          alignItems: "center",
+                        }}
+                      >
+                        <View
+                          style={{
+                            // position: "absolute",
+                            zIndex: 10,
+                            bottom: 2,
+                            // height: 80,
+                            // width: 80,
+                            // backgroundColor: Colors.primary,
+                            // opacity: 0.7,
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold" }}>
+                            {groups[item?.groupName]?.participants?.length}
+                          </Text>
+                        </View>
+
+                        <Fontisto name="map-marker-alt" size={25} color="red" />
+                      </TouchableOpacity>
+                    )}
+                  </Marker>
+                )}
               </View>
               // </>
               // </Circle>

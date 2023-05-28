@@ -434,14 +434,14 @@ const RollCallModal = ({ activity, setSelectedActivity, buses, setBuses }) => {
                             {item.type === "Instructor" ? (
                               <Ionicons
                                 name="person"
-                                color={Colors.primary}
+                                color={Colors.secondaryDark}
                                 size={20}
                                 style={{ marginHorizontal: 5 }}
                               />
                             ) : (
                               <Entypo
                                 name="book"
-                                color={Colors.primary}
+                                color={Colors.secondaryDark}
                                 size={20}
                                 style={{ marginHorizontal: 5 }}
                               />
@@ -501,7 +501,7 @@ const RollCallModal = ({ activity, setSelectedActivity, buses, setBuses }) => {
                           >
                             <Ionicons
                               name="person"
-                              color={Colors.primary}
+                              color={Colors.secondaryDark}
                               size={20}
                               style={{ marginHorizontal: 5 }}
                             />
@@ -545,76 +545,61 @@ const RollCallModal = ({ activity, setSelectedActivity, buses, setBuses }) => {
                 </View>
                 <View
                   style={{
-                    position: "absolute",
                     bottom: 30,
                     left: 0,
                     right: 0,
                     alignItems: "center",
-                    width: "100%",
+                    width: "90%",
+                    alignSelf: "center",
                   }}
                 >
                   {!rollCall && (
                     <>
-                      <View style={styles.bottomButton}>
-                        <TouchableOpacity
-                          style={styles.bottomButton}
-                          onPress={() => {
-                            setSaved(false);
-                            setRollCall(true);
-                          }}
+                      <LinearGradientButton
+                        onPress={() => {
+                          setSaved(false);
+                          setRollCall(true);
+                        }}
+                      >
+                        Roll Call
+                      </LinearGradientButton>
+
+                      <TouchableOpacity
+                        onPress={() => {
+                          dispatch(
+                            ChangeModalState.action({
+                              rollCallModalVisibility: false,
+                            })
+                          );
+                          setSelectedActivity(null);
+                        }}
+                      >
+                        <Text
+                          style={[styles.button, { color: Colors.primary }]}
                         >
-                          <Text style={styles.button}>Roll Call</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <View style={styles.bottomButton}>
-                        <TouchableOpacity
-                          style={styles.bottomButton}
-                          onPress={() => {
-                            dispatch(
-                              ChangeModalState.action({
-                                rollCallModalVisibility: false,
-                              })
-                            );
-                            setSelectedActivity(null);
-                          }}
-                        >
-                          <Text style={styles.button}>Close</Text>
-                        </TouchableOpacity>
-                      </View>
+                          Close
+                        </Text>
+                      </TouchableOpacity>
                     </>
                   )}
 
                   {rollCall && (
-                    <View style={styles.bottomButton}>
-                      <TouchableOpacity
-                        style={styles.bottomButton}
-                        onPress={() => {
-                          // markAll()
-                          setMarkAll(true);
-                          // isAttendance ? updateAttendance() : createAttendance();
-                          // setSaved(true);
-                          // setRollCall(false);
-                        }}
-                      >
-                        <Text style={styles.button}>Mark All</Text>
-                      </TouchableOpacity>
-                    </View>
+                    <LinearGradientButton onPress={() => setMarkAll(true)}>
+                      Mark All
+                    </LinearGradientButton>
                   )}
+                  <View style={{ marginVertical: 10 }} />
                   {rollCall && (
-                    <View style={styles.bottomButton}>
-                      <TouchableOpacity
-                        style={styles.bottomButton}
-                        onPress={() => {
-                          isAttendance
-                            ? updateAttendance()
-                            : createAttendance();
-                          setSaved(true);
-                          setRollCall(false);
-                        }}
-                      >
-                        <Text style={styles.button}>Save</Text>
-                      </TouchableOpacity>
-                    </View>
+                    <LinearGradientButton
+                      gradient={[Colors.primaryLight, Colors.primaryDark]}
+                      onPress={() => {
+                        isAttendance ? updateAttendance() : createAttendance();
+                        setSaved(true);
+                        setRollCall(false);
+                      }}
+                    >
+                      Save
+                    </LinearGradientButton>
                   )}
                 </View>
               </View>

@@ -10,7 +10,7 @@ export const EmailIcon = (style: any): IconElement => (
 );
 
 export const PersonIcon = (style: any): IconElement => (
-  <Image source={userIcon} style={{ height: 17, width: 17, marginRight: 10 }} />
+  <Image source={userIcon} style={{ height: 18, width: 18, marginRight: 10 }} />
 );
 export const LocationIcon = (style: any): IconElement => (
   <Image

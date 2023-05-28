@@ -27,7 +27,7 @@ import { LinearGradientButton } from "@/Components";
 import FastImage from "react-native-fast-image";
 import Colors from "@/Theme/Colors";
 import BackgroundLayout from "@/Components/BackgroundLayout";
-
+import CustomDropdown from "@/Components/CustomDropDown";
 const user_types = [
   { id: 1, label: "Parent", value: "Parent" },
   { id: 2, label: "Instructor", value: "Instructor" },
@@ -161,20 +161,19 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
           }) => (
             <>
               <Layout style={styles.formContainer}>
-                <Select
-                  style={{ marginTop: 18 }}
-                  value={user_type}
-                  selectedIndex={user_types.findIndex(
-                    (u) => u.id === user_type?.id
-                  )}
-                  placeholder="Select User"
-                  disabled
-                  label={(evaProps: any) => <Text {...evaProps}></Text>}
-                >
-                  {user_types.map((type, index) => {
-                    return <SelectItem key={index} title={type?.label} />;
-                  })}
-                </Select>
+                <View style={{ marginTop: 80, marginBottom: 30 }}>
+                  <CustomDropdown
+                    disable={true}
+                    placeholder="Select User"
+                    value={user_type}
+                    onSelect={(index: any) => {
+                      console.log("index", index);
+                      setFieldValue("user_type", user_type[index].value);
+                    }}
+                    dropDownList={user_types}
+                  />
+                </View>
+
                 <Input
                   placeholderTextColor={Colors.white}
                   placeholder="Reference Code"

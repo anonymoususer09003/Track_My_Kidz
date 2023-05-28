@@ -33,6 +33,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import Colors from "@/Theme/Colors";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import QRCodeScanner from "react-native-qrcode-scanner";
+import CustomDropdown from "@/Components/CustomDropDown";
 import { RNCamera } from "react-native-camera";
 import {
   GetAuthStudentByActivationCode,
@@ -254,23 +255,19 @@ const FirstSignUpScreen = ({ navigation }) => {
                 }) => (
                   <>
                     <Layout style={styles.formContainer}>
-                      <Select
-                        style={{ marginTop: 18 }}
-                        value={values.user_type}
-                        placeholder="Select User"
-                        onSelect={(index: any) => {
-                          setFieldValue(
-                            "user_type",
-                            user_type[index.row].value
-                          );
-                          setSelectedUserType(user_type[index.row].value);
-                        }}
-                        label={(evaProps: any) => <Text {...evaProps}></Text>}
-                      >
-                        {user_type.map((type, index) => {
-                          return <SelectItem key={index} title={type?.label} />;
-                        })}
-                      </Select>
+                      <View style={{ flex: 1, marginVertical: 30 }}>
+                        <CustomDropdown
+                          placeholder="Select User"
+                          value={values.user_type}
+                          onSelect={(index: any) => {
+                            console.log("index", index);
+                            setFieldValue("user_type", user_type[index].value);
+                            setSelectedUserType(user_type[index].value);
+                          }}
+                          dropDownList={user_type}
+                        />
+                      </View>
+                      {console.log("err", errors)}
                       {values.user_type === "Student" && (
                         <View style={{ marginVertical: 10 }}>
                           <Text

@@ -306,23 +306,21 @@ const InstructorsStudentsModal = ({
             {refreshing && (
               <ActivityIndicator size="large" color={Colors.primary} />
             )}
-
-            <View style={styles.buttonSettings}>
-              <View style={styles.bottomButton}>
-                <TouchableOpacity
-                  style={styles.bottomButton}
-                  onPress={() => {
-                    setIsVisible();
-                    setSelectAll(false);
-                    _dispatch({
-                      type: actions.SET_SELECTED_ACTIVITY,
-                      payload: null,
-                    });
-                  }}
-                >
-                  <Text style={styles.button}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
+            <View
+              style={{ width: "80%", alignSelf: "center", marginBottom: 20 }}
+            >
+              <LinearGradientButton
+                onPress={() => {
+                  setIsVisible();
+                  setSelectAll(false);
+                  _dispatch({
+                    type: actions.SET_SELECTED_ACTIVITY,
+                    payload: null,
+                  });
+                }}
+              >
+                Cancel
+              </LinearGradientButton>
             </View>
           </View>
         </View>

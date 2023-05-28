@@ -476,122 +476,261 @@ const SingleChatScreen = ({ route, navigation }) => {
   // );
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}>
-      <GiftedChat
-        renderLoading={renderLoading}
-        messages={messages}
-        alwaysShowSend={true}
-        showAvatarForEveryMessage={true}
-        renderInputToolbar={
-          params?.chattersIds?.length <= 1
-            ? () => renderNoUserMessage()
-            : undefined
-        }
-        onSend={(messages) => onSend(messages)}
-        user={{
-          ...chat?.user,
-        }}
-        renderUsernameOnMessage={true}
-        // renderAccessory={renderAccessory}
-        // renderAvatar={() => (
-        //   <Image
-        //     source={{ uri: user?.imageurl }}
-        //     style={{ height: 40, width: 40, borderRadius: 40 }}
-        //   />
-        // )}
-        renderBubble={(props) => {
-          const { currentMessage } = props;
-          return (
-            <Bubble
-              {...props}
-              wrapperStyle={{
-                left: {
-                  backgroundColor: "#fff",
-                },
-                right: {
-                  backgroundColor: Colors.primary,
-                },
-              }}
-              textStyle={{
-                left: { fontWeight: "bold" },
-                right: {},
-              }}
-              timeTextStyle={{
-                left: {},
-                right: {},
-              }}
-            />
-          );
-        }}
-        // onLongPress={(context, message) => {
-        //   const options = ["Copy Message", "Delete Message", "Cancel"];
-        //   const cancelButtonIndex = options?.length - 1;
-        //   context.actionSheet().showActionSheetWithOptions(
-        //     {
-        //       options,
-        //       cancelButtonIndex,
-        //     },
-        //     (buttonIndex) => {
-        //       switch (buttonIndex) {
-        //         case 0:
-        //           Clipboard.setString(message.text);
-        //           break;
-        //         case 1:
-        //           deleteSingleMessage(message);
-        //           break;
-        //       }
-        //     }
-        //   );
-        // }}
-      />
-
-      <Modal visible={chatModalVisible} style={{ width: "60%" }}>
-        <Card disabled={true}>
-          <Button onPress={() => deleteSingleChat()} style={styles.btnAction}>
-            <>
-              <Icon style={styles.icon} fill="#fff" name="trash-2-outline" />
-              <Text style={styles.btnActionsTxt}>Delete</Text>
-            </>
-          </Button>
-          <Button
-            onPress={() =>
-              dispatch(
-                ChangeModalState.action({
-                  flagBlogModal: true,
-                })
-              )
+    <>
+      {route?.params?.showHeader ? (
+        <BackgroundLayout title={`${route?.params?.title} Chat`}>
+          <GiftedChat
+            renderLoading={renderLoading}
+            messages={messages}
+            alwaysShowSend={true}
+            showAvatarForEveryMessage={true}
+            renderInputToolbar={
+              params?.chattersIds?.length <= 1
+                ? () => renderNoUserMessage()
+                : undefined
             }
-            style={styles.btnAction}
-          >
-            <>
-              <Icon style={styles.icon} fill="#fff" name="flag-outline" />
-              <Text style={styles.btnActionsTxt}>Flag</Text>
-            </>
-          </Button>
-          <Button
-            onPress={() => blockUser(receiverUser?.id, receiverUser?.username)}
-            style={styles.btnAction}
-          >
-            <>
-              <Icon name={"minus-circle"} style={styles.icon} fill="#fff" />
-              <Text style={styles.btnActionsTxt}>Block</Text>
-            </>
-          </Button>
+            onSend={(messages) => onSend(messages)}
+            user={{
+              ...chat?.user,
+            }}
+            renderUsernameOnMessage={true}
+            // renderAccessory={renderAccessory}
+            // renderAvatar={() => (
+            //   <Image
+            //     source={{ uri: user?.imageurl }}
+            //     style={{ height: 40, width: 40, borderRadius: 40 }}
+            //   />
+            // )}
+            renderBubble={(props) => {
+              const { currentMessage } = props;
+              return (
+                <Bubble
+                  {...props}
+                  wrapperStyle={{
+                    left: {
+                      backgroundColor: "#fff",
+                    },
+                    right: {
+                      backgroundColor: Colors.primary,
+                    },
+                  }}
+                  textStyle={{
+                    left: { fontWeight: "bold" },
+                    right: {},
+                  }}
+                  timeTextStyle={{
+                    left: {},
+                    right: {},
+                  }}
+                />
+              );
+            }}
+            // onLongPress={(context, message) => {
+            //   const options = ["Copy Message", "Delete Message", "Cancel"];
+            //   const cancelButtonIndex = options?.length - 1;
+            //   context.actionSheet().showActionSheetWithOptions(
+            //     {
+            //       options,
+            //       cancelButtonIndex,
+            //     },
+            //     (buttonIndex) => {
+            //       switch (buttonIndex) {
+            //         case 0:
+            //           Clipboard.setString(message.text);
+            //           break;
+            //         case 1:
+            //           deleteSingleMessage(message);
+            //           break;
+            //       }
+            //     }
+            //   );
+            // }}
+          />
 
-          <Button
-            onPress={() => setChatModalVisible(false)}
-            style={styles.btnAction}
-            appearance="ghost"
-          >
-            <>
-              <Text style={[styles.btnActionsTxt, { color: "#404040" }]}>
-                CANCEL
-              </Text>
-            </>
-          </Button>
-        </Card>
-      </Modal>
-    </View>
+          <Modal visible={chatModalVisible} style={{ width: "60%" }}>
+            <Card disabled={true}>
+              <Button
+                onPress={() => deleteSingleChat()}
+                style={styles.btnAction}
+              >
+                <>
+                  <Icon
+                    style={styles.icon}
+                    fill="#fff"
+                    name="trash-2-outline"
+                  />
+                  <Text style={styles.btnActionsTxt}>Delete</Text>
+                </>
+              </Button>
+              <Button
+                onPress={() =>
+                  dispatch(
+                    ChangeModalState.action({
+                      flagBlogModal: true,
+                    })
+                  )
+                }
+                style={styles.btnAction}
+              >
+                <>
+                  <Icon style={styles.icon} fill="#fff" name="flag-outline" />
+                  <Text style={styles.btnActionsTxt}>Flag</Text>
+                </>
+              </Button>
+              <Button
+                onPress={() =>
+                  blockUser(receiverUser?.id, receiverUser?.username)
+                }
+                style={styles.btnAction}
+              >
+                <>
+                  <Icon name={"minus-circle"} style={styles.icon} fill="#fff" />
+                  <Text style={styles.btnActionsTxt}>Block</Text>
+                </>
+              </Button>
+
+              <Button
+                onPress={() => setChatModalVisible(false)}
+                style={styles.btnAction}
+                appearance="ghost"
+              >
+                <>
+                  <Text style={[styles.btnActionsTxt, { color: "#404040" }]}>
+                    CANCEL
+                  </Text>
+                </>
+              </Button>
+            </Card>
+          </Modal>
+        </BackgroundLayout>
+      ) : (
+        <View style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}>
+          <GiftedChat
+            renderLoading={renderLoading}
+            messages={messages}
+            alwaysShowSend={true}
+            showAvatarForEveryMessage={true}
+            renderInputToolbar={
+              params?.chattersIds?.length <= 1
+                ? () => renderNoUserMessage()
+                : undefined
+            }
+            onSend={(messages) => onSend(messages)}
+            user={{
+              ...chat?.user,
+            }}
+            renderUsernameOnMessage={true}
+            // renderAccessory={renderAccessory}
+            // renderAvatar={() => (
+            //   <Image
+            //     source={{ uri: user?.imageurl }}
+            //     style={{ height: 40, width: 40, borderRadius: 40 }}
+            //   />
+            // )}
+            renderBubble={(props) => {
+              const { currentMessage } = props;
+              return (
+                <Bubble
+                  {...props}
+                  wrapperStyle={{
+                    left: {
+                      backgroundColor: "#fff",
+                    },
+                    right: {
+                      backgroundColor: Colors.primary,
+                    },
+                  }}
+                  textStyle={{
+                    left: { fontWeight: "bold" },
+                    right: {},
+                  }}
+                  timeTextStyle={{
+                    left: {},
+                    right: {},
+                  }}
+                />
+              );
+            }}
+            // onLongPress={(context, message) => {
+            //   const options = ["Copy Message", "Delete Message", "Cancel"];
+            //   const cancelButtonIndex = options?.length - 1;
+            //   context.actionSheet().showActionSheetWithOptions(
+            //     {
+            //       options,
+            //       cancelButtonIndex,
+            //     },
+            //     (buttonIndex) => {
+            //       switch (buttonIndex) {
+            //         case 0:
+            //           Clipboard.setString(message.text);
+            //           break;
+            //         case 1:
+            //           deleteSingleMessage(message);
+            //           break;
+            //       }
+            //     }
+            //   );
+            // }}
+          />
+
+          <Modal visible={chatModalVisible} style={{ width: "60%" }}>
+            <Card disabled={true}>
+              <Button
+                onPress={() => deleteSingleChat()}
+                style={styles.btnAction}
+              >
+                <>
+                  <Icon
+                    style={styles.icon}
+                    fill="#fff"
+                    name="trash-2-outline"
+                  />
+                  <Text style={styles.btnActionsTxt}>Delete</Text>
+                </>
+              </Button>
+              <Button
+                onPress={() =>
+                  dispatch(
+                    ChangeModalState.action({
+                      flagBlogModal: true,
+                    })
+                  )
+                }
+                style={styles.btnAction}
+              >
+                <>
+                  <Icon style={styles.icon} fill="#fff" name="flag-outline" />
+                  <Text style={styles.btnActionsTxt}>Flag</Text>
+                </>
+              </Button>
+              <Button
+                onPress={() =>
+                  blockUser(receiverUser?.id, receiverUser?.username)
+                }
+                style={styles.btnAction}
+              >
+                <>
+                  <Icon name={"minus-circle"} style={styles.icon} fill="#fff" />
+                  <Text style={styles.btnActionsTxt}>Block</Text>
+                </>
+              </Button>
+
+              <Button
+                onPress={() => setChatModalVisible(false)}
+                style={styles.btnAction}
+                appearance="ghost"
+              >
+                <>
+                  <Text style={[styles.btnActionsTxt, { color: "#404040" }]}>
+                    CANCEL
+                  </Text>
+                </>
+              </Button>
+            </Card>
+          </Modal>
+        </View>
+      )}
+    </>
   );
 };
 

@@ -597,7 +597,7 @@ const InstructorActivityScreen = ({ route }: any) => {
 
   useEffect(() => {
     if (isFocused) {
-      connectSockets();
+      // connectSockets();
       // Alert.alert("kk");
       // if (countries) {
       // fetchCountries();

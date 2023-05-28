@@ -39,3 +39,4 @@ export { default as ShowInstructorsStudentsModal } from "./ShowInstructorsStuden
 export { default as ShowStudentsInstructorsGroupModal } from "./ShowStudentsInstructorsGroupModal";
 export { default as ImagePickerModal } from "./ImagePickerModal";
 export { default as ViewBusInformation } from "./ViewBusInformation";
+export { default as GroupParticipantsModal } from "./GroupParticipantsModal";

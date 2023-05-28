@@ -70,6 +70,7 @@
     "react-native-device-info": "^8.5.0",
     "react-native-document-picker": "^6.0.4",
     "react-native-drax": "^0.10.3",
+    "react-native-dropdown-picker": "^5.4.6",
     "react-native-fast-image": "^8.5.11",
     "react-native-fix-image": "^2.1.0",
     "react-native-flipper": "^0.94.1",

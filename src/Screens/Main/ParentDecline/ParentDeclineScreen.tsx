@@ -242,7 +242,9 @@ const ParentDeclineScreen = ({ route }) => {
       )}
 
       {activities.length === 0 && groups.length == 0 && (
-        <View style={{ margin: 10 }}>
+        <View
+          style={{ padding: 10, backgroundColor: Colors.newBackgroundColor }}
+        >
           <Text style={[styles.text, { textAlign: "center" }]}>
             You do not have any declined activities or groups
           </Text>

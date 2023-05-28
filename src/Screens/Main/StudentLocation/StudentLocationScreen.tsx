@@ -33,6 +33,7 @@ import { UserState } from "@/Store/User";
 import { GetChildTrackHistory } from "@/Services/Parent";
 import FetchOne from "@/Services/User/FetchOne";
 import { parse } from "date-fns";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 
 const StudentLocationScreen = () => {
   const route = useRoute();
@@ -97,7 +98,7 @@ const StudentLocationScreen = () => {
   }, [selectedDependent, focused]);
   console.log("trackhostro", trackHistroy);
   return (
-    <>
+    <BackgroundLayout>
       <OtherTrackingModal />
       <WelcomeMessageModal />
       {!!selectedDependent && (
@@ -107,9 +108,10 @@ const StudentLocationScreen = () => {
         />
       )}
       <AppHeader
+        hideCenterIcon={true}
         hideCalendar={thumbnail || false}
-        title={`${student?.firstname || ""} History`}
-        isStack
+        // title={`${student?.firstname || ""} History`}
+        // isStack
       />
       {isCalendarVisible && (
         <Calendar
@@ -136,41 +138,43 @@ const StudentLocationScreen = () => {
           }}
         />
       )}
-      <SearchBar
-        searchText={searchParam}
-        onChangeText={(value) => setSearchParam(value)}
-        thumbnailView={thumbnail}
-        onToggleChange={() => {
-          setThumbnail(!thumbnail);
-          dispatch(
-            ChangeModalState.action({
-              showCalendar: false,
-            })
-          );
-        }}
-        isThumbnail
-        isThumbnailOnly
-      />
-      <Button
-        style={{
-          width: 110,
-          height: 40,
-          borderRadius: 12,
-          borderWidth: 1,
-          borderColor: Colors.primary,
-          alignSelf: "flex-end",
-          marginTop: 10,
-        }}
-        status="basic"
-        size="small"
-        onPress={() => {
-          Linking.openURL(
-            `https://live-api.trackmykidz.com/user/parent/download-csv?studentId=${student.studentId}`
-          );
-        }}
-      >
-        {() => <Text style={styles.buttonMessage}>Download</Text>}
-      </Button>
+      <View style={{ backgroundColor: Colors.newBackgroundColor }}>
+        <SearchBar
+          searchText={searchParam}
+          onChangeText={(value) => setSearchParam(value)}
+          thumbnailView={thumbnail}
+          onToggleChange={() => {
+            setThumbnail(!thumbnail);
+            dispatch(
+              ChangeModalState.action({
+                showCalendar: false,
+              })
+            );
+          }}
+          isThumbnail
+          isThumbnailOnly
+        />
+        <Button
+          style={{
+            width: 110,
+            height: 40,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: Colors.primary,
+            alignSelf: "flex-end",
+            marginTop: 10,
+          }}
+          status="basic"
+          size="small"
+          onPress={() => {
+            Linking.openURL(
+              `https://live-api.trackmykidz.com/user/parent/download-csv?studentId=${student.studentId}`
+            );
+          }}
+        >
+          {() => <Text style={styles.buttonMessage}>Download</Text>}
+        </Button>
+      </View>
       <View style={styles.layout}>
         {!thumbnail ? (
           <View style={{ flex: 1 }}>
@@ -380,7 +384,7 @@ const StudentLocationScreen = () => {
           </MapView>
         )}
       </View>
-    </>
+    </BackgroundLayout>
   );
 };
 
@@ -390,6 +394,7 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1,
     flexDirection: "column",
+    backgroundColor: Colors.newBackgroundColor,
   },
   item: {
     borderRadius: 10,

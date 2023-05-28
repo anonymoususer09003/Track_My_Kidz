@@ -11,6 +11,7 @@ import {
   Select,
   SelectItem,
 } from "@ui-kitten/components";
+import CustomDropdown from "@/Components/CustomDropDown";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Normalize } from "../../../Utils/Shared/NormalizeDisplay";
@@ -111,20 +112,17 @@ const ForgotPasswordScreen = ({ navigation }) => {
           }) => (
             <>
               <Layout style={styles.formContainer}>
-                <Select
-                  style={{ marginBottom: 18 }}
-                  value={values.user_type}
+                <CustomDropdown
                   placeholder="Select User"
+                  value={values.user_type}
                   onSelect={(index: any) => {
-                    setFieldValue("user_type", user_type[index.row].value);
-                    setSelectedUserType(user_type[index.row].value);
+                    console.log("index", index);
+                    setFieldValue("user_type", user_type[index].value);
+                    setSelectedUserType("user_type", user_type[index].value);
                   }}
-                  label={(evaProps: any) => <Text {...evaProps}></Text>}
-                >
-                  {user_type.map((type, index) => {
-                    return <SelectItem key={index} title={type?.label} />;
-                  })}
-                </Select>
+                  dropDownList={user_type}
+                />
+                <View style={{ marginBottom: 40 }} />
                 <Input
                   textStyle={{ color: Colors.white }}
                   style={styles.selectSettings}

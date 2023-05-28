@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { DraxProvider, DraxView, DraxList } from "react-native-drax";
-import { AppHeader } from "@/Components";
+import { AppHeader, LinearGradientButton } from "@/Components";
 import Colors from "@/Theme/Colors";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
@@ -23,6 +23,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { FindAllStudentsWhichActivity } from "@/Services/Activity";
 import { SaveStudentSeats, GetBusByID } from "@/Services/BusConfiguration";
 import { AnyMessageParams } from "yup/lib/types";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 const gestureRootViewStyle = { flex: 1 };
 
 export default function App({ route }: any) {
@@ -550,133 +551,134 @@ export default function App({ route }: any) {
   };
 
   return (
-    <GestureHandlerRootView style={gestureRootViewStyle}>
-      <AppHeader title="Roll Call" />
-      {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size={"large"} color={Colors.primary} />
-        </View>
-      ) : (
-        <ScrollView>
+    <BackgroundLayout>
+      <GestureHandlerRootView style={gestureRootViewStyle}>
+        <AppHeader hideCenterIcon={true} hideCalendar={true} />
+        {loading ? (
           <View
-            style={{
-              justifyContent: "flex-end",
-              alignItems: "flex-end",
-              marginTop: 10,
-            }}
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           >
-            <Switch
-              style={{ marginLeft: 20 }}
-              trackColor={{ false: "#767577", true: "#50CBC7" }}
-              thumbColor={Colors.white}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={() => {
-                setThumbnail(!thumbnail);
-                navigation.goBack();
-                dispatch(
-                  ChangeModalState.action({ rollCallModalVisibility: true })
-                );
+            <ActivityIndicator size={"large"} color={Colors.primary} />
+          </View>
+        ) : (
+          <ScrollView>
+            <View
+              style={{
+                justifyContent: "flex-end",
+                alignItems: "flex-end",
+                marginTop: 10,
               }}
-              value={thumbnail}
-            />
-          </View>
-          <View>
-            <Text style={styles.headerStyle}>
-              {"Drag drop students on seats"}
-            </Text>
-          </View>
-          <DraxProvider>
-            <View style={styles.container}>
-              <View style={styles.draxListContainer}>
-                <DraxList
-                  data={dragItemMiddleList}
-                  renderItemContent={DragUIComponent}
-                  keyExtractor={(item, index) => index.toString()}
-                  numColumns={2}
-                  ItemSeparatorComponent={FlatListItemSeparator}
-                  scrollEnabled={true}
-                />
-              </View>
-              <View style={[styles?.receivingContainer, { marginTop: 10 }]}>
-                {/* {console.log("rearSeats", rearSeats)} */}
-                {rearSeats &&
-                  rearSeats?.map((item, index) =>
-                    ReceivingZoneUIComponent({
-                      item,
-                      index,
-                      isRear: true,
-                      parentIndex: -1,
-                    })
-                  )}
-              </View>
-              <View style={styles.receivingContainer}>
-                {/* {console.log(
+            >
+              <Switch
+                style={{ marginLeft: 20 }}
+                trackColor={{ false: "#767577", true: "#50CBC7" }}
+                thumbColor={Colors.white}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={() => {
+                  setThumbnail(!thumbnail);
+                  navigation.goBack();
+                  dispatch(
+                    ChangeModalState.action({ rollCallModalVisibility: true })
+                  );
+                }}
+                value={thumbnail}
+              />
+            </View>
+            <View>
+              <Text style={styles.headerStyle}>
+                {"Drag drop students on seats"}
+              </Text>
+            </View>
+            <DraxProvider>
+              <View style={styles.container}>
+                <View style={styles.draxListContainer}>
+                  <DraxList
+                    data={dragItemMiddleList}
+                    renderItemContent={DragUIComponent}
+                    keyExtractor={(item, index) => index.toString()}
+                    numColumns={2}
+                    ItemSeparatorComponent={FlatListItemSeparator}
+                    scrollEnabled={true}
+                  />
+                </View>
+                <View style={[styles?.receivingContainer, { marginTop: 10 }]}>
+                  {/* {console.log("rearSeats", rearSeats)} */}
+                  {rearSeats &&
+                    rearSeats?.map((item, index) =>
+                      ReceivingZoneUIComponent({
+                        item,
+                        index,
+                        isRear: true,
+                        parentIndex: -1,
+                      })
+                    )}
+                </View>
+                <View style={styles.receivingContainer}>
+                  {/* {console.log(
                 "receivingItemList",
                 receivingItemList,
                 FirstReceivingItemList
               )} */}
-                {/* {receivingItemList.map((item, index) =>
+                  {/* {receivingItemList.map((item, index) =>
               ReceivingZoneUIComponent({ item, index })
             )} */}
-                {/* {console.log("receivingItemList", receivingItemList?.length)} */}
-                <View
+                  {/* {console.log("receivingItemList", receivingItemList?.length)} */}
+                  <View
+                    style={{
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {receivingItemList &&
+                      receivingItemList?.map((i, parentIndex: number) => (
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-evenly",
+                            width: "100%",
+                          }}
+                        >
+                          {i &&
+                            i?.map((item, index: number) =>
+                              ReceivingZoneUIComponent({
+                                item,
+                                index,
+                                parentIndex,
+                              })
+                            )}
+                        </View>
+                      ))}
+                  </View>
+                </View>
+                <Text
                   style={{
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    fontWeight: "bold",
+                    fontSize: 16,
+                    marginTop: 20,
+                    textAlign: "center",
                   }}
                 >
-                  {receivingItemList &&
-                    receivingItemList?.map((i, parentIndex: number) => (
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-evenly",
-                          width: "100%",
-                        }}
-                      >
-                        {i &&
-                          i?.map((item, index: number) =>
-                            ReceivingZoneUIComponent({
-                              item,
-                              index,
-                              parentIndex,
-                            })
-                          )}
-                      </View>
-                    ))}
-                </View>
+                  Bus Front
+                </Text>
               </View>
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  fontSize: 16,
-                  marginTop: 20,
-                  textAlign: "center",
+            </DraxProvider>
+            <View style={{ width: "80%", alignSelf: "center" }}>
+              <LinearGradientButton
+                onPress={() => {
+                  allocateSeats();
+                  // getSeatsList();
                 }}
               >
-                Bus Front
-              </Text>
+                Save
+              </LinearGradientButton>
             </View>
-          </DraxProvider>
-
-          <View style={styles.bottomButton}>
-            <TouchableOpacity
-              style={styles.bottomButton}
-              onPress={() => {
-                allocateSeats();
-                // getSeatsList();
-              }}
-            >
-              <Text style={styles.button}>Save</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      )}
-    </GestureHandlerRootView>
+            <View style={{ marginBottom: 80 }} />
+          </ScrollView>
+        )}
+      </GestureHandlerRootView>
+    </BackgroundLayout>
   );
 }
 

@@ -314,7 +314,9 @@ const ParentPendingScreen = ({ route }) => {
       )}
 
       {activities.length === 0 && groups.length === 0 && (
-        <View style={{ margin: 10 }}>
+        <View
+          style={{ backgroundColor: Colors.newBackgroundColor, padding: 10 }}
+        >
           <Text style={[styles.text, { textAlign: "center" }]}>
             You do not have any pending activities or groups to approve
           </Text>

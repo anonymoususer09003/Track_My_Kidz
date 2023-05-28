@@ -25,6 +25,7 @@ import {
 } from "@ui-kitten/components";
 import { Formik } from "formik";
 
+import CustomDropdown from "@/Components/CustomDropDown";
 import DeviceInfo from "react-native-device-info";
 import { Spinner } from "@/Components";
 import { getDeviceId } from "react-native-device-info";
@@ -52,6 +53,7 @@ import { useSelector, useDispatch } from "react-redux";
 import ChangeCountryState from "@/Store/Places/FetchCountries";
 import FetchCountries from "@/Store/Places/FetchCountries";
 import { GetAllCountries } from "@/Services/PlaceServices";
+import { EmailIcon } from "@/Components/SignUp/icons";
 
 const user_type = [
   { id: 1, label: "Parent", value: "Parent" },
@@ -81,7 +83,6 @@ const SignInScreen = ({ navigation }) => {
   const { login, register } = useContext(AuthContext);
   const fetchCountries = async () => {
     try {
-      console.log("usertype", countries);
       if (!countries) {
         let res = await GetAllCountries();
         dispatch(ChangeCountryState.action({ countries: res }));
@@ -216,7 +217,7 @@ const SignInScreen = ({ navigation }) => {
                     password: values.password,
                   };
                   setLoading(true);
-                  console.log("usertype", values.user_type);
+
                   dispatch(ChangeModalState.action({ loading: true }));
                   Login(objectToPass, values.user_type.toLowerCase())
                     .then((res) => {
@@ -289,22 +290,17 @@ const SignInScreen = ({ navigation }) => {
                 }) => (
                   <>
                     <Layout style={styles.formContainer}>
-                      <Select
-                        appearance={{ backgroundColor: "red" }}
-                        style={{
-                          width: "100%",
-                        }}
-                        value={values.user_type}
-                        placeholder="Select User"
-                        onSelect={(index: any) =>
-                          setFieldValue("user_type", user_type[index.row].value)
-                        }
-                        // label={(evaProps: any) => <Text {...evaProps}></Text>}
-                      >
-                        {user_type.map((type, index) => {
-                          return <SelectItem key={index} title={type?.label} />;
-                        })}
-                      </Select>
+                      <View style={{ flex: 1 }}>
+                        <CustomDropdown
+                          placeholder="Select User"
+                          value={values.user_type}
+                          onSelect={(index: any) => {
+                            console.log("index", index);
+                            setFieldValue("user_type", user_type[index].value);
+                          }}
+                          dropDownList={user_type}
+                        />
+                      </View>
 
                       <Input
                         placeholderTextColor={Colors.white}
@@ -496,5 +492,28 @@ const themedStyles = StyleService.create({
   logoText: {
     color: Colors.white,
     fontSize: 30,
+  },
+  dropdownContainer: {
+    width: "100%",
+    height: 40,
+    marginBottom: 10,
+    backgroundColor: "transparent",
+  },
+  dropdown: {
+    // backgroundColor: "#fafafa",
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    borderColor: Colors.white,
+    borderBottomWidth: 2,
+  },
+  dropdownItem: {
+    justifyContent: "flex-start",
+  },
+  dropdownDropdown: {
+    backgroundColor: "#fafafa",
+  },
+  placeholder: {
+    color: Colors.white,
+    fontSize: 15,
   },
 });
