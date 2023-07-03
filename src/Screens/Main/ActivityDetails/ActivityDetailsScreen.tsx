@@ -5,7 +5,7 @@ import {
   useRoute,
 } from "@react-navigation/native";
 import { Text, Icon } from "@ui-kitten/components";
-import { StyleSheet, View, FlatList, Switch, Alert } from "react-native";
+import { StyleSheet, View, FlatList, Switch, Alert, Image } from "react-native";
 import { loadToken } from "@/Storage/MainAppStorage";
 import * as Stomp from "stompjs";
 import SockJS from "sockjs-client";
@@ -344,20 +344,55 @@ const ActivityDetailsScreen = () => {
                       }}
                     >
                       {!item?.group && (
-                        <TouchableOpacity
-                          onPress={() => console.log("pressed")}
-                          style={{ alignItems: "center" }}
-                        >
-                          <Text>{item?.firstName}</Text>
-                          <Text style={{ marginBottom: 2 }}>
-                            {item?.lastName}
-                          </Text>
-                          <Fontisto
-                            name="map-marker-alt"
-                            size={25}
-                            color="red"
-                          />
-                        </TouchableOpacity>
+                        <View style={{}}>
+                          <View
+                            style={{
+                              height: 30,
+                              width: 30,
+                              borderRadius: 80,
+                              overflow: "hidden",
+                              // top: 33,
+                              // zIndex: 10,
+                            }}
+                          >
+                            {item?.image == "" && (
+                              <View
+                                style={{
+                                  height: "100%",
+                                  width: "100%",
+                                  borderRadius: 80,
+                                  backgroundColor: Colors.primary,
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Text style={{ color: Colors.white }}>
+                                  {item?.firstName
+                                    ?.substring(0, 1)
+                                    ?.toUpperCase() || ""}
+                                  {item?.lastName
+                                    ?.substring(0, 1)
+                                    ?.toUpperCase() || ""}
+                                </Text>
+                              </View>
+                            )}
+                            {item?.image != "" && (
+                              <Image
+                                source={{
+                                  uri: item?.image,
+                                }}
+                                style={{
+                                  height: "100%",
+                                  width: "100%",
+                                  borderRadius: 80,
+                                  aspectRatio: 1.5,
+                                }}
+                                resizeMode="contain"
+                              />
+                            )}
+                          </View>
+                          {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+                        </View>
                       )}
 
                       {item?.group && (

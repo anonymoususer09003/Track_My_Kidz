@@ -597,8 +597,8 @@ const InstructorActivityScreen = ({ route }: any) => {
 
   useEffect(() => {
     if (isFocused) {
-      // connectSockets();
-      // Alert.alert("kk");
+      connectSockets();
+
       // if (countries) {
       // fetchCountries();
       getInstructor();
@@ -745,7 +745,7 @@ const InstructorActivityScreen = ({ route }: any) => {
       console.log("err", err);
     }
   };
-  console.log("activitiescount", activitiesCount);
+
   useEffect(() => {
     if (countries && isFocused) {
       let temp = [];
@@ -772,13 +772,7 @@ const InstructorActivityScreen = ({ route }: any) => {
     activities?.result?.length || selectedInstructorActivities?.length,
     isFocused,
   ]);
-  const CalendarModalTrigger = () => {
-    dispatch(
-      ChangeModalState.action({
-        showCalendar: isCalendarVisible ? false : true,
-      })
-    );
-  };
+
   useEffect(() => {
     if (dropDownValue) {
       if (dropDownValue.row === 0) {
@@ -988,8 +982,12 @@ const InstructorActivityScreen = ({ route }: any) => {
                       justifyContent: "space-around",
                     }}
                   >
-                    <View style={{ alignItems: "center" }}>
-                      <Text style={styles.text}>{`Approval`}</Text>
+                    <View
+                      style={{
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={styles.footerText}>{`Approved`}</Text>
                       <View style={{ flexDirection: "row" }}>
                         <TouchableOpacity
                           style={styles.horizontal}
@@ -1012,7 +1010,7 @@ const InstructorActivityScreen = ({ route }: any) => {
                           <Entypo
                             name="book"
                             color={Colors.primary}
-                            size={15}
+                            size={20}
                             style={{ marginHorizontal: 5 }}
                           />
                         </TouchableOpacity>
@@ -1066,7 +1064,7 @@ const InstructorActivityScreen = ({ route }: any) => {
                           <Entypo
                             name="book"
                             color={Colors.primary}
-                            size={15}
+                            size={20}
                             style={{ marginHorizontal: 5 }}
                           />
                         </TouchableOpacity>
@@ -1122,7 +1120,7 @@ const InstructorActivityScreen = ({ route }: any) => {
                           <Entypo
                             name="book"
                             color={Colors.primary}
-                            size={15}
+                            size={20}
                             style={{ marginHorizontal: 5 }}
                           />
                         </TouchableOpacity>
@@ -1219,19 +1217,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    fontSize: 13,
+    fontSize: 14,
     marginVertical: 4,
   },
 
   iconImages: {
-    height: 15,
-    width: 15,
+    height: 18,
+    width: 18,
     resizeMode: "contain",
     marginLeft: 5,
     marginRight: 5,
   },
   footerText: {
-    fontSize: 13,
+    fontSize: 14,
     marginVertical: 2,
   },
   horizontal: {

@@ -84,7 +84,7 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
 
   return (
     <BackgroundLayout title="Settings">
-      <AppHeader hideCalendar={true} />
+      <AppHeader hideCalendar={true} hideCenterIcon={true} />
       <TwoFactorAuthenticationModal />
       <VerifyYourselfModal
         isActivationCode={verifyType === "activation-code"}
@@ -298,7 +298,7 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
                   dispatch(LogoutStore.action());
                 }}
               >
-                Log out
+                Log Out
               </LinearGradientButton>
             </View>
             <TouchableOpacity

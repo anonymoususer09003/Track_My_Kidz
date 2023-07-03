@@ -186,6 +186,7 @@ const PersonalProfileScreen = () => {
                     email: user?.email || "",
                     zipcode: user?.zipcode || "",
                     city: user?.city || "",
+                    apt: user?.apt || "",
                     state: user?.state || "",
                     phone: user?.phone || "",
                     selectedCountry: user?.country || "",
@@ -205,6 +206,7 @@ const PersonalProfileScreen = () => {
                       zipcode: values.zipcode,
                       phone: values.phone,
                       term: true,
+                      apt: values?.apt,
                     };
                     UpdateUser(objectToPass, "parent")
                       .then((response: any) => {
@@ -318,6 +320,29 @@ const PersonalProfileScreen = () => {
 
                           {!isEditMode ? (
                             <View style={{ flexDirection: "column" }}>
+                              <Text style={styles.editLabel}>Phone Number</Text>
+                              <View style={styles.editField}>
+                                {renderPhoneIcon()}
+                                <Text style={{ fontSize: 15 }}>
+                                  {values.phone}
+                                </Text>
+                              </View>
+                            </View>
+                          ) : (
+                            <Input
+                              keyboardType="number-pad"
+                              style={styles.inputSettings}
+                              autoCapitalize="none"
+                              label={(evaProps) => (
+                                <Text {...evaProps}>Phone Number</Text>
+                              )}
+                              value={values.phone}
+                              onChangeText={handleChange("phone")}
+                            />
+                          )}
+
+                          {!isEditMode ? (
+                            <View style={{ flexDirection: "column" }}>
                               <Text style={styles.editLabel}>
                                 Street Address
                               </Text>
@@ -342,76 +367,118 @@ const PersonalProfileScreen = () => {
                               onChangeText={handleChange("address")}
                             />
                           )}
+
                           {!isEditMode ? (
                             <View style={{ flexDirection: "column" }}>
-                              <Text style={styles.editLabel}>Phone Number</Text>
+                              <Text style={styles.editLabel}> Ste/Apt</Text>
                               <View style={styles.editField}>
-                                {renderPhoneIcon()}
+                                {renderLocationIcon()}
                                 <Text style={{ fontSize: 15 }}>
-                                  {values.phone}
+                                  {values?.apt}
                                 </Text>
                               </View>
                             </View>
                           ) : (
                             <Input
-                              keyboardType="number-pad"
-                              style={styles.inputSettings}
+                              style={[
+                                styles.inputSettings,
+                                { marginBottom: 5 },
+                              ]}
+                              accessoryLeft={renderLocationIcon}
                               autoCapitalize="none"
                               label={(evaProps) => (
-                                <Text {...evaProps}>Phone Number</Text>
+                                <Text {...evaProps}>Ste/Apt</Text>
                               )}
-                              value={values.phone}
-                              onChangeText={handleChange("phone")}
+                              value={values?.apt}
+                              onChangeText={handleChange("apt")}
                             />
                           )}
+                          {!isEditMode && (
+                            <Autocomplete
+                              accessoryLeft={renderLocationIcon}
+                              placeholder="Enter City"
+                              value={values.city}
+                              placement={placement}
+                              style={{
+                                marginVertical: 5,
+                                backgroundColor: Colors.white,
+                                borderRadius: 10,
+                                elevation: 1,
+                              }}
+                              // label={evaProps => <Text {...evaProps}>City</Text>}
+                              onChangeText={(query) => {
+                                setFieldValue("city", query);
+                                setCitiesData(
+                                  cities.filter((item) =>
+                                    filterCities(item, query)
+                                  )
+                                );
+                              }}
+                              onSelect={(query) => {
+                                setFieldValue("city", citiesData[query]);
+                                setFieldValue(
+                                  "selectedCity",
+                                  citiesData[query]
+                                );
+                              }}
+                            >
+                              {citiesData.map((item, index) => {
+                                return (
+                                  <AutocompleteItem key={index} title={item} />
+                                );
+                              })}
+                            </Autocomplete>
+                          )}
 
-                          <Autocomplete
-                            placeholder="Enter Country*"
-                            value={values.country}
-                            accessoryLeft={renderLocationIcon}
-                            placement={placement}
-                            style={{
-                              marginTop: 10,
-                              marginBottom: 5,
-                              backgroundColor: Colors.white,
-                              borderRadius: 10,
-                              elevation: 1,
-                            }}
-                            onChangeText={(query) => {
-                              setFieldValue("country", query);
-                              setCountriesData(
-                                countries.filter((item) =>
-                                  filterCountries(item, query)
-                                )
-                              );
-                            }}
-                            onSelect={(query) => {
-                              const selectedCountry = countriesData[query];
-                              setFieldValue("country", selectedCountry.name);
-                              setFieldValue(
-                                "selectedCountry",
-                                selectedCountry.name
-                              );
-                              setFieldValue("selectedState", "");
-                              setFieldValue("state", "");
-                              setStates([]);
-                              GetAllStates(
-                                selectedCountry.name.replace(/ /g, "")
-                              ).then((res) => {
-                                setStates(res.data);
-                                setStatesData(states);
-                              });
-                            }}
-                          >
-                            {countriesData.map((item, index) => {
-                              return (
-                                <AutocompleteItem
-                                  key={index}
-                                  title={item.name}
-                                />
-                              );
-                            })}
-                          </Autocomplete>
+                          {isEditMode && (
+                            <Autocomplete
+                              placeholder="Enter Country*"
+                              value={values.country}
+                              accessoryLeft={renderLocationIcon}
+                              placement={placement}
+                              style={{
+                                marginTop: 10,
+                                marginBottom: 5,
+                                backgroundColor: Colors.white,
+                                borderRadius: 10,
+                                elevation: 1,
+                              }}
+                              onChangeText={(query) => {
+                                setFieldValue("country", query);
+                                setCountriesData(
+                                  countries.filter((item) =>
+                                    filterCountries(item, query)
+                                  )
+                                );
+                              }}
+                              onSelect={(query) => {
+                                const selectedCountry = countriesData[query];
+                                setFieldValue("country", selectedCountry.name);
+                                setFieldValue(
+                                  "selectedCountry",
+                                  selectedCountry.name
+                                );
+                                setFieldValue("selectedState", "");
+                                setFieldValue("state", "");
+                                setStates([]);
+                                GetAllStates(
+                                  selectedCountry.name.replace(/ /g, "")
+                                ).then((res) => {
+                                  setStates(res.data);
+                                  setStatesData(states);
+                                });
+                              }}
+                            >
+                              {countriesData.map((item, index) => {
+                                return (
+                                  <AutocompleteItem
+                                    key={index}
+                                    title={item.name}
+                                  />
+                                );
+                              })}
+                            </Autocomplete>
+                          )}
                           <Autocomplete
                             accessoryLeft={renderLocationIcon}
                             placeholder="Enter State*"
@@ -453,38 +520,42 @@ const PersonalProfileScreen = () => {
                               );
                             })}
                           </Autocomplete>
-                          <Autocomplete
-                            accessoryLeft={renderLocationIcon}
-                            placeholder="Enter City"
-                            value={values.city}
-                            placement={placement}
-                            style={{
-                              marginVertical: 5,
-                              backgroundColor: Colors.white,
-                              borderRadius: 10,
-                              elevation: 1,
-                            }}
-                            // label={evaProps => <Text {...evaProps}>City</Text>}
-                            onChangeText={(query) => {
-                              setFieldValue("city", query);
-                              setCitiesData(
-                                cities.filter((item) =>
-                                  filterCities(item, query)
-                                )
-                              );
-                            }}
-                            onSelect={(query) => {
-                              setFieldValue("city", citiesData[query]);
-                              setFieldValue("selectedCity", citiesData[query]);
-                            }}
-                          >
-                            {citiesData.map((item, index) => {
-                              return (
-                                <AutocompleteItem key={index} title={item} />
-                              );
-                            })}
-                          </Autocomplete>
-
+                          {isEditMode && (
+                            <Autocomplete
+                              accessoryLeft={renderLocationIcon}
+                              placeholder="Enter City"
+                              value={values.city}
+                              placement={placement}
+                              style={{
+                                marginVertical: 5,
+                                backgroundColor: Colors.white,
+                                borderRadius: 10,
+                                elevation: 1,
+                              }}
+                              // label={evaProps => <Text {...evaProps}>City</Text>}
+                              onChangeText={(query) => {
+                                setFieldValue("city", query);
+                                setCitiesData(
+                                  cities.filter((item) =>
+                                    filterCities(item, query)
+                                  )
+                                );
+                              }}
+                              onSelect={(query) => {
+                                setFieldValue("city", citiesData[query]);
+                                setFieldValue(
+                                  "selectedCity",
+                                  citiesData[query]
+                                );
+                              }}
+                            >
+                              {citiesData.map((item, index) => {
+                                return (
+                                  <AutocompleteItem key={index} title={item} />
+                                );
+                              })}
+                            </Autocomplete>
+                          )}
                           {!isEditMode ? (
                             <View style={{ flexDirection: "column" }}>
                               <Text style={styles.editLabel}>
@@ -510,6 +581,56 @@ const PersonalProfileScreen = () => {
                               onChangeText={handleChange("zipcode")}
                             />
                           )}
+                          {!isEditMode && (
+                            <Autocomplete
+                              placeholder="Enter Country*"
+                              value={values.country}
+                              accessoryLeft={renderLocationIcon}
+                              placement={placement}
+                              style={{
+                                marginTop: 10,
+                                marginBottom: 5,
+                                backgroundColor: Colors.white,
+                                borderRadius: 10,
+                                elevation: 1,
+                              }}
+                              onChangeText={(query) => {
+                                setFieldValue("country", query);
+                                setCountriesData(
+                                  countries.filter((item) =>
+                                    filterCountries(item, query)
+                                  )
+                                );
+                              }}
+                              onSelect={(query) => {
+                                const selectedCountry = countriesData[query];
+                                setFieldValue("country", selectedCountry.name);
+                                setFieldValue(
+                                  "selectedCountry",
+                                  selectedCountry.name
+                                );
+                                setFieldValue("selectedState", "");
+                                setFieldValue("state", "");
+                                setStates([]);
+                                GetAllStates(
+                                  selectedCountry.name.replace(/ /g, "")
+                                ).then((res) => {
+                                  setStates(res.data);
+                                  setStatesData(states);
+                                });
+                              }}
+                            >
+                              {countriesData.map((item, index) => {
+                                return (
+                                  <AutocompleteItem
+                                    key={index}
+                                    title={item.name}
+                                  />
+                                );
+                              })}
+                            </Autocomplete>
+                          )}
+
                           {isEditMode ? (
                             <View style={{ marginVertical: 10 }}>
                               <LinearGradientButton onPress={handleSubmit}>

@@ -21,7 +21,7 @@ const CustomDropdown: React.FC = (props) => {
       setSelectedValue(props?.value);
     }
   }, [props?.value]);
-  console.log("props", props.value);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -70,6 +70,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1000,
   },
   dropdownHeader: {
     flexDirection: "row",
@@ -104,6 +105,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 5,
     backgroundColor: "#fff",
+    zIndex: 2,
   },
   dropdownOption: {
     flexDirection: "row",

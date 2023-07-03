@@ -1656,7 +1656,7 @@ const CreateActivityScreen = ({ route }) => {
                         onChangeText={(query) => {
                           setFieldValue("fromCity", query);
                           setCitiesData(
-                            cities.filter((item) => filterCities(item, query))
+                            cities?.filter((item) => filterCities(item, query))
                           );
                         }}
                         onSelect={(query) => {

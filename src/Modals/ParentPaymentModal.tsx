@@ -45,7 +45,7 @@ const ParentPaymentModal = ({ onPay, onCancel }) => {
     useState<IndexPath | null>(null);
   const [cardData, setCardData] = useState({});
   const [isValid, setIsValid] = useState(false);
-
+  const [isCardCompleted, setIsCardCompleted] = useState(false);
   const [payment, setPayment] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [parent, setParent] = useState(null);
@@ -245,6 +245,7 @@ const ParentPaymentModal = ({ onPay, onCancel }) => {
               marginVertical: 30,
             }}
             onCardChange={(cardDetails) => {
+              setIsCardCompleted(cardDetails?.complete);
               setCardData(cardDetails);
               if (cardDetails.complete) {
                 setIsValid(true);
@@ -256,6 +257,28 @@ const ParentPaymentModal = ({ onPay, onCancel }) => {
           />
         </View>
         <View style={styles.bottom}>
+          {!isLoading ? (
+            <View style={styles.buttonText}>
+              <LinearGradientButton
+                disabled={isCardCompleted ? false : true}
+                style={{
+                  borderRadius: 25,
+                  flex: 1,
+                }}
+                appearance="ghost"
+                size="medium"
+                status="control"
+                onPress={() => {
+                  activateSubscription();
+                }}
+              >
+                Pay
+              </LinearGradientButton>
+            </View>
+          ) : (
+            <ActivityIndicator size="large" color={Colors.primary} />
+          )}
+
           {!isLoading && (
             <View style={styles.buttonText}>
               <LinearGradientButton
@@ -279,26 +302,6 @@ const ParentPaymentModal = ({ onPay, onCancel }) => {
                 Cancel
               </LinearGradientButton>
             </View>
-          )}
-          {!isLoading ? (
-            <View style={styles.buttonText}>
-              <LinearGradientButton
-                style={{
-                  borderRadius: 25,
-                  flex: 1,
-                }}
-                appearance="ghost"
-                size="medium"
-                status="control"
-                onPress={() => {
-                  activateSubscription();
-                }}
-              >
-                Pay
-              </LinearGradientButton>
-            </View>
-          ) : (
-            <ActivityIndicator size="large" color={Colors.primary} />
           )}
         </View>
       </Card>

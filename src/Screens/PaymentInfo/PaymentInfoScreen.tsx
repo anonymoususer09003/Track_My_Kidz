@@ -188,7 +188,7 @@ const PaymentInformationScreen = ({ navigation }) => {
           </View>
         </View>
 
-        <View>
+        <View style={{ marginTop: 10 }}>
           {cardDetail && (
             <View style={styles.card}>
               <View style={{ flexDirection: "row" }}>
@@ -266,6 +266,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 10,
     paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   modal: { borderRadius: 10 },
   header: {},

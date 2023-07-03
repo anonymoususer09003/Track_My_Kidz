@@ -38,11 +38,12 @@ const ContactUsScreen = () => {
   const [isTouched, setisTouched] = useState(false);
   const [isSending, setisSending] = useState(false);
   const [isSent, setisSent] = useState(false);
-
+  const [formikValues, setFomikValues] = useState({ message: "" });
   const resetErrors = () => setShowErrors(false);
 
   useEffect(() => {
     resetErrors();
+    setFomikValues({ message: "" });
   }, [isFocuesed]);
 
   return (
@@ -52,89 +53,96 @@ const ContactUsScreen = () => {
           <AppHeader hideCalendar={true} hideCenterIcon={true} />
 
           <View style={styles.mainLayout}>
-            <Formik
-              validationSchema={contactUsValidationSchema}
-              validateOnMount={true}
-              initialValues={{ message: "" }}
-              onSubmit={async (values, { resetForm }) => {
-                setisSending(true);
-                const userId = await loadId();
+            {isFocuesed && (
+              <Formik
+                validateOnMount
+                enableReinitialize
+                validationSchema={contactUsValidationSchema}
+                initialValues={formikValues}
+                onSubmit={async (values, { resetForm }) => {
+                  setisSending(true);
+                  const userId = await loadId();
 
-                let objectToPass = {
-                  id: 0,
-                  userId: userId,
-                  message: values.message,
-                };
-                ContactUs(objectToPass)
-                  .then((response: any) => {
-                    console.log("res", response);
-                    if (response.status == 200) {
-                      setisSent(true);
-                      setTimeout(() => {
-                        setisSent(false);
+                  let objectToPass = {
+                    id: 0,
+                    userId: userId,
+                    message: values.message,
+                  };
+                  ContactUs(objectToPass)
+                    .then((response: any) => {
+                      console.log("res", response);
+                      if (response.status == 200) {
+                        setisSent(true);
+                        setTimeout(() => {
+                          setisSent(false);
 
-                        setisSending(false);
-                      }, 3000);
-                    }
-                  })
-                  .catch((error: any) => {
-                    console.log(error);
-                    Alert.alert("An error occured", "Please try again", [
-                      { text: "OK", style: "cancel" },
-                    ]);
+                          setisSending(false);
+                        }, 3000);
+                      }
+                    })
+                    .catch((error: any) => {
+                      console.log(error);
+                      Alert.alert("An error occured", "Please try again", [
+                        { text: "OK", style: "cancel" },
+                      ]);
 
-                    setisSending(false);
-                  });
-                resetForm();
-              }}
-            >
-              {({ handleChange, handleSubmit, values, errors, isValid }) => (
-                <>
-                  {isSending ? (
-                    isSent ? (
-                      <View style={styles.sppinerContainer}>
-                        <Text style={styles.sent}>
-                          Your message has been successfully submited.{"\n"}
-                          Thank you for contacting us!
-                        </Text>
-                      </View>
+                      setisSending(false);
+                    });
+                  resetForm();
+                }}
+              >
+                {({ handleChange, handleSubmit, values, errors, isValid }) => (
+                  <>
+                    {isSending ? (
+                      isSent ? (
+                        <View style={styles.sppinerContainer}>
+                          <Text style={styles.sent}>
+                            Your message has been successfully submited.{"\n"}
+                            Thank you for contacting us!
+                          </Text>
+                        </View>
+                      ) : (
+                        <View style={styles.sppinerContainer}>
+                          <Spinner status="primary" />
+                        </View>
+                      )
                     ) : (
-                      <View style={styles.sppinerContainer}>
-                        <Spinner status="primary" />
+                      <View style={styles.formContainer}>
+                        <Input
+                          style={styles.textInput}
+                          textStyle={styles.textArea}
+                          placeholder="Add your message here"
+                          onChangeText={handleChange("message")}
+                          onBlur={() => {
+                            setisTouched(true);
+                            setShowErrors(true);
+                          }}
+                          value={values.message}
+                          multiline={true}
+                          maxLength={500}
+                          status={isTouched && errors.message ? "danger" : ""}
+                        />
+                        <Text style={styles.message}>Min 50 characters</Text>
+                        {errors.message && isTouched && showErrors ? (
+                          <Text style={styles.errorText}>{errors.message}</Text>
+                        ) : null}
+                        {console.log("valid", isValid)}
+                        <LinearGradientButton
+                          onPress={() => (!isValid ? null : handleSubmit())}
+                          gradient={
+                            isValid
+                              ? [Colors.primary, "#EC5ADD"]
+                              : ["grey", "grey"]
+                          }
+                        >
+                          Send
+                        </LinearGradientButton>
                       </View>
-                    )
-                  ) : (
-                    <View style={styles.formContainer}>
-                      <Input
-                        style={styles.textInput}
-                        textStyle={styles.textArea}
-                        placeholder="Add your message here"
-                        onChangeText={handleChange("message")}
-                        onBlur={() => {
-                          setisTouched(true);
-                          setShowErrors(true);
-                        }}
-                        value={values.message}
-                        multiline={true}
-                        maxLength={500}
-                        status={isTouched && errors.message ? "danger" : ""}
-                      />
-                      <Text style={styles.message}>Min 50 characters</Text>
-                      {errors.message && isTouched && showErrors ? (
-                        <Text style={styles.errorText}>{errors.message}</Text>
-                      ) : null}
-
-                      <TouchableOpacity
-                        disabled={!isValid}
-                        onPress={handleSubmit}
-                      >
-                        <LinearGradientButton>Send</LinearGradientButton>
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                </>
-              )}
-            </Formik>
+                    )}
+                  </>
+                )}
+              </Formik>
+            )}
           </View>
         </KeyboardAvoidingView>
       </View>

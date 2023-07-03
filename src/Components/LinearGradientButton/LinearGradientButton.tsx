@@ -10,10 +10,17 @@ const LinearGradientButton = (props: any) => {
   return (
     <TouchableOpacity
       style={{ width: "100%", alignItems: "center" }}
+      disabled={props?.disabled}
       onPress={() => props.onPress()}
     >
       <LinearGradient
-        colors={props.gradient || [Colors.primary, "#EC5ADD"]}
+        colors={
+          props?.disabled
+            ? [Colors.gray, Colors.gray]
+            : props.gradient
+            ? props.gradient
+            : [Colors.primary, "#EC5ADD"]
+        }
         start={{ x: 0, y: 1 }}
         end={{ x: 1, y: 1 }}
         style={styles.linearGradient}

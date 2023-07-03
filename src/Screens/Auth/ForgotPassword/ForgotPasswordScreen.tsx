@@ -53,7 +53,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
     <Image
       source={require("@/Assets/Images/email.png")}
       style={{ height: 20, width: 20 }}
-      resizeMode="contain"
+      resizeMode='contain'
     />
   );
   return (
@@ -68,7 +68,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
               maxWidth: Normalize(160),
             }}
             source={require("@/Assets/Images/logo1.png")}
-            resizeMode="contain"
+            resizeMode='contain'
           />
 
           <Text style={styles.logoText}>Forgot Password</Text>
@@ -113,7 +113,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
             <>
               <Layout style={styles.formContainer}>
                 <CustomDropdown
-                  placeholder="Select User"
+                  placeholder='Select User'
                   value={values.user_type}
                   onSelect={(index: any) => {
                     console.log("index", index);
@@ -124,17 +124,18 @@ const ForgotPasswordScreen = ({ navigation }) => {
                 />
                 <View style={{ marginBottom: 40 }} />
                 <Input
+                  selectionColor={Colors.white}
                   textStyle={{ color: Colors.white }}
                   style={styles.selectSettings}
                   placeholderTextColor={Colors.white}
-                  placeholder="Email"
-                  autoCapitalize="none"
+                  placeholder='Email'
+                  autoCapitalize='none'
                   autoCorrect={false}
                   accessoryLeft={renderPersonIcon}
                   onChangeText={handleChange("email")}
                   onBlur={handleBlur("email")}
                   value={values.email}
-                  keyboardType="email-address"
+                  keyboardType='email-address'
                 />
                 {errors.email && touched.email && (
                   <Text style={styles.errorText}>{errors.email}</Text>
@@ -143,8 +144,8 @@ const ForgotPasswordScreen = ({ navigation }) => {
                   <LinearGradientButton
                     gradient={[Colors.secondaryTint, Colors.primaryLight]}
                     style={styles.resetButton}
-                    appearance="filled"
-                    size="medium"
+                    appearance='filled'
+                    size='medium'
                     onPress={handleSubmit}
                     disabled={!isValid}
                   >
@@ -154,17 +155,17 @@ const ForgotPasswordScreen = ({ navigation }) => {
               </Layout>
               <View style={styles.bottomView}>
                 <Button
-                  appearance="ghost"
-                  status="basic"
-                  size="small"
+                  appearance='ghost'
+                  status='basic'
+                  size='small'
                   onPress={onLoginButtonPress}
                 >
                   {() => <Text style={styles.buttonMessage}>Login</Text>}
                 </Button>
                 <Button
-                  appearance="ghost"
-                  status="basic"
-                  size="small"
+                  appearance='ghost'
+                  status='basic'
+                  size='small'
                   onPress={onSignUpButtonPress}
                 >
                   {() => <Text style={styles.buttonMessage}>Sign Up</Text>}
@@ -240,5 +241,6 @@ const themedStyles = StyleService.create({
     borderBottomWidth: 2,
     borderBottomColor: Colors.white,
     color: Colors.white,
+    zIndex: -2,
   },
 });

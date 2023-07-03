@@ -146,7 +146,7 @@ const SignInScreen = ({ navigation }) => {
       <Image
         source={require("@/Assets/Images/lock.png")}
         style={{ height: 20, width: 20 }}
-        resizeMode="contain"
+        resizeMode='contain'
       />
     </TouchableWithoutFeedback>
   );
@@ -154,7 +154,7 @@ const SignInScreen = ({ navigation }) => {
     <Image
       source={require("@/Assets/Images/email.png")}
       style={{ height: 20, width: 20 }}
-      resizeMode="contain"
+      resizeMode='contain'
     />
   );
 
@@ -188,7 +188,7 @@ const SignInScreen = ({ navigation }) => {
       <ImageBackground
         style={{ flex: 1 }}
         source={require("../../../Assets/Images/childBackground.png")}
-        resizeMode="stretch"
+        resizeMode='stretch'
       >
         <KeyboardAwareScrollView style={{ flex: 1 }}>
           <View style={{ flex: 1 }}>
@@ -201,7 +201,7 @@ const SignInScreen = ({ navigation }) => {
                   maxWidth: Normalize(160),
                 }}
                 source={require("@/Assets/Images/logo1.png")}
-                resizeMode="contain"
+                resizeMode='contain'
               />
 
               <Text style={styles.logoText}>Login</Text>
@@ -290,28 +290,27 @@ const SignInScreen = ({ navigation }) => {
                 }) => (
                   <>
                     <Layout style={styles.formContainer}>
-                      <View style={{ flex: 1 }}>
-                        <CustomDropdown
-                          placeholder="Select User"
-                          value={values.user_type}
-                          onSelect={(index: any) => {
-                            console.log("index", index);
-                            setFieldValue("user_type", user_type[index].value);
-                          }}
-                          dropDownList={user_type}
-                        />
-                      </View>
+                      <CustomDropdown
+                        placeholder='Select User'
+                        value={values.user_type}
+                        onSelect={(index: any) => {
+                          console.log("index", index);
+                          setFieldValue("user_type", user_type[index].value);
+                        }}
+                        dropDownList={user_type}
+                      />
 
                       <Input
+                        selectionColor={Colors.white}
                         placeholderTextColor={Colors.white}
-                        placeholder="Email"
+                        placeholder='Email'
                         style={styles.selectSettings}
                         accessoryLeft={renderPersonIcon}
                         onChangeText={handleChange("email")}
                         onBlur={handleBlur("email")}
                         value={values.email}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
+                        keyboardType='email-address'
+                        autoCapitalize='none'
                         textStyle={{ color: Colors.white }}
                         autoCorrect={false}
                       />
@@ -319,10 +318,11 @@ const SignInScreen = ({ navigation }) => {
                         <Text style={styles.errorText}>{errors.email}</Text>
                       )}
                       <Input
+                        selectionColor={Colors.white}
                         placeholderTextColor={Colors.white}
-                        autoCapitalize="none"
+                        autoCapitalize='none'
                         style={styles.passwordInput}
-                        placeholder="Password"
+                        placeholder='Password'
                         accessoryLeft={renderPasswordIcon}
                         onChangeText={handleChange("password")}
                         onBlur={handleBlur("password")}
@@ -335,9 +335,9 @@ const SignInScreen = ({ navigation }) => {
                       )}
                       <Button
                         style={{ alignSelf: "flex-end", marginTop: 10 }}
-                        appearance="ghost"
-                        status="basic"
-                        size="small"
+                        appearance='ghost'
+                        status='basic'
+                        size='small'
                         onPress={onForgotPasswordButtonPress}
                       >
                         {() => (
@@ -356,7 +356,7 @@ const SignInScreen = ({ navigation }) => {
                         <LinearGradientButton
                           gradient={[Colors.secondaryTint, Colors.primaryLight]}
                           style={styles.signInButton}
-                          size="medium"
+                          size='medium'
                           onPress={handleSubmit}
                           disabled={!isValid}
                         >
@@ -391,9 +391,9 @@ const SignInScreen = ({ navigation }) => {
           }}
         >
           <Button
-            appearance="ghost"
-            status="basic"
-            size="small"
+            appearance='ghost'
+            status='basic'
+            size='small'
             onPress={OnRegisterButtonPress}
           >
             {() => (
@@ -463,6 +463,7 @@ const themedStyles = StyleService.create({
     borderBottomWidth: 2,
     borderBottomColor: Colors.white,
     backgroundColor: "transparent",
+    zIndex: -1,
   },
   errorText: {
     fontSize: 12,
@@ -480,6 +481,8 @@ const themedStyles = StyleService.create({
     borderBottomWidth: 2,
     borderBottomColor: Colors.white,
     color: Colors.white,
+    zIndex: -2,
+    caretColor: "red",
   },
   row: {
     flexDirection: "row",

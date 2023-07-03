@@ -282,6 +282,7 @@ const PersonalProfileScreen = () => {
                     city: currentUser?.city || "",
                     state: currentUser?.state || "",
                     phone: currentUser?.phone || "",
+              
                     selectedCountry: "",
                     selectedState: "",
                     selectedCity: "",
@@ -332,7 +333,7 @@ const PersonalProfileScreen = () => {
                     formData.append("city", values.city);
                     formData.append("country", values.country);
                     formData.append("zipcode", values.zipcode);
-
+                
                     formData.append("term", true);
                     formData.append("isAdmin", currentUser?.isAdmin);
                     formData.append("id", currentUser?.instructorId);
@@ -515,6 +516,8 @@ const PersonalProfileScreen = () => {
                               onChangeText={handleChange("address")}
                             />
                           )}
+
+                    
 
                           {!isEditMode ? (
                             <View style={{ flexDirection: "column" }}>

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
+  Platform,
 } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { Button, Icon, Input, Select, SelectItem } from "@ui-kitten/components";
@@ -43,6 +44,7 @@ const Calendar = ({
 }: CalendarProps) => {
   const getDays = (month: string) => {
     const year = moment(new Date()).year();
+    console.log("year", month);
     if (
       month === "Jan" ||
       month === "Mar" ||
@@ -83,9 +85,7 @@ const Calendar = ({
     }
   };
   const ref = useRef();
-  const [days, setDays] = useState(
-    getDays(months[moment(new Date()).month() - 1])
-  );
+  const [days, setDays] = useState(getDays(months[moment(new Date()).month()]));
   useEffect(() => {
     ref.current.scrollToIndex({ index: selectedDay, animated: true });
   }, []);
@@ -108,7 +108,13 @@ const Calendar = ({
           })}
         </Select>
 
-        <View style={{ flex: 1, marginTop: 5, marginLeft: 15 }}>
+        <View
+          style={{
+            flex: 1,
+            marginTop: Platform.OS == "android" ? 5 : 0,
+            marginLeft: 15,
+          }}
+        >
           {days && (
             <FlatList
               horizontal

@@ -72,9 +72,15 @@ const ResetPasswordScreen = ({ route, navigation }) => {
   const forgotPassValidationSchema = yup.object().shape({
     activationCode: yup
       .string()
-      .min(6, ({ min }) => `Activation code must be at least ${min} characters`)
-      .max(6, ({ max }) => `Activation code must be at least ${max} characters`)
-      .required("Activation code is required"),
+      .min(
+        6,
+        ({ min }) => `Verification code must be at least ${min} characters`
+      )
+      .max(
+        6,
+        ({ max }) => `Verification code must be at least ${max} characters`
+      )
+      .required("Verification code is required"),
     password: yup
       .string()
       .min(8, ({ min }) => `Password must be at least ${min} characters`)

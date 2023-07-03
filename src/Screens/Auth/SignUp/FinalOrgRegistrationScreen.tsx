@@ -698,8 +698,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                   email: emailAddress,
                   password: values.password,
                 };
-                console.log("scholobj", schoolObject);
-                console.log("json stringfy", JSON.stringify(formData));
+            
                 Register(registerObject, "instructor")
                   .then(async (response) => {
                     console.log("response---", response.data);

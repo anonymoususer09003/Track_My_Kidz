@@ -43,6 +43,7 @@ const ParentPaymentModal = ({ onPay, onCancel, isVisible }) => {
   const [cardData, setCardData] = useState({});
   const [isValid, setIsValid] = useState(false);
   const [payment, setPayment] = useState(false);
+  const [isCardCompleted, setIsCardCompleted] = useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const availableAmounts = [
     {
@@ -116,6 +117,7 @@ const ParentPaymentModal = ({ onPay, onCancel, isVisible }) => {
             }}
             onCardChange={(cardDetails) => {
               console.log("cardDetails", cardDetails);
+              setIsCardCompleted(cardDetails?.complete);
               setCardData(cardDetails);
               if (cardDetails.complete) {
                 setIsValid(true);
@@ -128,22 +130,7 @@ const ParentPaymentModal = ({ onPay, onCancel, isVisible }) => {
         </View>
         <View style={styles.bottom}>
           <LinearGradientButton
-            style={{
-              borderRadius: 25,
-              flex: 1,
-            }}
-            appearance="ghost"
-            size="medium"
-            status="control"
-            onPress={() => {
-              onCancel();
-            }}
-          >
-            Cancel
-          </LinearGradientButton>
-          <View style={{ marginTop: 20 }} />
-          <LinearGradientButton
-            disabled={isValid ? false : true}
+            disabled={isCardCompleted ? false : true}
             style={{
               borderRadius: 25,
               flex: 1,
@@ -158,9 +145,24 @@ const ParentPaymentModal = ({ onPay, onCancel, isVisible }) => {
               // onPay();
             }}
           >
-            save
+            Save
           </LinearGradientButton>
         </View>
+        <View style={{ marginTop: 20 }} />
+        <LinearGradientButton
+          style={{
+            borderRadius: 25,
+            flex: 1,
+          }}
+          appearance="ghost"
+          size="medium"
+          status="control"
+          onPress={() => {
+            onCancel();
+          }}
+        >
+          Cancel
+        </LinearGradientButton>
       </Card>
     </Modal>
   );

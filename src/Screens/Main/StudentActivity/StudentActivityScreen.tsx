@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import * as Stomp from "stompjs";
 import SockJS from "sockjs-client";
+import BackgroundFetchingComponenet from "../../../Components/BackgroundFetching";
 import MapView, { Marker, Circle } from "react-native-maps";
 import GeolocationAndroid from "react-native-geolocation-service";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,12 +45,15 @@ import {
 } from "@/Storage/MainAppStorage";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { ParticipantLocation } from "@/Services/Activity";
-import { GetUserById } from "@/Services/User";
+
 import { StudentState } from "@/Store/StudentActivity";
 import firestore from "@react-native-firebase/firestore";
 import BackgroundService from "react-native-background-actions";
 import SetChatParam from "@/Store/chat/SetChatParams";
 import { GroupParticipantsModal } from "@/Modals";
+import { useStateValue } from "@/Context/state/State";
+import { actions } from "@/Context/state/Reducer";
+import { ShowInstructorsStudentsModal } from "@/Modals";
 const StudentActivityScreen = ({ route }) => {
   const navigation = useNavigation();
 
@@ -59,6 +63,13 @@ const StudentActivityScreen = ({ route }) => {
   );
   const cancelToken = axios.CancelToken;
   const source = cancelToken.source();
+  const [selectionData, setSelectionData] = useState({
+    type: "student",
+    status: "pending",
+  });
+  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
+    useState(false);
+  const [{ selectedActivity: activity }, _dispatch] = useStateValue();
   const [originalActivities, setOriginalActivities] = useState<Activity[]>([]);
   const [activitiesCount, setActivitiesCount] = useState({});
   const [children, setChildren] = useState([]);
@@ -142,7 +153,6 @@ const StudentActivityScreen = ({ route }) => {
       if (Platform.OS == "android") {
         GeolocationAndroid.getCurrentPosition(async (pos) => {
           const crd = pos.coords;
-          console.log("crd", crd);
 
           if (tracking) {
             sendCoordinates(crd.latitude, crd.longitude);
@@ -158,7 +168,7 @@ const StudentActivityScreen = ({ route }) => {
       } else {
         Geolocation.getCurrentPosition(async (pos) => {
           const crd = pos.coords;
-          console.log("crd", crd);
+
           if (tracking) {
             sendCoordinates(crd.latitude, crd.longitude);
           } else {
@@ -227,7 +237,6 @@ const StudentActivityScreen = ({ route }) => {
       //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
       // );
 
-      console.log("logs----", granted === PermissionsAndroid.RESULTS.GRANTED);
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         backgroundCall();
       } else {
@@ -255,7 +264,6 @@ const StudentActivityScreen = ({ route }) => {
       //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
       // );
 
-      console.log("logs----", granted === PermissionsAndroid.RESULTS.GRANTED);
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         backgroundCall(tracking);
       } else {
@@ -288,7 +296,9 @@ const StudentActivityScreen = ({ route }) => {
           } catch (error) {
             // console.log(error);
           }
-          await sleep(tracking ? 2000 : 900000);
+          await sleep(
+            tracking ? 12000 : Platform.OS == "ios" ? 900000 : 300000
+          );
         }
       });
 
@@ -306,7 +316,7 @@ const StudentActivityScreen = ({ route }) => {
       color: "#ff00ff",
       linkingURI: "yourSchemeHere://chat/jane", // See Deep Lking for more info
       parameters: {
-        delay: tracking ? 2000 : 900000,
+        delay: tracking ? 2000 : Platform.OS == "ios" ? 900000 : 300000,
       },
     };
     BackgroundService.on("expiration", () => {
@@ -333,7 +343,7 @@ const StudentActivityScreen = ({ route }) => {
       setParticipantsIds(deviceIds);
       deviceIds.length > 0 &&
         turnOnParticipantsTracker(activityId, deviceIds, "activity");
-      console.log("res", res);
+
       setParticipants(res);
     } catch (err) {
       console.log("err", err);
@@ -346,7 +356,6 @@ const StudentActivityScreen = ({ route }) => {
     from: any
   ) => {
     try {
-      console.log("deviceids", deviceIds);
       const token = await loadToken();
 
       const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
@@ -378,12 +387,14 @@ const StudentActivityScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    locationPermission();
+    if (currentUser?.childTrackHistory) {
+      locationPermission();
+    }
     // return () => backgroundCall();
-  }, []);
+  }, [currentUser]);
 
   // backgroundCall();
-  console.log("current", currentUser);
+
   const RightActions = (dragX: any, item: Activity) => (
     <View
       style={{
@@ -448,7 +459,7 @@ const StudentActivityScreen = ({ route }) => {
           justifyContent: "center",
         }}
       >
-        <Ionicons size={45} color={Colors.primary} name="chatbox-ellipses" />
+        <Ionicons size={35} color={Colors.primary} name="chatbox-ellipses" />
       </TouchableOpacity>
       {!item.status && (
         <TouchableOpacity
@@ -480,7 +491,6 @@ const StudentActivityScreen = ({ route }) => {
           longitude: item?.longititude ? parseFloat(item?.longititude) : null,
         });
 
-        console.log("item", item);
         if (item?.childDevice) {
           deviceIds.push(item?.childDevice);
         }
@@ -496,7 +506,6 @@ const StudentActivityScreen = ({ route }) => {
     }
   };
   const connectSockets = async (deviceIds: any) => {
-    console.log("deviceids", deviceIds);
     const token = await loadToken();
     const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
     stompClient = Stomp.over(socket);
@@ -555,7 +564,7 @@ const StudentActivityScreen = ({ route }) => {
       res.map((item) => {
         temp[item.activityId] = item;
       });
-      console.log("res", res);
+
       setActivitiesCount({ ...activitiesCount, ...temp });
     } catch (err) {
       console.log("err", err);
@@ -614,29 +623,25 @@ const StudentActivityScreen = ({ route }) => {
           (pers) => pers.childDeviceId == nextParticipant.childDeviceId
         );
         if (isUnderEqual100Meters) {
-          console.log("participnat", participant);
           participant["group"] = true;
           participant["groupName"] = index + 1;
           temp.push(participant);
           if (groups[index + 1]) {
             let tempValue = { ...groups[index + 1] };
-            console.log("participant--", participant);
-            console.log("tempvalue-------3", tempValue);
+
             tempValue.participants = [...tempValue.participants, participant];
             groups[index + 1] = tempValue;
           } else {
-            console.log("else", [participant]);
             groups[index + 1] = {
               id: index + 1,
               participants: [participant],
             };
           }
         } else {
-          console.log("participant", participant);
           temp.push(participant);
         }
       }
-      console.log("groups", groups);
+
       let firstPers = partcipants.find(
         (firPer) => firPer?.childDeviceId == item
       );
@@ -648,12 +653,11 @@ const StudentActivityScreen = ({ route }) => {
         firstPers["group"] = true;
         firstPers["groupName"] = index + 1;
         temp.push(firstPers);
-        console.log("groups", groups);
+
         if (groups[index + 1]) {
           let tempValue = { ...groups[index + 1] };
           tempValue.participants = [...tempValue.participants, firstPers];
           groups[index + 1] = tempValue;
-          console.log("tempvalue", tempValue);
         }
 
         // }
@@ -681,7 +685,6 @@ const StudentActivityScreen = ({ route }) => {
       }
     });
 
-    console.log("grouped", groupedArray);
     setnewParticipnatsArr(groupedArray);
     setParticipants(temp);
   }, [trackingList]);
@@ -694,7 +697,7 @@ const StudentActivityScreen = ({ route }) => {
           setSelectedInstructions={setSelectedInstructions}
         />
       )}
-
+      {/* {currentUser?.childTrackHistory && <BackgroundFetchingComponenet />} */}
       {selectedGroup && showModal && (
         <GroupParticipantsModal
           isVisible={showModal}
@@ -702,7 +705,16 @@ const StudentActivityScreen = ({ route }) => {
           participants={groups[selectedGroup]?.participants}
         />
       )}
-
+      {showStudentsInstructorsModal && (
+        <ShowInstructorsStudentsModal
+          isVisible={showStudentsInstructorsModal}
+          setIsVisible={() => {
+            setShowStudentsInstructorsModal(false);
+          }}
+          status={selectionData.status}
+          type={selectionData.type}
+        />
+      )}
       {!showFamilyMap && !showParticipantMap ? (
         <View style={styles.layout}>
           {activities.length > 0 && (
@@ -798,7 +810,7 @@ const StudentActivityScreen = ({ route }) => {
                       }}
                     >
                       <View style={{ alignItems: "center" }}>
-                        <Text style={styles.text}>{`Approval`}</Text>
+                        <Text style={styles.footerText}>{`Approved`}</Text>
                         <View style={{ flexDirection: "row" }}>
                           <TouchableOpacity
                             style={styles.horizontal}
@@ -821,7 +833,7 @@ const StudentActivityScreen = ({ route }) => {
                             <Entypo
                               name="book"
                               color={Colors.primary}
-                              size={15}
+                              size={20}
                               style={{ marginHorizontal: 5 }}
                             />
                           </TouchableOpacity>
@@ -875,7 +887,7 @@ const StudentActivityScreen = ({ route }) => {
                             <Entypo
                               name="book"
                               color={Colors.primary}
-                              size={15}
+                              size={20}
                               style={{ marginHorizontal: 5 }}
                             />
                           </TouchableOpacity>
@@ -931,7 +943,7 @@ const StudentActivityScreen = ({ route }) => {
                             <Entypo
                               name="book"
                               color={Colors.primary}
-                              size={15}
+                              size={20}
                               style={{ marginHorizontal: 5 }}
                             />
                           </TouchableOpacity>
@@ -972,14 +984,15 @@ const StudentActivityScreen = ({ route }) => {
               You currently do not have any activities
             </Text>
           )}
+          <View style={{ marginBottom: 50 }} />
         </View>
       ) : showParticipantMap ? (
         <MapView style={{ flex: 1 }}>
           {partcipants.map((item, index) => {
             // console.log("item", item);
-            let latitude = trackingList[item.childDeviceId]?.lat;
-            let longititude = trackingList[item.childDeviceId]?.lang;
-            console.log("latitiude-------", longititude);
+            let latitude = trackingList[item?.childDeviceId]?.lat;
+            let longititude = trackingList[item?.childDeviceId]?.lang;
+
             return (
               <View style={{ flex: 1 }}>
                 {latitude && longititude && (
@@ -999,16 +1012,55 @@ const StudentActivityScreen = ({ route }) => {
                     }}
                   >
                     {!item?.group && (
-                      <TouchableOpacity
-                        onPress={() => console.log("pressed")}
-                        style={{ alignItems: "center" }}
-                      >
-                        <Text>{item?.firstName}</Text>
-                        <Text style={{ marginBottom: 2 }}>
-                          {item?.lastName}
-                        </Text>
-                        <Fontisto name="map-marker-alt" size={25} color="red" />
-                      </TouchableOpacity>
+                      <View style={{}}>
+                        <View
+                          style={{
+                            height: 30,
+                            width: 30,
+                            borderRadius: 80,
+                            overflow: "hidden",
+                            // top: 33,
+                            // zIndex: 10,
+                          }}
+                        >
+                          {item?.image == "" && (
+                            <View
+                              style={{
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: 80,
+                                backgroundColor: Colors.primary,
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Text style={{ color: Colors.white }}>
+                                {item?.firstName
+                                  ?.substring(0, 1)
+                                  ?.toUpperCase() || ""}
+                                {item?.lastName
+                                  ?.substring(0, 1)
+                                  ?.toUpperCase() || ""}
+                              </Text>
+                            </View>
+                          )}
+                          {item?.image != "" && (
+                            <Image
+                              source={{
+                                uri: item?.image,
+                              }}
+                              style={{
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: 80,
+                                aspectRatio: 1.5,
+                              }}
+                              resizeMode="contain"
+                            />
+                          )}
+                        </View>
+                        {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+                      </View>
                     )}
 
                     {item?.group && (
@@ -1201,11 +1253,11 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     width: "96%",
     backgroundColor: "#fff",
-    marginTop: 10,
     marginHorizontal: "2%",
     // paddingHorizontal: 10,
     paddingTop: 10,
-    height: 175,
+    height: 185,
+    marginBottom: 20,
   },
   footer: {
     borderBottomLeftRadius: 10,
@@ -1222,19 +1274,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    fontSize: 13,
+    fontSize: 16,
     marginVertical: 4,
   },
 
   iconImages: {
-    height: 15,
-    width: 15,
+    height: 18,
+    width: 18,
     resizeMode: "contain",
     marginLeft: 5,
     marginRight: 5,
   },
   footerText: {
-    fontSize: 13,
+    fontSize: 16,
     marginVertical: 2,
   },
   horizontal: {

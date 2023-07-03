@@ -20,6 +20,7 @@ import {
   Spinner,
   Input,
 } from "@ui-kitten/components";
+import { useIsFocused } from "@react-navigation/native";
 // @ts-ignore
 import { ReportAProblem } from "../../../Services/SettingsServies";
 import LinearGradient from "react-native-linear-gradient";
@@ -53,7 +54,10 @@ const issues = [
   "",
   "Other",
 ];
-
+const initialValues = {
+  message: "",
+  selectedIndex: -1,
+};
 const RadioOptions = ({
   selectedIndex,
   setSelectedIndex,
@@ -105,23 +109,29 @@ const ReportProblemScreen = ({ navigation }) => {
       .min(20, ({ min }) => `Message needs to be at least ${min} characters`)
       .required("Message is required"),
   });
-
+  const isFocused = useIsFocused();
   const [userId, setUserId] = useState();
-
+  const [message, setMessage] = useState("");
   const getUserId = async () => {
     const _id = await loadUserId();
     setUserId(_id);
   };
 
   useEffect(() => {
-    getUserId();
-  }, []);
+    if (isFocused) {
+      getUserId();
+    } else {
+      setMessage(initialValues.message);
+      setSelectedIndex(initialValues.selectedIndex);
+    }
+  }, [isFocused]);
 
   const [isTouched, setisTouched] = useState(false);
   const [isSending, setisSending] = useState(false);
   const [isSent, setisSent] = useState(false);
 
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [selectedIndex, setSelectedIndex] = React.useState(-1);
+
   return (
     <BackgroundLayout title="Report a Problem">
       <AppHeader hideCalendar={true} hideCenterIcon={true} />
@@ -162,95 +172,98 @@ const ReportProblemScreen = ({ navigation }) => {
                     >
                       Explain (Min 20 & Max 200 Characters)
                     </Text>
-                    <Formik
-                      validationSchema={reportAProblemValidationSchema}
-                      validateOnMount={true}
-                      initialValues={{ message: "" }}
-                      onSubmit={(values, { resetForm }) => {
-                        setisSending(true);
-                        setisSent(true);
-                        let objectToPass = {
-                          userId: userId,
-                          subject: issues[selectedIndex],
-                          description: values.message,
-                        };
-                        CreateReport(objectToPass)
-                          .then((response: any) => {
-                            console.log("res", response.status);
-                            if (response.status == 201) {
-                              setisSent(true);
-                              setTimeout(() => {
-                                setisSent(false);
+                    {isFocused && (
+                      <Formik
+                        validationSchema={reportAProblemValidationSchema}
+                        // validateOnMount={true}
+                        enableReinitialize
+                        initialValues={{ message }}
+                        onSubmit={(values, { resetForm }) => {
+                          setisSending(true);
+                          setisSent(true);
+                          let objectToPass = {
+                            userId: userId,
+                            subject: issues[selectedIndex],
+                            description: values.message,
+                          };
+                          CreateReport(objectToPass)
+                            .then((response: any) => {
+                              console.log("res", response.status);
+                              if (response.status == 201) {
+                                setisSent(true);
+                                setTimeout(() => {
+                                  setisSent(false);
 
-                                setisSending(false);
-                              }, 400);
-                            }
-                          })
-                          .catch((error: any) => {
-                            Alert.alert(
-                              error.data.title,
-
-                              error.message,
-                              [{ text: "OK", style: "cancel" }]
-                            );
-                            setisSending(false);
-                          });
-                        resetForm();
-                        setSelectedIndex(0);
-                      }}
-                    >
-                      {({
-                        handleChange,
-                        handleSubmit,
-                        values,
-                        errors,
-                        isValid,
-                      }) => (
-                        <>
-                          <View style={styles.formContainer}>
-                            <Input
-                              style={styles.textInput}
-                              textStyle={styles.textArea}
-                              placeholder="Type your feedback"
-                              onChangeText={handleChange("message")}
-                              value={values.message}
-                              multiline={true}
-                              maxLength={500}
-                              status={
-                                isTouched && errors.message ? "danger" : ""
+                                  setisSending(false);
+                                }, 400);
                               }
-                            />
-                            {errors.message && isTouched ? (
-                              <Text style={styles.errorText}>
-                                {errors.message}
-                              </Text>
-                            ) : null}
-                            <View style={styles.buttonSettings}>
-                              <View style={{ width: "90%" }}>
-                                <LinearGradientButton
-                                  disabled={!isValid}
-                                  onPress={handleSubmit}
-                                >
-                                  Send
-                                </LinearGradientButton>
-                              </View>
+                            })
+                            .catch((error: any) => {
+                              Alert.alert(
+                                error.data.title,
 
-                              <View style={styles.cancelBackground}>
-                                <TouchableOpacity
-                                  style={styles.cancelBackground}
-                                  onPress={() => navigation.goBack()}
-                                >
-                                  <Text style={styles.cancelButton}>
-                                    Cancel
-                                  </Text>
-                                </TouchableOpacity>
+                                error.message,
+                                [{ text: "OK", style: "cancel" }]
+                              );
+                              setisSending(false);
+                            });
+                          resetForm();
+                          setSelectedIndex(0);
+                        }}
+                      >
+                        {({
+                          handleChange,
+                          handleSubmit,
+                          values,
+                          errors,
+                          isValid,
+                        }) => (
+                          <>
+                            <View style={styles.formContainer}>
+                              <Input
+                                style={styles.textInput}
+                                textStyle={styles.textArea}
+                                placeholder="Type your feedback"
+                                onChangeText={handleChange("message")}
+                                value={values.message}
+                                multiline={true}
+                                maxLength={500}
+                                status={
+                                  isTouched && errors.message ? "danger" : ""
+                                }
+                              />
+                              {errors.message && isTouched ? (
+                                <Text style={styles.errorText}>
+                                  {errors.message}
+                                </Text>
+                              ) : null}
+                              <View style={styles.buttonSettings}>
+                                <View style={{ width: "90%" }}>
+                                  <LinearGradientButton
+                                    disabled={!isValid || selectedIndex == -1}
+                                    onPress={handleSubmit}
+                                  >
+                                    Send
+                                  </LinearGradientButton>
+                                </View>
+
+                                <View style={styles.cancelBackground}>
+                                  <TouchableOpacity
+                                    style={styles.cancelBackground}
+                                    onPress={() => navigation.goBack()}
+                                  >
+                                    <Text style={styles.cancelButton}>
+                                      Cancel
+                                    </Text>
+                                  </TouchableOpacity>
+                                </View>
                               </View>
+                              <View style={{ height: 100 }} />
                             </View>
-                            <View style={{ height: 100 }} />
-                          </View>
-                        </>
-                      )}
-                    </Formik>
+                          </>
+                        )}
+                      </Formik>
+                    )}
                   </View>
                 </>
               )}

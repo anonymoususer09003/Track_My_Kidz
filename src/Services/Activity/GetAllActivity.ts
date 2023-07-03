@@ -6,7 +6,7 @@ export default async (page_number: number, page_size: number, config: any) => {
   );
   try {
     const response = await api.get(
-      `/activity/findall?page_number=${page_number}&page_size=${page_size}`,
+      `/activity/v2/findall?page_number=${page_number}&page_size=${page_size}`,
       config
     );
     return response.data;

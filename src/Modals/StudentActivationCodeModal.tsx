@@ -104,7 +104,7 @@ const StudentActivationCodeModal = ({
             />
           </View>
           <Text style={{ fontSize: 15, textAlign: "center" }}>
-            Student can use this activation code or scan QR code for sign up
+            Dependent can use this reference code or scan QR code for sign up
           </Text>
         </View>
         <View style={styles.buttonText}>

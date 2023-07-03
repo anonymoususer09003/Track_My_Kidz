@@ -24,6 +24,7 @@ import {
   GetAuthStudentByActivationCode,
   GetStudentByActivationCode,
 } from "@/Services/Student";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 const ImportDependent = ({ route }) => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
@@ -110,11 +111,12 @@ const ImportDependent = ({ route }) => {
       });
   };
   const importSingleChildren = () => {
-    let body = {
-      referenceCode: referenceCode,
-      // email: user?.email,
-    };
-    console.log("referncecode", referenceCode);
+    dispatch(
+      ChangeModalState.action({
+        importDependentsModalVisibility: false,
+      })
+    );
+
     ImportSingleChildren(referenceCode)
       .then((res) => {
         Toast.show({
@@ -132,7 +134,7 @@ const ImportDependent = ({ route }) => {
         Toast.show({
           type: "success",
           position: "top",
-          text1: `Error`,
+          text1: `This dependent is already linked to two parents/guardians`,
         });
         console.log("err", err);
       });
@@ -142,10 +144,16 @@ const ImportDependent = ({ route }) => {
       referenceCode: referenceCode,
       // email: user?.email,
     };
+    dispatch(
+      ChangeModalState.action({
+        importDependentsModalVisibility: false,
+      })
+    );
     ImportAllChildren(body)
       .then((res) => {
         setReferenceCode("");
         setChildren([]);
+
         Toast.show({
           type: "success",
           position: "top",
@@ -159,7 +167,7 @@ const ImportDependent = ({ route }) => {
         Toast.show({
           type: "success",
           position: "top",
-          text1: `Error`,
+          text1: `This dependent is already linked to two parents/guardians`,
         });
         console.log("err", err);
       });
@@ -188,7 +196,7 @@ const ImportDependent = ({ route }) => {
   }, [referenceCode, isFocused]);
 
   return (
-    <>
+    <BackgroundLayout title="Import Dependent">
       <QRCodeModal
         showQR={showQR}
         setShowQR={handleQR}
@@ -208,8 +216,9 @@ const ImportDependent = ({ route }) => {
         }}
       />
       <AppHeader
-        isBack={route?.params ? true : false}
-        title="Import Dependent"
+        isBack={false}
+        hideCalendar={true}
+        hideCenterIcon={true}
         isStack={false}
       />
       <View style={styles.layout}>
@@ -288,8 +297,9 @@ const ImportDependent = ({ route }) => {
             Not ready to import
           </LinearGradientButton>
         </View>
+        <View style={{ height: 50 }} />
       </View>
-    </>
+    </BackgroundLayout>
   );
 };
 
@@ -298,6 +308,10 @@ export default ImportDependent;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    paddingHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 10,
+    backgroundColor: Colors.newBackgroundColor,
+    borderRadius: 25,
   },
 });

@@ -182,7 +182,7 @@ const DependentInfoScreen = () => {
     let lat = coordinates?.latitude || position?.latitude || "0.000";
     try {
       let res = await fetch(
-        `https://live-api.trackmykidz.com/user/parent/alert/trackStudent?studentId=${item?.studentId}&parentLatitude=${lat}&parentLongitude=${lang}&toggleAlert=${status}&distanceAllowed=${distanceAllowed}&kilometers=${kilometers}`,
+        `https://live-api.trackmykidz.com/user/parent/v2/alert/trackStudent?studentId=${item?.studentId}&parentLatitude=${lat}&parentLongitude=${lang}&toggleAlert=${status}&distanceAllowed=${distanceAllowed}&kilometers=${kilometers}`,
         {
           method: "POST",
           headers: {

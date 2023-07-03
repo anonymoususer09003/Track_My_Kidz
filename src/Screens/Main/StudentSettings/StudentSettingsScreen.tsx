@@ -299,7 +299,7 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
                   dispatch(LogoutStore.action());
                 }}
               >
-                Log out
+                Log Out
               </LinearGradientButton>
             </View>
             <View style={{ marginVertical: 15 }}>

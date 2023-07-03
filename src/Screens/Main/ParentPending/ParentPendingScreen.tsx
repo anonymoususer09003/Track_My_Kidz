@@ -341,7 +341,15 @@ const ParentPendingScreen = ({ route }) => {
                       <Text style={[styles.text, { fontSize: 25 }]}>
                         {`${item?.activity?.activityName}`}
                       </Text>
-
+                      <View style={styles.horizontal}>
+                        <Image
+                          source={instructorImage}
+                          style={styles.iconStyle}
+                        />
+                        <Text
+                          style={styles.text}
+                        >{`${item?.firstName} ${item?.lastName}`}</Text>
+                      </View>
                       <View style={styles.horizontal}>
                         <Image source={calendarIcon} style={styles.iconStyle} />
                         <Text style={styles.text}>{`${moment(date).format(
@@ -355,23 +363,14 @@ const ParentPendingScreen = ({ route }) => {
                         )}`}</Text>
                       </View>
 
-                      <View style={styles.horizontal}>
-                        <Image
-                          source={instructorImage}
-                          style={styles.iconStyle}
-                        />
-                        <Text
-                          style={styles.text}
-                        >{`${item?.firstName} ${item?.lastName}`}</Text>
-                      </View>
-
+                      {/* 
                       <View style={styles.horizontal}>
                         <Image source={email} style={styles.iconStyle} />
 
                         <Text
                           style={styles.text}
                         >{`${item?.parentEmail1}`}</Text>
-                      </View>
+                      </View> */}
                     </View>
                   </Swipeable>
                 );
@@ -387,12 +386,6 @@ const ParentPendingScreen = ({ route }) => {
                         {item?.group?.groupName}
                       </Text>
                       <View style={styles.horizontal}>
-                        <Image source={calendarIcon} style={styles.iconStyle} />
-                        <Text style={styles.text}>{`${moment(
-                          item?.activity?.scheduler?.fromDate
-                        ).format("YYYY-MM-DD")}`}</Text>
-                      </View>
-                      <View style={styles.horizontal}>
                         <Image
                           source={instructorImage}
                           style={styles.iconStyle}
@@ -402,11 +395,18 @@ const ParentPendingScreen = ({ route }) => {
                         >{` ${item?.firstName} ${item?.lastName}`}</Text>
                       </View>
                       <View style={styles.horizontal}>
+                        <Image source={calendarIcon} style={styles.iconStyle} />
+                        <Text style={styles.text}>{`${moment(
+                          item?.activity?.scheduler?.fromDate
+                        ).format("YYYY-MM-DD")}`}</Text>
+                      </View>
+
+                      {/* <View style={styles.horizontal}>
                         <Image source={email} style={styles.iconStyle} />
                         <Text
                           style={styles.text}
                         >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
-                      </View>
+                      </View> */}
                     </View>
                   </Swipeable>
                 );

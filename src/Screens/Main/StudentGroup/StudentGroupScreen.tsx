@@ -13,6 +13,10 @@ import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import Colors from "@/Theme/Colors";
 import { InstructionsModal } from "@/Modals";
+import MapView, { Marker, Circle } from "react-native-maps";
+import * as Stomp from "stompjs";
+import SockJS from "sockjs-client";
+import { loadToken } from "@/Storage/MainAppStorage";
 import {
   DeleteGroup,
   GetAllGroup,
@@ -25,15 +29,19 @@ import {
   storeHomeScreenCacheInfo,
   getHomeScreenCacheInfo,
 } from "@/Storage/MainAppStorage";
+import { StudentState } from "@/Store/StudentActivity";
 import Entypo from "react-native-vector-icons/Entypo";
 import SetChatParam from "@/Store/chat/SetChatParams";
 import Ionicons from "react-native-vector-icons/Ionicons";
 const StudentGroupScreen = ({ route }) => {
   const navigation = useNavigation();
+  const [children, setChildren] = useState([]);
   const instructorImage = require("@/Assets/Images/approval_icon2.png");
   const dependent = route && route.params && route.params.dependent;
   const isFocused = useIsFocused();
+  const [trackingList, setTrackingList] = useState({});
   const swipeableRef = useRef(null);
+  const ref = useRef();
   const [groupCount, setGroupCount] = useState({});
   const dispatch = useDispatch();
   let prevOpenedRow: any;
@@ -41,6 +49,11 @@ const StudentGroupScreen = ({ route }) => {
   const searchBarValue = useSelector(
     (state: any) => state.header.searchBarValue
   );
+  const { hideCalendar, showFamilyMap, showParticipantMap } = useSelector(
+    (state: { studentActivity: StudentState }) => state.studentActivity
+  );
+  const [studentsEmails, setStudentsEmail] = useState([]);
+
   const [selectedDependent, setSelectedDependent] = useState(null);
   const [groups, setGroups] = useState([]);
   const [selectedInstructions, setSelectedInstructions] = useState(null);
@@ -124,8 +137,68 @@ const StudentGroupScreen = ({ route }) => {
     }
   }, [selectedInstructions]);
 
+  const getChildrens = async (referenceCode: any) => {
+    try {
+      let res = await GetParentChildrens(referenceCode);
+      let temp = [];
+      let deviceIds = [];
+      res.map((item, index) => {
+        temp.push({
+          latitude: item?.latitude ? parseFloat(item?.latitude) : null,
+
+          longitude: item?.longititude ? parseFloat(item?.longititude) : null,
+        });
+
+        if (item?.childDevice) {
+          deviceIds.push(item?.childDevice);
+        }
+      });
+      connectSockets(deviceIds);
+      setStudentsEmail(temp);
+      setChildren(res);
+    } catch (err) {
+      console.log("err in children", err);
+    }
+  };
+
+  let stompClient: any = React.createRef<Stomp.Client>();
+  const connectSockets = async (deviceIds: any) => {
+    const token = await loadToken();
+    const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+    stompClient = Stomp.over(socket);
+    stompClient.connect({ token }, () => {
+      console.log("Connected");
+
+      deviceIds.map((item) => {
+        stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+      });
+    });
+  };
+  const subscriptionCallback = (subscriptionMessage: any) => {
+    const messageBody = JSON.parse(subscriptionMessage.body);
+    console.log("Update Received", messageBody);
+
+    setTrackingList({
+      ...trackingList,
+      [messageBody.deviceId]: {
+        lat: messageBody.latitude,
+        lang: messageBody.longitude,
+      },
+    });
+  };
+
+  const fetchParent = async () => {
+    try {
+      getChildrens(currentUser?.parentReferenceCode1);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
   useEffect(() => {
-    getGroups();
+    if (isFocused) {
+      getGroups();
+      fetchParent();
+    }
   }, [isFocused]);
   useEffect(() => {
     if (searchBarValue) {
@@ -434,6 +507,149 @@ const StudentGroupScreen = ({ route }) => {
             }}
           />
         )}
+        {showFamilyMap && (
+          <MapView
+            ref={ref}
+            // onRegionChange={(region) => setRegion(region)}
+            // zoomEnabled
+            // region={region}
+            // initialRegion={{
+            //   latitude: children[0]?.latitude
+            //     ? parseFloat(children[0]?.latitude)
+            //     : parseFloat(10),
+            //   longitude: children[0]?.longititude
+            //     ? parseFloat(children[0]?.longititude)
+            //     : parseFloat(10),
+            //   latitudeDelta: 0.0922 + width / height,
+            //   longitudeDelta: 0.0421,
+            // }}
+            onLayout={() => {
+              let temp = studentsEmails.filter(
+                (item) => trackingList[item.childDevice]?.lat != null
+              );
+
+              ref?.current?.fitToCoordinates(temp, {
+                edgePadding: {
+                  top: 10,
+                  right: 10,
+                  bottom: 10,
+                  left: 10,
+                },
+                animated: true,
+              });
+            }}
+            style={{ flex: 1 }}
+          >
+            {children.map((item, index) => {
+              let latitude = trackingList[item.childDevice]?.lat;
+              let longititude = trackingList[item.childDevice]?.lang;
+
+              // console.log("item", item);
+              if (trackingList[item.childDevice]?.lat) {
+                return (
+                  <>
+                    <Marker
+                      onSelect={() => console.log("pressed")}
+                      onPress={() => {
+                        console.log("ref", ref);
+                        ref.current.fitToSuppliedMarkers(
+                          [
+                            {
+                              latitude: latitude
+                                ? parseFloat(latitude)
+                                : parseFloat(10),
+                              longitude: longititude
+                                ? parseFloat(longititude)
+                                : parseFloat(10),
+                            },
+                          ]
+                          // false, // not animated
+                        );
+                      }}
+                      identifier={item?.email}
+                      key={index}
+                      coordinate={{
+                        latitude: latitude
+                          ? parseFloat(latitude)
+                          : parseFloat(10),
+                        longitude: longititude
+                          ? parseFloat(longititude)
+                          : parseFloat(10),
+                      }}
+                    >
+                      <View style={{}}>
+                        <View
+                          style={{
+                            height: 30,
+                            width: 30,
+                            borderRadius: 80,
+                            overflow: "hidden",
+                            // top: 33,
+                            // zIndex: 10,
+                          }}
+                        >
+                          {item?.studentImage == "" && (
+                            <View
+                              style={{
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: 80,
+                                backgroundColor: Colors.primary,
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Text style={{ color: Colors.white }}>
+                                {item?.firstname
+                                  ?.substring(0, 1)
+                                  ?.toUpperCase() || ""}
+                                {item?.lastname
+                                  ?.substring(0, 1)
+                                  ?.toUpperCase() || ""}
+                              </Text>
+                            </View>
+                          )}
+                          {item?.studentImage != "" && (
+                            <Image
+                              source={{
+                                uri: item?.studentImage,
+                              }}
+                              style={{
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: 80,
+                                aspectRatio: 2,
+                              }}
+                              resizeMode="contain"
+                            />
+                          )}
+                        </View>
+                        {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+                      </View>
+                      {/* <TouchableOpacity
+                    onPress={() => console.log("pressed")}
+                    style={{ alignItems: "center" }}
+                  >
+                    <Text>{item?.firstname}</Text>
+                    <Text style={{ marginBottom: 2 }}>
+                      {item?.lastname}
+                    </Text>
+                    <Fontisto
+                      name="map-marker-alt"
+                      size={25}
+                      color="red"
+                    />
+                  </TouchableOpacity> */}
+                    </Marker>
+                  </>
+                  // </>
+                  // </Circle>
+                );
+              }
+            })}
+          </MapView>
+        )}
+
         {groups.length == 0 && (
           <Text style={{ textAlign: "center", marginTop: 5 }}>
             You currently do not have any groups

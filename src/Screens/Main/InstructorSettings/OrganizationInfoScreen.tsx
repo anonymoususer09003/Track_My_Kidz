@@ -158,7 +158,6 @@ const OrganizationInfoScreen = ({ navigation }) => {
 
   const handleGetOrganizationInfo = async () => {
     const userId = await loadUserId();
-
     let res = await GetInstructor(userId);
     if (res.schoolId || res.orgId) {
       GetSchool(res.schoolId)

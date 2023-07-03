@@ -1,43 +1,42 @@
-import React, { useEffect, useState } from "react";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
 import {
-  Input,
-  Layout,
-  Select,
-  SelectItem,
-  Text,
-  Modal,
-  Autocomplete,
-  AutocompleteItem,
-  CheckBox,
-  Button,
-  Icon,
-  Card,
-} from "@ui-kitten/components";
-import { LinearGradientButton, Spinner } from "@/Components";
+  CustomTextDropDown,
+  LinearGradientButton,
+  Spinner,
+} from "@/Components";
+import ProfileAvatarPicker from "@/Components/ProfileAvatar";
 import { PersonIcon, PhoneIcon } from "@/Components/SignUp/icons";
-import { StyleSheet, View, TouchableOpacity } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import Colors from "@/Theme/Colors";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import ImagePicker from "react-native-image-crop-picker";
-import { Formik } from "formik";
+import { ImagePickerModal } from "@/Modals";
+import { CountryDTO } from "@/Models/CountryDTOs";
+import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
+import { GetAllSchools, GetSchoolByFilters } from "@/Services/School";
 import { CreateStudent } from "@/Services/Student";
 import { loadUserId } from "@/Storage/MainAppStorage";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { GetSchoolByFilters, GetAllSchools } from "@/Services/School";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { PlaceState } from "@/Store/Places";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import { CountryDTO } from "@/Models/CountryDTOs";
-import { ImagePickerModal } from "@/Modals";
 import { UserState } from "@/Store/User";
-import { photoUpload } from "@/AWS/aws-upload-service";
-import ProfileAvatarPicker from "@/Components/ProfileAvatar";
+import Colors from "@/Theme/Colors";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import {
+  Autocomplete,
+  AutocompleteItem,
+  Button,
+  CheckBox,
+  Icon,
+  Input,
+  Layout,
+  Modal,
+  Text,
+} from "@ui-kitten/components";
+import { Formik } from "formik";
+import React, { useEffect, useState } from "react";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import ImagePicker from "react-native-image-crop-picker";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 import ProfileIcon from "react-native-vector-icons/EvilIcons";
+import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
-import LinearGradient from "react-native-linear-gradient";
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -120,7 +119,6 @@ const AddStudentModal = () => {
       }
     });
   };
-  console.log("uploadimage--000", uploadedImage);
 
   const getSchoolsByFilter = (
     country = "",
@@ -143,7 +141,7 @@ const AddStudentModal = () => {
         };
         const _schools = [...res];
         _schools.unshift(_data);
-        // setSchools(_schools);
+        setSchools(_schools);
         setSchoolsData(_schools);
       })
       .catch((err) => {
@@ -185,8 +183,8 @@ const AddStudentModal = () => {
   const renderEditAvatarButton = (): React.ReactElement => (
     <Button
       style={styles.editAvatarButton}
-      status="basic"
-      accessoryRight={<Icon name="edit" />}
+      status='basic'
+      accessoryRight={<Icon name='edit' />}
       onPress={() => setVisible(true)}
     />
   );
@@ -228,6 +226,7 @@ const AddStudentModal = () => {
           />
         )}
         <KeyboardAwareScrollView
+          nestedScrollEnabled={true}
           style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}
         >
           <View
@@ -262,6 +261,7 @@ const AddStudentModal = () => {
                   selectedState: "",
                   selectedCity: "",
                   addMore: false,
+                  image: selectedImage,
                 }}
                 onSubmit={async (values, { resetForm }) => {
                   console.log("values", values);
@@ -365,17 +365,23 @@ const AddStudentModal = () => {
                   isValid,
                 }) => (
                   <>
-                    <Layout style={styles.formContainer} level="1">
+                    <Layout style={styles.formContainer} level='1'>
                       <View style={{ width: "100%" }}>
                         {selectedImage != "" && (
                           <ProfileAvatarPicker
                             style={styles.profileImage}
                             // resizeMode='center'
-                            source={{
-                              uri:
-                                selectedImage + "?time" + new Date().getTime(),
-                              headers: { Pragma: "no-cache" },
-                            }}
+                            source={
+                              Platform.OS == "android"
+                                ? {
+                                    uri:
+                                      selectedImage +
+                                      "?time" +
+                                      new Date().getTime(),
+                                    headers: { Pragma: "no-cache" },
+                                  }
+                                : { uri: selectedImage }
+                            }
                             // editButton={false ? renderEditAvatarButton : null}
                           />
                         )}
@@ -392,10 +398,11 @@ const AddStudentModal = () => {
                               },
                             ]}
                           >
-                            <ProfileIcon size={110} name="user" />
+                            <ProfileIcon size={110} name='user' />
                             {/* {true && renderEditButtonElement()} */}
                           </View>
                         )}
+
                         <Text
                           style={[
                             styles.errorText,
@@ -409,6 +416,10 @@ const AddStudentModal = () => {
                           Headshots preffered
                         </Text>
                       </View>
+
+                      {errors?.image && (
+                        <Text style={styles.errorText}>{errors?.image}</Text>
+                      )}
                       <View
                         style={{
                           flexDirection: "row",
@@ -470,7 +481,7 @@ const AddStudentModal = () => {
                       </View>
                       <Input
                         style={styles.textInput}
-                        autoCapitalize="words"
+                        autoCapitalize='words'
                         autoCorrect={false}
                         placeholder={`Child's First Name*`}
                         accessoryRight={PersonIcon}
@@ -483,7 +494,7 @@ const AddStudentModal = () => {
                       )}
                       <Input
                         style={styles.textInput}
-                        autoCapitalize="words"
+                        autoCapitalize='words'
                         autoCorrect={false}
                         placeholder={`Child's Last Name*`}
                         accessoryRight={PersonIcon}
@@ -495,9 +506,9 @@ const AddStudentModal = () => {
                         <Text style={styles.errorText}>{errors.lastName}</Text>
                       )}
                       <Autocomplete
-                        placeholder="Country*"
+                        placeholder='Country*'
                         value={values.country}
-                        placement="bottom"
+                        placement='bottom'
                         style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>Country*</Text>}
                         onChangeText={(query) => {
@@ -541,9 +552,9 @@ const AddStudentModal = () => {
                         <Text style={styles.errorText}>{errors.country}</Text>
                       )}
                       <Autocomplete
-                        placeholder="State*"
+                        placeholder='State*'
                         value={values.state}
-                        placement="bottom"
+                        placement='bottom'
                         style={styles.textInput}
                         disabled={!values.selectedCountry}
                         // label={evaProps => <Text {...evaProps}>State</Text>}
@@ -586,9 +597,9 @@ const AddStudentModal = () => {
                         <Text style={styles.errorText}>{errors.state}</Text>
                       )}
                       <Autocomplete
-                        placeholder="City*"
+                        placeholder='City*'
                         value={values.city}
-                        placement="bottom"
+                        placement='bottom'
                         disabled={!values.selectedState}
                         style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>City</Text>}
@@ -602,7 +613,11 @@ const AddStudentModal = () => {
                           const selectedCity = citiesData[query];
                           setFieldValue("city", selectedCity);
                           setFieldValue("selectedCity", selectedCity);
-                          // getSchoolsByFilter("", "", selectedCity);
+                          getSchoolsByFilter(
+                            values.selectedCountry,
+                            values.selectedState,
+                            selectedCity
+                          );
                         }}
                       >
                         {citiesData.map((item, index) => {
@@ -615,55 +630,58 @@ const AddStudentModal = () => {
                           );
                         })}
                       </Autocomplete>
-                      <Autocomplete
-                        placeholder="School*"
+                      <View style={{ width: "95%", marginLeft: 10, zIndex: 2 }}>
+                        <CustomTextDropDown
+                          placeholder='Select School'
+                          value={values.school}
+                          onSelect={(index: any) => {
+                            console.log("index", index);
+
+                            let school = schoolsData[index];
+                            setFieldValue("school", school.name);
+                            setFieldValue("selectedSchool", school.name);
+                            if (school.name != "Other") {
+                              setFieldValue("schoolName", school.name);
+                              setFieldValue("schoolAddress", school.address);
+                            } else {
+                              setFieldValue("schoolName", "");
+                              setFieldValue("schoolAdress", "");
+                            }
+                          }}
+                          dropDownList={schoolsData}
+                        />
+                      </View>
+                      {/* <Select
+                        style={{
+                          width: "95%",
+                          marginLeft: 10,
+                          marginTop: 0,
+                          marginTop: -12,
+                          fontSize: 12,
+
+                          // borderRadius: 30,
+                        }}
                         value={values.school}
-                        placement="bottom"
-                        onBlur={() => setSchoolsData(schools)}
-                        // disabled={!values.selectedState}
-                        style={styles.textInput}
-                        onChangeText={(query) => {
-                          setFieldValue("school", query);
-                          // let schoolList = schools.filter((item: any) =>
-                          //   item?.name?.includes(query)
-                          // );
-                          if (values.school.length > 4) {
-                            getSchoolsByFilter("", "", "", query);
+                        placeholder="School*"
+                        onSelect={(index: any) => {
+                          let school = schoolsData[index.row];
+                          setFieldValue("school", school.name);
+                          setFieldValue("selectedSchool", school.name);
+                          if (school.name != "Other") {
+                            setFieldValue("schoolName", school.name);
+                            setFieldValue("schoolAddress", school.address);
+                          } else {
+                            setFieldValue("schoolName", "");
+                            setFieldValue("schoolAdress", "");
                           }
-                          // if (schoolList.length > 0) {
-                          //   setSchoolsData(schoolList);
-                          // } else {
-                          //   // setSchoolsData([
-                          //   //   {
-                          //   //     schoolId: 0,
-                          //   //     name: "Other",
-                          //   //   },
-                          //   // ]);
-                          // }
-                          // setSchoolsData(
-                          //   schools.filter((item) =>
-                          //     filterSchools(item?.name, query)
-                          //   )
-                          // );
                         }}
-                        onSelect={(query) => {
-                          const selectedSchool = schoolsData[query];
-                          setFieldValue("school", selectedSchool?.name);
-                          setFieldValue("selectedSchool", "");
-                        }}
+                        label={(evaProps: any) => <Text {...evaProps}></Text>}
                       >
-                        {schoolsData &&
-                          schoolsData.length > 0 &&
-                          schoolsData.map((school, index) => {
-                            return (
-                              <AutocompleteItem
-                                style={styles.autoCompleteItem}
-                                key={index}
-                                title={school?.name || ""}
-                              />
-                            );
-                          })}
-                      </Autocomplete>
+                        {schoolsData?.map((org, index) => {
+                          return <SelectItem key={index} title={org?.name} />;
+                        })}
+                      </Select> */}
+
                       {errors.school && touched.school && (
                         <Text style={styles.errorText}>{errors.school}</Text>
                       )}
@@ -672,10 +690,10 @@ const AddStudentModal = () => {
                         <>
                           <Input
                             style={styles.textInput}
-                            autoCapitalize="words"
+                            autoCapitalize='words'
                             // accessoryRight={PersonIcon}
                             value={values.selectedSchool}
-                            placeholder="School Name*"
+                            placeholder='School Name*'
                             onChangeText={handleChange("selectedSchool")}
                             onBlur={handleBlur("selectedSchool")}
                           />
@@ -690,7 +708,7 @@ const AddStudentModal = () => {
 
                       <Input
                         style={styles.textInput}
-                        autoCapitalize="none"
+                        autoCapitalize='none'
                         accessoryRight={PersonIcon}
                         value={values.email}
                         placeholder="Child's Email* (not parent's email)"
@@ -712,12 +730,12 @@ const AddStudentModal = () => {
                       </Text>
                       <Input
                         style={styles.textInput}
-                        autoCapitalize="none"
+                        autoCapitalize='none'
                         autoCorrect={false}
-                        placeholder="Phone Number"
+                        placeholder='Phone Number'
                         accessoryRight={PhoneIcon}
                         value={values.phoneNumber}
-                        keyboardType="number-pad"
+                        keyboardType='number-pad'
                         onChangeText={handleChange("phoneNumber")}
                       />
                     </Layout>
@@ -735,6 +753,7 @@ const AddStudentModal = () => {
                             width: "90%",
                             paddingBottom: 30,
                             alignSelf: "center",
+                            zIndex: -10,
                           }}
                         >
                           <View style={{ height: 20 }} />

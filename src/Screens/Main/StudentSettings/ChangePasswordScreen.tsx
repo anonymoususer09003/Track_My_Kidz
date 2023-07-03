@@ -215,7 +215,7 @@ const ChangePasswordScreen = () => {
                           onPress={handleSubmit}
                         >
                           <Text style={styles.button}>
-                            Send Activation Code
+                            Send Verification Code
                           </Text>
                         </TouchableOpacity>
                       </View>
@@ -238,7 +238,7 @@ const ChangePasswordScreen = () => {
               style={styles.backgroundTextButton}
               onPress={() => {}}
             >
-              <Text style={styles.buttonText}>Resend Activation Code</Text>
+              <Text style={styles.buttonText}>Resend Verification Code</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

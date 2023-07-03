@@ -66,7 +66,11 @@ const StudentActivityNavigator = () => {
     </TabBar>
   );
   return (
-    <BackgroundLayout title="Event Information" rightIcon={true}>
+    <BackgroundLayout
+      hideLeftIcon={true}
+      title="Event Information"
+      rightIcon={true}
+    >
       {isCalendarVisible && (
         <Calendar
           selectedMonth={selectedMonth}
@@ -92,7 +96,11 @@ const StudentActivityNavigator = () => {
           component={StudentGroupScreen}
         />
       </TabNavigator.Navigator>
-      <AppHeader hideCenterIcon={true} showGlobe={true} />
+      <AppHeader
+        hideCenterIcon={true}
+        hideCalendar={showFamilyMap ? true : false}
+        showGlobe={true}
+      />
     </BackgroundLayout>
   );
 };

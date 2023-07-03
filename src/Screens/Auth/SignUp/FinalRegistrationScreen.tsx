@@ -260,9 +260,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
         <Text
           style={{ color: Colors.primary, fontSize: 13 }}
           onPress={() => {
-            Linking.openURL("https://trackmykidz.com/terms-of-use").then(
-              (r) => {}
-            );
+            Linking.openURL("https://trackmykidz.com/terms/").then((r) => {});
           }}
         >
           {" "}
@@ -541,6 +539,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   phone: values.phoneNumber,
                   status: "",
                   term: true,
+                  apt: values?.apartment,
                   deviceId: getDeviceId(),
                 };
 
@@ -859,7 +858,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       onPress={handleSubmit}
                       disabled={!isValid || !values.termsAccepted}
                     >
-                      SIGN UP
+                      Sign Up
                     </LinearGradientButton>
                   </View>
                 </>

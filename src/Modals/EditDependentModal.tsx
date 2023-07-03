@@ -1,45 +1,44 @@
 import {
-  Card,
-  Modal,
-  Input,
-  Text,
-  Select,
-  SelectItem,
-  Autocomplete,
-  AutocompleteItem,
-  CheckBox,
-  Icon,
-  Button,
-} from "@ui-kitten/components";
-import { Dimensions } from "react-native";
-import { Spinner } from "@/Components";
-import * as yup from "yup";
+  CustomTextDropDown,
+  LinearGradientButton,
+  Spinner,
+} from "@/Components";
+import ProfileAvatarPicker from "@/Components/ProfileAvatar";
 import { ImagePickerModal } from "@/Modals";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
-import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { LinearGradientButton } from "@/Components";
-import { UpdateStudent } from "@/Services/Student";
-import Colors from "@/Theme/Colors";
+import { CountryDTO } from "@/Models/CountryDTOs";
+import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
 import {
   GetAllSchools,
   GetSchoolByFilters,
   UpdateSchool,
 } from "@/Services/School";
+import { UpdateStudent } from "@/Services/Student";
+import { loadUserId } from "@/Storage/MainAppStorage";
+import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { PlaceState } from "@/Store/Places";
+import { UserState } from "@/Store/User";
+import Colors from "@/Theme/Colors";
+import { useIsFocused } from "@react-navigation/native";
+import {
+  Autocomplete,
+  AutocompleteItem,
+  Button,
+  Card,
+  CheckBox,
+  Icon,
+  Input,
+  Modal,
+  Text,
+} from "@ui-kitten/components";
 import { Formik } from "formik";
+import React, { useEffect, useState } from "react";
+import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
 import ImagePicker from "react-native-image-crop-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import { PlaceState } from "@/Store/Places";
-import { CountryDTO } from "@/Models/CountryDTOs";
-import { useIsFocused } from "@react-navigation/native";
-import { UserState } from "@/Store/User";
-import ProfileAvatarPicker from "@/Components/ProfileAvatar";
-import ProfileIcon from "react-native-vector-icons/EvilIcons";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { useDispatch, useSelector } from "react-redux";
+import * as yup from "yup";
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -86,7 +85,7 @@ const EditDependentModal = ({
   const [visible, setVisible] = useState(false);
   // const [dependents, setCities] = useState<Array<any>>([]);
   const [checkBox, setCheckBox] = useState(false);
-  const [schoolsData, setSchoolsData] = React.useState(schools);
+  const [schoolsData, setSchoolsData] = React.useState([]);
   const isVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.editDependentModalVisibility
   );
@@ -146,12 +145,11 @@ const EditDependentModal = ({
     });
   };
 
-  console.log("uploadimage--000", uploadedImage);
   const renderEditAvatarButton = (): React.ReactElement => (
     <Button
       style={styles.editAvatarButton}
-      status="basic"
-      accessoryRight={<Icon name="edit" />}
+      status='basic'
+      accessoryRight={<Icon name='edit' />}
       onPress={() => setVisible(true)}
     />
   );
@@ -190,6 +188,7 @@ const EditDependentModal = ({
           schoolId: 0,
           name: "Other",
         };
+
         const _schools = [...res];
         _schools.unshift(_data);
         setSchools(_schools);
@@ -198,20 +197,24 @@ const EditDependentModal = ({
       .catch((err) => {});
   };
 
-  useEffect(() => {
-    getSchools();
-  }, [isVisible]);
+  // useEffect(() => {
+  //   getSchools();
+  // }, [isVisible]);
 
   const handleSetStudent = () => {
     if (selectedDependent) {
       setStudent(selectedDependent);
     }
   };
-
+  console.log("school data", schoolsData);
   useEffect(() => {
     if (isFocused) {
-      console.log("sjsjsjs", student?.studentImage);
       handleSetStudent();
+      getSchoolsByFilter(
+        selectedDependent?.country,
+        selectedDependent?.state,
+        selectedDependent?.city
+      );
       // setSelectedImage(selectedDependent?.studentImage);
       // setUploadedImage(selectedDependent?.studentImage);
     } else {
@@ -489,7 +492,7 @@ const EditDependentModal = ({
                       </View>
                       <Input
                         style={styles.textInput}
-                        autoCapitalize="none"
+                        autoCapitalize='none'
                         autoCorrect={false}
                         placeholder={`First Name`}
                         value={values?.firstName}
@@ -507,7 +510,7 @@ const EditDependentModal = ({
                       )}
                       <Input
                         style={styles.textInput}
-                        autoCapitalize="none"
+                        autoCapitalize='none'
                         autoCorrect={false}
                         placeholder={`Last Name`}
                         value={values.lastName}
@@ -526,10 +529,10 @@ const EditDependentModal = ({
                       )}
                       <Input
                         style={styles.textInput}
-                        autoCapitalize="none"
+                        autoCapitalize='none'
                         autoCorrect={false}
                         value={values.email}
-                        placeholder="Email*"
+                        placeholder='Email*'
                         onChangeText={handleChange("email")}
                         onBlur={handleBlur("email")}
                         // placeholder={`Email*`}
@@ -547,11 +550,11 @@ const EditDependentModal = ({
                       )}
                       <Input
                         style={styles.textInput}
-                        autoCapitalize="none"
+                        autoCapitalize='none'
                         autoCorrect={false}
                         placeholder={`Phone # (Optional)`}
                         value={values.phoneNumber}
-                        keyboardType="number-pad"
+                        keyboardType='number-pad'
                         onChangeText={handleChange("phoneNumber")}
                         // value={student?.phone}
                         // onChangeText={(value: string) =>
@@ -562,9 +565,9 @@ const EditDependentModal = ({
                         // }
                       />
                       <Autocomplete
-                        placeholder="Country*"
+                        placeholder='Country*'
                         value={values?.country}
-                        placement="bottom"
+                        placement='bottom'
                         style={styles.textInput}
                         onChangeText={(query) => {
                           setFieldValue("country", query);
@@ -590,6 +593,7 @@ const EditDependentModal = ({
                             setStates(res.data);
                             setStatesData(states);
                           });
+                          getSchoolsByFilter(selectedCountry);
                           // getSchoolsByFilter(selectedCountry.name);
                         }}
                       >
@@ -607,10 +611,10 @@ const EditDependentModal = ({
                         <Text style={styles.errorText}>{errors.country}</Text>
                       )}
                       <Autocomplete
-                        placeholder="State*"
+                        placeholder='State*'
                         value={values.state}
                         // value={student?.state}
-                        placement="bottom"
+                        placement='bottom'
                         style={styles.textInput}
                         disabled={!values.selectedCountry}
                         onChangeText={(query) => {
@@ -632,6 +636,10 @@ const EditDependentModal = ({
                           ).then((res) => {
                             setCities(res.data);
                           });
+                          getSchoolsByFilter(
+                            values.selectedCountry,
+                            selectedState
+                          );
                           // getSchoolsByFilter(values.selectedCountry, selectedState);
                         }}
                       >
@@ -650,9 +658,9 @@ const EditDependentModal = ({
                         <Text style={styles.errorText}>{errors.state}</Text>
                       )}
                       <Autocomplete
-                        placeholder="City"
+                        placeholder='City'
                         value={values?.city}
-                        placement="bottom"
+                        placement='bottom'
                         disabled={!values.selectedState}
                         // disabled={!student?.selectedState}
                         style={styles.textInput}
@@ -667,6 +675,11 @@ const EditDependentModal = ({
                           const selectedCity = citiesData[query];
                           setFieldValue("city", selectedCity);
                           setFieldValue("selectedCity", selectedCity);
+                          getSchoolsByFilter(
+                            values.selectedCountry,
+                            values.selectedState,
+                            selectedCity
+                          );
                           // getSchoolsByFilter("", "", selectedCity);
                         }}
                       >
@@ -681,8 +694,26 @@ const EditDependentModal = ({
                         })}
                       </Autocomplete>
                       {/* {console.log("values", values)} */}
+                      <CustomTextDropDown
+                        placeholder='Select School'
+                        value={values.school}
+                        onSelect={(index: any) => {
+                          console.log("index", index);
 
-                      <Autocomplete
+                          let school = schoolsData[index];
+                          setFieldValue("school", school.name);
+                          setFieldValue("selectedSchool", school.name);
+                          if (school.name != "Other") {
+                            setFieldValue("schoolName", school.name);
+                            setFieldValue("schoolAddress", school.address);
+                          } else {
+                            setFieldValue("schoolName", "");
+                            setFieldValue("schoolAdress", "");
+                          }
+                        }}
+                        dropDownList={schoolsData}
+                      />
+                      {/* <Autocomplete
                         placeholder="School*"
                         value={values.school}
                         placement="bottom"
@@ -713,15 +744,15 @@ const EditDependentModal = ({
                               />
                             );
                           })}
-                      </Autocomplete>
+                      </Autocomplete> */}
                       {values.school == "Other" && (
                         <>
                           <Input
                             style={styles.inputSettings}
-                            autoCapitalize="words"
+                            autoCapitalize='words'
                             // accessoryRight={PersonIcon}
                             value={values.selectedSchool}
-                            placeholder="School Name*"
+                            placeholder='School Name*'
                             onChangeText={handleChange("selectedSchool")}
                             onBlur={handleBlur("selectedSchool")}
                           />
@@ -745,9 +776,9 @@ const EditDependentModal = ({
                                 ? Colors.primary
                                 : Colors.gray,
                           }}
-                          appearance="ghost"
-                          size="medium"
-                          status="control"
+                          appearance='ghost'
+                          size='medium'
+                          status='control'
                           onPress={() => selectedImage != "" && handleSubmit()}
                         >
                           I'm done
@@ -762,9 +793,9 @@ const EditDependentModal = ({
                           borderRadius: 25,
                           flex: 1,
                         }}
-                        appearance="ghost"
-                        size="medium"
-                        status="control"
+                        appearance='ghost'
+                        size='medium'
+                        status='control'
                         onPress={() => {
                           dispatch(
                             ChangeModalState.action({
@@ -829,6 +860,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   buttonText: {
+    zIndex: -1,
     flex: 1,
     borderRadius: 25,
     fontFamily: "Gill Sans",

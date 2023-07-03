@@ -121,7 +121,7 @@ const ActivityScreen = ({ route }) => {
             justifyContent: "center",
           }}
         >
-          <Ionicons size={40} color={Colors.primary} name="chatbox-ellipses" />
+          <Ionicons size={35} color={Colors.primary} name="chatbox-ellipses" />
         </TouchableOpacity>
         {!item.status && (
           <TouchableOpacity
@@ -290,7 +290,7 @@ const ActivityScreen = ({ route }) => {
         );
         const isUnderEqual100Meters = distance <= 100;
         let participant = partcipants.find(
-          (pers) => pers.childDeviceId == nextParticipant.childDeviceId
+          (pers) => pers?.childDeviceId == nextParticipant?.childDeviceId
         );
         if (isUnderEqual100Meters) {
           participant["group"] = true;
@@ -388,271 +388,274 @@ const ActivityScreen = ({ route }) => {
       )}
       <View style={styles.layout}>
         {!showParticipantMap ? (
-          <FlatList
-            data={activities}
-            style={{
-              padding: 10,
-              width: "100%",
-              marginTop: 10,
-            }}
-            renderItem={({ item, index }) => (
-              <Swipeable
-                ref={(ref) => (row[index] = ref)}
-                // ref={swipeableRef}
+          <>
+            <FlatList
+              data={activities}
+              style={{
+                padding: 10,
+                width: "100%",
+                marginTop: 10,
+              }}
+              renderItem={({ item, index }) => (
+                <Swipeable
+                  ref={(ref) => (row[index] = ref)}
+                  // ref={swipeableRef}
 
-                onSwipeableOpen={() => closeRow(index)}
-                renderRightActions={(e) => RightActions(e, item, index)}
-              >
-                <View
-                  style={[
-                    styles.item,
-                    {
-                      backgroundColor: "#fff",
-                    },
-                  ]}
+                  onSwipeableOpen={() => closeRow(index)}
+                  renderRightActions={(e) => RightActions(e, item, index)}
                 >
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("InstructorActivityDetail", {
-                        data: item,
-                        activitiesCount: activitiesCount,
-                      });
-                    }}
+                  <View
+                    style={[
+                      styles.item,
+                      {
+                        backgroundColor: "#fff",
+                        marginBottom: index === activities.length - 1 ? 70 : 0,
+                      },
+                    ]}
                   >
-                    <Text
-                      style={[
-                        styles.text,
-                        {
-                          fontSize: 20,
-                          fontWeight: "800",
-                          paddingLeft: 25,
-                        },
-                      ]}
+                    <TouchableOpacity
+                      onPress={() => {
+                        navigation.navigate("InstructorActivityDetail", {
+                          data: item,
+                          activitiesCount: activitiesCount,
+                        });
+                      }}
                     >
-                      {item?.activityName}
-                    </Text>
+                      <Text
+                        style={[
+                          styles.text,
+                          {
+                            fontSize: 20,
+                            fontWeight: "800",
+                            paddingLeft: 25,
+                          },
+                        ]}
+                      >
+                        {item?.activityName}
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          paddingBottom: 20,
+                          borderBottomWidth: 0.5,
+                          paddingHorizontal: 10,
+                          borderColor: Colors.borderGrey,
+                        }}
+                      >
+                        <Image
+                          source={require("@/Assets/Images/circle-dashed.png")}
+                          style={{
+                            height: 40,
+                            width: 40,
+                            resizeMode: "contain",
+                            // marginRight: 10,
+                          }}
+                        />
+                        <View>
+                          <Text style={styles.text}>{`${moment(
+                            item?.fromDate == "string"
+                              ? new Date()
+                              : item?.fromDate
+                          ).format("YYYY-MM-DD")} at ${moment(
+                            item?.fromDate == "string"
+                              ? new Date()
+                              : item?.fromDate
+                          )
+                            .subtract("hours", 5)
+                            .format("hh:mm a")} `}</Text>
+                          <Text style={styles.text}>{`${moment(
+                            item?.toDate == "string" ? new Date() : item?.toDate
+                          ).format("YYYY-MM-DD")} at ${moment(
+                            item?.toDate == "string" ? new Date() : item?.toDate
+                          )
+                            .subtract("hours", 5)
+                            .format("hh:mm a")} `}</Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+
                     <View
                       style={{
                         flexDirection: "row",
-                        alignItems: "center",
-                        paddingBottom: 20,
-                        borderBottomWidth: 0.5,
-                        paddingHorizontal: 10,
-                        borderColor: Colors.borderGrey,
+                        justifyContent: "space-around",
                       }}
                     >
-                      <Image
-                        source={require("@/Assets/Images/circle-dashed.png")}
-                        style={{
-                          height: 40,
-                          width: 40,
-                          resizeMode: "contain",
-                          // marginRight: 10,
-                        }}
-                      />
-                      <View>
-                        <Text style={styles.text}>{`${moment(
-                          item?.fromDate == "string"
-                            ? new Date()
-                            : item?.fromDate
-                        ).format("YYYY-MM-DD")} at ${moment(
-                          item?.fromDate == "string"
-                            ? new Date()
-                            : item?.fromDate
-                        )
-                          .subtract("hours", 5)
-                          .format("hh:mm a")} `}</Text>
-                        <Text style={styles.text}>{`${moment(
-                          item?.toDate == "string" ? new Date() : item?.toDate
-                        ).format("YYYY-MM-DD")} at ${moment(
-                          item?.toDate == "string" ? new Date() : item?.toDate
-                        )
-                          .subtract("hours", 5)
-                          .format("hh:mm a")} `}</Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                    }}
-                  >
-                    <View style={{ alignItems: "center" }}>
-                      <Text style={styles.text}>{`Approval`}</Text>
-                      <View style={{ flexDirection: "row" }}>
-                        <TouchableOpacity
-                          style={styles.horizontal}
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: "approved",
-                              type: "student",
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                        >
-                          <Text style={styles.footerText}>{`${
-                            activitiesCount[item.activityId]
-                              ?.countApprovedStudents || "0"
-                          }`}</Text>
-                          <Entypo
-                            name="book"
-                            color={Colors.primary}
-                            size={15}
-                            style={{ marginHorizontal: 5 }}
-                          />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.horizontal}
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: "approved",
-                              type: "instructor",
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                        >
-                          <Text style={styles.text}>
-                            {activitiesCount[item.activityId]
-                              ?.countApprovedInstructors || "0"}
-                          </Text>
-                          <Image
-                            source={instructorImage}
-                            style={styles.iconImages}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-
-                    <View style={{ alignItems: "center" }}>
-                      <Text style={styles.footerText}>{`Declined`}</Text>
-                      <View style={{ flexDirection: "row" }}>
-                        <TouchableOpacity
-                          style={styles.horizontal}
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: "declined",
-                              type: "student",
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                        >
-                          <Text style={styles.text}>{`${
-                            activitiesCount[item.activityId]
-                              ?.countDeclinedStudents || "0"
-                          }`}</Text>
-                          <Entypo
-                            name="book"
-                            color={Colors.primary}
-                            size={15}
-                            style={{ marginHorizontal: 5 }}
-                          />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.horizontal}
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: "declined",
-                              type: "instructor",
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                        >
-                          <Text style={styles.text}>
-                            {activitiesCount[item.activityId]
-                              ?.countDeclinedInstructors || "0"}
-                          </Text>
-                          <Image
-                            source={instructorImage}
-                            style={styles.iconImages}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-
-                    <View style={{ alignItems: "center" }}>
-                      <Text style={styles.footerText}>{`Pending`}</Text>
-                      <View style={{ flexDirection: "row" }}>
-                        <TouchableOpacity
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: "pending",
-                              type: "student",
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                          style={styles.horizontal}
-                        >
-                          <Text style={styles.text}>
-                            {`${
+                      <View style={{ alignItems: "center" }}>
+                        <Text style={styles.footerText}>{`Approved`}</Text>
+                        <View style={{ flexDirection: "row" }}>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "approved",
+                                type: "student",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.footerText}>{`${
                               activitiesCount[item.activityId]
-                                ?.countPendingStudents || "0"
-                            }`}
-                          </Text>
-                          <Entypo
-                            name="book"
-                            color={Colors.primary}
-                            size={15}
-                            style={{ marginHorizontal: 5 }}
-                          />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.horizontal}
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: "pending",
-                              type: "instructor",
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                        >
-                          <Text style={styles.text}>
-                            {activitiesCount[item.activityId]
-                              ?.countPendingInstructors || "0"}
-                            {/* {item.countPendingInstructors || `0`} */}
-                          </Text>
-                          <Image
-                            source={instructorImage}
-                            style={styles.iconImages}
-                          />
-                        </TouchableOpacity>
+                                ?.countApprovedStudents || "0"
+                            }`}</Text>
+                            <Entypo
+                              name="book"
+                              color={Colors.primary}
+                              size={20}
+                              style={{ marginHorizontal: 5 }}
+                            />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "approved",
+                                type: "instructor",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>
+                              {activitiesCount[item.activityId]
+                                ?.countApprovedInstructors || "0"}
+                            </Text>
+                            <Image
+                              source={instructorImage}
+                              style={styles.iconImages}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+
+                      <View style={{ alignItems: "center" }}>
+                        <Text style={styles.footerText}>{`Declined`}</Text>
+                        <View style={{ flexDirection: "row" }}>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "declined",
+                                type: "student",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>{`${
+                              activitiesCount[item.activityId]
+                                ?.countDeclinedStudents || "0"
+                            }`}</Text>
+                            <Entypo
+                              name="book"
+                              color={Colors.primary}
+                              size={20}
+                              style={{ marginHorizontal: 5 }}
+                            />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "declined",
+                                type: "instructor",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>
+                              {activitiesCount[item.activityId]
+                                ?.countDeclinedInstructors || "0"}
+                            </Text>
+                            <Image
+                              source={instructorImage}
+                              style={styles.iconImages}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+
+                      <View style={{ alignItems: "center" }}>
+                        <Text style={styles.footerText}>{`Pending`}</Text>
+                        <View style={{ flexDirection: "row" }}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "pending",
+                                type: "student",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                            style={styles.horizontal}
+                          >
+                            <Text style={styles.text}>
+                              {`${
+                                activitiesCount[item.activityId]
+                                  ?.countPendingStudents || "0"
+                              }`}
+                            </Text>
+                            <Entypo
+                              name="book"
+                              color={Colors.primary}
+                              size={20}
+                              style={{ marginHorizontal: 5 }}
+                            />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: "pending",
+                                type: "instructor",
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>
+                              {activitiesCount[item.activityId]
+                                ?.countPendingInstructors || "0"}
+                              {/* {item.countPendingInstructors || `0`} */}
+                            </Text>
+                            <Image
+                              source={instructorImage}
+                              style={styles.iconImages}
+                            />
+                          </TouchableOpacity>
+                        </View>
                       </View>
                     </View>
                   </View>
-                </View>
-              </Swipeable>
-            )}
-          />
+                </Swipeable>
+              )}
+            />
+          </>
         ) : (
           <MapView style={{ flex: 1 }}>
             {partcipants.map((item, index) => {
-              let latitude = trackingList[item.childDeviceId]?.lat;
-              let longititude = trackingList[item.childDeviceId]?.lang;
+              let latitude = trackingList[item?.childDeviceId]?.lat;
+              let longititude = trackingList[item?.childDeviceId]?.lang;
               // console.log("item", item);
               return (
                 <View style={{ flex: 1 }}>
@@ -691,22 +694,56 @@ const ActivityScreen = ({ route }) => {
                       }}
                     >
                       {!item?.group && (
-                        <TouchableOpacity
-                          onPress={() => console.log("pressed")}
-                          style={{ alignItems: "center" }}
-                        >
-                          <Text>{item?.firstName}</Text>
-                          <Text style={{ marginBottom: 2 }}>
-                            {item?.lastName}
-                          </Text>
-                          <Fontisto
-                            name="map-marker-alt"
-                            size={25}
-                            color="red"
-                          />
-                        </TouchableOpacity>
+                        <View style={{}}>
+                          <View
+                            style={{
+                              height: 30,
+                              width: 30,
+                              borderRadius: 80,
+                              overflow: "hidden",
+                              // top: 33,
+                              // zIndex: 10,
+                            }}
+                          >
+                            {item?.image == "" && (
+                              <View
+                                style={{
+                                  height: "100%",
+                                  width: "100%",
+                                  borderRadius: 80,
+                                  backgroundColor: Colors.primary,
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Text style={{ color: Colors.white }}>
+                                  {item?.firstName
+                                    ?.substring(0, 1)
+                                    ?.toUpperCase() || ""}
+                                  {item?.lastName
+                                    ?.substring(0, 1)
+                                    ?.toUpperCase() || ""}
+                                </Text>
+                              </View>
+                            )}
+                            {item?.image != "" && (
+                              <Image
+                                source={{
+                                  uri: item?.image,
+                                }}
+                                style={{
+                                  height: "100%",
+                                  width: "100%",
+                                  borderRadius: 80,
+                                  aspectRatio: 1.5,
+                                }}
+                                resizeMode="contain"
+                              />
+                            )}
+                          </View>
+                          {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+                        </View>
                       )}
-
                       {item?.group && (
                         <TouchableOpacity
                           style={{
@@ -766,7 +803,7 @@ const styles = StyleSheet.create({
     marginHorizontal: "2%",
     // paddingHorizontal: 10,
     paddingTop: 10,
-    height: 175,
+    height: 185,
   },
   footer: {
     borderBottomLeftRadius: 10,
@@ -783,19 +820,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    fontSize: 13,
+    fontSize: 16,
     marginVertical: 4,
   },
 
   iconImages: {
-    height: 15,
-    width: 15,
+    height: 18,
+    width: 18,
     resizeMode: "contain",
     marginLeft: 5,
     marginRight: 5,
   },
   footerText: {
-    fontSize: 13,
+    fontSize: 16,
     marginVertical: 2,
   },
   horizontal: {

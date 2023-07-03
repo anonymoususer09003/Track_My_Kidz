@@ -103,7 +103,7 @@ const FirstSignUpScreen = ({ navigation }) => {
     <Image
       source={require("@/Assets/Images/email.png")}
       style={{ height: 20, width: 20 }}
-      resizeMode="contain"
+      resizeMode='contain'
     />
   );
 
@@ -134,7 +134,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                   maxWidth: Normalize(160),
                 }}
                 source={require("@/Assets/Images/logo1.png")}
-                resizeMode="contain"
+                resizeMode='contain'
               />
 
               <Text style={styles.logoText}>Register</Text>
@@ -255,21 +255,20 @@ const FirstSignUpScreen = ({ navigation }) => {
                 }) => (
                   <>
                     <Layout style={styles.formContainer}>
-                      <View style={{ flex: 1, marginVertical: 30 }}>
-                        <CustomDropdown
-                          placeholder="Select User"
-                          value={values.user_type}
-                          onSelect={(index: any) => {
-                            console.log("index", index);
-                            setFieldValue("user_type", user_type[index].value);
-                            setSelectedUserType(user_type[index].value);
-                          }}
-                          dropDownList={user_type}
-                        />
-                      </View>
-                      {console.log("err", errors)}
+                      <View style={{ height: 30 }} />
+                      <CustomDropdown
+                        placeholder='Select User'
+                        value={values.user_type}
+                        onSelect={(index: any) => {
+                          console.log("index", index);
+                          setFieldValue("user_type", user_type[index].value);
+                          setSelectedUserType(user_type[index].value);
+                        }}
+                        dropDownList={user_type}
+                      />
+                      <View style={{ height: 30 }} />
                       {values.user_type === "Student" && (
-                        <View style={{ marginVertical: 10 }}>
+                        <View style={{ marginVertical: 10, zIndex: -20 }}>
                           <Text
                             style={{
                               fontSize: 16,
@@ -286,6 +285,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                       )}
                       {!(values.user_type.toLowerCase() === "student") && (
                         <Input
+                          selectionColor={Colors.white}
                           placeholderTextColor={Colors.white}
                           placeholder={"Email"}
                           accessoryLeft={renderPersonIcon}
@@ -293,7 +293,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                           onBlur={handleBlur("email")}
                           value={values.email}
                           keyboardType={"email-address"}
-                          autoCapitalize="none"
+                          autoCapitalize='none'
                           autoCorrect={false}
                           textStyle={{ color: Colors.white }}
                           style={styles.selectSettings}
@@ -301,6 +301,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                       )}
                       {values.user_type.toLowerCase() === "student" && (
                         <MaskInput
+                          selectionColor={Colors.white}
                           value={values.email}
                           placeholderTextColor={
                             Colors.textInputPlaceholderColor
@@ -324,7 +325,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                         values.user_type !== "Student" && (
                           <Text style={styles.errorText}>{errors.email}</Text>
                         )}
-                      <View style={{ marginTop: 10 }}>
+                      <View style={{ marginTop: 10, zIndex: -10 }}>
                         {values.user_type === "Student" && (
                           <View
                             style={{
@@ -336,7 +337,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                             }}
                           >
                             <Entypo
-                              name="camera"
+                              name='camera'
                               size={30}
                               color={Colors.white}
                               onPress={() => setShowQR(true)}
@@ -371,11 +372,11 @@ const FirstSignUpScreen = ({ navigation }) => {
                           </View>
                         )}
                       </View>
-                      <View style={{ height: 20 }} />
+                      <View style={{ height: 80 }} />
                       <LinearGradientButton
                         gradient={[Colors.secondaryTint, Colors.primaryLight]}
                         style={[styles.signUpButton]}
-                        size="medium"
+                        size='medium'
                         onPress={handleSubmit}
                         disabled={!isValid}
                       >
@@ -385,9 +386,9 @@ const FirstSignUpScreen = ({ navigation }) => {
                     {values.user_type !== "Student" ? (
                       <View style={styles.bottomView}>
                         <Button
-                          appearance="ghost"
-                          status="basic"
-                          size="medium"
+                          appearance='ghost'
+                          status='basic'
+                          size='medium'
                           onPress={
                             () => navigation.navigate("Login")
                             // openActivationCode(values.email, values.user_type)
@@ -433,15 +434,15 @@ const FirstSignUpScreen = ({ navigation }) => {
                 <View style={{ width: "48%" }}>
                   <LinearGradientButton
                     style={styles.signUpButton}
-                    size="medium"
+                    size='medium'
                   >
                     Rescan
                   </LinearGradientButton>
                 </View>
-                <View style={{ width: "48%" }}>
+                <View style={{ width: "48%", zIndex: -2 }}>
                   <LinearGradientButton
                     style={styles.signUpButton}
-                    size="medium"
+                    size='medium'
                     onPress={() => {
                       navigation &&
                         navigation.navigate("EmailConfirmation", {
@@ -487,6 +488,8 @@ const themedStyles = StyleService.create({
   signUpButton: {
     marginHorizontal: 2,
     borderRadius: 20,
+    zIndex: -2,
+    marginTop: 10,
   },
   errorText: {
     fontSize: 10,
@@ -529,5 +532,6 @@ const themedStyles = StyleService.create({
     borderBottomWidth: 2,
     borderBottomColor: Colors.white,
     color: Colors.white,
+    zIndex: -1000,
   },
 });

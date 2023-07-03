@@ -1,6 +1,6 @@
-import api from '@/Services'
+import api from "@/Services";
 
 export default async (id: number) => {
-    const response = await api.get(`/user/org/${id}`)
-    return response.data
-}
+  const response = await api.get(`/user/org/v2/${id}`);
+  return response.data;
+};

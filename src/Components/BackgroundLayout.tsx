@@ -14,6 +14,9 @@ import Colors from "@/Theme/Colors";
 import { useDispatch, useSelector } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 import setHeaderParams from "@/Store/header/setHeaderParams";
+import { ModalState } from "@/Store/Modal";
+
+import { StudentState } from "@/Store/StudentActivity";
 export default function BackgroundLayout({
   title,
   children,
@@ -22,12 +25,18 @@ export default function BackgroundLayout({
   rightIcon,
   dropDownList,
   showDropDown,
+  hideLeftIcon,
 }: any) {
   const searchIcon = require("@/Assets/Images/search_icon.png");
   const navigation = useNavigation();
   const focused = useIsFocused();
   const dispatch = useDispatch();
+
   const headerState = useSelector((state: { user: UserState }) => state.header);
+
+  const { showFamilyMap, showParticipantMap } = useSelector(
+    (state: { studentActivity: StudentState }) => state.studentActivity
+  );
   const [showSearchBar, setShowSearchBar] = useState(false);
   useEffect(() => {
     if (!focused) {
@@ -51,17 +60,21 @@ export default function BackgroundLayout({
   };
 
   const renderIcon = (props: any) => <Icon {...props} name={"search"} />;
+
   return (
     <ImageBackground
       style={{ flex: 1 }}
       source={require("@/Assets/Images/App_Background.png")}
       resizeMode="stretch"
     >
-      {!hideHeader && (
+      {!hideHeader && !showFamilyMap && (
         <View style={[styles.main, style && style]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialIcon name="arrow-back" size={20} color={Colors.white} />
+            {!hideLeftIcon && (
+              <MaterialIcon name="arrow-back" size={20} color={Colors.white} />
+            )}
           </TouchableOpacity>
+
           <Text style={{ color: Colors.white, fontWeight: "bold" }}>
             {title}
           </Text>
@@ -86,7 +99,7 @@ export default function BackgroundLayout({
         >
           <SelectItem title="All" />
           {dropDownList &&
-            dropDownList.map((item, index) => (
+            dropDownList?.map((item, index) => (
               <SelectItem
                 key={index}
                 title={item?.firstname + " " + item?.lastname}

@@ -61,7 +61,7 @@ const ChangePasswordScreen = () => {
         Toast.show({
           type: "success",
           position: "top",
-          text1: "Activation Code sent successfully",
+          text1: "Verification Code sent successfully",
         });
       })
       .catch((err) => {
@@ -101,9 +101,12 @@ const ChangePasswordScreen = () => {
       .required("Password is required"),
     verificationCode: yup
       .string()
-      .min(6, ({ min }) => `Activation must be at least ${min} characters`)
-      .max(6, ({ max }) => `Activation code must be at least ${max} characters`)
-      .required("Activation Code is required"),
+      .min(6, ({ min }) => `Verification must be at least ${min} characters`)
+      .max(
+        6,
+        ({ max }) => `Verification code must be at least ${max} characters`
+      )
+      .required("Verification Code is required"),
   });
 
   const onOldPasswordIconPress = (): void => {
@@ -142,13 +145,16 @@ const ChangePasswordScreen = () => {
           position: "top",
           text1: "Password reset successfully",
         });
+        dispatch(LogoutStore.action());
       })
       .catch((err) => {
         Toast.show({
           type: "info",
           position: "top",
           text1:
-            err.status == 404 ? "Invalid Activation code" : `An error occured`,
+            err.status == 404
+              ? "Invalid Verification code"
+              : `An error occured`,
         });
         console.log("err", err);
       })
@@ -210,7 +216,6 @@ const ChangePasswordScreen = () => {
                   };
                   verifyActivationCode(resetPasswordObject);
                   resetForm();
-                  dispatch(LogoutStore.action());
                 }
                 // if (verificationMode) {
                 //     const data = {
@@ -348,22 +353,19 @@ const ChangePasswordScreen = () => {
                         </View>
                       )}
                       {!showCodeField && (
-                        <TouchableOpacity
-                          style={{ marginBottom: 10 }}
-                          onPress={handleSubmit}
-                        >
-                          <LinearGradientButton>
-                            Send Activation Code
+                        <View style={{ marginBottom: 10 }}>
+                          <LinearGradientButton onPress={handleSubmit}>
+                            Send Verification Code
                           </LinearGradientButton>
-                        </TouchableOpacity>
+                        </View>
                       )}
                       {showCodeField && (
-                        <TouchableOpacity
-                          disabled={!isValid ? true : false}
+                        <LinearGradientButton
+                          // disabled={!isValid ? true : false}
                           onPress={handleSubmit}
                         >
-                          <LinearGradientButton>Verify</LinearGradientButton>
-                        </TouchableOpacity>
+                          Verify
+                        </LinearGradientButton>
                       )}
                     </>
                   )}
@@ -372,7 +374,7 @@ const ChangePasswordScreen = () => {
             </Formik>
             {!verificationMode && (
               <TouchableOpacity onPress={() => getActivationCode()}>
-                <Text style={styles.buttonText}>Resend Activation Code</Text>
+                <Text style={styles.buttonText}>Resend Verificaion Code</Text>
               </TouchableOpacity>
             )}
           </View>

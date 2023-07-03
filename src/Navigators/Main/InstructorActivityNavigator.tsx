@@ -21,10 +21,12 @@ import {
   GetInstructor,
   FindInstructorBySchoolOrg,
 } from "@/Services/Instructor";
+import axios from "axios";
 // @refresh reset
 const InstructorActivityNavigator = () => {
   const dispatch = useDispatch();
-
+  const cancelToken = axios.CancelToken;
+  const source = cancelToken.source();
   const [, _dispatch] = useStateValue();
   const activeNav = useSelector(
     (state: { navigation: any }) => state.navigation.activeNav
@@ -101,12 +103,13 @@ const InstructorActivityNavigator = () => {
           cancelToken: source.token,
         }
       );
+
       if (instructorsList) {
         _dispatch({
           type: actions.ORG_INSTRUCTORS,
-          payload: { result: instructorsList },
+          payload: instructorsList,
         });
-        setInstructors({ result: instructorsList });
+        setInstructors(instructorsList);
         // setOrgInfo(org);
         //   })
       }
@@ -117,6 +120,7 @@ const InstructorActivityNavigator = () => {
 
   const getInstructors = async () => {
     try {
+      console.log("logs00000", Object.keys(currentUser).length == 0);
       if (Object.keys(currentUser).length == 0) {
         const userId = await loadUserId();
         let res = await GetInstructor(userId);
@@ -152,6 +156,7 @@ const InstructorActivityNavigator = () => {
         title={`Activity & Groups`}
       /> */}
       <BackgroundLayout
+        hideLeftIcon={true}
         dropDownList={instructors}
         showDropDown={currentUser?.isAdmin ? true : false}
         title={`Activity & Groups`}

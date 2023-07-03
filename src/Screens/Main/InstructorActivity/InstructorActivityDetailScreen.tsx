@@ -187,7 +187,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
                 <Entypo
                   name="book"
                   color={Colors.primary}
-                  size={15}
+                  size={20}
                   style={{ marginHorizontal: 5 }}
                 />
               </TouchableOpacity>
@@ -241,7 +241,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
                 <Entypo
                   name="book"
                   color={Colors.primary}
-                  size={15}
+                  size={20}
                   style={{ marginHorizontal: 5 }}
                 />
               </TouchableOpacity>
@@ -297,7 +297,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
                 <Entypo
                   name="book"
                   color={Colors.primary}
-                  size={15}
+                  size={20}
                   style={{ marginHorizontal: 5 }}
                 />
               </TouchableOpacity>
@@ -387,7 +387,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
             <View>
               <Text style={styles.label}>Address</Text>
 
-              <Text style={styles.text}>{orgInfo?.address}</Text>
+              <Text style={styles.text}>{orgInfo?.address || "-"}</Text>
             </View>
           </View>
 
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    fontSize: 13,
+    fontSize: 16,
 
     // marginVertical: 4,
     color: Colors.black,
@@ -459,12 +459,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   iconImages: {
-    height: 15,
-    width: 15,
+    height: 19,
+    width: 19,
     resizeMode: "contain",
   },
   footerText: {
-    fontSize: 13,
+    fontSize: 18,
     marginVertical: 2,
   },
   horizontal: {
@@ -473,8 +473,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   circle: {
-    height: 25,
-    width: 25,
+    height: 35,
+    width: 35,
     borderRadius: 50,
     backgroundColor: Colors.white,
     justifyContent: "center",
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   label: {
-    fontSize: 12,
+    fontSize: 17,
     // marginVertical: 4,
     color: Colors.lightgray,
   },

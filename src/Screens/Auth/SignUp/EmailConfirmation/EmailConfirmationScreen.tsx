@@ -28,6 +28,7 @@ import FastImage from "react-native-fast-image";
 import Colors from "@/Theme/Colors";
 import BackgroundLayout from "@/Components/BackgroundLayout";
 import CustomDropdown from "@/Components/CustomDropDown";
+import { VerifyCode } from "@/Services/LoginServices";
 const user_types = [
   { id: 1, label: "Parent", value: "Parent" },
   { id: 2, label: "Instructor", value: "Instructor" },
@@ -45,6 +46,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
     student,
     isDesignatedAdmin,
   } = route.params;
+  console.log("email address", emailAddress);
   const [activationCode, setActivationCode] = useState(activation_code);
   const { reactivate } = route.params;
 
@@ -79,6 +81,19 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
     navigation && navigation.navigate("SignUp1");
   };
 
+  const verifyOtpCode = async (code: any) => {
+    try {
+      let res = await VerifyCode(user_type, {
+        activationCode: code,
+        message: emailAddress,
+      });
+      return true;
+      console.log("res", res.data);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
   useEffect(() => {
     return () => {
       setActivationCode("");
@@ -97,7 +112,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
               maxWidth: Normalize(160),
             }}
             source={require("@/Assets/Images/logo1.png")}
-            resizeMode="contain"
+            resizeMode='contain'
           />
 
           <Text style={styles.logoText}>Email Confirmation</Text>
@@ -114,28 +129,30 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
               user_type == "Student" && activationCode ? activationCode : "",
           }}
           validateOnMount={true}
-          onSubmit={(values, { resetForm }) => {
+          onSubmit={async (values, { resetForm }) => {
             console.log("isDesignatedAdmin", isDesignatedAdmin);
+
+            let res = await verifyOtpCode(values.code);
+
             if (isDesignatedAdmin) {
-              console.log("isDesignatedAdmin console");
-              if (activationCode == values.code) {
+              if (res) {
                 navigation.navigate("FinalOrgRegistrationScreen", {
                   emailAddress: emailAddress,
                   registrationId: "test",
                   user_type: user_type,
-                  activation_code: activationCode,
+                  activation_code: values.code,
                 });
               }
               resetForm();
             } else {
               if (!reactivate) {
-                if (activationCode == values.code) {
+                if (res) {
                   navigation &&
                     navigation.navigate("FinalRegistrationScreen", {
                       emailAddress: emailAddress,
                       registrationId: "test",
                       user_type: user_type,
-                      activation_code: activation_code,
+                      activation_code: values.code,
                       student: student,
                     });
                 }
@@ -164,7 +181,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
                 <View style={{ marginTop: 80, marginBottom: 30 }}>
                   <CustomDropdown
                     disable={true}
-                    placeholder="Select User"
+                    placeholder='Select User'
                     value={user_type}
                     onSelect={(index: any) => {
                       console.log("index", index);
@@ -175,12 +192,13 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
                 </View>
 
                 <Input
+                  selectionColor={Colors.white}
                   placeholderTextColor={Colors.white}
-                  placeholder="Reference Code"
+                  placeholder='Reference Code'
                   value={values.code}
                   onChangeText={handleChange("code")}
                   onBlur={handleBlur("code")}
-                  keyboardType="numeric"
+                  keyboardType='numeric'
                   textStyle={{ color: Colors.white }}
                   style={styles.selectSettings}
                 />
@@ -190,7 +208,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
                 <LinearGradientButton
                   gradient={[Colors.secondary, Colors.primaryLight]}
                   style={styles.signUpButton}
-                  size="medium"
+                  size='medium'
                   onPress={handleSubmit}
                   disabled={!isValid || values.code.length === 0}
                 >
@@ -214,26 +232,26 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
         )}
         <View style={styles.bottomView}>
           <Button
-            appearance="ghost"
-            status="basic"
-            size="medium"
+            appearance='ghost'
+            status='basic'
+            size='medium'
             onPress={openLogin}
           >
             {() => <Text style={styles.buttonMessage}> Login </Text>}
           </Button>
           <Button
-            appearance="ghost"
-            status="basic"
-            size="medium"
+            appearance='ghost'
+            status='basic'
+            size='medium'
             onPress={openSignUp}
           >
             {() => <Text style={styles.buttonMessage}> Register </Text>}
           </Button>
           {emailAddress.length > 0 && (
             <Button
-              appearance="ghost"
-              status="basic"
-              size="medium"
+              appearance='ghost'
+              status='basic'
+              size='medium'
               onPress={onResendButtonPress}
             >
               {() => <Text style={styles.buttonMessage}> Resend Code </Text>}

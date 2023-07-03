@@ -3667,7 +3667,7 @@
             "captionFontSize": "text-caption-1-font-size",
             "captionFontWeight": "text-caption-1-font-weight",
             "captionFontFamily": "text-caption-1-font-family",
-            "popoverMaxHeight": 220,
+
             "popoverBorderRadius": "border-radius",
             "popoverBorderWidth": "border-width",
             "popoverBorderColor": "border-basic-color-4"
@@ -3897,7 +3897,7 @@
                 "borderRadius": "border-radius",
                 "borderWidth": "border-width",
                 "minHeight": "size-small",
-                "paddingVertical": 3,
+
                 "textFontSize": "text-subtitle-2-font-size",
                 "textFontWeight": "text-subtitle-2-font-weight",
                 "placeholderFontSize": "text-paragraph-1-font-size",
@@ -3907,7 +3907,7 @@
                 "borderRadius": "border-radius",
                 "borderWidth": "border-width",
                 "minHeight": "size-medium",
-                "paddingVertical": 7,
+
                 "textFontSize": "text-subtitle-1-font-size",
                 "textFontWeight": "text-subtitle-1-font-weight",
                 "placeholderFontSize": "text-paragraph-1-font-size",
@@ -3917,7 +3917,7 @@
                 "borderRadius": "border-radius",
                 "borderWidth": "border-width",
                 "minHeight": "size-large",
-                "paddingVertical": 11,
+
                 "textFontSize": "text-subtitle-1-font-size",
                 "textFontWeight": "text-subtitle-1-font-weight",
                 "placeholderFontSize": "text-paragraph-1-font-size",
