@@ -144,6 +144,10 @@ const OrganizationInfoScreen = ({ navigation }) => {
   const countries = useSelector(
     (state: { places: PlaceState }) => state.places.countries
   );
+  const currentUser = useSelector(
+    (state: { user: UserState }) => state.user.item
+  );
+  console.log("current user", currentUser);
   const [countriesData, setCountriesData] = React.useState(countries);
   const [statesData, setStatesData] = React.useState<Array<any>>([]);
   const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
@@ -438,50 +442,59 @@ const OrganizationInfoScreen = ({ navigation }) => {
                                   })
                                 : []}
                             </Autocomplete>
-                            <TouchableOpacity
-                              onPress={() =>
-                                navigation.navigate("InstructorList", {
-                                  data: orgInfo,
-                                })
-                              }
-                              style={styles.bottomButtons}
-                            >
-                              <Text style={styles.bottomButtonsText}>
-                                Instructor List
-                              </Text>
-                              <Icon
-                                // style={styles.icon}
-                                size={22}
-                                // fill={Colors.gray}
-                                name="chevron-right"
-                              />
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              onPress={() =>
-                                navigation.navigate("BusInfo", {
-                                  data: orgInfo,
-                                })
-                              }
-                              style={styles.bottomButtons}
-                            >
-                              <Text style={styles.bottomButtonsText}>
-                                Bus Information
-                              </Text>
-                              <Icon
-                                // style={styles.icon}
-                                size={22}
-                                // fill={Colors.gray}
-                                name="chevron-right"
-                              />
-                            </TouchableOpacity>
+                            {currentUser?.isAdmin ? (
+                              <>
+                                <TouchableOpacity
+                                  onPress={() =>
+                                    navigation.navigate("InstructorList", {
+                                      data: orgInfo,
+                                    })
+                                  }
+                                  style={styles.bottomButtons}
+                                >
+                                  <Text style={styles.bottomButtonsText}>
+                                    Instructor List
+                                  </Text>
+                                  <Icon
+                                    // style={styles.icon}
+                                    size={22}
+                                    // fill={Colors.gray}
+                                    name="chevron-right"
+                                  />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                  onPress={() =>
+                                    navigation.navigate("BusInfo", {
+                                      data: orgInfo,
+                                    })
+                                  }
+                                  style={styles.bottomButtons}
+                                >
+                                  <Text style={styles.bottomButtonsText}>
+                                    Bus Information
+                                  </Text>
+                                  <Icon
+                                    // style={styles.icon}
+                                    size={22}
+                                    // fill={Colors.gray}
+                                    name="chevron-right"
+                                  />
+                                </TouchableOpacity>
 
-                            <View
-                              style={{ marginVertical: 30, marginRight: 20 }}
-                            >
-                              <LinearGradientButton onPress={handleSubmit}>
-                                {isEditMode ? "Submit" : "Edit"}
-                              </LinearGradientButton>
-                            </View>
+                                <View
+                                  style={{
+                                    marginVertical: 30,
+                                    marginRight: 20,
+                                  }}
+                                >
+                                  <LinearGradientButton onPress={handleSubmit}>
+                                    {isEditMode ? "Submit" : "Edit"}
+                                  </LinearGradientButton>
+                                </View>
+                              </>
+                            ) : (
+                              <View style={{ marginBottom: 100 }}></View>
+                            )}
                           </View>
                         </>
                       )}

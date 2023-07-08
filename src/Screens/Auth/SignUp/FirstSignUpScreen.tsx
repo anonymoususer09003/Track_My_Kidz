@@ -103,7 +103,7 @@ const FirstSignUpScreen = ({ navigation }) => {
     <Image
       source={require("@/Assets/Images/email.png")}
       style={{ height: 20, width: 20 }}
-      resizeMode='contain'
+      resizeMode="contain"
     />
   );
 
@@ -134,7 +134,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                   maxWidth: Normalize(160),
                 }}
                 source={require("@/Assets/Images/logo1.png")}
-                resizeMode='contain'
+                resizeMode="contain"
               />
 
               <Text style={styles.logoText}>Register</Text>
@@ -257,7 +257,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                     <Layout style={styles.formContainer}>
                       <View style={{ height: 30 }} />
                       <CustomDropdown
-                        placeholder='Select User'
+                        placeholder="Select User"
                         value={values.user_type}
                         onSelect={(index: any) => {
                           console.log("index", index);
@@ -293,7 +293,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                           onBlur={handleBlur("email")}
                           value={values.email}
                           keyboardType={"email-address"}
-                          autoCapitalize='none'
+                          autoCapitalize="none"
                           autoCorrect={false}
                           textStyle={{ color: Colors.white }}
                           style={styles.selectSettings}
@@ -337,7 +337,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                             }}
                           >
                             <Entypo
-                              name='camera'
+                              name="camera"
                               size={30}
                               color={Colors.white}
                               onPress={() => setShowQR(true)}
@@ -367,7 +367,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                                 color: Colors.white,
                               }}
                             >
-                              I am designated admin for my organisation
+                              I'm a designated admin for my organisation
                             </Text>
                           </View>
                         )}
@@ -376,7 +376,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                       <LinearGradientButton
                         gradient={[Colors.secondaryTint, Colors.primaryLight]}
                         style={[styles.signUpButton]}
-                        size='medium'
+                        size="medium"
                         onPress={handleSubmit}
                         disabled={!isValid}
                       >
@@ -386,9 +386,9 @@ const FirstSignUpScreen = ({ navigation }) => {
                     {values.user_type !== "Student" ? (
                       <View style={styles.bottomView}>
                         <Button
-                          appearance='ghost'
-                          status='basic'
-                          size='medium'
+                          appearance="ghost"
+                          status="basic"
+                          size="medium"
                           onPress={
                             () => navigation.navigate("Login")
                             // openActivationCode(values.email, values.user_type)
@@ -434,7 +434,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                 <View style={{ width: "48%" }}>
                   <LinearGradientButton
                     style={styles.signUpButton}
-                    size='medium'
+                    size="medium"
                   >
                     Rescan
                   </LinearGradientButton>
@@ -442,7 +442,7 @@ const FirstSignUpScreen = ({ navigation }) => {
                 <View style={{ width: "48%", zIndex: -2 }}>
                   <LinearGradientButton
                     style={styles.signUpButton}
-                    size='medium'
+                    size="medium"
                     onPress={() => {
                       navigation &&
                         navigation.navigate("EmailConfirmation", {

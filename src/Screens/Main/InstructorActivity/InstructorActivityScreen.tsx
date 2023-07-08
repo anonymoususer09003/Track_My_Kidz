@@ -597,7 +597,7 @@ const InstructorActivityScreen = ({ route }: any) => {
 
   useEffect(() => {
     if (isFocused) {
-      connectSockets();
+      // connectSockets();
 
       // if (countries) {
       // fetchCountries();
@@ -875,7 +875,7 @@ const InstructorActivityScreen = ({ route }: any) => {
       )}
 
       <View style={styles.layout}>
-        {activities.length == 0 && (
+        {activities?.result?.length == 0 && (
           <Text style={{ textAlign: "center", marginTop: 5 }}>
             You currently do not have any activities
           </Text>

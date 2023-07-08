@@ -508,10 +508,14 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
             <ProfileAvatarPicker
               style={styles.profileImage}
               // resizeMode='center'
-              source={{
-                uri: selectedImage + "?time" + new Date().getTime(),
-                headers: { Pragma: "no-cache" },
-              }}
+              source={
+                Platform.OS == "android"
+                  ? {
+                      uri: selectedImage + "?time" + new Date().getTime(),
+                      headers: { Pragma: "no-cache" },
+                    }
+                  : { uri: selectedImage }
+              }
               editButton={false ? renderEditAvatarButton : null}
             />
           )}
@@ -542,6 +546,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
             </View>
           )}
         </View>
+
         <ScrollView style={styles.container}>
           {reRender && (
             <Formik
@@ -587,6 +592,10 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                 schoolId = Array.isArray(schoolId)
                   ? schoolId[0].schoolId
                   : schoolId?.schoolId;
+
+                let schoolAddress = Array.isArray(schoolId)
+                  ? schoolId[0]?.address
+                  : schoolId?.address;
                 console.log("----888school", schoolId);
                 const org_name = values.schoolName;
                 const orgId =
@@ -627,15 +636,18 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                 formData.append("term", true);
                 formData.append("isAdmin", true);
                 formData.append("deviceId", getDeviceId());
-                formData.append("schoolId", schoolId || "");
-                formData.append("orgId", orgId || "");
+                // formData.append("schoolId", schoolId || "");
+                // formData.append("orgId", orgId || "");
 
                 console.log("formData0202002020200202", formData);
 
                 const userObject: UserRegistrationDTO = {
                   firstname: values.firstName,
                   lastname: values.lastName,
-                  address: values.schoolAddress || "",
+                  address:
+                    schoolId != 0 && schoolId
+                      ? schoolAddress
+                      : values?.schoolAddress,
                   email: emailAddress,
                   state: values.state,
                   city: values.city,
@@ -666,7 +678,10 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     values.school === "Other"
                       ? values.school_name
                       : values.schoolName,
-                  address: values.schoolAddress || "",
+                  address:
+                    schoolId != 0 && schoolId
+                      ? schoolAddress
+                      : values?.schoolAddress,
                   country: values.country,
                   zipcode: values.zipcode,
                   city: values.city,
@@ -698,7 +713,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                   email: emailAddress,
                   password: values.password,
                 };
-            
+
                 Register(registerObject, "instructor")
                   .then(async (response) => {
                     console.log("response---", response.data);
@@ -716,6 +731,8 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           });
 
                           formData.append("schoolId", _res?.data?.schoolId);
+
+                          console.log("formdata---------------", formData);
                           // {
                           //   ...userObject,
                           //   schoolId: _res.data.schoolId,
@@ -786,6 +803,8 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                       values.selected_entity == "School" &&
                       schoolId != 0
                     ) {
+                      formData.append("schoolId", schoolId);
+
                       CompleteRegistration(formData, "instructor")
                         .then(async (res: any) => {
                           console.log("response2727878", res);
@@ -912,6 +931,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                         });
                     } else if (values.selected_entity != "School" && orgId) {
                       formData.append("schoolId", null);
+                      formData.append("orgId", orgId);
                       CompleteRegistration(formData, "instructor")
                         .then(async (res: any) => {
                           console.log("response2727878", res);
@@ -1259,7 +1279,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           <>
                             <Input
                               style={styles.inputSettings}
-                              autoCapitalize="none"
+                              autoCapitalize="words"
                               autoCorrect={false}
                               placeholder={`Enter School Name*`}
                               value={values.school_name}
@@ -1274,7 +1294,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
 
                             <Input
                               style={styles.inputSettings}
-                              autoCapitalize="none"
+                              autoCapitalize="words"
                               autoCorrect={false}
                               placeholder={`School Street Address*`}
                               value={values.schoolAddress}

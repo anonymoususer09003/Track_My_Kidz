@@ -369,7 +369,12 @@ const PersonalProfileScreen = () => {
                           )}
 
                           {!isEditMode ? (
-                            <View style={{ flexDirection: "column" }}>
+                            <View
+                              style={{
+                                flexDirection: "column",
+                                marginBottom: 5,
+                              }}
+                            >
                               <Text style={styles.editLabel}> Ste/Apt</Text>
                               <View style={styles.editField}>
                                 {renderLocationIcon()}
@@ -395,12 +400,17 @@ const PersonalProfileScreen = () => {
                           )}
                           {!isEditMode && (
                             <Autocomplete
+                              label={(evaProps) => (
+                                <Text {...evaProps} style={styles.editLabel}>
+                                  City
+                                </Text>
+                              )}
                               accessoryLeft={renderLocationIcon}
                               placeholder="Enter City"
                               value={values.city}
                               placement={placement}
                               style={{
-                                marginVertical: 5,
+                                // marginBottom: 5,
                                 backgroundColor: Colors.white,
                                 borderRadius: 10,
                                 elevation: 1,
@@ -432,13 +442,21 @@ const PersonalProfileScreen = () => {
 
                           {isEditMode && (
                             <Autocomplete
+                              label={(evaProps) => (
+                                <Text
+                                  {...evaProps}
+                                  style={[styles.editLabel, { marginTop: 4 }]}
+                                >
+                                  Country
+                                </Text>
+                              )}
                               placeholder="Enter Country*"
                               value={values.country}
                               accessoryLeft={renderLocationIcon}
                               placement={placement}
                               style={{
-                                marginTop: 10,
-                                marginBottom: 5,
+                                // marginTop: 10,
+                                // marginBottom: 5,
                                 backgroundColor: Colors.white,
                                 borderRadius: 10,
                                 elevation: 1,
@@ -480,12 +498,17 @@ const PersonalProfileScreen = () => {
                             </Autocomplete>
                           )}
                           <Autocomplete
+                            label={(evaProps) => (
+                              <Text {...evaProps} style={styles.editLabel}>
+                                Street Address
+                              </Text>
+                            )}
                             accessoryLeft={renderLocationIcon}
                             placeholder="Enter State*"
                             value={values.state}
                             placement={placement}
                             style={{
-                              marginVertical: 5,
+                              // marginBottom: 5,
                               backgroundColor: Colors.white,
                               borderRadius: 10,
                               elevation: 1,
@@ -522,12 +545,17 @@ const PersonalProfileScreen = () => {
                           </Autocomplete>
                           {isEditMode && (
                             <Autocomplete
+                              label={(evaProps) => (
+                                <Text {...evaProps} style={styles.editLabel}>
+                                  City
+                                </Text>
+                              )}
                               accessoryLeft={renderLocationIcon}
                               placeholder="Enter City"
                               value={values.city}
                               placement={placement}
                               style={{
-                                marginVertical: 5,
+                                // marginBottom: 5,
                                 backgroundColor: Colors.white,
                                 borderRadius: 10,
                                 elevation: 1,
@@ -572,7 +600,10 @@ const PersonalProfileScreen = () => {
                           ) : (
                             <Input
                               accessoryLeft={renderLocationIcon}
-                              style={styles.inputSettings}
+                              style={[
+                                styles.inputSettings,
+                                { marginBottom: 10 },
+                              ]}
                               autoCapitalize="none"
                               label={(evaProps) => (
                                 <Text {...evaProps}>Zip/Post code</Text>
@@ -583,12 +614,17 @@ const PersonalProfileScreen = () => {
                           )}
                           {!isEditMode && (
                             <Autocomplete
+                              label={(evaProps) => (
+                                <Text {...evaProps} style={styles.editLabel}>
+                                  Country
+                                </Text>
+                              )}
                               placeholder="Enter Country*"
                               value={values.country}
                               accessoryLeft={renderLocationIcon}
                               placement={placement}
                               style={{
-                                marginTop: 10,
+                                // marginTop: 10,
                                 marginBottom: 5,
                                 backgroundColor: Colors.white,
                                 borderRadius: 10,

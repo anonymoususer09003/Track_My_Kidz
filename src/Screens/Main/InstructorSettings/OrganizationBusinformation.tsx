@@ -27,10 +27,10 @@ import AddBusInformation from "@/Modals/AddBusInformation";
 import ViewBusInformation from "@/Modals/ViewBusInformation";
 import EditOrgInstructorsModal from "@/Modals/EditOrganizationInstructorModal";
 import BackgroundLayout from "@/Components/BackgroundLayout";
+import GetBusBySchoolId from "@/Services/BusConfiguration/GetBusBySchoolId";
 const height = Dimensions.get("screen").height;
 
 const OrgBusDetail = ({ route }: any) => {
-  console.log("route------------", route.params.data.buses);
   const dispatch = useDispatch();
   const [selectedItem, setSelectedItem] = useState(null);
   const [visible, setVisible] = useState(false);
@@ -62,6 +62,20 @@ const OrgBusDetail = ({ route }: any) => {
       .catch((err) => console.log("err", err));
   };
 
+  const getBuses = async () => {
+    try {
+      let res = await GetBusBySchoolId(route?.params?.data?.schoolId, 0, 60);
+      setBuses(res.data.result);
+      console.log("res---", res);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
+  console.log("route", route.params);
+  useEffect(() => {
+    getBuses();
+  }, []);
   return (
     <BackgroundLayout title="Bus Information">
       {/* {selectedItem && ( */}
@@ -96,7 +110,7 @@ const OrgBusDetail = ({ route }: any) => {
           }}
         >
           <View style={{ flex: 1 }}>
-            {buses.map((item, index) => {
+            {buses?.map((item, index) => {
               return (
                 <View key={index} style={styles.card}>
                   <TouchableOpacity

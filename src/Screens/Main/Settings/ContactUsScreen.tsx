@@ -120,7 +120,7 @@ const ContactUsScreen = () => {
                           value={values.message}
                           multiline={true}
                           maxLength={500}
-                          status={isTouched && errors.message ? "danger" : ""}
+                          // status={isTouched && errors.message ? "danger" : ""}
                         />
                         <Text style={styles.message}>Min 50 characters</Text>
                         {errors.message && isTouched && showErrors ? (

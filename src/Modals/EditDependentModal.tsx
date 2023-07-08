@@ -148,8 +148,8 @@ const EditDependentModal = ({
   const renderEditAvatarButton = (): React.ReactElement => (
     <Button
       style={styles.editAvatarButton}
-      status='basic'
-      accessoryRight={<Icon name='edit' />}
+      status="basic"
+      accessoryRight={<Icon name="edit" />}
       onPress={() => setVisible(true)}
     />
   );
@@ -473,6 +473,12 @@ const EditDependentModal = ({
                                 "selectedCity",
                                 currentUser?.city || ""
                               );
+
+                              getSchoolsByFilter(
+                                currentUser?.country,
+                                currentUser?.state,
+                                currentUser?.city
+                              );
                             } else {
                               setCheckBox(checked);
                               setFieldValue("country", "");
@@ -481,6 +487,7 @@ const EditDependentModal = ({
                               setFieldValue("selectedState", "");
                               setFieldValue("state", "");
                               setFieldValue("city", "");
+                              setFieldValue("school", "");
                             }
                             // if (checked) {
                             //   Alert.alert(checked);
@@ -492,7 +499,7 @@ const EditDependentModal = ({
                       </View>
                       <Input
                         style={styles.textInput}
-                        autoCapitalize='none'
+                        autoCapitalize="none"
                         autoCorrect={false}
                         placeholder={`First Name`}
                         value={values?.firstName}
@@ -510,7 +517,7 @@ const EditDependentModal = ({
                       )}
                       <Input
                         style={styles.textInput}
-                        autoCapitalize='none'
+                        autoCapitalize="none"
                         autoCorrect={false}
                         placeholder={`Last Name`}
                         value={values.lastName}
@@ -529,10 +536,10 @@ const EditDependentModal = ({
                       )}
                       <Input
                         style={styles.textInput}
-                        autoCapitalize='none'
+                        autoCapitalize="none"
                         autoCorrect={false}
                         value={values.email}
-                        placeholder='Email*'
+                        placeholder="Email*"
                         onChangeText={handleChange("email")}
                         onBlur={handleBlur("email")}
                         // placeholder={`Email*`}
@@ -550,11 +557,11 @@ const EditDependentModal = ({
                       )}
                       <Input
                         style={styles.textInput}
-                        autoCapitalize='none'
+                        autoCapitalize="none"
                         autoCorrect={false}
                         placeholder={`Phone # (Optional)`}
                         value={values.phoneNumber}
-                        keyboardType='number-pad'
+                        keyboardType="number-pad"
                         onChangeText={handleChange("phoneNumber")}
                         // value={student?.phone}
                         // onChangeText={(value: string) =>
@@ -565,9 +572,9 @@ const EditDependentModal = ({
                         // }
                       />
                       <Autocomplete
-                        placeholder='Country*'
+                        placeholder="Country*"
                         value={values?.country}
-                        placement='bottom'
+                        placement="bottom"
                         style={styles.textInput}
                         onChangeText={(query) => {
                           setFieldValue("country", query);
@@ -611,10 +618,10 @@ const EditDependentModal = ({
                         <Text style={styles.errorText}>{errors.country}</Text>
                       )}
                       <Autocomplete
-                        placeholder='State*'
+                        placeholder="State*"
                         value={values.state}
                         // value={student?.state}
-                        placement='bottom'
+                        placement="bottom"
                         style={styles.textInput}
                         disabled={!values.selectedCountry}
                         onChangeText={(query) => {
@@ -658,9 +665,9 @@ const EditDependentModal = ({
                         <Text style={styles.errorText}>{errors.state}</Text>
                       )}
                       <Autocomplete
-                        placeholder='City'
+                        placeholder="City"
                         value={values?.city}
-                        placement='bottom'
+                        placement="bottom"
                         disabled={!values.selectedState}
                         // disabled={!student?.selectedState}
                         style={styles.textInput}
@@ -695,14 +702,14 @@ const EditDependentModal = ({
                       </Autocomplete>
                       {/* {console.log("values", values)} */}
                       <CustomTextDropDown
-                        placeholder='Select School'
+                        placeholder="Select School"
                         value={values.school}
                         onSelect={(index: any) => {
                           console.log("index", index);
 
                           let school = schoolsData[index];
                           setFieldValue("school", school.name);
-                          setFieldValue("selectedSchool", school.name);
+                          setFieldValue("selectedSchool", "");
                           if (school.name != "Other") {
                             setFieldValue("schoolName", school.name);
                             setFieldValue("schoolAddress", school.address);
@@ -749,10 +756,10 @@ const EditDependentModal = ({
                         <>
                           <Input
                             style={styles.inputSettings}
-                            autoCapitalize='words'
+                            autoCapitalize="words"
                             // accessoryRight={PersonIcon}
                             value={values.selectedSchool}
-                            placeholder='School Name*'
+                            placeholder="School Name*"
                             onChangeText={handleChange("selectedSchool")}
                             onBlur={handleBlur("selectedSchool")}
                           />
@@ -776,9 +783,9 @@ const EditDependentModal = ({
                                 ? Colors.primary
                                 : Colors.gray,
                           }}
-                          appearance='ghost'
-                          size='medium'
-                          status='control'
+                          appearance="ghost"
+                          size="medium"
+                          status="control"
                           onPress={() => selectedImage != "" && handleSubmit()}
                         >
                           I'm done
@@ -793,9 +800,9 @@ const EditDependentModal = ({
                           borderRadius: 25,
                           flex: 1,
                         }}
-                        appearance='ghost'
-                        size='medium'
-                        status='control'
+                        appearance="ghost"
+                        size="medium"
+                        status="control"
                         onPress={() => {
                           dispatch(
                             ChangeModalState.action({

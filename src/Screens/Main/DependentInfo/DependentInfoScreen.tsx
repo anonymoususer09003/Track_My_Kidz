@@ -297,7 +297,7 @@ const DependentInfoScreen = () => {
         </View>
         <FlatList
           data={children}
-          style={{ padding: 10, width: "100%" }}
+          style={{ padding: 10, width: "100%", marginBottom: 70 }}
           renderItem={({ item, index }) => (
             <>
               <View style={[styles.row, { justifyContent: "space-between" }]}>

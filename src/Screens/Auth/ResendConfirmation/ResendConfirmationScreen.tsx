@@ -189,7 +189,7 @@ const ResendConfirmationScreen = ({ navigation }) => {
                       {""}
                     </CheckBox>
                     <Text style={{ marginLeft: 20, width: "90%" }}>
-                      I am designated admin for my organisation
+                      I'm a designated admin for my organisation
                     </Text>
                   </View>
                 )}

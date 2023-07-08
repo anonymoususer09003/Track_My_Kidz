@@ -179,7 +179,7 @@ const ChangePasswordScreen = () => {
               validationSchema={
                 showCodeField ? CodeValidationSchema : loginValidationSchema
               }
-              //   validateOnMount={true}
+              validateOnMount={true}
               initialValues={{
                 oldPassword: "",
                 password: "",
@@ -335,11 +335,12 @@ const ChangePasswordScreen = () => {
                             textStyle={{ fontSize: 16 }}
                             autoCapitalize="none"
                             label={(evaProps) => (
-                              <Text {...evaProps} style={{ fontSize: 16 }}>
-                                Activation code
+                              <Text style={styles.inputLabels}>
+                                Verification Code
                               </Text>
                             )}
-                            placeholder="Activation Code"
+                            style={styles.textInput}
+                            placeholder="Verification Code"
                             value={values.verificationCode}
                             onBlur={handleBlur("verificationCode")}
                             onChangeText={handleChange("verificationCode")}
@@ -352,9 +353,13 @@ const ChangePasswordScreen = () => {
                             )}
                         </View>
                       )}
+                      {console.log("err", isValid)}
                       {!showCodeField && (
                         <View style={{ marginBottom: 10 }}>
-                          <LinearGradientButton onPress={handleSubmit}>
+                          <LinearGradientButton
+                            disabled={isValid ? false : true}
+                            onPress={handleSubmit}
+                          >
                             Send Verification Code
                           </LinearGradientButton>
                         </View>

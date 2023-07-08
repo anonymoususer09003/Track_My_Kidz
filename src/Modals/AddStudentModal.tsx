@@ -183,8 +183,8 @@ const AddStudentModal = () => {
   const renderEditAvatarButton = (): React.ReactElement => (
     <Button
       style={styles.editAvatarButton}
-      status='basic'
-      accessoryRight={<Icon name='edit' />}
+      status="basic"
+      accessoryRight={<Icon name="edit" />}
       onPress={() => setVisible(true)}
     />
   );
@@ -297,26 +297,7 @@ const AddStudentModal = () => {
                   formData.append("state", values.state);
                   formData.append("city", values.city);
                   formData.append("parentemail1", currentUser.email);
-                  formData.append("parentemail2", "");
-                  // const data = {
-                  //   image: selectedImage || "",
-                  //   parentId: parseInt(userId, 0),
-                  //   firstname: values.firstName,
-                  //   lastname: values.lastName,
-                  //   phone: values.phoneNumber,
-                  //   email: values.email,
-                  //   school:
-                  //     values.selectedSchool != ""
-                  //       ? values.selectedSchool
-                  //       : values.school,
-                  //   // grade: values.grade,
-                  //   country: values.selectedCountry,
-                  //   state: values.state,
-                  //   city: values.city,
-                  //   parentemail1: currentUser.email,
-                  //   parentemail2: "",
-                  // };
-                  // console.log("data", data);
+
                   CreateStudent(formData)
                     .then((response) => {
                       console.log("response", response);
@@ -365,7 +346,7 @@ const AddStudentModal = () => {
                   isValid,
                 }) => (
                   <>
-                    <Layout style={styles.formContainer} level='1'>
+                    <Layout style={styles.formContainer} level="1">
                       <View style={{ width: "100%" }}>
                         {selectedImage != "" && (
                           <ProfileAvatarPicker
@@ -398,7 +379,7 @@ const AddStudentModal = () => {
                               },
                             ]}
                           >
-                            <ProfileIcon size={110} name='user' />
+                            <ProfileIcon size={110} name="user" />
                             {/* {true && renderEditButtonElement()} */}
                           </View>
                         )}
@@ -413,7 +394,7 @@ const AddStudentModal = () => {
                             },
                           ]}
                         >
-                          Headshots preffered
+                          Mandatory. Close-up preferred
                         </Text>
                       </View>
 
@@ -462,7 +443,14 @@ const AddStudentModal = () => {
                                 "selectedCity",
                                 currentUser?.city || ""
                               );
+
+                              getSchoolsByFilter(
+                                currentUser?.country,
+                                currentUser?.state,
+                                currentUser?.city
+                              );
                             } else {
+                              setSchoolsData([]);
                               setCheckBox(checked);
                               setFieldValue("country", "");
                               setFieldValue("selectedCountry", "");
@@ -470,6 +458,7 @@ const AddStudentModal = () => {
                               setFieldValue("selectedState", "");
                               setFieldValue("state", "");
                               setFieldValue("city", "");
+                              setFieldValue("school", "");
                             }
                             // if (checked) {
                             //   Alert.alert(checked);
@@ -481,7 +470,7 @@ const AddStudentModal = () => {
                       </View>
                       <Input
                         style={styles.textInput}
-                        autoCapitalize='words'
+                        autoCapitalize="words"
                         autoCorrect={false}
                         placeholder={`Child's First Name*`}
                         accessoryRight={PersonIcon}
@@ -494,7 +483,7 @@ const AddStudentModal = () => {
                       )}
                       <Input
                         style={styles.textInput}
-                        autoCapitalize='words'
+                        autoCapitalize="words"
                         autoCorrect={false}
                         placeholder={`Child's Last Name*`}
                         accessoryRight={PersonIcon}
@@ -506,9 +495,9 @@ const AddStudentModal = () => {
                         <Text style={styles.errorText}>{errors.lastName}</Text>
                       )}
                       <Autocomplete
-                        placeholder='Country*'
+                        placeholder="Country*"
                         value={values.country}
-                        placement='bottom'
+                        placement="bottom"
                         style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>Country*</Text>}
                         onChangeText={(query) => {
@@ -552,9 +541,9 @@ const AddStudentModal = () => {
                         <Text style={styles.errorText}>{errors.country}</Text>
                       )}
                       <Autocomplete
-                        placeholder='State*'
+                        placeholder="State*"
                         value={values.state}
-                        placement='bottom'
+                        placement="bottom"
                         style={styles.textInput}
                         disabled={!values.selectedCountry}
                         // label={evaProps => <Text {...evaProps}>State</Text>}
@@ -597,9 +586,9 @@ const AddStudentModal = () => {
                         <Text style={styles.errorText}>{errors.state}</Text>
                       )}
                       <Autocomplete
-                        placeholder='City*'
+                        placeholder="City*"
                         value={values.city}
-                        placement='bottom'
+                        placement="bottom"
                         disabled={!values.selectedState}
                         style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>City</Text>}
@@ -632,14 +621,15 @@ const AddStudentModal = () => {
                       </Autocomplete>
                       <View style={{ width: "95%", marginLeft: 10, zIndex: 2 }}>
                         <CustomTextDropDown
-                          placeholder='Select School'
+                          disable={schoolsData?.length == 0 ? true : false}
+                          placeholder="Select School"
                           value={values.school}
                           onSelect={(index: any) => {
                             console.log("index", index);
 
                             let school = schoolsData[index];
                             setFieldValue("school", school.name);
-                            setFieldValue("selectedSchool", school.name);
+                            setFieldValue("selectedSchool", "");
                             if (school.name != "Other") {
                               setFieldValue("schoolName", school.name);
                               setFieldValue("schoolAddress", school.address);
@@ -690,10 +680,10 @@ const AddStudentModal = () => {
                         <>
                           <Input
                             style={styles.textInput}
-                            autoCapitalize='words'
+                            autoCapitalize="words"
                             // accessoryRight={PersonIcon}
                             value={values.selectedSchool}
-                            placeholder='School Name*'
+                            placeholder="School Name*"
                             onChangeText={handleChange("selectedSchool")}
                             onBlur={handleBlur("selectedSchool")}
                           />
@@ -708,7 +698,7 @@ const AddStudentModal = () => {
 
                       <Input
                         style={styles.textInput}
-                        autoCapitalize='none'
+                        autoCapitalize="none"
                         accessoryRight={PersonIcon}
                         value={values.email}
                         placeholder="Child's Email* (not parent's email)"
@@ -730,12 +720,12 @@ const AddStudentModal = () => {
                       </Text>
                       <Input
                         style={styles.textInput}
-                        autoCapitalize='none'
+                        autoCapitalize="none"
                         autoCorrect={false}
-                        placeholder='Phone Number'
+                        placeholder="Phone Number"
                         accessoryRight={PhoneIcon}
                         value={values.phoneNumber}
-                        keyboardType='number-pad'
+                        keyboardType="number-pad"
                         onChangeText={handleChange("phoneNumber")}
                       />
                     </Layout>
@@ -758,6 +748,7 @@ const AddStudentModal = () => {
                         >
                           <View style={{ height: 20 }} />
                           <LinearGradientButton
+                            disabled={isValid ? false : true}
                             onPress={() => {
                               if (selectedImage != "") {
                                 setFieldValue("addMore", false);
@@ -767,8 +758,10 @@ const AddStudentModal = () => {
                           >
                             I'm done
                           </LinearGradientButton>
+                          {console.log("err", isValid)}
                           <View style={{ height: 20 }} />
                           <LinearGradientButton
+                            disabled={isValid ? false : true}
                             onPress={() => {
                               if (selectedImage != "") {
                                 setFieldValue("addMore", true);

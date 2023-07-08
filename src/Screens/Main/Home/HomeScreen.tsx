@@ -451,6 +451,7 @@ const HomeScreen = () => {
       />
       {isCalendarVisible && (
         <Calendar
+          style={{ backgroundColor: Colors.primary }}
           selectedMonth={selectedMonth}
           setSelectedMonth={setSelectedMonth}
           selectedDay={parseInt(selectedDay)}
@@ -632,7 +633,6 @@ const HomeScreen = () => {
             }}
             style={{ flex: 1 }}
           >
-            {console.log("children", children)}
             {children
               .filter(
                 (item) =>

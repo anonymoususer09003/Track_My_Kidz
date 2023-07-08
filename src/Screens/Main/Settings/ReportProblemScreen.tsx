@@ -193,6 +193,8 @@ const ReportProblemScreen = ({ navigation }) => {
                                 setisSent(true);
                                 setTimeout(() => {
                                   setisSent(false);
+                                  setMessage(initialValues.message);
+                                  setSelectedIndex(initialValues.selectedIndex);
 
                                   setisSending(false);
                                 }, 400);
@@ -240,7 +242,11 @@ const ReportProblemScreen = ({ navigation }) => {
                               <View style={styles.buttonSettings}>
                                 <View style={{ width: "90%" }}>
                                   <LinearGradientButton
-                                    disabled={!isValid || selectedIndex == -1}
+                                    disabled={
+                                      !isValid || selectedIndex == -1
+                                        ? true
+                                        : false
+                                    }
                                     onPress={handleSubmit}
                                   >
                                     Send

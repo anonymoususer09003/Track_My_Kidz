@@ -93,6 +93,13 @@ const AddBusInformation = ({
       setBusName("");
     }
   }, [isVisible]);
+  let disabled =
+    busName == "" ||
+    numberOfSeatsPerRow == "" ||
+    numberOfKidsPerSeat == "" ||
+    numberOfRows == ""
+      ? true
+      : false;
   // @ts-ignore
   return (
     <Modal
@@ -263,6 +270,7 @@ const AddBusInformation = ({
                 }}
               >
                 <LinearGradientButton
+                  disabled={disabled}
                   onPress={() =>
                     dispatch(
                       ChangeModalState.action({

@@ -8,6 +8,9 @@ import {
   FlatList,
   Platform,
 } from "react-native";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { useDispatch } from "react-redux";
+import { useIsFocused } from "@react-navigation/native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { Button, Icon, Input, Select, SelectItem } from "@ui-kitten/components";
 import { useTheme } from "@/Theme";
@@ -19,6 +22,7 @@ export interface CalendarProps {
   selectedDay: number;
   setSelectedMonth: React.Dispatch<React.SetStateAction<number>>;
   setSelectedDay: React.Dispatch<React.SetStateAction<number>>;
+  style: any;
 }
 
 const months = [
@@ -41,6 +45,7 @@ const Calendar = ({
   setSelectedMonth,
   selectedDay,
   setSelectedDay,
+  style,
 }: CalendarProps) => {
   const getDays = (month: string) => {
     const year = moment(new Date()).year();
@@ -85,14 +90,25 @@ const Calendar = ({
     }
   };
   const ref = useRef();
+  const focused = useIsFocused();
+  const dispatch = useDispatch();
   const [days, setDays] = useState(getDays(months[moment(new Date()).month()]));
   useEffect(() => {
     ref.current.scrollToIndex({ index: selectedDay, animated: true });
   }, []);
+  useEffect(() => {
+    if (!focused) {
+      dispatch(
+        ChangeModalState.action({
+          showCalendar: false,
+        })
+      );
+    }
+  }, [focused]);
 
   return (
     <>
-      <View style={styles.calendar}>
+      <View style={[styles.calendar, style && style]}>
         <Select
           style={{ width: "30%" }}
           value={months[selectedMonth]}

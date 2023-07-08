@@ -112,7 +112,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
               maxWidth: Normalize(160),
             }}
             source={require("@/Assets/Images/logo1.png")}
-            resizeMode='contain'
+            resizeMode="contain"
           />
 
           <Text style={styles.logoText}>Email Confirmation</Text>
@@ -181,7 +181,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
                 <View style={{ marginTop: 80, marginBottom: 30 }}>
                   <CustomDropdown
                     disable={true}
-                    placeholder='Select User'
+                    placeholder="Select User"
                     value={user_type}
                     onSelect={(index: any) => {
                       console.log("index", index);
@@ -194,21 +194,30 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
                 <Input
                   selectionColor={Colors.white}
                   placeholderTextColor={Colors.white}
-                  placeholder='Reference Code'
+                  placeholder="Activation Code"
                   value={values.code}
                   onChangeText={handleChange("code")}
                   onBlur={handleBlur("code")}
-                  keyboardType='numeric'
+                  keyboardType="numeric"
                   textStyle={{ color: Colors.white }}
                   style={styles.selectSettings}
                 />
                 {errors.code && touched.code && (
                   <Text style={styles.errorText}>{errors.code}</Text>
                 )}
+
+                <Text
+                  style={[
+                    styles.errorText,
+                    { textAlign: "center", fontSize: 15, marginBottom: 10 },
+                  ]}
+                >
+                  Check email for activation code
+                </Text>
                 <LinearGradientButton
                   gradient={[Colors.secondary, Colors.primaryLight]}
                   style={styles.signUpButton}
-                  size='medium'
+                  size="medium"
                   onPress={handleSubmit}
                   disabled={!isValid || values.code.length === 0}
                 >
@@ -232,26 +241,26 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
         )}
         <View style={styles.bottomView}>
           <Button
-            appearance='ghost'
-            status='basic'
-            size='medium'
+            appearance="ghost"
+            status="basic"
+            size="medium"
             onPress={openLogin}
           >
             {() => <Text style={styles.buttonMessage}> Login </Text>}
           </Button>
           <Button
-            appearance='ghost'
-            status='basic'
-            size='medium'
+            appearance="ghost"
+            status="basic"
+            size="medium"
             onPress={openSignUp}
           >
             {() => <Text style={styles.buttonMessage}> Register </Text>}
           </Button>
           {emailAddress.length > 0 && (
             <Button
-              appearance='ghost'
-              status='basic'
-              size='medium'
+              appearance="ghost"
+              status="basic"
+              size="medium"
               onPress={onResendButtonPress}
             >
               {() => <Text style={styles.buttonMessage}> Resend Code </Text>}

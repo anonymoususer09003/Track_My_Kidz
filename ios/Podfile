@@ -18,8 +18,7 @@ target 'TrackMyKidz' do
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   permissions_path = '../node_modules/react-native-permissions/ios'
   pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
-  rn_maps_path = '../node_modules/react-native-maps'
-  pod 'react-native-google-maps', :path => rn_maps_path
+
   target 'TrackMyKidzTests' do
     inherit! :complete
     # Pods for testing
@@ -31,19 +30,21 @@ target 'TrackMyKidz' do
   # you should disable the next line.
     use_flipper!({ 'Flipper' => '0.102.0' , 'Flipper-Folly' => '2.6.7', 'Flipper-RSocket' => '1.4.3'})
     # use_flipper!({ 'Flipper-Folly' => '2.6.7' })
-   post_install do |installer|
-     installer.pods_project.build_configurations.each do |config|
-      #  config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.1'
-     end
-     react_native_post_install(installer)
-   end
-
+  #  post_install do |installer|
+  #    installer.pods_project.build_configurations.each do |config|
+  #     #  config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+  #      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.1'
+  #    end
+  #    react_native_post_install(installer)
+  #  end
    post_install do |installer|
     installer.pods_project.targets.each do |target|
-     target.build_configurations.each do |config|
-       config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64 i386"
-    end
+      target.build_configurations.each do |config|
+        config.build_settings['EXPANDED_CODE_SIGN_IDENTITY'] = ""
+        config.build_settings['CODE_SIGNING_REQUIRED'] = "NO"
+        config.build_settings['CODE_SIGNING_ALLOWED'] = "NO"
+       end
     end
   end
+   
 end

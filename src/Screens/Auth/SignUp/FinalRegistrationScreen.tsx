@@ -407,10 +407,14 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
             <ProfileAvatarPicker
               style={styles.profileImage}
               // resizeMode='center'
-              source={{
-                uri: selectedImage + "?time" + new Date().getTime(),
-                headers: { Pragma: "no-cache" },
-              }}
+              source={
+                Platform.OS == "android"
+                  ? {
+                      uri: selectedImage + "?time" + new Date().getTime(),
+                      headers: { Pragma: "no-cache" },
+                    }
+                  : { uri: selectedImage }
+              }
               editButton={true ? renderEditAvatarButton : null}
             />
           )}

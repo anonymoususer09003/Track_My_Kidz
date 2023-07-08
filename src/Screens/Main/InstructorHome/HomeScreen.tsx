@@ -92,7 +92,7 @@ const HomeScreen = () => {
   const [selectedMonth, setSelectedMonth] = useState(
     moment(new Date()).month()
   );
-  const [selectedDay, setSelectedDay] = useState(moment(new Date()).day());
+  const [selectedDay, setSelectedDay] = useState(moment(new Date()).date());
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );

@@ -129,7 +129,7 @@ const AddInstructorsModal = ({
                     style={{
                       width: "33.33%",
                       alignItems: "center",
-                      backgroundColor: Colors.lightgray,
+                      backgroundColor: Colors.white,
                       padding: 5,
                     }}
                   >
@@ -147,7 +147,7 @@ const AddInstructorsModal = ({
                     style={{
                       width: "33.33%",
                       alignItems: "center",
-                      backgroundColor: Colors.lightgray,
+                      backgroundColor: Colors.white,
                       padding: 5,
                     }}
                   >
@@ -165,7 +165,7 @@ const AddInstructorsModal = ({
                     style={{
                       width: "33.33%",
                       alignItems: "center",
-                      backgroundColor: Colors.lightgray,
+                      backgroundColor: Colors.white,
                       padding: 5,
                     }}
                   >
@@ -196,15 +196,13 @@ const AddInstructorsModal = ({
                       <View
                         style={{
                           width: "33.33%",
-                          backgroundColor:
-                            index % 2 === 0 ? "#cccccc" : "#ffffff",
+                          backgroundColor: "#ffffff",
                         }}
                       >
                         <Input
                           style={{
                             margin: 5,
-                            backgroundColor:
-                              index % 2 === 0 ? "#cccccc" : "#ffffff",
+                            backgroundColor: "#ffffff",
                           }}
                           autoCapitalize="none"
                           value={item?.firstName}
@@ -214,15 +212,13 @@ const AddInstructorsModal = ({
                       <View
                         style={{
                           width: "33.33%",
-                          backgroundColor:
-                            index % 2 === 0 ? "#cccccc" : "#ffffff",
+                          backgroundColor: "#ffffff",
                         }}
                       >
                         <Input
                           style={{
                             margin: 5,
-                            backgroundColor:
-                              index % 2 === 0 ? "#cccccc" : "#ffffff",
+                            backgroundColor: "#ffffff",
                           }}
                           autoCapitalize="none"
                           value={item?.lastName}
@@ -232,15 +228,13 @@ const AddInstructorsModal = ({
                       <View
                         style={{
                           width: "33.33%",
-                          backgroundColor:
-                            index % 2 === 0 ? "#cccccc" : "#ffffff",
+                          backgroundColor: "#ffffff",
                         }}
                       >
                         <Input
                           style={{
                             margin: 5,
-                            backgroundColor:
-                              index % 2 === 0 ? "#cccccc" : "#ffffff",
+                            backgroundColor: "#ffffff",
                           }}
                           autoCapitalize="none"
                           value={item?.email}
@@ -318,6 +312,7 @@ const AddInstructorsModal = ({
               }}
             >
               <LinearGradientButton
+                disabled={instructors.length > 0 ? false : true}
                 gradient={[Colors.primaryLight, Colors.primary]}
                 onPress={() => {
                   dispatch(

@@ -24,7 +24,7 @@ const StudentActivityNavigator = () => {
     (state: { studentActivity: StudentState }) => state.studentActivity
   );
 
-  const [selectedDay, setSelectedDay] = useState(moment(new Date()).day());
+  const [selectedDay, setSelectedDay] = useState(moment(new Date()).date());
 
   const isCalendarVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.showCalendar

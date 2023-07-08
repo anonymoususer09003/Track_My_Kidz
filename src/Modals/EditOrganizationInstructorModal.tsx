@@ -295,7 +295,7 @@ const EditOrgInstructorsModal = ({
                   style={{ marginTop: 40, width: "100%", alignItems: "center" }}
                 >
                   <LinearGradientButton onPress={handleSubmit}>
-                    I'm done
+                    {isEdit ? "Save" : "I'm done"}
                   </LinearGradientButton>
                   <View style={{ height: 15 }} />
                   {!isEdit && (

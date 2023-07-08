@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)  for background location indentification </string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -18,8 +20,6 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -47,27 +47,29 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>localhost</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
-		</dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
 	</dict>
 	<key>NSCalendarsUsageDescription</key>
-	<string>Custom In App Calendar to filter user events in $(PRODUCT_NAME)</string>
+	<string>Optional for users to use calendar for scheduler in $(PRODUCT_NAME)</string>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires access to camera for uploading Posts, Blogs and Products</string>
+	<string>$(PRODUCT_NAME) requires access to camera for uploading Profile Picture of users.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires access to contacts for users to invite friends.</string>
+	<string>$(PRODUCT_NAME) requires access to contacts for users to share the app information to other peoples.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Optional for users to use Face ID to log into $(PRODUCT_NAME)</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app requires access to the location of activity participants (students / childrens and instructors) during an event. It allows parents to monitor their children's whereabouts and ensure their safety. This app uses participant location data in the background and foreground to accurately display current location on a map in the app.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>For background location tracking of participants of an activity by parents and instructors.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires location info to show locations of dependents/students and instructors.</string>
+	<string>This app uses your location to show child current locations to their parents.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>$(PRODUCT_NAME) needs access to your microphone for video calls between activity participants and parents.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>$(PRODUCT_NAME) needs access to your activity data to for accurate location tracking.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires access to photo library for uploading photos of users.</string>
+	<string>$(PRODUCT_NAME) requires access to photo library for uploading photos for user profile picture.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -110,6 +112,11 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>location</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+		<string>voip</string>
+		<string>audio</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

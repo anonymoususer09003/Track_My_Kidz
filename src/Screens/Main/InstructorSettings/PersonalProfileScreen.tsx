@@ -282,7 +282,7 @@ const PersonalProfileScreen = () => {
                     city: currentUser?.city || "",
                     state: currentUser?.state || "",
                     phone: currentUser?.phone || "",
-              
+
                     selectedCountry: "",
                     selectedState: "",
                     selectedCity: "",
@@ -333,7 +333,7 @@ const PersonalProfileScreen = () => {
                     formData.append("city", values.city);
                     formData.append("country", values.country);
                     formData.append("zipcode", values.zipcode);
-                
+
                     formData.append("term", true);
                     formData.append("isAdmin", currentUser?.isAdmin);
                     formData.append("id", currentUser?.instructorId);
@@ -488,205 +488,417 @@ const PersonalProfileScreen = () => {
                             />
                           )}
 
-                          {!isEditMode ? (
-                            <View style={{ flexDirection: "column" }}>
-                              <Text style={styles.editLabel}>
-                                {" "}
-                                Street Address
-                              </Text>
-                              <View style={styles.editField}>
-                                {renderLocationIcon()}
-                                <Text style={{ fontSize: 15 }}>
-                                  {values.address}
+                          {!isEditMode && (
+                            <>
+                              <View style={{ flexDirection: "column" }}>
+                                <Text style={styles.editLabel}>
+                                  School Name
                                 </Text>
+                                <View style={styles.editField}>
+                                  {renderSchoolIcon()}
+                                  <Text style={{ fontSize: 15 }}>
+                                    {values.schoolName}
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
-                          ) : (
-                            <Input
-                              style={[
-                                styles.inputSettings,
-                                { marginBottom: 5 },
-                              ]}
-                              accessoryLeft={renderLocationIcon}
-                              autoCapitalize="none"
-                              label={(evaProps) => (
-                                <Text {...evaProps}>Street Address</Text>
-                              )}
-                              value={values.address}
-                              onChangeText={handleChange("address")}
-                            />
+                              <View style={{ flexDirection: "column" }}>
+                                <Text style={styles.editLabel}>
+                                  {" "}
+                                  Street Address
+                                </Text>
+                                <View style={styles.editField}>
+                                  {renderLocationIcon()}
+                                  <Text style={{ fontSize: 15 }}>
+                                    {values.address}
+                                  </Text>
+                                </View>
+                              </View>
+                              <Autocomplete
+                                label={(evaProps) => (
+                                  <Text
+                                    {...evaProps}
+                                    style={{
+                                      fontSize: 15,
+                                      color: "#8f9bb3",
+                                      marginBottom: 4,
+
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    City
+                                  </Text>
+                                )}
+                                disabled={isEditMode ? false : true}
+                                placeholder="Enter City"
+                                value={values.city}
+                                placement={placement}
+                                style={{
+                                  marginVertical: 5,
+                                  backgroundColor: Colors.white,
+                                  borderRadius: 12,
+                                  elevation: 1,
+                                }}
+                                accessoryLeft={renderLocationIcon}
+                                // label={evaProps => <Text {...evaProps}>City</Text>}
+                                onChangeText={(query) => {
+                                  setFieldValue("city", query);
+                                  setCitiesData(
+                                    cities.filter((item) =>
+                                      filterCities(item, query)
+                                    )
+                                  );
+                                }}
+                                onSelect={(query) => {
+                                  setFieldValue("city", citiesData[query]);
+                                  setFieldValue(
+                                    "selectedCity",
+                                    citiesData[query]
+                                  );
+                                }}
+                              >
+                                {citiesData.map((item, index) => {
+                                  return (
+                                    <AutocompleteItem
+                                      key={index}
+                                      title={item}
+                                    />
+                                  );
+                                })}
+                              </Autocomplete>
+
+                              <Autocomplete
+                                label={(evaProps) => (
+                                  <Text
+                                    {...evaProps}
+                                    style={{
+                                      fontSize: 15,
+                                      color: "#8f9bb3",
+                                      marginBottom: 4,
+
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    State
+                                  </Text>
+                                )}
+                                disabled={isEditMode ? false : true}
+                                placeholder="Enter State*"
+                                value={values.state}
+                                placement={placement}
+                                style={{
+                                  marginVertical: 5,
+                                  backgroundColor: Colors.white,
+                                  borderRadius: 12,
+                                  elevation: 1,
+                                }}
+                                accessoryLeft={renderLocationIcon}
+                                // label={evaProps => <Text {...evaProps}>State</Text>}
+                                onChangeText={(query) => {
+                                  setFieldValue("state", query);
+                                  setStatesData(
+                                    states.filter((item) =>
+                                      filterStates(item, query)
+                                    )
+                                  );
+                                }}
+                                onSelect={(query) => {
+                                  const selectedState = statesData[query];
+                                  setFieldValue("state", selectedState);
+                                  setFieldValue("selectedState", selectedState);
+                                  setFieldValue("selectedCity", "");
+                                  setFieldValue("city", "");
+                                  setCities([]);
+                                  GetAllCities(
+                                    values.selectedCountry.trim(),
+                                    selectedState.trim()
+                                  ).then((res) => {
+                                    setCities(res.data);
+                                  });
+                                }}
+                              >
+                                {statesData.map((item, index) => {
+                                  return (
+                                    <AutocompleteItem
+                                      key={index}
+                                      title={item}
+                                    />
+                                  );
+                                })}
+                              </Autocomplete>
+
+                              <View style={{ flexDirection: "column" }}>
+                                <Text style={styles.editLabel}>
+                                  {" "}
+                                  Zip/Post code
+                                </Text>
+                                <View style={styles.editField}>
+                                  {renderLocationIcon()}
+                                  <Text
+                                    style={{ fontSize: 15, marginLeft: 10 }}
+                                  >
+                                    {values.zipcode}
+                                  </Text>
+                                </View>
+                              </View>
+                              <Autocomplete
+                                label={(evaProps) => (
+                                  <Text
+                                    {...evaProps}
+                                    style={{
+                                      fontSize: 15,
+                                      color: "#8f9bb3",
+                                      marginBottom: 4,
+
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    Country
+                                  </Text>
+                                )}
+                                disabled={isEditMode ? false : true}
+                                placeholder="Enter Country*"
+                                value={values.country}
+                                placement={placement}
+                                style={{
+                                  marginVertical: 5,
+                                  backgroundColor: Colors.white,
+                                  borderRadius: 12,
+                                  elevation: 1,
+                                  marginTop: 10,
+                                }}
+                                accessoryLeft={renderLocationIcon}
+                                onChangeText={(query) => {
+                                  setFieldValue("country", query);
+                                  setCountriesData(
+                                    countries.filter((item) =>
+                                      filterCountries(item, query)
+                                    )
+                                  );
+                                }}
+                                onSelect={(query) => {
+                                  const selectedCountry = countriesData[query];
+                                  setFieldValue(
+                                    "country",
+                                    selectedCountry.name
+                                  );
+                                  setFieldValue(
+                                    "selectedCountry",
+                                    selectedCountry.name
+                                  );
+                                  setFieldValue("selectedState", "");
+                                  setFieldValue("state", "");
+                                  setFieldValue("city", "");
+                                  setStates([]);
+                                  GetAllStates(
+                                    selectedCountry.name.trim()
+                                  ).then((res) => {
+                                    setStates(res.data);
+                                    setStatesData(states);
+                                  });
+                                }}
+                              >
+                                {countriesData.map((item, index) => {
+                                  return (
+                                    <AutocompleteItem
+                                      key={index}
+                                      title={item.name}
+                                    />
+                                  );
+                                })}
+                              </Autocomplete>
+                            </>
                           )}
 
-                    
+                          {isEditMode && (
+                            <>
+                              <Input
+                                disabled={currentUser?.isAdmin ? false : true}
+                                style={[
+                                  styles.inputSettings,
+                                  { marginBottom: 5 },
+                                ]}
+                                accessoryLeft={renderLocationIcon}
+                                autoCapitalize="none"
+                                label={(evaProps) => (
+                                  <Text {...evaProps}>Street Address</Text>
+                                )}
+                                value={values.address}
+                                onChangeText={handleChange("address")}
+                              />
 
-                          {!isEditMode ? (
-                            <View style={{ flexDirection: "column" }}>
-                              <Text style={styles.editLabel}>School Name</Text>
-                              <View style={styles.editField}>
-                                {renderSchoolIcon()}
-                                <Text style={{ fontSize: 15 }}>
-                                  {values.schoolName}
-                                </Text>
-                              </View>
-                            </View>
-                          ) : (
-                            <Input
-                              accessoryLeft={renderSchoolIcon()}
-                              style={styles.inputSettings}
-                              autoCapitalize="none"
-                              label={(evaProps) => (
-                                <Text {...evaProps}>School Name</Text>
-                              )}
-                              value={values.schoolName}
-                              onChangeText={handleChange("schoolName")}
-                            />
+                              <Input
+                                disabled={currentUser?.isAdmin ? false : true}
+                                accessoryLeft={renderSchoolIcon()}
+                                style={styles.inputSettings}
+                                autoCapitalize="none"
+                                label={(evaProps) => (
+                                  <Text {...evaProps}>School Name</Text>
+                                )}
+                                value={values.schoolName}
+                                onChangeText={handleChange("schoolName")}
+                              />
+                            </>
                           )}
 
-                          <Autocomplete
-                            placeholder="Enter Country*"
-                            value={values.country}
-                            placement={placement}
-                            style={{
-                              marginVertical: 5,
-                              backgroundColor: Colors.white,
-                              borderRadius: 12,
-                              elevation: 1,
-                              marginTop: 10,
-                            }}
-                            accessoryLeft={renderLocationIcon}
-                            onChangeText={(query) => {
-                              setFieldValue("country", query);
-                              setCountriesData(
-                                countries.filter((item) =>
-                                  filterCountries(item, query)
-                                )
-                              );
-                            }}
-                            onSelect={(query) => {
-                              const selectedCountry = countriesData[query];
-                              setFieldValue("country", selectedCountry.name);
-                              setFieldValue(
-                                "selectedCountry",
-                                selectedCountry.name
-                              );
-                              setFieldValue("selectedState", "");
-                              setFieldValue("state", "");
-                              setFieldValue("city", "");
-                              setStates([]);
-                              GetAllStates(selectedCountry.name.trim()).then(
-                                (res) => {
-                                  setStates(res.data);
-                                  setStatesData(states);
-                                }
-                              );
-                            }}
-                          >
-                            {countriesData.map((item, index) => {
-                              return (
-                                <AutocompleteItem
-                                  key={index}
-                                  title={item.name}
-                                />
-                              );
-                            })}
-                          </Autocomplete>
-                          <Autocomplete
-                            placeholder="Enter State*"
-                            value={values.state}
-                            placement={placement}
-                            style={{
-                              marginVertical: 5,
-                              backgroundColor: Colors.white,
-                              borderRadius: 12,
-                              elevation: 1,
-                            }}
-                            accessoryLeft={renderLocationIcon}
-                            // label={evaProps => <Text {...evaProps}>State</Text>}
-                            onChangeText={(query) => {
-                              setFieldValue("state", query);
-                              setStatesData(
-                                states.filter((item) =>
-                                  filterStates(item, query)
-                                )
-                              );
-                            }}
-                            onSelect={(query) => {
-                              const selectedState = statesData[query];
-                              setFieldValue("state", selectedState);
-                              setFieldValue("selectedState", selectedState);
-                              setFieldValue("selectedCity", "");
-                              setFieldValue("city", "");
-                              setCities([]);
-                              GetAllCities(
-                                values.selectedCountry.trim(),
-                                selectedState.trim()
-                              ).then((res) => {
-                                setCities(res.data);
-                              });
-                            }}
-                          >
-                            {statesData.map((item, index) => {
-                              return (
-                                <AutocompleteItem key={index} title={item} />
-                              );
-                            })}
-                          </Autocomplete>
-                          <Autocomplete
-                            placeholder="Enter City"
-                            value={values.city}
-                            placement={placement}
-                            style={{
-                              marginVertical: 5,
-                              backgroundColor: Colors.white,
-                              borderRadius: 12,
-                              elevation: 1,
-                            }}
-                            accessoryLeft={renderLocationIcon}
-                            // label={evaProps => <Text {...evaProps}>City</Text>}
-                            onChangeText={(query) => {
-                              setFieldValue("city", query);
-                              setCitiesData(
-                                cities.filter((item) =>
-                                  filterCities(item, query)
-                                )
-                              );
-                            }}
-                            onSelect={(query) => {
-                              setFieldValue("city", citiesData[query]);
-                              setFieldValue("selectedCity", citiesData[query]);
-                            }}
-                          >
-                            {citiesData.map((item, index) => {
-                              return (
-                                <AutocompleteItem key={index} title={item} />
-                              );
-                            })}
-                          </Autocomplete>
+                          {isEditMode && (
+                            <>
+                              <Autocomplete
+                                disabled={currentUser?.isAdmin ? false : true}
+                                label={(evaProps) => (
+                                  <Text {...evaProps}>Country</Text>
+                                )}
+                                placeholder="Enter Country*"
+                                value={values.country}
+                                placement={placement}
+                                style={{
+                                  marginVertical: 5,
+                                  backgroundColor: Colors.white,
+                                  borderRadius: 12,
+                                  elevation: 1,
+                                  marginTop: 10,
+                                }}
+                                accessoryLeft={renderLocationIcon}
+                                onChangeText={(query) => {
+                                  setFieldValue("country", query);
+                                  setCountriesData(
+                                    countries.filter((item) =>
+                                      filterCountries(item, query)
+                                    )
+                                  );
+                                }}
+                                onSelect={(query) => {
+                                  const selectedCountry = countriesData[query];
+                                  setFieldValue(
+                                    "country",
+                                    selectedCountry.name
+                                  );
+                                  setFieldValue(
+                                    "selectedCountry",
+                                    selectedCountry.name
+                                  );
+                                  setFieldValue("selectedState", "");
+                                  setFieldValue("state", "");
+                                  setFieldValue("city", "");
+                                  setStates([]);
+                                  GetAllStates(
+                                    selectedCountry.name.trim()
+                                  ).then((res) => {
+                                    setStates(res.data);
+                                    setStatesData(states);
+                                  });
+                                }}
+                              >
+                                {countriesData.map((item, index) => {
+                                  return (
+                                    <AutocompleteItem
+                                      key={index}
+                                      title={item.name}
+                                    />
+                                  );
+                                })}
+                              </Autocomplete>
+                              <Autocomplete
+                                disabled={currentUser?.isAdmin ? false : true}
+                                label={(evaProps) => (
+                                  <Text {...evaProps}>State</Text>
+                                )}
+                                placeholder="Enter State*"
+                                value={values.state}
+                                placement={placement}
+                                style={{
+                                  marginVertical: 5,
+                                  backgroundColor: Colors.white,
+                                  borderRadius: 12,
+                                  elevation: 1,
+                                }}
+                                accessoryLeft={renderLocationIcon}
+                                // label={evaProps => <Text {...evaProps}>State</Text>}
+                                onChangeText={(query) => {
+                                  setFieldValue("state", query);
+                                  setStatesData(
+                                    states.filter((item) =>
+                                      filterStates(item, query)
+                                    )
+                                  );
+                                }}
+                                onSelect={(query) => {
+                                  const selectedState = statesData[query];
+                                  setFieldValue("state", selectedState);
+                                  setFieldValue("selectedState", selectedState);
+                                  setFieldValue("selectedCity", "");
+                                  setFieldValue("city", "");
+                                  setCities([]);
+                                  GetAllCities(
+                                    values.selectedCountry.trim(),
+                                    selectedState.trim()
+                                  ).then((res) => {
+                                    setCities(res.data);
+                                  });
+                                }}
+                              >
+                                {statesData.map((item, index) => {
+                                  return (
+                                    <AutocompleteItem
+                                      key={index}
+                                      title={item}
+                                    />
+                                  );
+                                })}
+                              </Autocomplete>
+                              <Autocomplete
+                                disabled={currentUser?.isAdmin ? false : true}
+                                label={(evaProps) => (
+                                  <Text {...evaProps}>City</Text>
+                                )}
+                                placeholder="Enter City"
+                                value={values.city}
+                                placement={placement}
+                                style={{
+                                  marginVertical: 5,
+                                  backgroundColor: Colors.white,
+                                  borderRadius: 12,
+                                  elevation: 1,
+                                }}
+                                accessoryLeft={renderLocationIcon}
+                                // label={evaProps => <Text {...evaProps}>City</Text>}
+                                onChangeText={(query) => {
+                                  setFieldValue("city", query);
+                                  setCitiesData(
+                                    cities.filter((item) =>
+                                      filterCities(item, query)
+                                    )
+                                  );
+                                }}
+                                onSelect={(query) => {
+                                  setFieldValue("city", citiesData[query]);
+                                  setFieldValue(
+                                    "selectedCity",
+                                    citiesData[query]
+                                  );
+                                }}
+                              >
+                                {citiesData.map((item, index) => {
+                                  return (
+                                    <AutocompleteItem
+                                      key={index}
+                                      title={item}
+                                    />
+                                  );
+                                })}
+                              </Autocomplete>
 
-                          {!isEditMode ? (
-                            <View style={{ flexDirection: "column" }}>
-                              <Text style={styles.editLabel}>
-                                {" "}
-                                Zip/Post code
-                              </Text>
-                              <View style={styles.editField}>
-                                {renderLocationIcon()}
-                                <Text style={{ fontSize: 15, marginLeft: 10 }}>
-                                  {values.zipcode}
-                                </Text>
-                              </View>
-                            </View>
-                          ) : (
-                            <Input
-                              accessoryLeft={renderLocationIcon}
-                              style={styles.inputSettings}
-                              autoCapitalize="none"
-                              label={(evaProps) => (
-                                <Text {...evaProps}>Zip/Post code</Text>
-                              )}
-                              value={values.zipcode}
-                              onChangeText={handleChange("zipcode")}
-                            />
+                              <Input
+                                disabled={currentUser?.isAdmin ? false : true}
+                                accessoryLeft={renderLocationIcon}
+                                style={styles.inputSettings}
+                                autoCapitalize="none"
+                                label={(evaProps) => (
+                                  <Text {...evaProps}>Zip/Post code</Text>
+                                )}
+                                value={values.zipcode}
+                                onChangeText={handleChange("zipcode")}
+                              />
+                            </>
                           )}
                           {/* {!isEditMode ? (
                           <View style={{ flexDirection: "column" }}>
@@ -750,7 +962,7 @@ const PersonalProfileScreen = () => {
                   )}
                 </Formik>
               )}
-              {isKeyboardVisible && <View style={{ height: 400 }} />}
+              {isKeyboardVisible && <View style={{ height: 100 }} />}
             </View>
           </KeyboardAwareScrollView>
         </BackgroundLayout>
