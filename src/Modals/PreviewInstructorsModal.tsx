@@ -1,17 +1,15 @@
-import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { Text, TopNavigationAction, Icon } from "@ui-kitten/components";
-import { StyleSheet, View, FlatList, TouchableOpacity } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import Colors from "@/Theme/Colors";
-import Feather from "react-native-vector-icons/Feather";
-import AntDesign from "react-native-vector-icons/AntDesign";
+import { LinearGradientButton } from "@/Components";
+import { Instructor } from "@/Models/UserDTOs";
 import { ModalState } from "@/Store/Modal";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import Colors from "@/Theme/Colors";
+import { useNavigation } from "@react-navigation/native";
+import { Text } from "@ui-kitten/components";
+import React, { useState } from "react";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal";
-import { Instructor } from "@/Models/UserDTOs";
-import EditInstructorsModal from "./EditInstructorModal";
-import { LinearGradientButton } from "@/Components";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { useDispatch, useSelector } from "react-redux";
 interface InstructorModal {
   instructors: Array<Instructor>;
   setInstructors: (data: Array<Instructor>) => {};

@@ -1,96 +1,57 @@
+import { CompleteRegistration, Register } from "@//Services/SignUpServices";
+import { LinearGradientButton, ProfileAvatarPicker, Spinner } from "@/Components";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import {
+  PersonIcon,
+  PhoneIcon
+} from "@/Components/SignUp/icons";
+import { AddInstructorsModal, EditInstructorsModal, ImagePickerModal } from "@/Modals";
+import AddBusInformation from "@/Modals/AddBusInformation";
+import { CountryDTO } from "@/Models/CountryDTOs";
+import { RegisterDTO, UserRegistrationDTO } from "@/Models/UserDTOs";
+import { AuthContext } from "@/Navigators/Auth/AuthProvider";
+import { Login } from "@/Services/LoginServices";
+import { GetAllOrg, GetOrgByFilters } from "@/Services/Org";
+import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
+import { GetAllSchools, GetSchoolByFilters } from "@/Services/School";
+import { storeInstructors, storeToken } from "@/Storage/MainAppStorage";
+import LoginStore from "@/Store/Authentication/LoginStore";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { PlaceState } from "@/Store/Places";
+import Colors from "@/Theme/Colors";
+import { useIsFocused } from "@react-navigation/native";
+import {
+  Autocomplete,
+  AutocompleteItem,
+  Button,
+  CheckBox, Icon, Input,
+  Layout, Select,
+  SelectItem,
+  StyleService,
+  Text,
+  useStyleSheet
+} from "@ui-kitten/components";
+import { Props } from "@ui-kitten/components/devsupport/services/props/props.service";
+import { Formik } from "formik";
 import React, {
   ReactElement,
   ReactText,
   useContext,
   useEffect,
-  useState,
+  useState
 } from "react";
 import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  TouchableWithoutFeedback,
-  View,
-  TouchableOpacity,
+  KeyboardAvoidingView, Linking, Platform,
+  ScrollView, TouchableOpacity, TouchableWithoutFeedback,
+  View
 } from "react-native";
-import { Spinner } from "@/Components";
 import { getDeviceId } from "react-native-device-info";
-import { ProfileAvatarPicker } from "@/Components";
-import { Linking } from "react-native";
-import {
-  Autocomplete,
-  AutocompleteItem,
-  Button,
-  CheckBox,
-  Datepicker,
-  Icon,
-  IndexPath,
-  Input,
-  Layout,
-  Popover,
-  Select,
-  SelectItem,
-  StyleService,
-  Text,
-  useStyleSheet,
-} from "@ui-kitten/components";
-import CreateMultipleInstructor from "@/Services/Instructor/CreateMultipleInstructor";
 import ImagePicker from "react-native-image-crop-picker";
-import { ProfileAvatar } from "../../../Components/SignUp/profile-avatar.component";
-import {
-  CalendarIcon,
-  FacebookIcon,
-  InstagramIcon,
-  PaypalIcon,
-  PersonIcon,
-  PhoneIcon,
-  PlusIcon,
-  TwitterIcon,
-  WebsiteIcon,
-} from "@/Components/SignUp/icons";
-import { Formik } from "formik";
-import * as yup from "yup";
-import { Props } from "@ui-kitten/components/devsupport/services/props/props.service";
-import { CompleteRegistration, Register } from "@//Services/SignUpServices";
-import { UserRegistrationDTO, RegisterDTO } from "@/Models/UserDTOs";
-import Moment from "moment";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import {
-  ImagePickerResponse,
-  launchCamera,
-  launchImageLibrary,
-} from "react-native-image-picker";
-import { ImagePickerModal } from "@/Modals";
-import { storeInstructors } from "@/Storage/MainAppStorage";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { useDispatch, useSelector } from "react-redux";
-import LoginStore from "@/Store/Authentication/LoginStore";
 import Toast from "react-native-toast-message";
-import { photoUpload } from "@/AWS/aws-upload-service";
-import { AuthContext } from "@/Navigators/Auth/AuthProvider";
-import { PlaceState } from "@/Store/Places";
-import { CountryDTO } from "@/Models/CountryDTOs";
-import { LinearGradientButton } from "@/Components";
-import Entypo from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Feather from "react-native-vector-icons/Feather";
-import Colors from "@/Theme/Colors";
-import moment from "moment";
-import {
-  AddInstructorsModal,
-  ParentPaymentModal,
-  WelcomeMessageModal,
-  EditInstructorsModal,
-} from "@/Modals";
-import { useIsFocused } from "@react-navigation/native";
-import MultiSelect from "react-native-multiple-select";
-import AddBusInformation from "@/Modals/AddBusInformation";
-import { storeToken } from "@/Storage/MainAppStorage";
-import { GetAllSchools, GetSchoolByFilters } from "@/Services/School";
-import { GetOrgByFilters, GetAllOrg, CreateOrg } from "@/Services/Org";
-import { Login } from "@/Services/LoginServices";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import { useDispatch, useSelector } from "react-redux";
+import * as yup from "yup";
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -172,8 +133,9 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   const [placement, setPlacement] = React.useState("bottom");
   const [instructors, setInstructors] = useState(_instructors);
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
-    ""
+    route.params?.details?.photo||""
   );
+  console.log('route.params?.details?.photo',route.params?.details?.photo)
   const [visibleImagePicker, setVisibleImagePicker] = useState(false);
   const [buses, setBuses] = useState([]);
   const [uploadedImage, setUploadedImage] = React.useState(null);
@@ -183,7 +145,9 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   const styles = useStyleSheet(themedStyles);
   const { emailAddress, user_type, details } = route.params;
   const { registrationId, activation_code } = route.params;
-
+const {country,state,city,zipcode,selected_entity} = details
+  console.log('country',country)
+console.log('details',details)
   const [visible, setVisible] = React.useState(false);
   const dispatch = useDispatch();
 
@@ -395,7 +359,6 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
         console.log("GetSchoolByFilters", err);
       });
   };
-  console.log("schoolsdta", schoolsData);
   const getOrgByFilter = (
     country = "",
     state = "",
@@ -559,13 +522,13 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                 schoolName: "",
                 school_name: "",
                 schoolAddress: "",
-                country: "",
+                country:details && country ? country : "",
                 selectedCountry: "",
                 selectedState: "",
                 selectedCity: "",
-                city: "",
-                state: "",
-                zipcode: "",
+                city: details && city?city:'',
+                state: details && state?state:'',
+                zipcode:details && zipcode?zipcode:'',
 
                 phoneNumber:
                   details && details.phoneNumber ? details.phoneNumber : "",
@@ -574,7 +537,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                 termsAccepted: false,
                 school: "",
                 organization: "",
-                selected_entity: "",
+                selected_entity: details && selected_entity?selected_entity:"",
                 organizationName: "",
               }}
               onSubmit={(values, { resetForm }) => {
@@ -1384,14 +1347,14 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     )}
                     <View
                       style={{
-                        marginVertical: 10,
+                        // marginVertical: 10,
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        marginTop: 20,
+                        // marginTop: 20,
                       }}
                     >
-                      <View
+                      {/* <View
                         style={{ flexDirection: "row", alignItems: "center" }}
                       >
                         <Text
@@ -1418,8 +1381,8 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                             )
                           }
                         />
-                      </View>
-                      <AntDesign
+                      </View> */}
+                      {/* <AntDesign
                         name="pluscircle"
                         size={25}
                         color={Colors.secondaryDark}
@@ -1430,7 +1393,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                             })
                           )
                         }
-                      />
+                      /> */}
                     </View>
                     {instructors && instructors.length > 0 && (
                       <ScrollView
@@ -1488,7 +1451,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           ))}
                       </ScrollView>
                     )}
-                    <View
+                    {/* <View
                       style={{
                         marginVertical: 10,
                         flexDirection: "row",
@@ -1534,7 +1497,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           )
                         }
                       />
-                    </View>
+                    </View> */}
 
                     {buses && buses.length > 0 && (
                       <ScrollView

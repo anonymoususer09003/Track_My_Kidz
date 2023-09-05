@@ -1,88 +1,60 @@
+import { ProfileAvatarPicker } from "@/Components";
+import { ImagePickerModal } from "@/Modals";
+import { Login } from "@/Services/LoginServices";
+import { useIsFocused } from "@react-navigation/native";
+import {
+  Autocomplete,
+  AutocompleteItem,
+  Button,
+  CheckBox, Icon, Input,
+  Layout, Select,
+  SelectItem,
+  StyleService,
+  Text,
+  useStyleSheet
+} from "@ui-kitten/components";
 import React, {
   ReactElement,
   ReactText,
   useContext,
   useEffect,
-  useState,
+  useState
 } from "react";
 import {
-  Alert,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
+  Alert, KeyboardAvoidingView, Linking, Platform,
   ScrollView,
   TouchableWithoutFeedback,
-  View,
+  View
 } from "react-native";
-import { Login } from "@/Services/LoginServices";
 import { getDeviceId } from "react-native-device-info";
-import { Linking } from "react-native";
-import { useIsFocused } from "@react-navigation/native";
-import { ImagePickerModal } from "@/Modals";
-import {
-  Autocomplete,
-  AutocompleteItem,
-  Button,
-  CheckBox,
-  Datepicker,
-  Icon,
-  IndexPath,
-  Input,
-  Layout,
-  Popover,
-  Select,
-  SelectItem,
-  StyleService,
-  Text,
-  useStyleSheet,
-} from "@ui-kitten/components";
-import { AppHeader, ProfileAvatarPicker } from "@/Components";
 
-import { ProfileAvatar } from "../../../Components/SignUp/profile-avatar.component";
+import { CompleteRegistration, Register } from "@//Services/SignUpServices";
 import {
-  CalendarIcon,
-  FacebookIcon,
-  InstagramIcon,
-  PaypalIcon,
-  PersonIcon,
-  LocationIcon,
-  PhoneIcon,
-  PlusIcon,
-  TwitterIcon,
-  WebsiteIcon,
+  LocationIcon, PersonIcon, PhoneIcon
 } from "@/Components/SignUp/icons";
+import { RegisterDTO, UserRegistrationDTO } from "@/Models/UserDTOs";
+import { Props } from "@ui-kitten/components/devsupport/services/props/props.service";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { Props } from "@ui-kitten/components/devsupport/services/props/props.service";
-import { CompleteRegistration, Register } from "@//Services/SignUpServices";
-import { UserRegistrationDTO, RegisterDTO } from "@/Models/UserDTOs";
 
-import Moment from "moment";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import {
-  ImagePickerResponse,
-  launchCamera,
-  launchImageLibrary,
-} from "react-native-image-picker";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { useDispatch, useSelector } from "react-redux";
-import LoginStore from "@/Store/Authentication/LoginStore";
-import Toast from "react-native-toast-message";
-import { photoUpload } from "@/AWS/aws-upload-service";
-import { AuthContext } from "@/Navigators/Auth/AuthProvider";
-import { PlaceState } from "@/Store/Places";
-import { CountryDTO } from "@/Models/CountryDTOs";
 import { LinearGradientButton } from "@/Components";
-import Entypo from "react-native-vector-icons/Entypo";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import { ParentPaymentModal } from "@/Modals";
+import { CountryDTO } from "@/Models/CountryDTOs";
+import { AuthContext } from "@/Navigators/Auth/AuthProvider";
+import { GetOrgByFilters } from "@/Services/Org";
+import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
+import { GetSchoolByFilters } from "@/Services/School";
+import { storeToken, storeUserType } from "@/Storage/MainAppStorage";
+import LoginStore from "@/Store/Authentication/LoginStore";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { PlaceState } from "@/Store/Places";
 import Colors from "@/Theme/Colors";
 import moment from "moment";
-import { ParentPaymentModal, WelcomeMessageModal } from "@/Modals";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { storeToken, storeUserType } from "@/Storage/MainAppStorage";
-import { GetSchoolByFilters } from "@/Services/School";
-import { GetOrgByFilters } from "@/Services/Org";
 import ImagePicker from "react-native-image-crop-picker";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import Toast from "react-native-toast-message";
+import { useDispatch, useSelector } from "react-redux";
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -1312,6 +1284,13 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                                         firstname: values.firstName,
                                         lastname: values.lastName,
                                         phoneNumber: values.phoneNumber,
+                                        state: values.state,
+                                        country: values.country,
+                                        city: values.city,
+                                        zipcode: values.zipcode,
+                                        selected_entity:values.selected_entity,
+                                       photo:uploadedImage?.path
+                                        
                                       },
                                     }
                                   ),

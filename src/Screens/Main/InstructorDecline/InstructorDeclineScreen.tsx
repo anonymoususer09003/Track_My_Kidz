@@ -1,31 +1,23 @@
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Icon, Text } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { Text, Icon } from "@ui-kitten/components";
 
 import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
+  ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View
 } from "react-native";
 
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Colors from "@/Theme/Colors";
-import Entypo from "react-native-vector-icons/Entypo";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import moment from "moment";
-import { InstructionsModal } from "@/Modals";
+import { ApproveActivityModal, InstructionsModal } from "@/Modals";
 import {
-  GetAllActivity,
-  GetActivitiesByInsructorId,
+  GetActivitiesByInsructorId
 } from "@/Services/Activity";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { ApproveActivityModal } from "@/Modals";
 import { GetGroupByInstructorId } from "@/Services/Group";
 import { loadUserId } from "@/Storage/MainAppStorage";
-import { useSelector, useDispatch } from "react-redux";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import Colors from "@/Theme/Colors";
+import moment from "moment";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { useDispatch, useSelector } from "react-redux";
 const InstructorGroupPendingScreen = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
@@ -303,20 +295,20 @@ const InstructorGroupPendingScreen = ({ route }) => {
                         <Text style={[styles.text, { fontSize: 25 }]}>
                           {item?.activityName}
                         </Text>
-                        <View style={styles.horizontal}>
+                        {/* <View style={styles.horizontal}>
                           <Image
                             source={calendarIcon}
                             style={styles.iconStyle}
                           />
                           <Text style={styles.text}>{`Date: ${date} `}</Text>
-                        </View>
+                        </View> */}
 
-                        <View style={styles.horizontal}>
+                        {/* <View style={styles.horizontal}>
                           <Image source={clockIcon} style={styles.iconStyle} />
                           <Text style={styles.text}>{`${moment().format(
                             "hh:mm a"
                           )}`}</Text>
-                        </View>
+                        </View> */}
 
                         <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />

@@ -1,7 +1,7 @@
 import {
   CustomTextDropDown,
   LinearGradientButton,
-  Spinner,
+  Spinner
 } from "@/Components";
 import ProfileAvatarPicker from "@/Components/ProfileAvatar";
 import { PersonIcon, PhoneIcon } from "@/Components/SignUp/icons";
@@ -26,7 +26,7 @@ import {
   Input,
   Layout,
   Modal,
-  Text,
+  Text
 } from "@ui-kitten/components";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";

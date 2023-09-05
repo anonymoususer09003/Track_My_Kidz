@@ -1,43 +1,26 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Text, Icon, Input, Select, SelectItem } from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  PermissionsAndroid,
-  Platform,
-  Image,
-} from "react-native";
-import moment from "moment";
-import * as Stomp from "stompjs";
-import BackgroundService from "react-native-background-actions";
-import Geolocation from "@react-native-community/geolocation";
-import GeolocationAndroid from "react-native-geolocation-service";
-import SockJS from "sockjs-client";
-import { loadToken } from "@/Storage/MainAppStorage";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import Entypo from "react-native-vector-icons/Entypo";
-import { UserTypeState } from "@/Store/UserType";
 import { InstructionsModal, ShowInstructorsStudentsModal } from "@/Modals";
-
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { UserTypeState } from "@/Store/UserType";
+import Colors from "@/Theme/Colors";
+import { useIsFocused } from "@react-navigation/native";
+import { Text } from "@ui-kitten/components";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import {
-  GetAllInstructors,
-  GetInstructor,
-  FindInstructorBySchoolOrg,
-} from "@/Services/Instructor";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { GetSchool } from "@/Services/School";
+  Image, StyleSheet, TouchableOpacity, View
+} from "react-native";
+import Entypo from "react-native-vector-icons/Entypo";
+import { useDispatch, useSelector } from "react-redux";
+
+import BackgroundLayout from "@/Components/BackgroundLayout";
 import { actions } from "@/Context/state/Reducer";
 import { useStateValue } from "@/Context/state/State";
+import {
+  GetInstructor
+} from "@/Services/Instructor";
+import { GetSchool } from "@/Services/School";
+import { loadUserId } from "@/Storage/MainAppStorage";
 import { ModalState } from "@/Store/Modal";
-import BackgroundLayout from "@/Components/BackgroundLayout";
 import { UserState } from "@/Store/User";
 
 const instructorImage = require("@/Assets/Images/approval_icon2.png");

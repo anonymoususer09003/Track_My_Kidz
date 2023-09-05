@@ -1,77 +1,51 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { LinearGradientButton } from "@/Components";
 import BackgroundLayout from "@/Components/BackgroundLayout";
+import { actions } from "@/Context/state/Reducer";
+import { useStateValue } from "@/Context/state/State";
+import { AddIndividialMembersModal, GroupSelectionModal } from "@/Modals";
 import {
-  Text,
-  Divider,
+  CreateActivity, DeleteActivityParticipants, GetActivity,
+  GetOptIn, UpdateActivity
+} from "@/Services/Activity";
+import NotifyToInstructors from "@/Services/Activity/NotifyToInstructors";
+import NotifyToParent from "@/Services/Activity/NotifyToParent";
+import { GetGroup } from "@/Services/Group";
+import {
+  FindInstructorBySchoolOrg,
+  GetInstructor
+} from "@/Services/Instructor";
+import { GetOrg } from "@/Services/Org";
+import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
+import { GetSchool } from "@/Services/School";
+import FetchOne from "@/Services/User/FetchOne";
+import { loadUserId } from "@/Storage/MainAppStorage";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { PlaceState } from "@/Store/Places";
+import { UserState } from "@/Store/User";
+import ChangeUserState from "@/Store/User/FetchOne";
+import Colors from "@/Theme/Colors";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import {
+  Autocomplete,
+  AutocompleteItem, CheckBox, Datepicker, Divider,
   Input,
   Radio,
   RadioGroup,
   Select,
-  SelectItem,
-  Datepicker,
-  CheckBox,
-  Autocomplete,
-  AutocompleteItem,
+  SelectItem, Text
 } from "@ui-kitten/components";
-import * as yup from "yup";
+import { Formik } from "formik";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-  ImageBackground,
-  Image,
-  StatusBar,
+  Image, ScrollView, StatusBar, StyleSheet, TextInput, TouchableOpacity, View
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
-import MaterialIcon from "react-native-vector-icons/MaterialIcons";
-import fetchOneUserService from "@/Services/User/FetchOne";
-import ChangeUserState from "@/Store/User/FetchOne";
-import { GetSchool, UpdateSchool } from "@/Services/School";
-import { GetOrg } from "@/Services/Org";
-import { GetGroup } from "@/Services/Group";
-import { useDispatch, useSelector } from "react-redux";
-import { useIsFocused } from "@react-navigation/native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { LinearGradientButton } from "@/Components";
-import { AddIndividialMembersModal, GroupSelectionModal } from "@/Modals";
-import { Formik } from "formik";
-import { AppHeader } from "@/Components";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Entypo from "react-native-vector-icons/Entypo";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import { CreateGroup } from "@/Services/Group";
-import {
-  CreateActivity,
-  UpdateActivity,
-  GetActivity,
-  GetOptIn,
-  DeleteActivityParticipants,
-} from "@/Services/Activity";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import moment from "moment";
-import { PlaceState } from "@/Store/Places";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import { UserState } from "@/Store/User";
-import FetchOne from "@/Services/User/FetchOne";
-import CreateMultipleInstructor from "@/Services/Instructor/CreateMultipleInstructor";
-import {
-  GetAllInstructors,
-  FindInstructorBySchoolOrg,
-  GetInstructor,
-} from "@/Services/Instructor";
-import NotifyToParent from "@/Services/Activity/NotifyToParent";
-import NotifyToInstructors from "@/Services/Activity/NotifyToInstructors";
-import { useStateValue } from "@/Context/state/State";
-import { actions } from "@/Context/state/Reducer";
 
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { useDispatch, useSelector } from "react-redux";
+import * as yup from "yup";
 const _days = [
   {
     id: 1,
@@ -167,7 +141,7 @@ const CreateActivityScreen = ({ route }) => {
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
-  console.log("currentUser", currentUser);
+  console.log("currentUser", currentUser.isAdmin);
   const [orgId, setOrgId] = useState({});
   const [hideForm, setHideForm] = useState(true);
 
@@ -616,11 +590,11 @@ const CreateActivityScreen = ({ route }) => {
                   0;
                 // console.log("onBhelf", _instructor);
                 let totime = moment(values.toTime, ["h:mm A"]).format("HH:mm");
-                let todate = moment(values.to).format("YYYY-MM-DD");
+                let todate = moment(values.to).format('MMM DD, YYYY');
                 let fromtime = moment(values.fromTime, ["h:mm A"]).format(
                   "HH:mm"
                 );
-                let fromdate = moment(values.from).format("YYYY-MM-DD");
+                let fromdate = moment(new Date(values.from)).format('MMM DD, YYYY');
                 // console.log("date", values.from + "----", +values.fromTime);
                 // console.log("fafaffafafafafa", date + "T" + time + ":00.000Z");
                 const data = {
@@ -924,8 +898,8 @@ const CreateActivityScreen = ({ route }) => {
               }) => (
                 <>
                   <View style={styles.formContainer}>
-                    {/* {console.log("values", values)} */}
-                    <View
+                    {console.log("values", values)}
+                    {currentUser.isAdmin&&(<View
                       style={{
                         marginTop: 5,
 
@@ -962,7 +936,7 @@ const CreateActivityScreen = ({ route }) => {
                             />
                           ))}
                       </Select>
-                    </View>
+                    </View>)}
 
                     <Input
                       style={styles.textInput}
@@ -996,7 +970,7 @@ const CreateActivityScreen = ({ route }) => {
                         style={{
                           flexDirection: "row",
                           alignItems: "space-between",
-                          width: "50%",
+                          width: "60%",
                           icon: () => null,
                         }}
                         onChange={(index) => {
@@ -1058,7 +1032,7 @@ const CreateActivityScreen = ({ route }) => {
                           flexDirection: "row",
                           alignItems: "center",
                           justifyContent: "space-between",
-                          width: "50%",
+                          width: "60%",
                         }}
                         onChange={(index) => setTimeSelectedIndex(index)}
                       >
@@ -1992,7 +1966,7 @@ const CreateActivityScreen = ({ route }) => {
                                 >
                                   <View>
                                     <Text>{item?.name}</Text>
-                                    <Text>{item?.parent1_email}</Text>
+                                    
                                   </View>
                                 </View>
                                 <AntDesign
@@ -2083,7 +2057,6 @@ const CreateActivityScreen = ({ route }) => {
                                     <Text>
                                       {item?.firstname + " " + item?.lastname}
                                     </Text>
-                                    <Text>{item?.email}</Text>
                                   </View>
                                 </View>
                                 <AntDesign

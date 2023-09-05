@@ -1,4 +1,4 @@
-import { ThemeImages, ThemeVariables } from '@/Theme/theme.type'
+import { ThemeImages, ThemeVariables } from "@/Theme/theme.type";
 
 /**
  *
@@ -6,7 +6,7 @@ import { ThemeImages, ThemeVariables } from '@/Theme/theme.type'
  * @return {*}
  */
 export default function ({}: ThemeVariables): ThemeImages {
-  return {
-    logo: require('@/Assets/Images/TOM.png'),
-  }
+  // return {
+  //   logo: require('@/Assets/Images/TOM.png'),
+  // };
 }
