@@ -43,7 +43,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
   const [orgInfo, setOrgInfo] = useState(null);
   const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
     useState(false);
-
+console.log('orgInfo',orgInfo)
   const data = route?.params?.data;
   const activitiesCount = route?.params?.activitiesCount || {};
   const showInstructorModal = useSelector(
@@ -51,6 +51,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
   );
   let temp = [];
   let instructor = data?.instructors?.map((item) => temp.push(item?.firstName));
+  console.log('data',data)
   const handleGetOrganizationInfo = async () => {
     const userId = await loadUserId();
 
@@ -320,7 +321,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
               <Text style={styles.label}>From</Text>
               <Text style={styles.text}>{`${moment(
                 data?.fromDate == "string" ? new Date() : data?.fromDate
-              ).format("YYYY-MM-DD")} at ${moment(
+              ).format("MMM DD, YYYY")} at ${moment(
                 data?.fromDate == "string" ? new Date() : data?.fromDate
               )
                 .subtract("hours", 5)
@@ -344,7 +345,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
 
               <Text style={styles.text}>{`${moment(
                 data?.toDate == "string" ? new Date() : data?.toDate
-              ).format("YYYY-MM-DD")} at ${moment(
+              ).format("MMM DD, YYYY")} at ${moment(
                 data?.toDate == "string" ? new Date() : data?.toDate
               )
                 .subtract("hours", 5)
@@ -359,7 +360,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
             <View>
               <Text style={styles.label}>Where</Text>
 
-              <Text style={styles.text}>{data?.venueFromAddress}</Text>
+              <Text style={styles.text}>{data?.venueFromName}</Text>
             </View>
           </View>
 
@@ -370,7 +371,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
             <View>
               <Text style={styles.label}>Address</Text>
 
-              <Text style={styles.text}>{orgInfo?.address || "-"}</Text>
+              <Text style={styles.text}>{`${orgInfo?.address}, ${orgInfo?.city}, ${orgInfo.state} ${orgInfo?.zipcode}, ${orgInfo?.country}` || "-"}</Text>
             </View>
           </View>
 

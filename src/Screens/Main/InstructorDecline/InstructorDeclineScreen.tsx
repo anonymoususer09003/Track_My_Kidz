@@ -309,7 +309,43 @@ const InstructorGroupPendingScreen = ({ route }) => {
                             "hh:mm a"
                           )}`}</Text>
                         </View> */}
-
+                        <View style={styles.horizontal}>
+                          {/* <Image
+                            source={calendarIcon}
+                            style={styles.iconStyle}
+                          /> */}
+                          <Image
+                        source={require("@/Assets/Images/circle-dashed.png")}
+                        style={{
+                          height: 40,
+                          width: 15,
+                          marginRight:10,
+                          resizeMode: "contain",
+                          // marginRight: 10,
+                        }}
+                      />
+                       <View>
+                        <Text style={styles.text}>{`${moment(
+                          item?.fromDate == "string"
+                            ? new Date()
+                            : item?.fromDate
+                        ).format("MMM DD, YYYY")} at ${moment(
+                          item?.fromDate == "string"
+                            ? new Date()
+                            : item?.fromDate
+                        )
+                          .subtract("hours", 5)
+                          .format("hh:mm a")} `}</Text>
+                        <Text style={styles.text}>{`${moment(
+                          item?.toDate == "string" ? new Date() : item?.toDate
+                        ).format('MMM DD, YYYY')} at ${moment(
+                          item?.toDate == "string" ? new Date() : item?.toDate
+                        )
+                          .subtract("hours", 5)
+                          .format("hh:mm a")} `}</Text>
+                      </View>
+                            {/* <Text style={styles.text}>{date}</Text> */}
+                        </View>
                         <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />
                           <Text style={styles.text}>{item?.venueFromName}</Text>
@@ -317,9 +353,11 @@ const InstructorGroupPendingScreen = ({ route }) => {
 
                         <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />
-                          <Text style={styles.text}>
-                            {item?.venueFromAddress}
-                          </Text>
+                          <View>
+                          <Text style={styles.text} >
+                            {`${item?.venueFromAddress}, ${item?.venueFromCity}, ${item?.venueFromState} ${item?.venueFromZip}, ${item?.venueToCountry}`}
+                          </Text> 
+                          </View>
                         </View>
                       </TouchableOpacity>
                       <TouchableOpacity
