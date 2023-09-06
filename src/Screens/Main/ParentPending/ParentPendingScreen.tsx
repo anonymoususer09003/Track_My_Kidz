@@ -1,33 +1,25 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Text, Icon } from "@ui-kitten/components";
 import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  Image,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import {
-  InstructionsModal,
   ApproveActivityModal,
-  DeclineActivityModal,
+  DeclineActivityModal, InstructionsModal
 } from "@/Modals";
-import moment from "moment";
-import { GetChildrenAcitivities } from "@/Services/Activity";
-import { UserState } from "@/Store/User";
-import FetchOne from "@/Services/User/FetchOne";
 import ChildrenSelectionModal from "@/Modals/ChildrenSelectionModal";
-import { ModalState } from "@/Store/Modal";
+import { GetChildrenAcitivities } from "@/Services/Activity";
 import { GetChildrenGroups } from "@/Services/Group";
 import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
+import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { UserState } from "@/Store/User";
+import Colors from "@/Theme/Colors";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Icon, Text } from "@ui-kitten/components";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View
+} from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { useDispatch, useSelector } from "react-redux";
 const ParentPendingScreen = ({ route }) => {
   const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
   const marker = require("@/Assets/Images/marker.png");
@@ -337,41 +329,85 @@ const ParentPendingScreen = ({ route }) => {
                     onSwipeableOpen={() => closeRow(item?.activity?.activityId)}
                     renderRightActions={(e) => RightActions(e, item)}
                   >
-                    <View style={[styles.item]}>
+                    <TouchableOpacity
+                        onPress={() => {
+                          // navigation.navigate('InstructorGroupApproval')
+                        }}
+                        style={[styles.item]}
+                      >
                       <Text style={[styles.text, { fontSize: 25 }]}>
                         {`${item?.activity?.activityName}`}
                       </Text>
-                      <View style={styles.horizontal}>
-                        <Image
-                          source={instructorImage}
-                          style={styles.iconStyle}
-                        />
-                        <Text
-                          style={styles.text}
-                        >{`${item?.firstName} ${item?.lastName}`}</Text>
+                      
+                      <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        
+                      }}
+                      >
+                      <Image
+                        source={require("@/Assets/Images/circle-dashed.png")}
+                        style={{
+                          height: 40,
+                          width: 15,
+                          resizeMode: "contain",
+                         marginRight: 10,
+                        }}
+                      />
+                        <View>
+                          <Text style={styles.text}>{`${moment(
+                          item?.activity?.fromDate == "string"
+                            ? new Date()
+                            : item?.activity?.fromDate
+                         ).format("MMM DD YYYY")} at ${moment(
+                          item?.activity?.fromDate == "string"
+                            ? new Date()
+                            : item?.activity?.fromDate
+                          )
+                          .subtract("hours", 5)
+                          .format("hh:mm a")} `}</Text>
+                        <Text style={styles.text}>{`${moment(
+                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
+                        ).format("MMM DD YYYY")} at ${moment(
+                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
+                        )
+                          .subtract("hours", 5)
+                          .format("hh:mm a")} `}</Text>
                       </View>
-                      <View style={styles.horizontal}>
-                        <Image source={calendarIcon} style={styles.iconStyle} />
-                        <Text style={styles.text}>{`${moment(date).format(
-                          "YYYY-MM-DD"
-                        )}`}</Text>
-                      </View>
-                      <View style={styles.horizontal}>
-                        <Image source={clockIcon} style={styles.iconStyle} />
-                        <Text style={styles.text}>{`${moment(date).format(
-                          "hh:mm A"
-                        )}`}</Text>
-                      </View>
-
-                      {/* 
-                      <View style={styles.horizontal}>
-                        <Image source={email} style={styles.iconStyle} />
-
-                        <Text
-                          style={styles.text}
-                        >{`${item?.parentEmail1}`}</Text>
-                      </View> */}
                     </View>
+
+                      
+                      <View style={styles.horizontal}>
+                          <Image source={marker} style={styles.iconStyle} />
+                          <Text style={styles.text}>{item?.activity?.venueFromName}</Text>
+                      </View>
+
+                        <View style={styles.horizontal}>
+                          <Image source={marker} style={styles.iconStyle} />
+                          <View>
+                            <Text style={styles.text}>
+                            {`${item?.activity?.venueFromAddress}, ${item?.activity?.venueFromCity}, ${item?.activity?.venueFromState} ${item?.activity?.venueFromZip}, ${item?.activity?.venueFromCountry}`}
+                            </Text>
+                          </View>
+                        </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                        onPress={() => {
+                          dispatch(
+                            ChangeModalState.action({
+                              instructionsModalVisibility: true,
+                            })
+                          );
+                          setSelectedInstructions(item);
+                        }}
+                        style={[styles.footer]}
+                      >
+                        <Text
+                          style={[styles.text, { textAlign: "center" }]}
+                        >{`Instructions / Disclaimer / Agreement`}</Text>
+                      </TouchableOpacity>
+
                   </Swipeable>
                 );
               } else {

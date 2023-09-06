@@ -1,31 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { LinearGradientButton } from "@/Components";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import { AddIndividialMembersModal, GroupSelectionModal } from "@/Modals";
+import { CreateActivity } from "@/Services/Activity";
+import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
+import { GetAllStudents } from "@/Services/Student";
+import Colors from "@/Theme/Colors";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import {
-  Text,
-  Divider,
+  Autocomplete,
+  AutocompleteItem, CheckBox, Datepicker, Divider,
   Input,
   Radio,
   RadioGroup,
   Select,
-  SelectItem,
-  Datepicker,
-  CheckBox,
-  Autocomplete,
-  AutocompleteItem,
+  SelectItem, Text
 } from "@ui-kitten/components";
-import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import Colors from "@/Theme/Colors";
-import { AddIndividialMembersModal, GroupSelectionModal } from "@/Modals";
 import { Formik } from "formik";
-import { AppHeader, LinearGradientButton } from "@/Components";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { CreateActivity } from "@/Services/Activity";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
 import moment from "moment";
-import { GetAllStudents } from "@/Services/Student";
-import { useIsFocused } from "@react-navigation/native";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import React, { useEffect, useState } from "react";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { useDispatch, useSelector } from "react-redux";
+
 
 const _days = [
   {

@@ -1,96 +1,58 @@
+import { CompleteRegistration, Register } from "@//Services/SignUpServices";
+import { LinearGradientButton, ProfileAvatarPicker, Spinner } from "@/Components";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import {
+  PersonIcon,
+  PhoneIcon
+} from "@/Components/SignUp/icons";
+import { AddInstructorsModal, EditInstructorsModal, ImagePickerModal } from "@/Modals";
+import AddBusInformation from "@/Modals/AddBusInformation";
+import { CountryDTO } from "@/Models/CountryDTOs";
+import { RegisterDTO, UserRegistrationDTO } from "@/Models/UserDTOs";
+import { AuthContext } from "@/Navigators/Auth/AuthProvider";
+import { Login } from "@/Services/LoginServices";
+import { GetAllOrg, GetOrgByFilters } from "@/Services/Org";
+import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
+import { GetAllSchools, GetSchoolByFilters } from "@/Services/School";
+import { storeInstructors, storeToken } from "@/Storage/MainAppStorage";
+import LoginStore from "@/Store/Authentication/LoginStore";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { PlaceState } from "@/Store/Places";
+import Colors from "@/Theme/Colors";
+import { useIsFocused } from "@react-navigation/native";
+import {
+  Autocomplete,
+  AutocompleteItem,
+  Button,
+  CheckBox, Icon, Input,
+  Layout, Select,
+  SelectItem,
+  StyleService,
+  Text,
+  useStyleSheet
+} from "@ui-kitten/components";
+import { Props } from "@ui-kitten/components/devsupport/services/props/props.service";
+import { Formik } from "formik";
 import React, {
   ReactElement,
   ReactText,
   useContext,
   useEffect,
-  useState,
+  useState
 } from "react";
 import {
   Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  TouchableWithoutFeedback,
-  View,
-  TouchableOpacity,
+  KeyboardAvoidingView, Linking, Platform,
+  ScrollView, TouchableOpacity, TouchableWithoutFeedback,
+  View
 } from "react-native";
-import { Spinner } from "@/Components";
 import { getDeviceId } from "react-native-device-info";
-import { ProfileAvatarPicker } from "@/Components";
-import { Linking } from "react-native";
-import {
-  Autocomplete,
-  AutocompleteItem,
-  Button,
-  CheckBox,
-  Datepicker,
-  Icon,
-  IndexPath,
-  Input,
-  Layout,
-  Popover,
-  Select,
-  SelectItem,
-  StyleService,
-  Text,
-  useStyleSheet,
-} from "@ui-kitten/components";
-import CreateMultipleInstructor from "@/Services/Instructor/CreateMultipleInstructor";
 import ImagePicker from "react-native-image-crop-picker";
-import { ProfileAvatar } from "../../../Components/SignUp/profile-avatar.component";
-import {
-  CalendarIcon,
-  FacebookIcon,
-  InstagramIcon,
-  PaypalIcon,
-  PersonIcon,
-  PhoneIcon,
-  PlusIcon,
-  TwitterIcon,
-  WebsiteIcon,
-} from "@/Components/SignUp/icons";
-import { Formik } from "formik";
-import * as yup from "yup";
-import { Props } from "@ui-kitten/components/devsupport/services/props/props.service";
-import { CompleteRegistration, Register } from "@//Services/SignUpServices";
-import { UserRegistrationDTO, RegisterDTO } from "@/Models/UserDTOs";
-import Moment from "moment";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import {
-  ImagePickerResponse,
-  launchCamera,
-  launchImageLibrary,
-} from "react-native-image-picker";
-import { ImagePickerModal } from "@/Modals";
-import { storeInstructors } from "@/Storage/MainAppStorage";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { useDispatch, useSelector } from "react-redux";
-import LoginStore from "@/Store/Authentication/LoginStore";
 import Toast from "react-native-toast-message";
-import { photoUpload } from "@/AWS/aws-upload-service";
-import { AuthContext } from "@/Navigators/Auth/AuthProvider";
-import { PlaceState } from "@/Store/Places";
-import { CountryDTO } from "@/Models/CountryDTOs";
-import { LinearGradientButton } from "@/Components";
-import Entypo from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Feather from "react-native-vector-icons/Feather";
-import Colors from "@/Theme/Colors";
-import moment from "moment";
-import {
-  AddInstructorsModal,
-  ParentPaymentModal,
-  WelcomeMessageModal,
-  EditInstructorsModal,
-} from "@/Modals";
-import { useIsFocused } from "@react-navigation/native";
-import MultiSelect from "react-native-multiple-select";
-import AddBusInformation from "@/Modals/AddBusInformation";
-import { storeToken } from "@/Storage/MainAppStorage";
-import { GetAllSchools, GetSchoolByFilters } from "@/Services/School";
-import { GetOrgByFilters, GetAllOrg, CreateOrg } from "@/Services/Org";
-import { Login } from "@/Services/LoginServices";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import { useDispatch, useSelector } from "react-redux";
+import * as yup from "yup";
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -472,7 +434,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
     });
   };
   return (
-    <BackgroundLayout title="Registeration">
+    <BackgroundLayout title="Registration">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}

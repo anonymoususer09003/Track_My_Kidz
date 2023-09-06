@@ -313,38 +313,59 @@ const ParentApprovalScreen = ({ route }) => {
                       </TouchableOpacity>
                       </View> */}
                     
-                    <View style={[styles.item]}>
+                  <TouchableOpacity
+                        onPress={() => {
+                          // navigation.navigate('InstructorGroupApproval')
+                        }}
+                        style={[styles.item]}
+                      >
                       <Text style={[styles.text, { fontSize: 25 }]}>
                         {`${item?.activity?.activityName}`}
                       </Text>
-                      <View style={styles.horizontal}>
-                        <Image
-                          source={instructorImage}
-                          style={styles.iconStyle}
-                        />
-                        <Text
-                          style={styles.text}
-                        >{`${item?.firstName} ${item?.lastName}`}</Text>
+                      
+                      <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        
+                      }}
+                      >
+                      <Image
+                        source={require("@/Assets/Images/circle-dashed.png")}
+                        style={{
+                          height: 40,
+                          width: 15,
+                          resizeMode: "contain",
+                         marginRight: 10,
+                        }}
+                      />
+                        <View>
+                          <Text style={styles.text}>{`${moment(
+                          item?.activity?.fromDate == "string"
+                            ? new Date()
+                            : item?.activity?.fromDate
+                         ).format("MMM DD YYYY")} at ${moment(
+                          item?.activity?.fromDate == "string"
+                            ? new Date()
+                            : item?.activity?.fromDate
+                          )
+                          .subtract("hours", 5)
+                          .format("hh:mm a")} `}</Text>
+                        <Text style={styles.text}>{`${moment(
+                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
+                        ).format("MMM DD YYYY")} at ${moment(
+                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
+                        )
+                          .subtract("hours", 5)
+                          .format("hh:mm a")} `}</Text>
                       </View>
-                      <View style={styles.horizontal}>
-                        <Image source={calendarIcon} style={styles.iconStyle} />
-                        <Text style={styles.text}>{`${moment(date).format(
-                          "YYYY-MM-DD"
-                        )}`}</Text>
-                      </View>
+                    </View>
 
                       
-
-                      <View style={styles.horizontal}>
-                        <Image source={clockIcon} style={styles.iconStyle} />
-                        <Text style={styles.text}>{`${moment(date).format(
-                          "hh:mm A"
-                        )}`}</Text>
-                      </View>
                       <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />
                           <Text style={styles.text}>{item?.activity?.venueFromName}</Text>
-                        </View>
+                      </View>
 
                         <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />
@@ -354,6 +375,22 @@ const ParentApprovalScreen = ({ route }) => {
                             </Text>
                           </View>
                         </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                        onPress={() => {
+                          dispatch(
+                            ChangeModalState.action({
+                              instructionsModalVisibility: true,
+                            })
+                          );
+                          setSelectedInstructions(item);
+                        }}
+                        style={[styles.footer]}
+                      >
+                        <Text
+                          style={[styles.text, { textAlign: "center" }]}
+                        >{`Instructions / Disclaimer / Agreement`}</Text>
+                      </TouchableOpacity>
                         {/* <TouchableOpacity
                         onPress={() => {
                           dispatch(
@@ -413,7 +450,9 @@ const ParentApprovalScreen = ({ route }) => {
                           style={styles.text}
                         >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
                       </View> */}
-                    </View>
+                      
+                    
+                   
                   </Swipeable>
                 );
               }
@@ -450,7 +489,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.newBackgroundColor,
   },
   item: {
-    borderRadius: 20,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
     width: "96%",
     backgroundColor: "#fff",
     marginTop: 10,

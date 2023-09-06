@@ -1,7 +1,7 @@
 import {
   CustomTextDropDown,
   LinearGradientButton,
-  Spinner,
+  Spinner
 } from "@/Components";
 import ProfileAvatarPicker from "@/Components/ProfileAvatar";
 import { ImagePickerModal } from "@/Modals";
@@ -10,7 +10,7 @@ import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
 import {
   GetAllSchools,
   GetSchoolByFilters,
-  UpdateSchool,
+  UpdateSchool
 } from "@/Services/School";
 import { UpdateStudent } from "@/Services/Student";
 import { loadUserId } from "@/Storage/MainAppStorage";
@@ -29,7 +29,7 @@ import {
   Icon,
   Input,
   Modal,
-  Text,
+  Text
 } from "@ui-kitten/components";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
