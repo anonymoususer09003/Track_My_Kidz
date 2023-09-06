@@ -145,7 +145,13 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   const styles = useStyleSheet(themedStyles);
   const { emailAddress, user_type, details } = route.params;
   const { registrationId, activation_code } = route.params;
-const {country,state,city,zipcode,selected_entity} = details
+
+const country = details?.country
+const state = details?.state
+const city = details?.city
+const zipcode = details?.zipcode
+const selected_entity = details?.selected_entity
+
   console.log('country',country)
 console.log('details',details)
   const [visible, setVisible] = React.useState(false);
@@ -953,6 +959,7 @@ console.log('details',details)
                     }
                   })
                   .catch((error) => {
+                    console.log('error SignUP',error)
                     dispatch(ChangeModalState.action({ loading: false }));
                     Toast.show({
                       type: "info",

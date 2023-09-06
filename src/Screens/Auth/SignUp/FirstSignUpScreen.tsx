@@ -1,47 +1,36 @@
-import React, { useState, useEffect } from "react";
+import { StartRegistration } from "@//Services/SignUpServices";
+import { LinearGradientButton } from "@/Components";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import CustomDropdown from "@/Components/CustomDropDown";
 import {
-  Image,
-  KeyboardAvoidingView,
-  View,
-  Linking,
-  Dimensions,
-  ImageBackground,
-} from "react-native";
+  GetAuthStudentByActivationCode
+} from "@/Services/Student";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import Colors from "@/Theme/Colors";
+import { ReferenceCodeRegex, ReferenceCodeStyle } from "@/Theme/Variables";
+import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
+import { useIsFocused } from "@react-navigation/native";
 import {
-  Button,
-  Icon,
-  Input,
+  Button, CheckBox, Input,
   Layout,
   StyleService,
   Text,
-  useStyleSheet,
-  Select,
-  SelectItem,
-  CheckBox,
+  useStyleSheet
 } from "@ui-kitten/components";
 import { Formik } from "formik";
-import { useIsFocused } from "@react-navigation/native";
-import * as yup from "yup";
-import { StartRegistration } from "@//Services/SignUpServices";
-import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
-import { useDispatch } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Toast from "react-native-toast-message";
-import { LinearGradientButton } from "@/Components";
-import FastImage from "react-native-fast-image";
-import Entypo from "react-native-vector-icons/Entypo";
-import Colors from "@/Theme/Colors";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import QRCodeScanner from "react-native-qrcode-scanner";
-import CustomDropdown from "@/Components/CustomDropDown";
-import { RNCamera } from "react-native-camera";
+import React, { useEffect, useState } from "react";
 import {
-  GetAuthStudentByActivationCode,
-  GetStudentByActivationCode,
-} from "@/Services/Student";
+  Dimensions, Image,
+  KeyboardAvoidingView,
+  View
+} from "react-native";
+import { RNCamera } from "react-native-camera";
 import MaskInput from "react-native-mask-input";
-import { ReferenceCodeRegex, ReferenceCodeStyle } from "@/Theme/Variables";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import QRCodeScanner from "react-native-qrcode-scanner";
+import Toast from "react-native-toast-message";
+import Entypo from "react-native-vector-icons/Entypo";
+import { useDispatch } from "react-redux";
+import * as yup from "yup";
 
 const user_type = [
   { id: 1, label: "Parent", value: "Parent" },
