@@ -196,7 +196,7 @@ const AppHeader = ({ showGlobe, ...props }) => {
       )}
       {/* {!hideCalendar && ( */}
         <TopNavigationAction
-          icon={renderListItem}
+          icon={user_type === "parent"?renderListItem:undefined}
           style={{ marginLeft: 10 }}
           onPress={()=> props?.setThumbnail && props?.setThumbnail(true)}
         />
