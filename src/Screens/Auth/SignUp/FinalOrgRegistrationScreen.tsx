@@ -41,16 +41,13 @@ import React, {
   useState
 } from "react";
 import {
-  Alert,
   KeyboardAvoidingView, Linking, Platform,
-  ScrollView, TouchableOpacity, TouchableWithoutFeedback,
+  ScrollView, TouchableWithoutFeedback,
   View
 } from "react-native";
 import { getDeviceId } from "react-native-device-info";
 import ImagePicker from "react-native-image-crop-picker";
 import Toast from "react-native-toast-message";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Feather from "react-native-vector-icons/Feather";
 import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
 
@@ -600,7 +597,13 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                 formData.append("deviceId", getDeviceId());
                 // formData.append("schoolId", schoolId || "");
                 // formData.append("orgId", orgId || "");
-
+                values.schoolId
+                  ? formData.append("schoolId", values.schoolId)
+                  : formData.append("schoolId", "");
+                values.orgId
+                  ? formData.append("orgId", values.orgId)
+                  : formData.append("orgId", "");
+                
                 console.log("formData0202002020200202", formData);
 
                 const userObject: UserRegistrationDTO = {
@@ -678,7 +681,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
 
                 Register(registerObject, "instructor")
                   .then(async (response) => {
-                    console.log("response---", response.data);
+                    console.log("response1111111", response.data);
                     await storeToken(response.data.token);
                     console.log("schoolId", schoolId);
                     if (
@@ -687,7 +690,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     ) {
                       CompleteRegistration(schoolObject, "school")
                         .then((_res) => {
-                          console.log("kskksks", {
+                          console.log("response1.1", {
                             ...userObject,
                             schoolId: _res?.data?.schoolId,
                           });
@@ -701,7 +704,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           // }
                           CompleteRegistration(formData, "instructor")
                             .then(async (response: any) => {
-                              console.log("response2727878", response);
+                              console.log("response1.3", response);
                               let obj = {
                                 token: response.data.token,
                                 userType: "instructor",
@@ -737,7 +740,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                               }
                             })
                             .catch((error: any) => {
-                              console.log("error third", error);
+                              console.log("error1111", error);
                               Toast.show({
                                 type: "info",
                                 position: "top",
@@ -759,7 +762,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                             });
                         })
                         .catch((err) => {
-                          console.log("err first", err);
+                          console.log("err1111", err);
                         });
                     } else if (
                       values.selected_entity == "School" &&
@@ -769,7 +772,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
 
                       CompleteRegistration(formData, "instructor")
                         .then(async (res: any) => {
-                          console.log("response2727878", res);
+                          console.log("response2", res);
                           let obj = {
                             token: res.data.token,
                             userType: "instructor",
@@ -798,7 +801,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           }
                         })
                         .catch((error: any) => {
-                          console.log("error third", error);
+                          console.log("error2", error);
                           Toast.show({
                             type: "info",
                             position: "top",
@@ -823,6 +826,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                             ...userObject,
                             orgId: _res.data.orgId,
                           });
+                          console.log('response3')
                           formData.append("orgId", _res.data.orgId);
                           formData.append("schoolId", null);
                           // {
@@ -856,8 +860,10 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                                 "_instructors",
                                 response.data.instructorId
                               );
+                              console.log('response4', response.status)
 
                               if (response.status == 201) {
+                                console.log("response4.1")
                                 register(emailAddress, values.password);
                                 // dispatch(
                                 //   ChangeModalState.action({
@@ -867,7 +873,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                               }
                             })
                             .catch((error: any) => {
-                              console.log("error third", error);
+                              console.log("error333", error);
                               Toast.show({
                                 type: "info",
                                 position: "top",
@@ -889,14 +895,15 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                             });
                         })
                         .catch((err) => {
-                          console.log("err first", err);
+                          console.log("err444", err);
                         });
                     } else if (values.selected_entity != "School" && orgId) {
                       formData.append("schoolId", null);
                       formData.append("orgId", orgId);
+                      console.log('response5', formData)
                       CompleteRegistration(formData, "instructor")
                         .then(async (res: any) => {
-                          console.log("response2727878", res);
+                          console.log("response5.1", res);
                           let obj = {
                             token: res.data.token,
                             userType: "instructor",
@@ -989,7 +996,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                       style={styles.inputSettings}
                       placeholder="Select Entity*"
                       value={values.selected_entity}
-                      // label={(evaProps: any) => <Text {...evaProps}>Entity</Text>}
+                      //label={(evaProps: any) => <Text {...evaProps}>Entity</Text>}
                       onSelect={(index: any) => {
                         resetForm();
                         setFieldValue(
@@ -1344,7 +1351,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                         )}
                       </>
                     )}
-                    <View
+                    {/* <View
                       style={{
                         marginVertical: 10,
                         flexDirection: "row",
@@ -1536,7 +1543,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                             </View>
                           ))}
                       </ScrollView>
-                    )}
+                    )} */}
                     <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"

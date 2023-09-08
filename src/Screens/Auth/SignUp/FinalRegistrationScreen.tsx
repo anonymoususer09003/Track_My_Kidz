@@ -99,6 +99,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
   const countries = useSelector(
     (state: { places: PlaceState }) => state.places.countries
   );
+  
   const [countriesData, setCountriesData] = React.useState(countries);
   const [schoolsData, setSchoolsData] = React.useState([]);
   const [schools, setSchools] = useState([]);
@@ -120,11 +121,15 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
   const [cities, setCities] = useState<Array<any>>([]);
   const [phoneCode, setPhoneCode] = useState<string>("");
   const [placement, setPlacement] = React.useState("bottom");
+  const [phoneCodeNumber, setPhoneCodeNumber] = useState<string>("");
 
   const { register } = useContext(AuthContext);
 
   const styles = useStyleSheet(themedStyles);
-  const { emailAddress, user_type, student, activation_code } = route.params;
+  const { emailAddress, user_type, student, activation_code } = route.params; //correct here
+
+  console.log('student', student)
+  
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
     ""
   );
@@ -205,6 +210,11 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
     setConfirmPasswordVisible(!confirmPasswordVisible);
   };
 
+
+
+  
+
+
   const renderPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onPasswordIconPress}>
       <Icon
@@ -224,6 +234,24 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
       />
     </TouchableWithoutFeedback>
   );
+
+
+  
+
+  const studentCountryName = student?.parents[0].country; 
+  const codeNumber = countries?.find(item => item.name === studentCountryName);
+  
+  useEffect(() => {
+    if (codeNumber) {
+      const formattedPhoneCode = codeNumber.phone_code.toString().startsWith("+")
+        ? codeNumber.phone_code.toString()
+        : "+" + codeNumber.phone_code;
+      setPhoneCodeNumber(formattedPhoneCode);
+    } else {
+      setPhoneCodeNumber(''); 
+    }
+  }, [codeNumber]);
+  
 
   const CheckboxLabel = (evaProps: any) => {
     return (
@@ -420,37 +448,86 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
       )}
 
       {_user_type?.id == 3 && (
+        // <View style={{ width: "100%" }}>
+        //   {student?.studentPhoto && (
+        //     <ProfileAvatarPicker
+        //       style={styles.profileImage}
+        //       // resizeMode='center'
+        //       source={{
+        //         uri: student?.studentPhotoe + "?time" + new Date().getTime(),
+        //         headers: { Pragma: "no-cache" },
+        //       }}
+        //       editButton={false ? renderEditAvatarButton : null}
+        //     />
+        //   )}
+        //   {!student?.studentPhoto && (
+        //     <View
+        //       style={[
+        //         styles.profileImage,
+        //         {
+        //           alignItems: "center",
+        //           justifyContent: "center",
+        //           backgroundColor: Colors.lightgray,
+        //         },
+        //       ]}
+        //     >
+        //       <Text style={{ fontSize: 30 }}>
+        //         {student?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
+        //         {student?.lastname?.substring(0, 1)?.toUpperCase()}
+        //       </Text>
+        //       {true && renderEditButtonElement()}
+        //     </View>
+        //   )}
+        // </View>
+
+
+
         <View style={{ width: "100%" }}>
-          {student?.studentPhoto && (
+          {selectedImage != "" && (
             <ProfileAvatarPicker
               style={styles.profileImage}
               // resizeMode='center'
-              source={{
-                uri: student?.studentPhotoe + "?time" + new Date().getTime(),
-                headers: { Pragma: "no-cache" },
-              }}
-              editButton={false ? renderEditAvatarButton : null}
+              source={
+                Platform.OS == "android"
+                  ? {
+                      uri: selectedImage + "?time" + new Date().getTime(),
+                      headers: { Pragma: "no-cache" },
+                    }
+                  : { uri: selectedImage }
+              }
+              editButton={true ? renderEditAvatarButton : null}
             />
           )}
-          {!student?.studentPhoto && (
+          {selectedImage == "" && (
             <View
               style={[
                 styles.profileImage,
                 {
-                  alignItems: "center",
-                  justifyContent: "center",
+                  // alignItems: "center",
+                  // justifyContent: "center",
                   backgroundColor: Colors.lightgray,
                 },
               ]}
             >
-              <Text style={{ fontSize: 30 }}>
-                {student?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
-                {student?.lastname?.substring(0, 1)?.toUpperCase()}
-              </Text>
-              {/* {true && renderEditButtonElement()} */}
+              {/* <Text style={{ fontSize: 30 }}>
+                      {user?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
+                      {user?.lastname?.substring(0, 1)?.toUpperCase()}
+                    </Text> */}
+              <View
+                style={{
+                  position: "absolute",
+                  marginTop: 70,
+                  marginLeft: 75,
+                }}
+              >
+                {true && renderEditButtonElement()}
+              </View>
             </View>
           )}
         </View>
+
+
+
       )}
 
       <KeyboardAvoidingView
@@ -912,6 +989,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                 values.orgId
                   ? formData.append("orgId", values.orgId)
                   : formData.append("orgId", "");
+                 
 
                 const userObject: UserRegistrationDTO = {
                   firstname: values.firstName,
@@ -949,7 +1027,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                     console.log("userobject", JSON.stringify(formData));
                     CompleteRegistration(formData, "instructor")
                       .then(async (response: any) => {
-                        console.log("response", response);
+                        console.log("responsefromback", response);
                         await Login(loginObject, user_type.toLowerCase());
                         dispatch(
                           LoginStore.action({
@@ -1374,9 +1452,11 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                 confirmPassword: "",
                 termsAccepted: false,
                 phoneNumber: student ? student.phone : "",
+                // countryCode: student ? phoneCodeNumber:"",
                 parentId:
                   student && student.parentIds ? student.parentIds[0] : 0,
               }}
+              
               onSubmit={(values, { resetForm }) => {
                 dispatch(ChangeModalState.action({ loading: true }));
                 const registerObject: RegisterDTO = {
@@ -1389,6 +1469,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   password: values.password,
                 };
                 console.log("response", registerObject);
+
                 // const userObject: UserRegistrationDTO = {
                 //   firstname: values.firstName,
                 //   lastname: values.lastName,
@@ -1451,6 +1532,14 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               }) => (
                 <>
                   <Layout style={styles.formContainer} level="1">
+                       <Input
+                      textStyle={{ color: Colors.gray }}
+                      style={styles.inputSettings}
+                      autoCapitalize="none"
+                      accessoryRight={PersonIcon}
+                      value={"Email: " + (student?.email || "")}
+                      disabled={true}
+                    />
                     <Input
                       textStyle={{ color: Colors.gray }}
                       style={styles.inputSettings}
@@ -1543,14 +1632,6 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                     {errors.parentName2 && touched.parentName2 && (
                       <Text style={styles.errorText}>{errors.parentName2}</Text>
                     )}
-                    <Input
-                      textStyle={{ color: Colors.gray }}
-                      style={styles.inputSettings}
-                      autoCapitalize="none"
-                      accessoryRight={PersonIcon}
-                      value={"Email: " + (student?.email || "")}
-                      disabled={true}
-                    />
                     <View style={styles.phoneNumber}>
                       <Input
                         textStyle={{ color: Colors.gray }}
@@ -1559,7 +1640,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         disabled={true}
                         placeholderTextColor={Colors.gray}
                         selectTextOnFocus={false}
-                        value={phoneCode?.toString()}
+                        value={phoneCodeNumber.toString()}
                         placeholder="Prefix"
                       />
                       <Input
