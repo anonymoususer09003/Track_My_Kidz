@@ -1,62 +1,61 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Image, Share } from "react-native";
-import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { ProfileAvatar } from "@/Components/SignUp/profile-avatar.component";
-import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
-import { useDispatch, useSelector } from "react-redux";
 import { navigateAndSimpleReset } from "@/Navigators/Functions";
 import LogoutStore from "@/Store/Authentication/LogoutStore";
-import { Avatar, Text } from "@ui-kitten/components";
 import { UserState } from "@/Store/User";
-import Toast from "react-native-toast-message";
-import { NotificationsState } from "@/Store/Notifications";
 import Colors from "@/Theme/Colors";
+import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
+import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
+import { Text } from "@ui-kitten/components";
+import React, { useState } from "react";
+import { Image, Share, StyleSheet, View } from "react-native";
+import Toast from "react-native-toast-message";
+import { useDispatch, useSelector } from "react-redux";
 
 const RightDrawerContent = (props: any) => {
   const userData = useSelector((state: { user: UserState }) => state.user.item);
 
   const dispatch = useDispatch();
   const [rightDrawerOptions, setrightDrawerOptions] = useState<Array<any>>([
-    {
-      label: "My Profile",
-      url: "/layout/userprofile",
-      imageIcon: require("@/Assets/Images/DrawerIcons/YourProfile.png"),
-      route: "MyProfile",
-    },
-    {
-      label: "Chat",
-      url: "/layout/userprofile",
-      imageIcon: require("@/Assets/Images/DrawerIcons/chat-icon.png"),
-      route: "Chats",
-    },
-    {
-      label: "Notifications",
-      url: "/layout/userprofile",
-      imageIcon: require("@/Assets/Images/DrawerIcons/notifications-icon.png"),
-      route: "Notifications",
-    },
-    {
-      label: "Invite Friends",
-      url: "/layout/userprofile",
-      imageIcon: require("@/Assets/Images/DrawerIcons/InviteFriends.png"),
-    },
-    {
-      label: "Contact Us",
-      url: "/layout/userprofile",
-      imageIcon: require("@/Assets/Images/DrawerIcons/contact-icon.png"),
-      route: "ContactUs",
-    },
-    {
-      label: "Settings",
-      url: "/layout/userprofile",
-      imageIcon: require("@/Assets/Images/DrawerIcons/settings-icon.png"),
-      route: "Settings",
-    },
-    {
-      label: "Logout",
-      url: "/layout/userprofile",
-      imageIcon: require("@/Assets/Images/DrawerIcons/logout.png"),
-    },
+    // {
+    //   label: "My Profile",
+    //   url: "/layout/userprofile",
+    //   imageIcon: require("@/Assets/Images/DrawerIcons/YourProfile.png"),
+    //   route: "MyProfile",
+    // },
+    // {
+    //   label: "Chat",
+    //   url: "/layout/userprofile",
+    //   imageIcon: require("@/Assets/Images/DrawerIcons/chat-icon.png"),
+    //   route: "Chats",
+    // },
+    // {
+    //   label: "Notifications",
+    //   url: "/layout/userprofile",
+    //   imageIcon: require("@/Assets/Images/DrawerIcons/notifications-icon.png"),
+    //   route: "Notifications",
+    // },
+    // {
+    //   label: "Invite Friends",
+    //   url: "/layout/userprofile",
+    //   imageIcon: require("@/Assets/Images/DrawerIcons/InviteFriends.png"),
+    // },
+    // {
+    //   label: "Contact Us",
+    //   url: "/layout/userprofile",
+    //   imageIcon: require("@/Assets/Images/DrawerIcons/contact-icon.png"),
+    //   route: "ContactUs",
+    // },
+    // {
+    //   label: "Settings",
+    //   url: "/layout/userprofile",
+    //   imageIcon: require("@/Assets/Images/DrawerIcons/settings-icon.png"),
+    //   route: "Settings",
+    // },
+    // {
+    //   label: "Logout",
+    //   url: "/layout/userprofile",
+    //   imageIcon: require("@/Assets/Images/DrawerIcons/logout.png"),
+    // },
   ]);
 
   const onShare = async () => {

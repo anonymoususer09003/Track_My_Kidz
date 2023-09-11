@@ -1,39 +1,24 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Switch,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
 import { useTheme } from "@/Theme";
 import {
-  Icon,
-  Select,
-  SelectItem,
-  IndexPath,
-  Modal,
-  Card,
-  Spinner,
+  Card, Icon, Modal, Spinner
 } from "@ui-kitten/components";
-import Share from "react-native-share";
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet, Text, TouchableOpacity, View
+} from "react-native";
 import BackgroundService from "react-native-background-actions";
+import Share from "react-native-share";
 // @ts-ignore
-import { useSelector, useDispatch } from "react-redux";
-import { UserState } from "@/Store/User";
-import ChangeUserState from "@/Store/UserType/ChangeUserTypeState";
-import { StripeModal, FlagBlogModal, DonationModal } from "@/Modals";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import ChangeLoginState from "@/Store/Authentication/ChangeLoginState";
-import Toast from "react-native-toast-message";
-import DeactivateTwoFAService from "@/Services/TwoFAServices/DeactivateTwoFAService";
-import ReactivateTwoFA from "@/Services/TwoFAServices/ReactivateTwoFA";
-import Colors from "@/Theme/Colors";
 import { AppHeader, LinearGradientButton } from "@/Components";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 import { TwoFactorAuthenticationModal, VerifyYourselfModal } from "@/Modals";
 import LogoutStore from "@/Store/Authentication/LogoutStore";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { UserState } from "@/Store/User";
+import ChangeUserState from "@/Store/UserType/ChangeUserTypeState";
+import Colors from "@/Theme/Colors";
+import Toast from "react-native-toast-message";
+import { useDispatch, useSelector } from "react-redux";
 
 const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
   const dispatch = useDispatch();
@@ -287,7 +272,7 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
             />
           </TouchableOpacity>
           <View style={styles.buttonsContainer}>
-            <View style={{ marginVertical: 15 }}>
+            <View style={{ marginVertical: 5 }}>
               <LinearGradientButton
                 onPress={async () => {
                   dispatch(
@@ -301,11 +286,11 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
               >
                 Log Out
               </LinearGradientButton>
-            </View>
-            <View style={{ marginVertical: 15 }}>
+            <View style={{ marginVertical: 5 }}>
               <Text style={[styles.button, { color: Colors.primary }]}>
                 Account can only be deleted by your parent/guardian
               </Text>
+            </View>
             </View>
           </View>
         </View>
@@ -381,6 +366,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     justifyContent: "flex-end",
+    marginBottom:50
   },
   backgroundOutline: {
     backgroundColor: Colors.transparent,

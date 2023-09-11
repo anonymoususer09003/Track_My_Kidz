@@ -1,35 +1,24 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { Text, Icon, Select, SelectItem } from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
-import { AppHeader } from "@/Components";
-import messaging from "@react-native-firebase/messaging";
-import { UpdateDeviceToken } from "@/Services/User";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeSearchString from "@/Store/Blogs/ChangeSearchString";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { navigateAndSimpleReset } from "@/Navigators/Functions";
-import { WelcomeMessageModal, EditDependentModal } from "@/Modals";
+import { AppHeader, Calendar } from "@/Components";
 import SearchBar from "@/Components/SearchBar/SearchBar";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Entypo from "react-native-vector-icons/Entypo";
-import { LinearGradientButton } from "@/Components";
-import MapView from "react-native-maps";
-import { ModalState } from "@/Store/Modal";
-import moment from "moment";
-import { Calendar } from "@/Components";
-import { UserState } from "@/Store/User";
+import { EditDependentModal, WelcomeMessageModal } from "@/Modals";
 import { GetAllStudents } from "@/Services/Parent";
-import { loadUserId } from "@/Storage/MainAppStorage";
 import FetchOne from "@/Services/User/FetchOne";
+import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { UserState } from "@/Store/User";
+import Colors from "@/Theme/Colors";
+import { useNavigation } from "@react-navigation/native";
+import { Icon, Text } from "@ui-kitten/components";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  FlatList, StyleSheet, TouchableOpacity, View
+} from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import MapView from "react-native-maps";
+import Entypo from "react-native-vector-icons/Entypo";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { useDispatch, useSelector } from "react-redux";
 
 const _children = [
   {

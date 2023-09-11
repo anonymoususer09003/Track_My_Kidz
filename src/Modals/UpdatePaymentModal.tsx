@@ -1,27 +1,18 @@
+import { LinearGradientButton } from "@/Components";
+import { UserState } from "@/Store/User";
+import { useTheme } from "@/Theme";
+import Colors from "@/Theme/Colors";
+import {
+  CardField, createToken
+} from "@stripe/stripe-react-native";
 import {
   Card,
   IndexPath,
-  Modal,
-  Radio,
-  RadioGroup,
-  Text,
+  Modal, Text
 } from "@ui-kitten/components";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import { useTheme } from "@/Theme";
-import { LinearGradientButton } from "@/Components";
-import ChangeSelectedState from "@/Store/Selected/ChangeSelectedState";
-import { DeclineToGift } from "@/Services/GiftService";
-import Colors from "@/Theme/Colors";
-import {
-  CardField,
-  useConfirmPayment,
-  createToken,
-} from "@stripe/stripe-react-native";
+import { useDispatch, useSelector } from "react-redux";
 
 const ParentPaymentModal = ({ onPay, onCancel, isVisible }) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);

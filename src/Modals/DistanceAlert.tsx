@@ -1,43 +1,28 @@
+import { LinearGradientButton } from "@/Components";
+import { CountryDTO } from "@/Models/CountryDTOs";
+import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
 import {
-  Card,
-  Modal,
-  Input,
-  Text,
-  Select,
-  SelectItem,
-  Autocomplete,
-  AutocompleteItem,
-  Toggle,
-  Radio,
-  RadioGroup,
-  CheckBox,
-} from "@ui-kitten/components";
-import Geocoder from "react-native-geocoding";
-import * as yup from "yup";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { useDispatch, useSelector } from "react-redux";
+  GetAllSchools
+} from "@/Services/School";
 import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { PlaceState } from "@/Store/Places";
+import { UserState } from "@/Store/User";
+import Colors from "@/Theme/Colors";
+import { useIsFocused } from "@react-navigation/native";
+import {
+  Autocomplete,
+  AutocompleteItem, Card, CheckBox, Input, Modal, Radio,
+  RadioGroup, Text
+} from "@ui-kitten/components";
+import axios from "axios";
+import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { LinearGradientButton } from "@/Components";
-import { UpdateStudent } from "@/Services/Student";
-import Colors from "@/Theme/Colors";
-import {
-  GetAllSchools,
-  GetSchoolByFilters,
-  UpdateSchool,
-} from "@/Services/School";
-import { Formik } from "formik";
+import Geocoder from "react-native-geocoding";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import { PlaceState } from "@/Store/Places";
-import { CountryDTO } from "@/Models/CountryDTOs";
-import { useIsFocused } from "@react-navigation/native";
-import { UserState } from "@/Store/User";
-import { PermissionsAndroid, Platform } from "react-native";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import * as yup from "yup";
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };

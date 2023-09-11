@@ -1,17 +1,14 @@
-import React from "react";
 import {
-  EmailConfirmationScreen,
-  FinalRegistrationScreen,
+  EmailConfirmationScreen, FinalOrgRegistrationScreen, FinalRegistrationScreen,
   FirstSignUpScreen,
   ForgotPasswordScreen,
   ReactivateAccountScreen,
   ResendConfirmationScreen,
   ResetPasswordScreen,
-  SignInScreen,
-  FinalOrgRegistrationScreen,
+  SignInScreen
 } from "@/Screens";
 import { createStackNavigator } from "@react-navigation/stack";
-import { AuthStackHeader } from "@/Components";
+import React from "react";
 import { AuthProvider } from "./AuthProvider";
 
 const AuthNavigator = createStackNavigator();

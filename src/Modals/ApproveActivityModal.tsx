@@ -1,27 +1,15 @@
-import { Card, Modal, CheckBox, Text } from "@ui-kitten/components";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
-import React, { useState, useEffect } from "react";
-import { StyleSheet, View, ScrollView, Alert } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { LinearGradientButton } from "@/Components";
-import Colors from "@/Theme/Colors";
-import UpdateActivityStatus from "@/Services/Activity/UpdateActivityStatus";
-import { UpdateActivityByStatus } from "@/Services/Activity";
-import { UpdateGroupByStatus } from "@/Services/Group";
 import { useStateValue } from "@/Context/state/State";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import {
-  GetAllActivity,
-  GetActivitiesByInsructorId,
-  InstructorUpdateStatus,
-  GetOptIn,
-} from "@/Services/Activity";
-import {
-  GetGroupByInstructorId,
-  UpdateInstructorGroupStatus,
-  GetOptInGroup,
-} from "@/Services/Group";
+import { GetOptIn, InstructorUpdateStatus, UpdateActivityByStatus } from "@/Services/Activity";
+import { GetOptInGroup, UpdateGroupByStatus, UpdateInstructorGroupStatus } from "@/Services/Group";
+import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import Colors from "@/Theme/Colors";
+import { useIsFocused } from "@react-navigation/native";
+import { Card, CheckBox, Modal, Text } from "@ui-kitten/components";
+import React, { useEffect, useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 const ApproveActivityModal = ({
   selectedChild,
   setSelectedChild,
@@ -216,7 +204,7 @@ const ApproveActivityModal = ({
                     fontSize: 18,
                   }}
                 >
-                  You have opted to approved
+                  You have opted to approve
                 </Text>
               </View>
             </View>

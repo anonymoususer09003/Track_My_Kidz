@@ -1,64 +1,36 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Text, Icon, Select, SelectItem } from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Dimensions,
-} from "react-native";
-import * as Stomp from "stompjs";
-import SockJS from "sockjs-client";
-import firestore from "@react-native-firebase/firestore";
-import Fontisto from "react-native-vector-icons/Fontisto";
 import { loadToken } from "@/Storage/MainAppStorage";
-// import { LinearGradientButton } from "@/Components/LinearGradientButton/LinearGradientButton";
-import { AppHeader } from "@/Components";
-import TrackHistory from "@/Services/Parent/TrackHistory";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { AwsLocationTracker } from "@/Services/TrackController";
-import messaging from "@react-native-firebase/messaging";
-import { UpdateDeviceToken } from "@/Services/User";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeSearchString from "@/Store/Blogs/ChangeSearchString";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { navigateAndSimpleReset } from "@/Navigators/Functions";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Icon, Select, SelectItem, Text } from "@ui-kitten/components";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  WelcomeMessageModal,
-  EditDependentModal,
-  AddStudentModal,
-  ParentPaymentModal,
-} from "@/Modals";
-import FA5 from "react-native-vector-icons/FontAwesome5";
+  Dimensions, FlatList,
+  Image, StyleSheet, TouchableOpacity, View
+} from "react-native";
+import SockJS from "sockjs-client";
+import * as Stomp from "stompjs";
+// import { LinearGradientButton } from "@/Components/LinearGradientButton/LinearGradientButton";
+import { AppHeader, Calendar, LinearGradientButton } from "@/Components";
 import SearchBar from "@/Components/SearchBar/SearchBar";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import MaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import Entypo from "react-native-vector-icons/Entypo";
-import { LinearGradientButton } from "@/Components";
-import MapView, { Marker, Circle } from "react-native-maps";
-import { ModalState } from "@/Store/Modal";
-import moment from "moment";
-import { Calendar } from "@/Components";
-import { UserState } from "@/Store/User";
-import { GetAllStudents, GetParent } from "@/Services/Parent";
-import { loadIsSubscribed, loadUserId, loadId } from "@/Storage/MainAppStorage";
-import FetchOne from "@/Services/User/FetchOne";
-import { GetAllActivity, GetChildrenAcitivities } from "@/Services/Activity";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { useStateValue } from "@/Context/state/State";
 import { actions } from "@/Context/state/Reducer";
-import { color } from "react-native-reanimated";
-import LogoutStore from "@/Store/Authentication/LogoutStore";
-import Geolocation from "@react-native-community/geolocation";
+import { useStateValue } from "@/Context/state/State";
+import {
+  AddStudentModal, EditDependentModal, ParentPaymentModal
+} from "@/Modals";
+import { GetParent } from "@/Services/Parent";
 import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
-import { iteratorSymbol } from "immer/dist/internal";
+import FetchOne from "@/Services/User/FetchOne";
+import { loadIsSubscribed, loadUserId } from "@/Storage/MainAppStorage";
+import LogoutStore from "@/Store/Authentication/LogoutStore";
+import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { UserState } from "@/Store/User";
+import Colors from "@/Theme/Colors";
+import Geolocation from "@react-native-community/geolocation";
+import moment from "moment";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import MapView, { Circle, Marker } from "react-native-maps";
+import MaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
+import { useDispatch, useSelector } from "react-redux";
 const window = Dimensions.get("window");
 const { width, height } = window;
 const HomeScreen = () => {
@@ -428,7 +400,7 @@ const HomeScreen = () => {
 
   return (
     <>
-      <WelcomeMessageModal />
+      {/* <WelcomeMessageModal /> */}
       <AddStudentModal />
       {!!selectedDependent && (
         <EditDependentModal

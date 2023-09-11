@@ -1,31 +1,27 @@
-import React, { useEffect, useCallback } from "react";
-import {
-  Icon,
-  TopNavigation,
-  TopNavigationAction,
-  Text,
-  Popover,
-  Layout,
-  Avatar,
-} from "@ui-kitten/components";
-import { StyleSheet, TouchableOpacity, View, Image, Alert } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
-import { useDispatch, useSelector } from "react-redux";
-import { NavigationCustomState } from "@/Store/Navigation";
+import { navigateAndSimpleReset } from "@/Navigators/Functions";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { NavigationCustomState } from "@/Store/Navigation";
 import ChangeStudentActivityState from "@/Store/StudentActivity/ChangeStudentActivityState";
+import Colors from "@/Theme/Colors";
 import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
 import { useNavigation } from "@react-navigation/native";
-import { navigateAndSimpleReset } from "@/Navigators/Functions";
+import {
+  Text, TopNavigation,
+  TopNavigationAction
+} from "@ui-kitten/components";
+import React from "react";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
-import Colors from "@/Theme/Colors";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { useDispatch, useSelector } from "react-redux";
 
-import { UserTypeState } from "@/Store/UserType";
 import { ModalState } from "@/Store/Modal";
+import { UserTypeState } from "@/Store/UserType";
 
 import { StudentState } from "@/Store/StudentActivity";
 const homeIcon = require("@/Assets/Images/navigation_icon1.png");
 const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
+
 const activitiesIcon = require("@/Assets/Images/navigation_icon3.png");
 const settings = require("@/Assets/Images/navigation_icon4.png");
 const addIcon = require("@/Assets/Images/add.png");
@@ -109,12 +105,8 @@ const AppHeader = ({ showGlobe, ...props }) => {
     <Image style={{ height: 27, width: 27 }} source={homeIcon} />
   );
   //@ts-ignore
-  const renderCalendarIcon = (props) => (
-    <Image
-      style={{ height: 27, width: 27 }}
-      source={calendarIcon}
-      fill={Colors.white}
-    />
+  const renderListItem = (props) => (
+    <Icon name="list" size={25} color="white" /> 
   );
 
   const isStack = props && props.isStack;
@@ -189,7 +181,7 @@ const AppHeader = ({ showGlobe, ...props }) => {
                 })
               );
             } else {
-              nav.navigate("Home");
+              // nav.navigate("Home");
               if (props?.thumbnail) {
                 dispatch(
                   ChangeModalState.action({
@@ -202,13 +194,13 @@ const AppHeader = ({ showGlobe, ...props }) => {
           }}
         />
       )}
-      {!hideCalendar && (
+      {/* {!hideCalendar && ( */}
         <TopNavigationAction
-          icon={renderCalendarIcon}
+          icon={user_type === "parent"?renderListItem:undefined}
           style={{ marginLeft: 10 }}
-          onPress={CalendarModalTrigger}
+          onPress={()=> props?.setThumbnail && props?.setThumbnail(true)}
         />
-      )}
+      {/* )} */}
     </View>
   );
   const RightDrawerMenu = () => {
