@@ -1411,7 +1411,7 @@ console.log('details',details)
                           )
                         }
                       /> */}
-                    </View>
+                    {/* </View> */}
                     {instructors && instructors.length > 0 && (
                       <ScrollView
                         style={{
