@@ -1,4 +1,4 @@
-import { ThemeImages, ThemeVariables } from '@/Theme/theme.type'
+import { ThemeImages, ThemeVariables } from '@/Theme/theme.type';
 
 /**
  *

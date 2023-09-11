@@ -748,7 +748,7 @@ const AddStudentModal = () => {
                         >
                           <View style={{ height: 20 }} />
                           <LinearGradientButton
-                            disabled={isValid ? false : true}
+                            disabled={isValid && values.phoneNumber ? false : true}
                             onPress={() => {
                               if (selectedImage != "") {
                                 setFieldValue("addMore", false);
@@ -761,7 +761,7 @@ const AddStudentModal = () => {
                           {console.log("err", isValid)}
                           <View style={{ height: 20 }} />
                           <LinearGradientButton
-                            disabled={isValid ? false : true}
+                            disabled={isValid && values.phoneNumber? false : true}
                             onPress={() => {
                               if (selectedImage != "") {
                                 setFieldValue("addMore", true);

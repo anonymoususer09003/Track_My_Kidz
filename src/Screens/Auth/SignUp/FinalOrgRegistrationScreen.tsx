@@ -441,7 +441,7 @@ console.log('details',details)
     });
   };
   return (
-    <BackgroundLayout title="Registeration">
+    <BackgroundLayout title="Registration">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -607,7 +607,13 @@ console.log('details',details)
                 formData.append("deviceId", getDeviceId());
                 // formData.append("schoolId", schoolId || "");
                 // formData.append("orgId", orgId || "");
-
+                values.schoolId
+                  ? formData.append("schoolId", values.schoolId)
+                  : formData.append("schoolId", "");
+                values.orgId
+                  ? formData.append("orgId", values.orgId)
+                  : formData.append("orgId", "");
+                
                 console.log("formData0202002020200202", formData);
 
                 const userObject: UserRegistrationDTO = {
@@ -685,7 +691,7 @@ console.log('details',details)
 
                 Register(registerObject, "instructor")
                   .then(async (response) => {
-                    console.log("response---", response.data);
+                    console.log("response1111111", response.data);
                     await storeToken(response.data.token);
                     console.log("schoolId", schoolId);
                     if (
@@ -694,7 +700,7 @@ console.log('details',details)
                     ) {
                       CompleteRegistration(schoolObject, "school")
                         .then((_res) => {
-                          console.log("kskksks", {
+                          console.log("response1.1", {
                             ...userObject,
                             schoolId: _res?.data?.schoolId,
                           });
@@ -708,7 +714,7 @@ console.log('details',details)
                           // }
                           CompleteRegistration(formData, "instructor")
                             .then(async (response: any) => {
-                              console.log("response2727878", response);
+                              console.log("response1.3", response);
                               let obj = {
                                 token: response.data.token,
                                 userType: "instructor",
@@ -744,7 +750,7 @@ console.log('details',details)
                               }
                             })
                             .catch((error: any) => {
-                              console.log("error third", error);
+                              console.log("error1111", error);
                               Toast.show({
                                 type: "info",
                                 position: "top",
@@ -766,7 +772,7 @@ console.log('details',details)
                             });
                         })
                         .catch((err) => {
-                          console.log("err first", err);
+                          console.log("err1111", err);
                         });
                     } else if (
                       values.selected_entity == "School" &&
@@ -776,7 +782,7 @@ console.log('details',details)
 
                       CompleteRegistration(formData, "instructor")
                         .then(async (res: any) => {
-                          console.log("response2727878", res);
+                          console.log("response2", res);
                           let obj = {
                             token: res.data.token,
                             userType: "instructor",
@@ -805,7 +811,7 @@ console.log('details',details)
                           }
                         })
                         .catch((error: any) => {
-                          console.log("error third", error);
+                          console.log("error2", error);
                           Toast.show({
                             type: "info",
                             position: "top",
@@ -830,6 +836,7 @@ console.log('details',details)
                             ...userObject,
                             orgId: _res.data.orgId,
                           });
+                          console.log('response3')
                           formData.append("orgId", _res.data.orgId);
                           formData.append("schoolId", null);
                           // {
@@ -863,8 +870,10 @@ console.log('details',details)
                                 "_instructors",
                                 response.data.instructorId
                               );
+                              console.log('response4', response.status)
 
                               if (response.status == 201) {
+                                console.log("response4.1")
                                 register(emailAddress, values.password);
                                 // dispatch(
                                 //   ChangeModalState.action({
@@ -874,7 +883,7 @@ console.log('details',details)
                               }
                             })
                             .catch((error: any) => {
-                              console.log("error third", error);
+                              console.log("error333", error);
                               Toast.show({
                                 type: "info",
                                 position: "top",
@@ -896,14 +905,15 @@ console.log('details',details)
                             });
                         })
                         .catch((err) => {
-                          console.log("err first", err);
+                          console.log("err444", err);
                         });
                     } else if (values.selected_entity != "School" && orgId) {
                       formData.append("schoolId", null);
                       formData.append("orgId", orgId);
+                      console.log('response5', formData)
                       CompleteRegistration(formData, "instructor")
                         .then(async (res: any) => {
-                          console.log("response2727878", res);
+                          console.log("response5.1", res);
                           let obj = {
                             token: res.data.token,
                             userType: "instructor",
@@ -997,7 +1007,7 @@ console.log('details',details)
                       style={styles.inputSettings}
                       placeholder="Select Entity*"
                       value={values.selected_entity}
-                      // label={(evaProps: any) => <Text {...evaProps}>Entity</Text>}
+                      //label={(evaProps: any) => <Text {...evaProps}>Entity</Text>}
                       onSelect={(index: any) => {
                         resetForm();
                         setFieldValue(
@@ -1352,7 +1362,7 @@ console.log('details',details)
                         )}
                       </>
                     )}
-                    <View
+                    {/* <View
                       style={{
                         // marginVertical: 10,
                         flexDirection: "row",
@@ -1544,7 +1554,7 @@ console.log('details',details)
                             </View>
                           ))}
                       </ScrollView>
-                    )}
+                    )} */}
                     <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"

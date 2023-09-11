@@ -1,31 +1,21 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Text, Icon } from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  Image,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import Entypo from "react-native-vector-icons/Entypo";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { LinearGradientButton } from "@/Components";
-import moment from "moment";
-import { InstructionsModal, DeclineActivityModal } from "@/Modals";
-import GetActivityByStatus from "@/Services/Activity/GetActivityByStatus";
-import { GetChildrenAcitivities } from "@/Services/Activity";
-import { UserState } from "@/Store/User";
-import { GetChildrenGroups } from "@/Services/Group";
+import { DeclineActivityModal, InstructionsModal } from "@/Modals";
 import ChildrenSelectionModal from "@/Modals/ChildrenSelectionModal";
+import { GetChildrenAcitivities } from "@/Services/Activity";
+import { GetChildrenGroups } from "@/Services/Group";
 import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { UserState } from "@/Store/User";
+import Colors from "@/Theme/Colors";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Icon, Text } from "@ui-kitten/components";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View
+} from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { useDispatch, useSelector } from "react-redux";
 const ParentApprovalScreen = ({ route }) => {
   const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
   const marker = require("@/Assets/Images/marker.png");
@@ -264,37 +254,158 @@ const ParentApprovalScreen = ({ route }) => {
             renderItem={({ item, index }) => {
               if (item?.activity?.activityId) {
                 let date = item?.activity?.fromDate;
+                console.log(item)
                 return (
                   <Swipeable
                     ref={(ref) => (row[item?.activity?.activityId] = ref)}
                     onSwipeableOpen={() => closeRow(item?.activity?.activityId)}
                     renderRightActions={(e) => RightActions(e, item)}
                   >
-                    <View style={[styles.item]}>
+                    {/* <View style={[styles.item]}><
+                    <TouchableOpacity
+                        onPress={() => setSelectedInstructions(item?.activity?.optin)}
+                        style={[styles.footer, { backgroundColor: "#fff" }]}
+                      >
+                        <Text style={[styles.text, { fontSize: 25 }]}>
+                          {item?.activity?.activityName}
+                        </Text>
+                        <View style={styles.horizontal}>
+                          <Image
+                            source={calendarIcon}
+                            style={styles.iconStyle}
+                          />
+                          <Text style={styles.text}>{date}</Text>
+                        </View>
+
+                        <View style={styles.horizontal}>
+                          <Image source={clockIcon} style={styles.iconStyle} />
+                          <Text style={styles.text}>{`${moment().format(
+                            "hh:mm a"
+                          )}`}</Text>
+                        </View>
+
+                        <View style={styles.horizontal}>
+                          <Image source={marker} style={styles.iconStyle} />
+                          <Text style={styles.text}>{item?.venueFromName}</Text>
+                        </View>
+
+                        <View style={styles.horizontal}>
+                          <Image source={marker} style={styles.iconStyle} />
+                          <Text style={styles.text}>
+                            {item?.venueFromAddress}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          dispatch(
+                            ChangeModalState.action({
+                              instructionsModalVisibility: true,
+                            })
+                          );
+                          setSelectedInstructions(item);
+                        }}
+                        style={[styles.footer]}
+                      >
+                        <Text
+                          style={[styles.text, { textAlign: "center" }]}
+                        >{`Instructions / Disclaimer / Agreement`}</Text>
+                      </TouchableOpacity>
+                      </View> */}
+                    
+                  <TouchableOpacity
+                        onPress={() => {
+                          // navigation.navigate('InstructorGroupApproval')
+                        }}
+                        style={[styles.item]}
+                      >
                       <Text style={[styles.text, { fontSize: 25 }]}>
                         {`${item?.activity?.activityName}`}
                       </Text>
+                      
+                      <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        
+                      }}
+                      >
+                      <Image
+                        source={require("@/Assets/Images/circle-dashed.png")}
+                        style={{
+                          height: 40,
+                          width: 15,
+                          resizeMode: "contain",
+                         marginRight: 10,
+                        }}
+                      />
+                        <View>
+                          <Text style={styles.text}>{`${moment(
+                          item?.activity?.fromDate == "string"
+                            ? new Date()
+                            : item?.activity?.fromDate
+                         ).format("MMM DD YYYY")} at ${moment(
+                          item?.activity?.fromDate == "string"
+                            ? new Date()
+                            : item?.activity?.fromDate
+                          )
+                          .subtract("hours", 5)
+                          .format("hh:mm a")} `}</Text>
+                        <Text style={styles.text}>{`${moment(
+                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
+                        ).format("MMM DD YYYY")} at ${moment(
+                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
+                        )
+                          .subtract("hours", 5)
+                          .format("hh:mm a")} `}</Text>
+                      </View>
+                    </View>
+
+                      
                       <View style={styles.horizontal}>
-                        <Image
-                          source={instructorImage}
-                          style={styles.iconStyle}
-                        />
+                          <Image source={marker} style={styles.iconStyle} />
+                          <Text style={styles.text}>{item?.activity?.venueFromName}</Text>
+                      </View>
+
+                        <View style={styles.horizontal}>
+                          <Image source={marker} style={styles.iconStyle} />
+                          <View>
+                            <Text style={styles.text}>
+                            {`${item?.activity?.venueFromAddress}, ${item?.activity?.venueFromCity}, ${item?.activity?.venueFromState} ${item?.activity?.venueFromZip}, ${item?.activity?.venueFromCountry}`}
+                            </Text>
+                          </View>
+                        </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                        onPress={() => {
+                          dispatch(
+                            ChangeModalState.action({
+                              instructionsModalVisibility: true,
+                            })
+                          );
+                          setSelectedInstructions(item);
+                        }}
+                        style={[styles.footer]}
+                      >
                         <Text
-                          style={styles.text}
-                        >{`${item?.firstName} ${item?.lastName}`}</Text>
-                      </View>
-                      <View style={styles.horizontal}>
-                        <Image source={calendarIcon} style={styles.iconStyle} />
-                        <Text style={styles.text}>{`${moment(date).format(
-                          "YYYY-MM-DD"
-                        )}`}</Text>
-                      </View>
-                      <View style={styles.horizontal}>
-                        <Image source={clockIcon} style={styles.iconStyle} />
-                        <Text style={styles.text}>{`${moment(date).format(
-                          "hh:mm A"
-                        )}`}</Text>
-                      </View>
+                          style={[styles.text, { textAlign: "center" }]}
+                        >{`Instructions / Disclaimer / Agreement`}</Text>
+                      </TouchableOpacity>
+                        {/* <TouchableOpacity
+                        onPress={() => {
+                          dispatch(
+                            ChangeModalState.action({
+                              instructionsModalVisibility: true,
+                            })
+                          );
+                          setSelectedInstructions(item);
+                        }}
+                        style={[styles.footer]}
+                      >
+                        <Text
+                          style={[styles.text, { textAlign: "center" }]}
+                        >{`Instructions / Disclaimer / Agreement`}</Text>
+                      </TouchableOpacity> */}
 
                       {/* <View style={styles.horizontal}>
                         <Image source={email} style={styles.iconStyle} />
@@ -302,7 +413,7 @@ const ParentApprovalScreen = ({ route }) => {
                         <Text
                           style={styles.text}
                         >{`${item?.parentEmail1}`}</Text>
-                      </View> */}
+                      </View> 
                     </View>
                   </Swipeable>
                 );
@@ -339,7 +450,9 @@ const ParentApprovalScreen = ({ route }) => {
                           style={styles.text}
                         >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
                       </View> */}
-                    </View>
+                      
+                    
+                   
                   </Swipeable>
                 );
               }
@@ -376,7 +489,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.newBackgroundColor,
   },
   item: {
-    borderRadius: 20,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
     width: "96%",
     backgroundColor: "#fff",
     marginTop: 10,

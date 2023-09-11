@@ -1,49 +1,33 @@
-import React, { ReactElement, ReactText, useEffect, useState } from "react";
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-  Image,
-} from "react-native";
-import { useTheme } from "@/Theme";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import {
-  Button,
-  Autocomplete,
-  AutocompleteItem,
-  Icon,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Text,
-} from "@ui-kitten/components";
 import {
   AppHeader,
-  LinearGradientButton,
-  ProfileAvatarPicker,
+  LinearGradientButton
 } from "@/Components";
-import ImagePicker from "react-native-image-crop-picker";
-import {
-  ImagePickerResponse,
-  launchImageLibrary,
-} from "react-native-image-picker";
 import { loadUserId } from "@/Storage/MainAppStorage";
-import { UpdateUser } from "../../../Services/SettingsServies";
+import { useTheme } from "@/Theme";
+import {
+  Autocomplete,
+  AutocompleteItem, Button, Icon,
+  Input, Spinner,
+  Text
+} from "@ui-kitten/components";
 import { Formik } from "formik";
+import React, { ReactText, useEffect, useState } from "react";
+import {
+  Alert, Image, ScrollView,
+  StyleSheet,
+  TouchableOpacity, View
+} from "react-native";
+import ImagePicker from "react-native-image-crop-picker";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as yup from "yup";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { UpdateUser } from "../../../Services/SettingsServies";
 // @ts-ignore
-import { useSelector, useDispatch } from "react-redux";
-import { UserState } from "@/Store/User";
-import { PlaceState } from "@/Store/Places";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import FetchOne from "@/Store/User/FetchOne";
-import Colors from "@/Theme/Colors";
 import BackgroundLayout from "@/Components/BackgroundLayout";
+import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
+import { PlaceState } from "@/Store/Places";
+import { UserState } from "@/Store/User";
+import Colors from "@/Theme/Colors";
+import { useDispatch, useSelector } from "react-redux";
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -500,7 +484,7 @@ const PersonalProfileScreen = () => {
                           <Autocomplete
                             label={(evaProps) => (
                               <Text {...evaProps} style={styles.editLabel}>
-                                Street Address
+                                State
                               </Text>
                             )}
                             accessoryLeft={renderLocationIcon}

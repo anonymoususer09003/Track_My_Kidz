@@ -1,59 +1,38 @@
-import React, { useEffect, useState, useContext } from "react";
 import {
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  View,
-  Dimensions,
-  ScrollView,
-  Alert,
-  ImageBackground,
-} from "react-native";
-import {
-  Button,
-  Icon,
-  Input,
+  Button, Input,
   Layout,
   StyleService,
   Text,
-  useStyleSheet,
-  Select,
-  SelectItem,
-  CheckBox,
-  Theme,
+  useStyleSheet
 } from "@ui-kitten/components";
 import { Formik } from "formik";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  Dimensions, Image, ImageBackground, TouchableWithoutFeedback,
+  View
+} from "react-native";
 
 import CustomDropdown from "@/Components/CustomDropDown";
-import DeviceInfo from "react-native-device-info";
-import { Spinner } from "@/Components";
-import { getDeviceId } from "react-native-device-info";
-import { useIsFocused } from "@react-navigation/native";
-import * as yup from "yup";
 import { Login } from "@/Services/LoginServices";
-import { Normalize } from "../../../Utils/Shared/NormalizeDisplay";
 import LoginStore from "@/Store/Authentication/LoginStore";
+import { useIsFocused } from "@react-navigation/native";
+import { getDeviceId } from "react-native-device-info";
+import * as yup from "yup";
+import { Normalize } from "../../../Utils/Shared/NormalizeDisplay";
 // import { useDispatch } from "react-redux";
-import Toast from "react-native-toast-message";
+import { UpdateDeviceToken } from "@/Services/User";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import messaging from "@react-native-firebase/messaging";
-import { authenticateAsync } from "expo-local-authentication";
-import { loadBiometricToken, storeToken } from "@/Storage/MainAppStorage";
-import { UpdateDeviceToken } from "@/Services/User";
+import Toast from "react-native-toast-message";
 
-import { GetAllVariables } from "@/Services/Settings";
-import { AuthContext } from "../../../Navigators/Auth/AuthProvider";
 import { LinearGradientButton } from "@/Components";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import FastImage from "react-native-fast-image";
-import Colors from "@/Theme/Colors";
-import UserType from "@/Store/UserType";
-import { useSelector, useDispatch } from "react-redux";
-import ChangeCountryState from "@/Store/Places/FetchCountries";
-import FetchCountries from "@/Store/Places/FetchCountries";
+import { ParentPaymentModal } from "@/Modals";
 import { GetAllCountries } from "@/Services/PlaceServices";
-import { EmailIcon } from "@/Components/SignUp/icons";
+import ChangeCountryState from "@/Store/Places/FetchCountries";
+import Colors from "@/Theme/Colors";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useDispatch, useSelector } from "react-redux";
+import { AuthContext } from "../../../Navigators/Auth/AuthProvider";
 
 const user_type = [
   { id: 1, label: "Parent", value: "Parent" },
@@ -66,6 +45,7 @@ const SignInScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const isFocuesed = useIsFocused();
   const [loading, setLoading] = useState(false);
+  const [loginObj, setLoginObj] = useState(null);
   // const dispatch = useDispatch();
   const countries = useSelector(
     (state: { state: any }) => state.places.countries
@@ -191,6 +171,15 @@ const SignInScreen = ({ navigation }) => {
         resizeMode='stretch'
       >
         <KeyboardAwareScrollView style={{ flex: 1 }}>
+        <ParentPaymentModal
+          onPay={() => {
+            dispatch(LoginStore.action(loginObj));
+            dispatch(ChangeModalState.action({ loading: false }));
+          }}
+          onCancel={()=>{
+            dispatch(ChangeModalState.action({ loading: false }));
+          }}
+        />
           <View style={{ flex: 1 }}>
             <View style={styles.headerContainer}>
               <Image
@@ -231,10 +220,21 @@ const SignInScreen = ({ navigation }) => {
                           res.data?.isSubscribed == false) && {
                           isSubscribed: res.data?.isSubscribed,
                         }),
+                     
                       };
-                      console.log(obj);
-                      dispatch(LoginStore.action(obj));
-                      dispatch(ChangeModalState.action({ loading: false }));
+                      setLoginObj(obj)
+                      //show the modal if not subscribed
+                      if(!res.data?.isSubscribed){
+                        dispatch(
+                          ChangeModalState.action({
+                              parentPaymentModalVisibility: true,
+                          }),
+                      )
+                      }else{
+                        console.log(obj);
+                        dispatch(LoginStore.action(obj));
+                        dispatch(ChangeModalState.action({ loading: false }));
+                      }
                       setLoading(false);
                     })
                     .catch((err) => {

@@ -48,6 +48,7 @@
     "i18next": "^20.3.2",
     "intl": "^1.2.5",
     "jwt-decode": "^3.1.2",
+    "libphonenumber-js": "^1.10.44",
     "moment": "^2.29.1",
     "multiselect-react-dropdown": "^2.0.5",
     "net": "^1.0.2",

@@ -1,38 +1,32 @@
+import { GetParent } from "@/Services/Parent";
+import { ModalState } from "@/Store/Modal";
 import {
   Card,
   IndexPath,
   Modal,
   Radio,
   RadioGroup,
-  Text,
-  Spinner,
+  Text
 } from "@ui-kitten/components";
 import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
-import { GetParent } from "@/Services/Parent";
 
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Alert } from "react-native";
+import { LinearGradientButton } from "@/Components";
+import { DeclineToGift } from "@/Services/GiftService";
+import { CreateSinglePaymentIntent } from "@/Services/Payments";
+import { UpdateUser } from "@/Services/SettingsServies";
+import { loadUserId, storeIsSubscribed } from "@/Storage/MainAppStorage";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { UserState } from "@/Store/User";
 import { useTheme } from "@/Theme";
-import { LinearGradientButton } from "@/Components";
-import ChangeSelectedState from "@/Store/Selected/ChangeSelectedState";
-import { DeclineToGift } from "@/Services/GiftService";
 import Colors from "@/Theme/Colors";
-import { CreateSinglePaymentIntent } from "@/Services/Payments";
 import {
   CardField,
   useConfirmPayment,
-  useStripe,
+  useStripe
 } from "@stripe/stripe-react-native";
-import { ActivityIndicator } from "react-native";
-import { fetchPaymentIntent } from "@/Services/StripeServices";
-import { loadUserId } from "@/Storage/MainAppStorage";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
-import FetchOne from "@/Store/User/FetchOne";
-import { UpdateUser } from "@/Services/SettingsServies";
-import { storeIsSubscribed } from "@/Storage/MainAppStorage";
 const ParentPaymentModal = ({ onPay, onCancel }) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);
   const { createToken } = useStripe();
@@ -64,7 +58,7 @@ const ParentPaymentModal = ({ onPay, onCancel }) => {
   const isVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.parentPaymentModalVisibility
   );
-
+console.log('isVisible',isVisible)
   const dispatch = useDispatch();
 
   useEffect(() => {

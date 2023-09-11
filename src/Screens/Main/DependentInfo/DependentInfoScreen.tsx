@@ -1,47 +1,29 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Image,
-} from "react-native";
-import { Text, Icon, Toggle } from "@ui-kitten/components";
 import { AppHeader } from "@/Components";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import {
-  EditDependentModal,
-  WelcomeMessageModal,
-  DependentAddImportModal,
-  AddStudentModal,
-  StudentActivationCodeModal,
-  StudentVisibilityPermissionModal,
-  DistanceAlert,
+  AddStudentModal, DependentAddImportModal, DistanceAlert, EditDependentModal, StudentActivationCodeModal,
+  StudentVisibilityPermissionModal
 } from "@/Modals";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Text, Toggle } from "@ui-kitten/components";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  FlatList, Image, StyleSheet, TouchableOpacity, View
+} from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 
-import Swipeable from "react-native-gesture-handler/Swipeable";
 import Colors from "@/Theme/Colors";
-import Entypo from "react-native-vector-icons/Entypo";
 
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Ionicons from "react-native-vector-icons/Ionicons";
 
 import FetchOne from "@/Services/User/FetchOne";
-import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
 // import FetchOne from "@/Services/Parent/GetParentChildrens";
-import { GetParent } from "@/Services/Parent";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
-import { ModalState } from "@/Store/Modal";
-import TrackHistory from "@/Services/Parent/TrackHistory";
-import moment from "moment";
-import TrackStudent from "@/Services/Parent/TrackStudent";
-import Geolocation from "@react-native-community/geolocation";
-import AntDesign from "react-native-vector-icons/AntDesign";
 import BackgroundLayout from "@/Components/BackgroundLayout";
+import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
+import TrackHistory from "@/Services/Parent/TrackHistory";
+import { ModalState } from "@/Store/Modal";
+import Geolocation from "@react-native-community/geolocation";
+import moment from "moment";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 const DependentInfoScreen = () => {
   const navigation = useNavigation();
