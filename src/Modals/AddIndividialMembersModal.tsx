@@ -1,15 +1,15 @@
-import React from "react";
-import { Input, Text, Layout, Button, Modal } from "@ui-kitten/components";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
-import { StyleSheet, TouchableOpacity, View, ScrollView } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import DocumentPicker from "react-native-document-picker";
-import Papa from "papaparse";
 import { LinearGradientButton } from "@/Components";
-import { Formik } from "formik";
-import * as yup from "yup";
+import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Colors from "@/Theme/Colors";
+import { Input, Layout, Modal, Text } from "@ui-kitten/components";
+import { Formik } from "formik";
+import Papa from "papaparse";
+import React from "react";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import DocumentPicker from "react-native-document-picker";
+import { useDispatch, useSelector } from "react-redux";
+import * as yup from "yup";
 
 const AddIndividialMembersModal = ({
   individuals,
@@ -176,7 +176,7 @@ const AddIndividialMembersModal = ({
                     <LinearGradientButton
                       size="medium"
                       onPress={handleSubmit}
-                      disabled={!isValid}
+                      disabled={isValid&&values.first_name&&values.last_name&&values.parent1_email ? false : true }
                     >
                       Add one more
                     </LinearGradientButton>
@@ -194,7 +194,7 @@ const AddIndividialMembersModal = ({
                         handleSubmit();
                         hidemodal();
                       }}
-                      disabled={!isValid}
+                      disabled={isValid&&values.first_name&&values.last_name&&values.parent1_email ? false : true }
                     >
                       I'm done
                     </LinearGradientButton>

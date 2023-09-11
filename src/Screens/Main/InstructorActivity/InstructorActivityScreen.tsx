@@ -1,87 +1,48 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Text, Icon, Input, Select, SelectItem } from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  PermissionsAndroid,
-  Platform,
-  Image,
-} from "react-native";
-import * as Stomp from "stompjs";
-import BackgroundService from "react-native-background-actions";
-import Geolocation from "@react-native-community/geolocation";
-import GeolocationAndroid from "react-native-geolocation-service";
-import SockJS from "sockjs-client";
-import { loadToken } from "@/Storage/MainAppStorage";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import Entypo from "react-native-vector-icons/Entypo";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Feather from "react-native-vector-icons/Feather";
-import ChangeUserState from "@/Store/User/FetchOne";
-import fetchOneUserService from "@/Services/User/FetchOne";
-import ChangeCountryState from "@/Store/Places/FetchCountries";
-import FetchCountries from "@/Store/Places/FetchCountries";
-import { GetAllCountries } from "@/Services/PlaceServices";
-import { InstructorActivitiesModal, CancelActivityModal } from "@/Modals";
-import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
-import {
-  InstructionsModal,
-  JourneyTrackerModal,
-  RollCallModal,
-  RequestPermissionModal,
-  SetupVehicleModal,
-  MarkAllRollCallModal,
-  ShowInstructorsStudentsModal,
-} from "@/Modals";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import {
-  DeleteActivity,
-  GetActivityByName,
-  GetAllActivity,
-  FindActivitiesByUserId,
-  GetActivitesCount,
-} from "@/Services/Activity";
-import {
-  GetAllInstructors,
-  GetInstructor,
-  FindInstructorBySchoolOrg,
-} from "@/Services/Instructor";
-import {
-  loadUserId,
-  getOrgInstructors,
-  removeInstructors,
-  storeInstructors,
-  loadUserType,
-  storeHomeScreenCacheInfo,
-  getHomeScreenCacheInfo,
-} from "@/Storage/MainAppStorage";
-import CreateMultipleInstructor from "@/Services/Instructor/CreateMultipleInstructor";
-import moment from "moment";
-import api from "@/Services";
-import { UserState } from "@/Store/User";
-import { InstructorState } from "@/Store/InstructorsActivity";
-import { useDebouncedEffect } from "@/Utils/Hooks";
-import usePrevious from "@/Utils/Hooks/usePrevious";
-import { useStateValue } from "@/Context/state/State";
-import { actions } from "@/Context/state/Reducer";
-import { FindAllBus } from "@/Services/BusConfiguration";
-import GetActivityByInstructor from "@/Services/Activity/GetActivityByInstructor";
-import { Activity, Optin } from "@/Models/DTOs";
-import { PlaceState } from "@/Store/Places";
-import ChangeInstructorState from "@/Store/InstructorsActivity/ChangeInstructorActivityState";
-import { ModalState } from "@/Store/Modal";
-import { abortController } from "@/Utils/Hooks";
-import axios from "axios";
 import { AppHeader } from "@/Components";
+import { actions } from "@/Context/state/Reducer";
+import { useStateValue } from "@/Context/state/State";
+import { CancelActivityModal, InstructionsModal, InstructorActivitiesModal, JourneyTrackerModal, RequestPermissionModal, RollCallModal, SetupVehicleModal, ShowInstructorsStudentsModal } from "@/Modals";
+import { Activity, Optin } from "@/Models/DTOs";
+import {
+  FindActivitiesByUserId,
+  GetActivitesCount, GetActivityByName,
+  GetAllActivity
+} from "@/Services/Activity";
+import GetActivityByInstructor from "@/Services/Activity/GetActivityByInstructor";
+import {
+  GetInstructor
+} from "@/Services/Instructor";
+import CreateMultipleInstructor from "@/Services/Instructor/CreateMultipleInstructor";
+import { GetAllCountries } from "@/Services/PlaceServices";
+import { getHomeScreenCacheInfo, getOrgInstructors, loadToken, loadUserId, removeInstructors, storeHomeScreenCacheInfo } from "@/Storage/MainAppStorage";
+import { InstructorState } from "@/Store/InstructorsActivity";
+import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
+import { PlaceState } from "@/Store/Places";
+import { UserState } from "@/Store/User";
+import ChangeUserState from "@/Store/User/FetchOne";
+import Colors from "@/Theme/Colors";
+import { abortController } from "@/Utils/Hooks";
+import usePrevious from "@/Utils/Hooks/usePrevious";
+import Geolocation from "@react-native-community/geolocation";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Icon, Text } from "@ui-kitten/components";
+import axios from "axios";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator, FlatList, Image, PermissionsAndroid,
+  Platform, StyleSheet, TouchableOpacity, View
+} from "react-native";
+import BackgroundService from "react-native-background-actions";
+import GeolocationAndroid from "react-native-geolocation-service";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import Entypo from "react-native-vector-icons/Entypo";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { useDispatch, useSelector } from "react-redux";
+import SockJS from "sockjs-client";
+import * as Stomp from "stompjs";
 const studentImage = require("@/Assets/Images/approval_icon1.png");
 const instructorImage = require("@/Assets/Images/approval_icon2.png");
 const InstructorActivityScreen = ({ route }: any) => {
@@ -675,8 +636,8 @@ const InstructorActivityScreen = ({ route }: any) => {
       console.log("dsate----", moment(item?.fromDate).format("YYYY-MM-DD")); // console.log("itemdate", itemDate[0]);
 
       if (
-        moment(item?.fromDate).format("YYYY-MM-DD") ==
-        moment(date).format("YYYY-MM-DD")
+        moment(item?.fromDate).format('MMM DD, YYYY') ==
+        moment(date).format('MMM DD, YYYY')
       ) {
         temp.push(item);
       }
@@ -958,7 +919,7 @@ const InstructorActivityScreen = ({ route }: any) => {
                           item?.fromDate == "string"
                             ? new Date()
                             : item?.fromDate
-                        ).format("YYYY-MM-DD")} at ${moment(
+                        ).format('MMM DD, YYYY')} at ${moment(
                           item?.fromDate == "string"
                             ? new Date()
                             : item?.fromDate
@@ -967,7 +928,7 @@ const InstructorActivityScreen = ({ route }: any) => {
                           .format("hh:mm a")} `}</Text>
                         <Text style={styles.text}>{`${moment(
                           item?.toDate == "string" ? new Date() : item?.toDate
-                        ).format("YYYY-MM-DD")} at ${moment(
+                        ).format('MMM DD, YYYY')} at ${moment(
                           item?.toDate == "string" ? new Date() : item?.toDate
                         )
                           .subtract("hours", 5)

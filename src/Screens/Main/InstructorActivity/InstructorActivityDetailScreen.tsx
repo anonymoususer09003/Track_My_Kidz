@@ -1,43 +1,26 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Text, Icon, Input, Select, SelectItem } from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  PermissionsAndroid,
-  Platform,
-  Image,
-} from "react-native";
-import moment from "moment";
-import * as Stomp from "stompjs";
-import BackgroundService from "react-native-background-actions";
-import Geolocation from "@react-native-community/geolocation";
-import GeolocationAndroid from "react-native-geolocation-service";
-import SockJS from "sockjs-client";
-import { loadToken } from "@/Storage/MainAppStorage";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import Entypo from "react-native-vector-icons/Entypo";
-import { UserTypeState } from "@/Store/UserType";
 import { InstructionsModal, ShowInstructorsStudentsModal } from "@/Modals";
-
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { UserTypeState } from "@/Store/UserType";
+import Colors from "@/Theme/Colors";
+import { useIsFocused } from "@react-navigation/native";
+import { Text } from "@ui-kitten/components";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import {
-  GetAllInstructors,
-  GetInstructor,
-  FindInstructorBySchoolOrg,
-} from "@/Services/Instructor";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { GetSchool } from "@/Services/School";
+  Image, StyleSheet, TouchableOpacity, View
+} from "react-native";
+import Entypo from "react-native-vector-icons/Entypo";
+import { useDispatch, useSelector } from "react-redux";
+
+import BackgroundLayout from "@/Components/BackgroundLayout";
 import { actions } from "@/Context/state/Reducer";
 import { useStateValue } from "@/Context/state/State";
+import {
+  GetInstructor
+} from "@/Services/Instructor";
+import { GetSchool } from "@/Services/School";
+import { loadUserId } from "@/Storage/MainAppStorage";
 import { ModalState } from "@/Store/Modal";
-import BackgroundLayout from "@/Components/BackgroundLayout";
 import { UserState } from "@/Store/User";
 
 const instructorImage = require("@/Assets/Images/approval_icon2.png");
@@ -60,7 +43,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
   const [orgInfo, setOrgInfo] = useState(null);
   const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
     useState(false);
-
+console.log('orgInfo',orgInfo)
   const data = route?.params?.data;
   const activitiesCount = route?.params?.activitiesCount || {};
   const showInstructorModal = useSelector(
@@ -68,6 +51,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
   );
   let temp = [];
   let instructor = data?.instructors?.map((item) => temp.push(item?.firstName));
+  console.log('data',data)
   const handleGetOrganizationInfo = async () => {
     const userId = await loadUserId();
 
@@ -337,7 +321,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
               <Text style={styles.label}>From</Text>
               <Text style={styles.text}>{`${moment(
                 data?.fromDate == "string" ? new Date() : data?.fromDate
-              ).format("YYYY-MM-DD")} at ${moment(
+              ).format("MMM DD, YYYY")} at ${moment(
                 data?.fromDate == "string" ? new Date() : data?.fromDate
               )
                 .subtract("hours", 5)
@@ -361,7 +345,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
 
               <Text style={styles.text}>{`${moment(
                 data?.toDate == "string" ? new Date() : data?.toDate
-              ).format("YYYY-MM-DD")} at ${moment(
+              ).format("MMM DD, YYYY")} at ${moment(
                 data?.toDate == "string" ? new Date() : data?.toDate
               )
                 .subtract("hours", 5)
@@ -376,7 +360,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
             <View>
               <Text style={styles.label}>Where</Text>
 
-              <Text style={styles.text}>{data?.venueFromAddress}</Text>
+              <Text style={styles.text}>{data?.venueFromName}</Text>
             </View>
           </View>
 
@@ -387,7 +371,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
             <View>
               <Text style={styles.label}>Address</Text>
 
-              <Text style={styles.text}>{orgInfo?.address || "-"}</Text>
+              <Text style={styles.text}>{`${orgInfo?.address}, ${orgInfo?.city}, ${orgInfo.state} ${orgInfo?.zipcode}, ${orgInfo?.country}` || "-"}</Text>
             </View>
           </View>
 

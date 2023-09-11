@@ -42,12 +42,14 @@ import React, {
 } from "react";
 import {
   KeyboardAvoidingView, Linking, Platform,
-  ScrollView, TouchableWithoutFeedback,
+  ScrollView, TouchableOpacity, TouchableWithoutFeedback,
   View
 } from "react-native";
 import { getDeviceId } from "react-native-device-info";
 import ImagePicker from "react-native-image-crop-picker";
 import Toast from "react-native-toast-message";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import Feather from "react-native-vector-icons/Feather";
 import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
 
@@ -131,8 +133,9 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   const [placement, setPlacement] = React.useState("bottom");
   const [instructors, setInstructors] = useState(_instructors);
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
-    ""
+    route.params?.details?.photo||""
   );
+  console.log('route.params?.details?.photo',route.params?.details?.photo)
   const [visibleImagePicker, setVisibleImagePicker] = useState(false);
   const [buses, setBuses] = useState([]);
   const [uploadedImage, setUploadedImage] = React.useState(null);
@@ -143,6 +146,14 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
   const { emailAddress, user_type, details } = route.params;
   const { registrationId, activation_code } = route.params;
 
+const country = details?.country
+const state = details?.state
+const city = details?.city
+const zipcode = details?.zipcode
+const selected_entity = details?.selected_entity
+
+  console.log('country',country)
+console.log('details',details)
   const [visible, setVisible] = React.useState(false);
   const dispatch = useDispatch();
 
@@ -354,7 +365,6 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
         console.log("GetSchoolByFilters", err);
       });
   };
-  console.log("schoolsdta", schoolsData);
   const getOrgByFilter = (
     country = "",
     state = "",
@@ -518,13 +528,13 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                 schoolName: "",
                 school_name: "",
                 schoolAddress: "",
-                country: "",
+                country:details && country ? country : "",
                 selectedCountry: "",
                 selectedState: "",
                 selectedCity: "",
-                city: "",
-                state: "",
-                zipcode: "",
+                city: details && city?city:'',
+                state: details && state?state:'',
+                zipcode:details && zipcode?zipcode:'',
 
                 phoneNumber:
                   details && details.phoneNumber ? details.phoneNumber : "",
@@ -533,7 +543,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                 termsAccepted: false,
                 school: "",
                 organization: "",
-                selected_entity: "",
+                selected_entity: details && selected_entity?selected_entity:"",
                 organizationName: "",
               }}
               onSubmit={(values, { resetForm }) => {
@@ -959,6 +969,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     }
                   })
                   .catch((error) => {
+                    console.log('error SignUP',error)
                     dispatch(ChangeModalState.action({ loading: false }));
                     Toast.show({
                       type: "info",
@@ -1353,14 +1364,14 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                     )}
                     {/* <View
                       style={{
-                        marginVertical: 10,
+                        // marginVertical: 10,
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        marginTop: 20,
+                        // marginTop: 20,
                       }}
                     >
-                      <View
+                      {/* <View
                         style={{ flexDirection: "row", alignItems: "center" }}
                       >
                         <Text
@@ -1387,8 +1398,8 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                             )
                           }
                         />
-                      </View>
-                      <AntDesign
+                      </View> */}
+                      {/* <AntDesign
                         name="pluscircle"
                         size={25}
                         color={Colors.secondaryDark}
@@ -1399,8 +1410,8 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                             })
                           )
                         }
-                      />
-                    </View>
+                      /> */}
+                    {/* </View> */}
                     {instructors && instructors.length > 0 && (
                       <ScrollView
                         style={{
@@ -1457,7 +1468,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           ))}
                       </ScrollView>
                     )}
-                    <View
+                    {/* <View
                       style={{
                         marginVertical: 10,
                         flexDirection: "row",
@@ -1503,7 +1514,7 @@ const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
                           )
                         }
                       />
-                    </View>
+                    </View> */}
 
                     {buses && buses.length > 0 && (
                       <ScrollView

@@ -1,7 +1,7 @@
 import api from "@/Services";
 import {
   getInstructorDetail,
-  storeInstructorDetail,
+  storeInstructorDetail
 } from "@/Storage/MainAppStorage";
 export default async (id: number, config: any) => {
   let instructorDetail = await getInstructorDetail();

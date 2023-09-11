@@ -1,13 +1,11 @@
 import { ProfileAvatar } from "@/Components/SignUp/profile-avatar.component";
-import { navigateAndSimpleReset } from "@/Navigators/Functions";
-import LogoutStore from "@/Store/Authentication/LogoutStore";
 import { UserState } from "@/Store/User";
 import Colors from "@/Theme/Colors";
 import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
-import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
+import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { Text } from "@ui-kitten/components";
 import React, { useState } from "react";
-import { Image, Share, StyleSheet, View } from "react-native";
+import { Share, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -90,47 +88,22 @@ const RightDrawerContent = (props: any) => {
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerContent}>
         <View>
-          <ProfileAvatar
-            style={
-              userData?.pictureUrl === ""
-                ? styles.profileAvatar
-                : styles.profileImage
-            }
-            source={
-              userData?.pictureUrl === ""
-                ? require("@/Screens/Auth/SignUp/assets/image-person.png")
-                : { uri: userData?.pictureUrl }
-            }
-          />
-          <Text style={styles.basicDetails}>
-            {userData?.firstName + " " + userData?.lastName}
-          </Text>
+          <ProfileAvatar style={userData?.pictureUrl === "" ? styles.profileAvatar : styles.profileImage} source={userData?.pictureUrl === "" ? require("@/Screens/Auth/SignUp/assets/image-person.png") : { uri: userData?.pictureUrl }} />
+          <Text style={styles.basicDetails}>{userData?.firstName + " " + userData?.lastName}</Text>
           <Text style={styles.basicDetails}>{userData?.username}</Text>
         </View>
         <View style={styles.drawerSection}>
-          {rightDrawerOptions.map((option, index) => {
+          {/* {rightDrawerOptions.map((option, index) => {
             return (
               <DrawerItem
                 key={index}
                 label={option.label}
                 style={styles.drawerItem}
-                icon={() => (
-                  <Image
-                    source={option.imageIcon}
-                    style={styles.drawerImage}
-                    resizeMode="contain"
-                  />
-                )}
+                icon={() => <Image source={option.imageIcon} style={styles.drawerImage} resizeMode="contain" />}
                 onPress={() => {
                   if (option.label === "Logout") {
                     dispatch(LogoutStore.action());
-                  } else if (
-                    option.label === "Settings" ||
-                    option.label === "Contact Us" ||
-                    option.label === "My Profile" ||
-                    option.label === "Chat" ||
-                    option.label === "Notifications"
-                  ) {
+                  } else if (option.label === "Settings" || option.label === "Contact Us" || option.label === "My Profile" || option.label === "Chat" || option.label === "Notifications") {
                     props.navigation.closeDrawer();
                     navigateAndSimpleReset(option.route);
                   } else if (option.label === "Invite Friends") {
@@ -143,7 +116,7 @@ const RightDrawerContent = (props: any) => {
                 }}
               />
             );
-          })}
+          })} */}
         </View>
       </View>
     </DrawerContentScrollView>

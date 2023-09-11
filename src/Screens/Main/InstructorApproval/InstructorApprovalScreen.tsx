@@ -1,29 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { Text, Icon } from "@ui-kitten/components";
+import { DeclineActivityModal, InstructionsModal } from "@/Modals";
 import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  Image,
+  GetActivitiesByInsructorId
+} from "@/Services/Activity";
+import { GetGroupByInstructorId } from "@/Services/Group";
+import { loadUserId } from "@/Storage/MainAppStorage";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import Colors from "@/Theme/Colors";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Icon, Text } from "@ui-kitten/components";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View
 } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { useDispatch } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Colors from "@/Theme/Colors";
-import Entypo from "react-native-vector-icons/Entypo";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import moment from "moment";
-import { InstructionsModal, DeclineActivityModal } from "@/Modals";
-import {
-  GetAllActivity,
-  GetActivitiesByInsructorId,
-} from "@/Services/Activity";
-import { GetGroupByInstructorId } from "@/Services/Group";
-import { loadUserId } from "@/Storage/MainAppStorage";
 const InstructorGroupPendingScreen = ({ route }) => {
   let prevOpenedRow: any;
   let row: Array<any> = [];
@@ -250,19 +242,51 @@ const InstructorGroupPendingScreen = ({ route }) => {
                           {item?.activityName}
                         </Text>
                         <View style={styles.horizontal}>
-                          <Image
+                          {/* <Image
                             source={calendarIcon}
                             style={styles.iconStyle}
-                          />
-                          <Text style={styles.text}>{date}</Text>
+                          /> */}
+                          <Image
+                        source={require("@/Assets/Images/circle-dashed.png")}
+                        style={{
+                          height: 40,
+                          width: 15,
+                          marginRight:10,
+                          resizeMode: "contain",
+                          // marginRight: 10,
+                        }}
+                      />
+
+                        <View>
+                        <Text style={styles.text}>{`${moment(
+                          item?.fromDate == "string"
+                            ? new Date()
+                            : item?.fromDate
+                        ).format("MMM DD, YYYY")} at ${moment(
+                          item?.fromDate == "string"
+                            ? new Date()
+                            : item?.fromDate
+                        )
+                          .subtract("hours", 5)
+                          .format("hh:mm a")} `}</Text>
+                        <Text style={styles.text}>{`${moment(
+                          item?.toDate == "string" ? new Date() : item?.toDate
+                        ).format('MMM DD, YYYY')} at ${moment(
+                          item?.toDate == "string" ? new Date() : item?.toDate
+                        )
+                          .subtract("hours", 5)
+                          .format("hh:mm a")} `}</Text>
+                      </View>
+                        
+                          {/* <Text style={styles.text}>{date}</Text> */}
                         </View>
 
-                        <View style={styles.horizontal}>
+                        {/* <View style={styles.horizontal}>
                           <Image source={clockIcon} style={styles.iconStyle} />
                           <Text style={styles.text}>{`${moment().format(
                             "hh:mm a"
                           )}`}</Text>
-                        </View>
+                        </View> */}
 
                         <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />
@@ -271,9 +295,11 @@ const InstructorGroupPendingScreen = ({ route }) => {
 
                         <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />
-                          <Text style={styles.text}>
-                            {item?.venueFromAddress}
-                          </Text>
+                          <View>
+                          <Text style={styles.text} >
+                            {`${item?.venueFromAddress}, ${item?.venueFromCity}, ${item?.venueFromState} ${item?.venueFromZip}, ${item?.venueToCountry}`}
+                          </Text> 
+                          </View>
                         </View>
                       </TouchableOpacity>
                       <TouchableOpacity

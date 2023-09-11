@@ -1357,6 +1357,13 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                                         firstname: values.firstName,
                                         lastname: values.lastName,
                                         phoneNumber: values.phoneNumber,
+                                        state: values.state,
+                                        country: values.country,
+                                        city: values.city,
+                                        zipcode: values.zipcode,
+                                        selected_entity:values.selected_entity,
+                                       photo:uploadedImage?.path
+                                        
                                       },
                                     }
                                   ),
