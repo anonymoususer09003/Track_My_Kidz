@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react'
-import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
-import { useTheme } from '@/Theme'
-import { Card, Text, Radio, RadioGroup, Spinner } from '@ui-kitten/components';
-import { fetchPaymentIntent } from '@/Services/StripeServices'
+import { fetchPaymentIntent } from '@/Services/StripeServices';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import FetchOne from '@/Store/User/FetchOne';
+import { useTheme } from '@/Theme';
 import { CardField, useConfirmPayment } from '@stripe/stripe-react-native';
-import { useSelector, useDispatch } from "react-redux";
-import { loadUserId } from '@/Storage/MainAppStorage'
-import FetchOne from '@/Store/User/FetchOne'
+import { Card, Radio, RadioGroup, Spinner, Text } from '@ui-kitten/components';
+import React, { useEffect, useState } from 'react';
+import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useDispatch, useSelector } from "react-redux";
 // @ts-ignore
 
-import LinearGradient from 'react-native-linear-gradient'
 import { GetAllVariables } from '@/Services/Settings';
 import { UserState } from "@/Store/User";
 import Colors from '@/Theme/Colors';
@@ -107,6 +106,7 @@ const ServiceActivationScreen = ({ route, navigation }: { route: any, navigation
         });
 
         if (error) {
+            console.log('error',error)
             setIsLoading(false)
             ;
             Alert.alert('Payment confirmation error.', error.message, [{ text: 'OK', style: 'cancel' }])

@@ -1,19 +1,19 @@
-import "react-native-gesture-handler";
-import React, { useEffect } from "react";
-import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/lib/integration/react";
-import { store, persistor } from "@/Store";
+import { Config } from "@/Config";
 import { ApplicationNavigator } from "@/Navigators";
-import "./Translations";
+import { persistor, store } from "@/Store";
+import { StripeProvider, initStripe } from "@stripe/stripe-react-native";
 import { IconRegistry } from "@ui-kitten/components";
 import { EvaIconsPack } from "@ui-kitten/eva-icons";
-import { initStripe, StripeProvider } from "@stripe/stripe-react-native";
-import { Config } from "@/Config";
-import { StateProvider } from "./Context/state/State";
-import { reducer } from "./Context/state/Reducer";
-import { initialState } from "./Context/state/InitialState";
+import React, { useEffect } from "react";
+import { LogBox } from "react-native";
+import "react-native-gesture-handler";
 import { MenuProvider } from "react-native-popup-menu";
-import { LogBox, AppState } from "react-native";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/lib/integration/react";
+import { initialState } from "./Context/state/InitialState";
+import { reducer } from "./Context/state/Reducer";
+import { StateProvider } from "./Context/state/State";
+import "./Translations";
 
 LogBox.ignoreLogs(["Reanimated 2"]);
 export default function App() {
@@ -21,7 +21,7 @@ export default function App() {
     initStripe({
       publishableKey: Config.STRIPE_PK,
     });
-  });
+  },[]);
   XMLHttpRequest = GLOBAL.originalXMLHttpRequest
     ? GLOBAL.originalXMLHttpRequest
     : GLOBAL.XMLHttpRequest;

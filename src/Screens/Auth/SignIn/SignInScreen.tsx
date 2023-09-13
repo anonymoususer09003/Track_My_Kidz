@@ -201,6 +201,7 @@ const SignInScreen = ({ navigation }) => {
                 validateOnMount={true}
                 initialValues={intitialValues}
                 onSubmit={(values) => {
+                  console.log('values.user_type',values.user_type)
                   let objectToPass = {
                     email: values.email,
                     password: values.password,
@@ -224,7 +225,7 @@ const SignInScreen = ({ navigation }) => {
                       };
                       setLoginObj(obj)
                       //show the modal if not subscribed
-                      if(!res.data?.isSubscribed){
+                      if(!res.data?.isSubscribed && values.user_type === 'Parent'){
                         dispatch(
                           ChangeModalState.action({
                               parentPaymentModalVisibility: true,
