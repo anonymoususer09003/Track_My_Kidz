@@ -27,7 +27,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
-const ParentPaymentModal = ({ onPay, onCancel }) => {
+const ParentPaymentModal = ({ onPay, onCancel,email,password }) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);
   const { createToken } = useStripe();
   const { confirmPayment, loading } = useConfirmPayment();
@@ -144,20 +144,20 @@ console.log('isVisible',isVisible)
     const billingDetails = {
       email: user?.email,
     };
-
+  
     // Confirm the payment with the card details
     const { paymentIntent, error } = await confirmPayment(clientSecret, {
       paymentMethodType: "Card",
       paymentMethodData: billingDetails,
     });
-    console.log("paymentIntent", paymentIntent);
     if (error) {
-      console.log("err", error);
+      console.log("err PAYMENT", error);
       setIsLoading(false);
       Alert.alert("Payment confirmation error.", error.message, [
         { text: "OK", style: "cancel" },
       ]);
     } else if (paymentIntent) {
+      console.log('paymentIntent',paymentIntent)
       setIsLoading(false);
       updateUser();
       // const userId = await loadUserId();
@@ -178,6 +178,7 @@ console.log('isVisible',isVisible)
   };
   const updateUser = async () => {
     try {
+      console.log('user',user, user?.parentId)
       let res = await UpdateUser(
         { ...user, id: user?.parentId, isSubscribed: true },
         "parent"

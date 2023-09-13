@@ -371,7 +371,7 @@ console.log('orgInfo',orgInfo)
             <View>
               <Text style={styles.label}>Address</Text>
 
-              <Text style={styles.text}>{`${orgInfo?.address}, ${orgInfo?.city}, ${orgInfo.state} ${orgInfo?.zipcode}, ${orgInfo?.country}` || "-"}</Text>
+              <Text style={styles.text}>{`${orgInfo?.address}, ${orgInfo?.city}, ${orgInfo?.state} ${orgInfo?.zipcode}, ${orgInfo?.country}` || "-"}</Text>
             </View>
           </View>
 

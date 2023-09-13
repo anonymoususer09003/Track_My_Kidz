@@ -26,7 +26,6 @@ import messaging from "@react-native-firebase/messaging";
 import Toast from "react-native-toast-message";
 
 import { LinearGradientButton } from "@/Components";
-import { ParentPaymentModal } from "@/Modals";
 import { GetAllCountries } from "@/Services/PlaceServices";
 import ChangeCountryState from "@/Store/Places/FetchCountries";
 import Colors from "@/Theme/Colors";
@@ -171,15 +170,7 @@ const SignInScreen = ({ navigation }) => {
         resizeMode='stretch'
       >
         <KeyboardAwareScrollView style={{ flex: 1 }}>
-        <ParentPaymentModal
-          onPay={() => {
-            dispatch(LoginStore.action(loginObj));
-            dispatch(ChangeModalState.action({ loading: false }));
-          }}
-          onCancel={()=>{
-            dispatch(ChangeModalState.action({ loading: false }));
-          }}
-        />
+       
           <View style={{ flex: 1 }}>
             <View style={styles.headerContainer}>
               <Image
@@ -290,6 +281,17 @@ const SignInScreen = ({ navigation }) => {
                   isValid,
                 }) => (
                   <>
+                   {/* <ParentPaymentModal
+                   email={values?.email}
+                   password={values?.password}
+          onPay={() => {
+            dispatch(LoginStore.action(loginObj));
+            dispatch(ChangeModalState.action({ loading: false }));
+          }}
+          onCancel={()=>{
+            dispatch(ChangeModalState.action({ loading: false }));
+          }}
+        /> */}
                     <Layout style={styles.formContainer}>
                       <CustomDropdown
                         placeholder='Select User'
