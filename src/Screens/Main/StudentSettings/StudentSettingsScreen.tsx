@@ -41,9 +41,23 @@ const StudentSettingsScreen = ({ navigation }: { navigation: any }) => {
   }, [verifyType]);
 
   const onShare = async () => {
-    Share.open({
+    Share.open(   {
       message: `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`,
       url: "https://trackmykidz.com/apps/",
+      
+      activityItemSources:[{
+        placeholderItem: { 
+          type: 'url', 
+        content:  require("@/Assets/AppIcons/appstore.png")},
+        item: {
+          default: { type: 'url', content:  require("@/Assets/AppIcons/appstore.png") },
+        },
+      linkMetadata: {
+        title: 'TrackMykidz',
+        subject: 'trackmykidz.com',
+        icon: require("@/Assets/AppIcons/appstore.png"),
+      },
+      }],
     })
       .then((res) => {
         Toast.show({

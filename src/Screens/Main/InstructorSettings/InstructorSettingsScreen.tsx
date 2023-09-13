@@ -1,41 +1,31 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Switch,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
 import { useTheme } from "@/Theme";
 import {
-  Icon,
-  Select,
-  SelectItem,
-  IndexPath,
-  Modal,
   Card,
-  Spinner,
+  Icon,
+  Modal,
+  Spinner
 } from "@ui-kitten/components";
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import Share from "react-native-share";
 // @ts-ignore
-import ChangeUserState from "@/Store/UserType/ChangeUserTypeState";
-import { useSelector, useDispatch } from "react-redux";
-import { UserState } from "@/Store/User";
-import { StripeModal, FlagBlogModal, DonationModal } from "@/Modals";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import ChangeLoginState from "@/Store/Authentication/ChangeLoginState";
-import Toast from "react-native-toast-message";
-import DeactivateTwoFAService from "@/Services/TwoFAServices/DeactivateTwoFAService";
-import ReactivateTwoFA from "@/Services/TwoFAServices/ReactivateTwoFA";
-import Colors from "@/Theme/Colors";
 import { AppHeader, LinearGradientButton } from "@/Components";
-import { TwoFactorAuthenticationModal, VerifyYourselfModal } from "@/Modals";
-import LogoutStore from "@/Store/Authentication/LogoutStore";
-import { loadId, loadUserId } from "@/Storage/MainAppStorage";
-import { DeleteUser } from "@/Services/SettingsServies";
 import BackgroundLayout from "@/Components/BackgroundLayout";
-import LinearGradient from "react-native-linear-gradient";
+import { TwoFactorAuthenticationModal, VerifyYourselfModal } from "@/Modals";
+import { DeleteUser } from "@/Services/SettingsServies";
+import { loadId } from "@/Storage/MainAppStorage";
+import LogoutStore from "@/Store/Authentication/LogoutStore";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { UserState } from "@/Store/User";
+import ChangeUserState from "@/Store/UserType/ChangeUserTypeState";
+import Colors from "@/Theme/Colors";
+import Toast from "react-native-toast-message";
+import { useDispatch, useSelector } from "react-redux";
 
 const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
   const dispatch = useDispatch();
@@ -57,9 +47,23 @@ const InstructorSettingsScreen = ({ navigation }: { navigation: any }) => {
   }, [verifyType]);
 
   const onShare = async () => {
-    Share.open({
+    Share.open(   {
       message: `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`,
       url: "https://trackmykidz.com/apps/",
+      
+      activityItemSources:[{
+        placeholderItem: { 
+          type: 'url', 
+        content:  require("@/Assets/AppIcons/appstore.png")},
+        item: {
+          default: { type: 'url', content:  require("@/Assets/AppIcons/appstore.png") },
+        },
+      linkMetadata: {
+        title: 'TrackMykidz',
+        subject: 'trackmykidz.com',
+        icon: require("@/Assets/AppIcons/appstore.png"),
+      },
+      }],
     })
       .then((res) => {
         Toast.show({

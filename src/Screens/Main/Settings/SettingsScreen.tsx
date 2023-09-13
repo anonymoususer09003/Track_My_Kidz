@@ -65,8 +65,6 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
             default: { type: 'text', content: `${message} https://trackmykidz.com/apps/` },
           },
           linkMetadata: {
-            title: 'Trackmykidz',
-            subject: 'trackmykidz.com',
             icon: require("@/Assets/AppIcons/appstore.png"),
           },
         },
@@ -100,8 +98,6 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
         icon: require("@/Assets/AppIcons/appstore.png"),
       },
       }],
-      
-      
     }
     )
       .then((res) => {
