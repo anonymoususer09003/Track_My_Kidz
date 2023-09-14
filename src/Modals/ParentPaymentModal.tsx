@@ -27,7 +27,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
-const ParentPaymentModal = ({ onPay, onCancel,email,password }) => {
+const ParentPaymentModal = ({ onPay, onCancel,loginObj }) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);
   const { createToken } = useStripe();
   const { confirmPayment, loading } = useConfirmPayment();
@@ -174,13 +174,14 @@ console.log('isVisible',isVisible)
           parentPaymentModalVisibility: false,
         })
       );
+      onPay()
     }
   };
   const updateUser = async () => {
     try {
-      console.log('user',user, user?.parentId)
+      console.log('userrrrr',loginObj)
       let res = await UpdateUser(
-        { ...user, id: user?.parentId, isSubscribed: true },
+        { ...loginObj, isSubscribed: true },
         "parent"
       );
       console.log("res", res);

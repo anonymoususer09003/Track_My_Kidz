@@ -26,6 +26,7 @@ import messaging from "@react-native-firebase/messaging";
 import Toast from "react-native-toast-message";
 
 import { LinearGradientButton } from "@/Components";
+import { ParentPaymentModal } from "@/Modals";
 import { GetAllCountries } from "@/Services/PlaceServices";
 import ChangeCountryState from "@/Store/Places/FetchCountries";
 import Colors from "@/Theme/Colors";
@@ -217,11 +218,12 @@ const SignInScreen = ({ navigation }) => {
                       setLoginObj(obj)
                       //show the modal if not subscribed
                       if(!res.data?.isSubscribed && values.user_type === 'Parent'){
-                        dispatch(
-                          ChangeModalState.action({
-                              parentPaymentModalVisibility: true,
-                          }),
-                      )
+                      //   dispatch(
+                      //     ChangeModalState.action({
+                      //         parentPaymentModalVisibility: true,
+                      //     }),
+                      // )
+                      dispatch(LoginStore.action(obj));
                       }else{
                         console.log(obj);
                         dispatch(LoginStore.action(obj));
@@ -281,9 +283,8 @@ const SignInScreen = ({ navigation }) => {
                   isValid,
                 }) => (
                   <>
-                   {/* <ParentPaymentModal
-                   email={values?.email}
-                   password={values?.password}
+                   <ParentPaymentModal
+               loginObj={loginObj}
           onPay={() => {
             dispatch(LoginStore.action(loginObj));
             dispatch(ChangeModalState.action({ loading: false }));
@@ -291,7 +292,7 @@ const SignInScreen = ({ navigation }) => {
           onCancel={()=>{
             dispatch(ChangeModalState.action({ loading: false }));
           }}
-        /> */}
+        />
                     <Layout style={styles.formContainer}>
                       <CustomDropdown
                         placeholder='Select User'

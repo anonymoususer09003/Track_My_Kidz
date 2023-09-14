@@ -47,6 +47,7 @@ import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
 import { GetSchoolByFilters } from "@/Services/School";
 import { storeToken, storeUserType } from "@/Storage/MainAppStorage";
 import LoginStore from "@/Store/Authentication/LoginStore";
+import { ModalState } from "@/Store/Modal";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { PlaceState } from "@/Store/Places";
 import Colors from "@/Theme/Colors";
@@ -132,6 +133,9 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
   
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
     ""
+  );
+  const isVisible = useSelector(
+    (state: { modal: ModalState }) => state.modal.parentPaymentModalVisibility
   );
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const [visible, setVisible] = React.useState(false);
@@ -399,6 +403,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
     }
   }, [isFocuesed]);
 
+
+  
   return (
     <BackgroundLayout title="Registration">
       {_user_type.id == 2 && (
@@ -542,17 +548,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
             close={() => setVisibleImagePicker(false)}
           />
         )}
-        <ParentPaymentModal
-          onPay={() => {
-            dispatch(LoginStore.action(loginObj));
-            dispatch(
-              ChangeModalState.action({
-                welcomeMessageModal: true,
-              })
-            );
-          }}
-          onCancel={()=>{}}
-        />
+    
         <ScrollView style={styles.container}>
           {_user_type.id === 1 ? (
             <Formik
@@ -663,6 +659,18 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                 isValid,
               }) => (
                 <>
+                    <ParentPaymentModal
+                    loginObj={loginObj}
+          onPay={() => {
+            dispatch(LoginStore.action(loginObj));
+            dispatch(
+              ChangeModalState.action({
+                welcomeMessageModal: true,
+              })
+            );
+          }}
+          onCancel={()=>{}}
+        />
                   <Layout style={styles.formContainer} level="1">
                     <Input
                       style={styles.inputSettings}
