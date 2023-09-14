@@ -416,7 +416,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
                         <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />
                           <View>
-                          <Text style={styles.text} >
+                          <Text style={[styles.text,{paddingRight:20}]} >
                             {`${item?.venueFromAddress}, ${item?.venueFromCity}, ${item?.venueFromState} ${item?.venueFromZip}, ${item?.venueToCountry}`}
                           </Text> 
                           </View>
@@ -550,6 +550,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     marginVertical: 4,
+    whiteSpace: "nowrap",
   },
   background: {
     width: "80%",

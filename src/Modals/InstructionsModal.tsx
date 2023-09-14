@@ -1,24 +1,20 @@
+import { LinearGradientButton } from "@/Components";
+import { GetOptIn } from "@/Services/Activity";
+import { GetOptInGroup } from "@/Services/Group";
+import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { UserState } from "@/Store/User";
+import { useTheme } from "@/Theme";
+import Colors from "@/Theme/Colors";
 import {
   Card,
   IndexPath,
   Modal,
-  RadioGroup,
-  Text,
+  Text
 } from "@ui-kitten/components";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
 import React, { useEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import { useTheme } from "@/Theme";
-import { LinearGradientButton } from "@/Components";
-import ChangeSelectedState from "@/Store/Selected/ChangeSelectedState";
-import { DeclineToGift } from "@/Services/GiftService";
-import Colors from "@/Theme/Colors";
-import EvilIcons from "react-native-vector-icons/EvilIcons";
-import { GetOptIn } from "@/Services/Activity";
-import { GetOptInGroup } from "@/Services/Group";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 const InstructionsModal = ({
   selectedInstructions,
   setSelectedInstructions,
