@@ -1,14 +1,12 @@
-import React from "react";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { Button, TabBar } from "@ui-kitten/components";
-import { Alert, StyleSheet, View } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
-import { ActivityScreen, GroupScreen } from "@/Screens";
-import { AppHeader } from "@/Components";
-import Colors from "@/Theme/Colors";
-import { useStateValue } from "@/Context/state/State";
 import { LinearGradientButton } from "@/Components";
 import BackgroundLayout from "@/Components/BackgroundLayout";
+import { useStateValue } from "@/Context/state/State";
+import { ActivityScreen, GroupScreen } from "@/Screens";
+import Colors from "@/Theme/Colors";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { TabBar } from "@ui-kitten/components";
+import React from "react";
+import { StyleSheet, View } from "react-native";
 // @refresh reset
 const ActivityNavigator = ({ route }) => {
   const TabNavigator = createMaterialTopTabNavigator();

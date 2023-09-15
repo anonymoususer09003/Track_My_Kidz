@@ -561,6 +561,7 @@ const HomeScreen = () => {
                       });
                       navigation.navigate("Activity", {
                         dependent: item,
+                        setThumbnail:()=>setThumbnail(true),
                       });
                     }}
                   >

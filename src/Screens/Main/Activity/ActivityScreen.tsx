@@ -1,36 +1,31 @@
-import React, { useEffect, useState, useRef } from "react";
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Text, Icon } from "@ui-kitten/components";
-import { useIsFocused } from "@react-navigation/native";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Image,
-} from "react-native";
 import { actions } from "@/Context/state/Reducer";
-import { useDispatch, useSelector } from "react-redux";
+import { useStateValue } from "@/Context/state/State";
+import { GroupParticipantsModal, InstructionsModal, ShowInstructorsStudentsModal } from "@/Modals";
+import { Activity } from "@/Models/DTOs";
+import { GetActivitesCount, GetActivityByStudentId, ParticipantLocation } from "@/Services/Activity";
 import { loadToken } from "@/Storage/MainAppStorage";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Swipeable from "react-native-gesture-handler/Swipeable";
+import SetChatParam from "@/Store/chat/SetChatParams";
 import Colors from "@/Theme/Colors";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Icon, Text } from "@ui-kitten/components";
+import axios from "axios";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import MapView, { Marker } from "react-native-maps";
 import Entypo from "react-native-vector-icons/Entypo";
 import Fontisto from "react-native-vector-icons/Fontisto";
-import { InstructionsModal, ShowInstructorsStudentsModal } from "@/Modals";
-import { GetActivityByStudentId, GetActivitesCount } from "@/Services/Activity";
-import { ParticipantLocation } from "@/Services/Activity";
-import { Activity } from "@/Models/DTOs";
-import { useStateValue } from "@/Context/state/State";
-import { AwsLocationTracker } from "@/Services/TrackController";
-import moment from "moment";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import SetChatParam from "@/Store/chat/SetChatParams";
-import axios from "axios";
-import MapView, { Marker } from "react-native-maps";
+import { useDispatch, useSelector } from "react-redux";
 import SockJS from "sockjs-client";
 import * as Stomp from "stompjs";
-import { GroupParticipantsModal } from "@/Modals";
 const ActivityScreen = ({ route }) => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
@@ -50,6 +45,7 @@ const ActivityScreen = ({ route }) => {
   });
   const instructorImage = require("@/Assets/Images/approval_icon2.png");
   const dependent = route && route.params && route.params.dependent;
+  console.log('setThumbnail',route.params)
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
@@ -70,6 +66,8 @@ const ActivityScreen = ({ route }) => {
   const [showModal, setModal] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [newParticipnatsArr, setnewParticipnatsArr] = useState([]);
+
+  console.log('activities',activities)
   const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
