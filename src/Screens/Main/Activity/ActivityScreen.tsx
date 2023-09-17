@@ -45,7 +45,7 @@ const ActivityScreen = ({ route }) => {
   });
   const instructorImage = require("@/Assets/Images/approval_icon2.png");
   const dependent = route && route.params && route.params.dependent;
-  console.log('setThumbnail',route.params)
+  console.log('setThumbnail',route)
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
@@ -455,19 +455,17 @@ const ActivityScreen = ({ route }) => {
                             item?.fromDate == "string"
                               ? new Date()
                               : item?.fromDate
-                          ).format("YYYY-MM-DD")} at ${moment(
+                          ).format("YYYY-MM-DD")} at ${moment.utc(
                             item?.fromDate == "string"
                               ? new Date()
                               : item?.fromDate
                           )
-                            .subtract("hours", 5)
                             .format("hh:mm a")} `}</Text>
                           <Text style={styles.text}>{`${moment(
                             item?.toDate == "string" ? new Date() : item?.toDate
-                          ).format("YYYY-MM-DD")} at ${moment(
+                          ).format("YYYY-MM-DD")} at ${moment.utc(
                             item?.toDate == "string" ? new Date() : item?.toDate
                           )
-                            .subtract("hours", 5)
                             .format("hh:mm a")} `}</Text>
                         </View>
                       </View>

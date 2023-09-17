@@ -1,52 +1,52 @@
-import React, { useEffect } from "react";
 import {
-  SettingsScreen,
-  PersonalProfileScreen,
-  ChangePasswordScreen,
-  NotificationsScreen,
-  PaymentInfoScreen,
-  ReportProblemScreen,
-  ContactUsScreen,
-  AppListScreen,
   ActivationCodeScreen,
-  DependentInfoScreen,
-  ImportDependentScreen,
-  StudentSettingsScreen,
-  StudentPersonalProfileScreen,
-  StudentActivityDetailsScreen,
-  CreateGroupScreen,
-  CreateActivityScreen,
   ActivityDetailsScreen,
-  InstructorSettingsScreen,
-  OrganizationInfoScreen,
-  InstructorsListScreen,
-  OrganizationBusinformation,
+  AppListScreen,
+  ChangePasswordScreen,
+  ContactUsScreen,
+  CreateActivityScreen,
+  CreateGroupScreen,
+  CreateParentActivityScreen,
+  DependentInfoScreen,
+  DragDropStudentScreen,
+  ImportDependentScreen,
+  InstructorActivityDetailScreen,
   InstructorHome,
   InstructorPersonalProfileScreen,
+  InstructorSettingsScreen,
+  InstructorsListScreen,
+  NotificationsScreen,
+  OrganizationBusinformation,
+  OrganizationInfoScreen,
+  PaymentInfoScreen,
+  PersonalProfileScreen,
+  ReportProblemScreen,
+  SettingsScreen,
+  StudentActivityDetailsScreen,
   StudentLocationScreen,
-  CreateParentActivityScreen,
-  DragDropStudentScreen,
-  InstructorActivityDetailScreen,
+  StudentPersonalProfileScreen,
+  StudentSettingsScreen,
 } from "@/Screens";
-import { createDrawerNavigator } from "@react-navigation/drawer";
 import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
-import { useDispatch, useSelector } from "react-redux";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import React, { useEffect } from "react";
 import RNDeviceInfo from "react-native-device-info";
+import { useDispatch, useSelector } from "react-redux";
 
+import ActivityNavigator from "@/Navigators/Main/ActivityNavigator";
+import ApprovalNavigator from "@/Navigators/Main/ApprovalNavigator";
 import RightDrawerContent from "@/Navigators/Main/DrawerContents/RightDrawerContent/RightDrawerContent";
 import HomeNavigator from "@/Navigators/Main/HomeNavigator";
-import ActivityNavigator from "@/Navigators/Main/ActivityNavigator";
-import InstructorChatNavigator from "@/Navigators/Main/InstructorChatNavigator";
-import { ParentChatScreen, StudentChatScreen } from "@/Screens/Chats";
-import StudentActivityNavigator from "@/Navigators/Main/StudentActivityNavigator";
-import ApprovalNavigator from "@/Navigators/Main/ApprovalNavigator";
-import InstructorApprovalNavigator from "@/Navigators/Main/InstructorApprovalNavigator";
 import InstructorActivityNavigator from "@/Navigators/Main/InstructorActivityNavigator";
+import InstructorApprovalNavigator from "@/Navigators/Main/InstructorApprovalNavigator";
+import InstructorChatNavigator from "@/Navigators/Main/InstructorChatNavigator";
+import StudentActivityNavigator from "@/Navigators/Main/StudentActivityNavigator";
+import { ParentChatScreen } from "@/Screens/Chats";
 
-import InstructorGroupApprovalNavigator from "@/Navigators/Main/InstructorGroupApprovalNavigator";
 import AddMembersNavigator from "@/Navigators/Main/AddMembersNavigator";
-import { UserTypeState } from "@/Store/UserType";
+import InstructorGroupApprovalNavigator from "@/Navigators/Main/InstructorGroupApprovalNavigator";
 import ParentDeletePermissionScreen from "@/Screens/Main/ParentDeletePermission/ParentDeletePermissionScreen";
+import { UserTypeState } from "@/Store/UserType";
 
 const RightDrawerNavigator = () => {
   const Drawer = createDrawerNavigator();

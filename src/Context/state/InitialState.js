@@ -6,4 +6,5 @@ export const initialState = {
   childName: "",
   child: {},
   orgInstructors: {},
+  toggle:false
 };

@@ -70,6 +70,7 @@ console.log('orgInfo',orgInfo)
     }
   }, [isFocused]);
 
+  console.log('data',data.fromDate)
   return (
     <BackgroundLayout style={{ paddingBottom: 10 }}>
       {showInstructorModal && (
@@ -319,13 +320,13 @@ console.log('orgInfo',orgInfo)
             </View>
             <View>
               <Text style={styles.label}>From</Text>
-              <Text style={styles.text}>{`${moment(
+              <Text style={styles.text}>{`${moment.utc(
                 data?.fromDate == "string" ? new Date() : data?.fromDate
-              ).format("MMM DD, YYYY")} at ${moment(
+              ).format("MMM DD, YYYY")} at ${moment.utc(
                 data?.fromDate == "string" ? new Date() : data?.fromDate
               )
-                .subtract("hours", 5)
-                .format("hh:mm a")} `}</Text>
+                .format("hh:mm a")} `}
+                </Text>
               {/* <Text style={styles.text}>{`${moment(
               data?.toDate == "string" ? new Date() : data?.toDate
             ).format("YYYY-MM-DD")} at ${moment(
@@ -343,12 +344,11 @@ console.log('orgInfo',orgInfo)
             <View>
               <Text style={styles.label}>To</Text>
 
-              <Text style={styles.text}>{`${moment(
+              <Text style={styles.text}>{`${moment.utc(
                 data?.toDate == "string" ? new Date() : data?.toDate
-              ).format("MMM DD, YYYY")} at ${moment(
+              ).format("MMM DD, YYYY")} at ${moment.utc(
                 data?.toDate == "string" ? new Date() : data?.toDate
               )
-                .subtract("hours", 5)
                 .format("hh:mm a")} `}</Text>
             </View>
           </View>

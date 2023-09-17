@@ -11,7 +11,7 @@ import { StyleSheet, View } from "react-native";
 const ActivityNavigator = ({ route }) => {
   const TabNavigator = createMaterialTopTabNavigator();
   const tabNames = ["Activity", "Group"];
-
+  
   const [{ childName }] = useStateValue();
   //@ts-ignore
   const TopTabBar = ({ navigation, state }) => (

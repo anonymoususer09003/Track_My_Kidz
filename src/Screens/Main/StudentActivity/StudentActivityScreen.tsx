@@ -1,59 +1,48 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Text, Icon } from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  Platform,
-  PermissionsAndroid,
-  AppState,
-  Image,
-} from "react-native";
-import * as Stomp from "stompjs";
-import SockJS from "sockjs-client";
-import BackgroundFetchingComponenet from "../../../Components/BackgroundFetching";
-import MapView, { Marker, Circle } from "react-native-maps";
-import GeolocationAndroid from "react-native-geolocation-service";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import axios from "axios";
 import { InstructionsModal } from "@/Modals";
-import {
-  GetActivityByStudentId,
-  GetAllActivity,
-  GetActivitesCount,
-} from "@/Services/Activity";
-import Fontisto from "react-native-vector-icons/Fontisto";
-import { AwsLocationTracker } from "@/Services/TrackController";
-import Geolocation from "@react-native-community/geolocation";
-import { UserState } from "@/Store/User";
-import moment from "moment";
-import ChangeStudentActivityState from "@/Store/StudentActivity/ChangeStudentActivityState";
-import TrackHistory from "@/Services/Parent/TrackHistory";
-import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
 import { Activity, Optin } from "@/Models/DTOs";
-import { loadToken } from "@/Storage/MainAppStorage";
-import Entypo from "react-native-vector-icons/Entypo";
 import {
-  storeHomeScreenCacheInfo,
-  getHomeScreenCacheInfo,
-} from "@/Storage/MainAppStorage";
+  GetActivitesCount,
+  GetActivityByStudentId,
+  ParticipantLocation
+} from "@/Services/Activity";
+import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
+import TrackHistory from "@/Services/Parent/TrackHistory";
+import { getHomeScreenCacheInfo, loadToken, storeHomeScreenCacheInfo } from "@/Storage/MainAppStorage";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import ChangeStudentActivityState from "@/Store/StudentActivity/ChangeStudentActivityState";
+import { UserState } from "@/Store/User";
+import Colors from "@/Theme/Colors";
+import Geolocation from "@react-native-community/geolocation";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Icon, Text } from "@ui-kitten/components";
+import axios from "axios";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  FlatList,
+  Image,
+  PermissionsAndroid,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from "react-native";
+import GeolocationAndroid from "react-native-geolocation-service";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import MapView, { Marker } from "react-native-maps";
+import Entypo from "react-native-vector-icons/Entypo";
+import Fontisto from "react-native-vector-icons/Fontisto";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { ParticipantLocation } from "@/Services/Activity";
+import { useDispatch, useSelector } from "react-redux";
+import SockJS from "sockjs-client";
+import * as Stomp from "stompjs";
 
-import { StudentState } from "@/Store/StudentActivity";
-import firestore from "@react-native-firebase/firestore";
-import BackgroundService from "react-native-background-actions";
-import SetChatParam from "@/Store/chat/SetChatParams";
-import { GroupParticipantsModal } from "@/Modals";
-import { useStateValue } from "@/Context/state/State";
 import { actions } from "@/Context/state/Reducer";
-import { ShowInstructorsStudentsModal } from "@/Modals";
+import { useStateValue } from "@/Context/state/State";
+import { GroupParticipantsModal, ShowInstructorsStudentsModal } from "@/Modals";
+import { StudentState } from "@/Store/StudentActivity";
+import SetChatParam from "@/Store/chat/SetChatParams";
+import BackgroundService from "react-native-background-actions";
 const StudentActivityScreen = ({ route }) => {
   const navigation = useNavigation();
 
@@ -785,19 +774,17 @@ const StudentActivityScreen = ({ route }) => {
                             item?.fromDate == "string"
                               ? new Date()
                               : item?.fromDate
-                          ).format("YYYY-MM-DD")} at ${moment(
+                          ).format("YYYY-MM-DD")} at ${moment.utc(
                             item?.fromDate == "string"
                               ? new Date()
                               : item?.fromDate
                           )
-                            .subtract("hours", 5)
                             .format("hh:mm a")} `}</Text>
                           <Text style={styles.text}>{`${moment(
                             item?.toDate == "string" ? new Date() : item?.toDate
-                          ).format("YYYY-MM-DD")} at ${moment(
+                          ).format("YYYY-MM-DD")} at ${moment.utc(
                             item?.toDate == "string" ? new Date() : item?.toDate
                           )
-                            .subtract("hours", 5)
                             .format("hh:mm a")} `}</Text>
                         </View>
                       </View>

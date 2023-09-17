@@ -38,7 +38,7 @@ const HomeScreen = () => {
   const focused = useIsFocused();
   const swipeableRef = useRef(null);
   const ref = useRef();
-  const [, _dispatch] = useStateValue();
+  const [_, _dispatch] = useStateValue();
   let row: Array<any> = [];
   let prevOpenedRow: any;
   const dispatch = useDispatch();
@@ -49,6 +49,7 @@ const HomeScreen = () => {
     latitudeDelta: 0.001,
     longitudeDelta: 0.001,
   });
+
   useEffect(() => {
     Geolocation.getCurrentPosition((pos) => {
       const crd = pos.coords;
@@ -61,7 +62,8 @@ const HomeScreen = () => {
     });
   }, []);
   useEffect(() => {
-    setThumbnail(false);
+    
+    // setThumbnail(false);
   }, [focused]);
   const [children, setChildren] = useState([]);
   const [trackingList, setTrackingList] = useState({});
@@ -561,7 +563,6 @@ const HomeScreen = () => {
                       });
                       navigation.navigate("Activity", {
                         dependent: item,
-                        setThumbnail:()=>setThumbnail(true),
                       });
                     }}
                   >
@@ -594,15 +595,15 @@ const HomeScreen = () => {
             onLayout={() => {
               let temp = studentsEmails.filter((item) => item.latitude != null);
 
-              ref?.current?.fitToCoordinates(temp, {
-                edgePadding: {
-                  top: 10,
-                  right: 10,
-                  bottom: 10,
-                  left: 10,
-                },
-                animated: true,
-              });
+              // ref?.current?.fitToCoordinates(temp, {
+              //   edgePadding: {
+              //     top: 10,
+              //     right: 10,
+              //     bottom: 10,
+              //     left: 10,
+              //   },
+              //   animated: true,
+              // });
             }}
             style={{ flex: 1 }}
           >

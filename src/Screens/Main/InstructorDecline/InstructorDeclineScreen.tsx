@@ -329,19 +329,17 @@ const InstructorGroupPendingScreen = ({ route }) => {
                           item?.fromDate == "string"
                             ? new Date()
                             : item?.fromDate
-                        ).format("MMM DD, YYYY")} at ${moment(
+                        ).format("MMM DD, YYYY")} at ${moment.utc(
                           item?.fromDate == "string"
                             ? new Date()
                             : item?.fromDate
                         )
-                          .subtract("hours", 5)
                           .format("hh:mm a")} `}</Text>
                         <Text style={styles.text}>{`${moment(
                           item?.toDate == "string" ? new Date() : item?.toDate
-                        ).format('MMM DD, YYYY')} at ${moment(
+                        ).format('MMM DD, YYYY')} at ${moment.utc(
                           item?.toDate == "string" ? new Date() : item?.toDate
                         )
-                          .subtract("hours", 5)
                           .format("hh:mm a")} `}</Text>
                       </View>
                             {/* <Text style={styles.text}>{date}</Text> */}

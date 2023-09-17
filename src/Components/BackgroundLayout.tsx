@@ -67,7 +67,11 @@ export default function BackgroundLayout({
     >
       {!hideHeader && !showFamilyMap && (
         <View style={[styles.main, style && style]}>
-          <TouchableOpacity onPress={() => {navigation.goBack()}}>
+          <TouchableOpacity onPress={() => {
+           
+            navigation.goBack()
+            
+            }}>
             {!hideLeftIcon && (
               <MaterialIcon name="arrow-back" size={20} color={Colors.white} />
             )}
