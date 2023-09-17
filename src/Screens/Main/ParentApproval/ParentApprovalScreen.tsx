@@ -194,13 +194,14 @@ const ParentApprovalScreen = ({ route }) => {
       </View>
     );
   };
-  console.log("selected child", selectedChild);
+  console.log("aaaaaaa", activities);
 
   return (
     <>
       <InstructionsModal
         selectedInstructions={selectedInstructions}
         setSelectedInstructions={setSelectedInstructions}
+        activity={selectedInstructions?.activity}
       />
       {declineActivity && (
         <ChildrenSelectionModal

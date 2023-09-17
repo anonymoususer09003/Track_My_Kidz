@@ -40,7 +40,6 @@ const AppHeader = ({ showGlobe, ...props }) => {
   );
 
   const navigation = useNavigation()
-console.log('navigation',navigation.getState().index)
   // const user_type = 'instructor';
   //@ts-ignore
   const renderSettingIcon = (props) => {
@@ -106,13 +105,15 @@ console.log('navigation',navigation.getState().index)
   const renderHomeIcon = (props) => (
     <Image style={{ height: 27, width: 27 }} source={homeIcon} />
   );
+  console.log('props',props)
   //@ts-ignore
-  const renderListItem = (props) => (
-    // navigation.getState().index === 0?
+  const renderListItem = () => {
+    return (
+      props?.thumbnail?<></>:!props?.isCalendar ?
     <Icon name="list" size={25} color="white" /> 
-    // <Image style={{ height: 27, width: 27 }} source={calendarIcon} />
+    : <Image style={{ height: 27, width: 27 }} source={calendarIcon} />
 
-  );
+  )};
 
   const isStack = props && props.isStack;
   const isBack = props && props.isBack;
@@ -205,7 +206,15 @@ console.log('navigation',navigation.getState().index)
         <TopNavigationAction
           icon={user_type === "parent"?renderListItem:undefined}
           style={{ marginLeft: 10 }}
-          onPress={()=> props?.setThumbnail && props?.setThumbnail(true)}
+          onPress={()=> {
+            if(props?.isCalendar){
+              dispatch(
+                ChangeModalState.action({
+                  showCalendar: true,
+                })
+              );
+            }
+            props?.setThumbnail && props?.setThumbnail(true)}}
         />
       {/* )} */}
     </View>

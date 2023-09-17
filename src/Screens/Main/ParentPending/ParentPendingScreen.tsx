@@ -242,6 +242,7 @@ const ParentPendingScreen = ({ route }) => {
         <InstructionsModal
           selectedInstructions={selectedInstructions}
           setSelectedInstructions={setSelectedInstructions}
+          activity={selectedInstructions?.activity}
         />
       )}
       {activity && (

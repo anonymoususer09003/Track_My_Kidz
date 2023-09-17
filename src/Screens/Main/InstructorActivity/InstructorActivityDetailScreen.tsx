@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import BackgroundLayout from "@/Components/BackgroundLayout";
 import { actions } from "@/Context/state/Reducer";
 import { useStateValue } from "@/Context/state/State";
+import { FindAllIstructorActivities } from "@/Services/Activity";
 import {
   GetInstructor
 } from "@/Services/Instructor";
@@ -28,7 +29,8 @@ const location = require("@/Assets/Images/marker.png");
 const clock = require("@/Assets/Images/clock1.png");
 const InstructorActivityDetailScreen = ({ route }) => {
   const dispatch = useDispatch();
-  const [, _dispatch] = useStateValue();
+  const [{ selectedActivity }, _dispatch] = useStateValue();
+
   const isFocused = useIsFocused();
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
@@ -43,25 +45,23 @@ const InstructorActivityDetailScreen = ({ route }) => {
   const [orgInfo, setOrgInfo] = useState(null);
   const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
     useState(false);
-console.log('orgInfo',orgInfo)
   const data = route?.params?.data;
   const activitiesCount = route?.params?.activitiesCount || {};
+  const [insturctorsList,setInstructorsList] = useState([])
   const showInstructorModal = useSelector(
     (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
   );
   let temp = [];
   let instructor = data?.instructors?.map((item) => temp.push(item?.firstName));
-  console.log('data',data)
   const handleGetOrganizationInfo = async () => {
     const userId = await loadUserId();
-
     let res = await GetInstructor(userId);
     if (res.schoolId || res.orgId) {
       GetSchool(res?.schoolId)
         .then((org) => {
           setOrgInfo(org);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log('[ERROR]',err));
     }
   };
   useEffect(() => {
@@ -69,8 +69,25 @@ console.log('orgInfo',orgInfo)
       handleGetOrganizationInfo();
     }
   }, [isFocused]);
+  useEffect(()=>{
+    setSelectionData({
+      status: "approved",
+      type: "instructor",
+    });
+    if(selectionData?.status&&data?.activityId )
+    {
+    let body = {
+      activityId: data?.activityId,
+      status: selectionData?.status,
+      page: 0,
+      page_size: 10,
+    };
+    FindAllIstructorActivities(body).then((data)=>{
+      setInstructorsList(data)
+    }).catch((err)=>{console.log('ERRRR', err)});
+  }
 
-  console.log('data',data.fromDate)
+  },[selectedActivity?.activityId,selectionData?.status])
   return (
     <BackgroundLayout style={{ paddingBottom: 10 }}>
       {showInstructorModal && (
@@ -149,7 +166,7 @@ console.log('orgInfo',orgInfo)
           <View style={{ alignItems: "center" }}>
             <Text
               style={[styles.text, { color: Colors.black }]}
-            >{`Approval`}</Text>
+            >{`Approved`}</Text>
             <View style={{ flexDirection: "row" }}>
               <TouchableOpacity
                 style={styles.horizontal}
@@ -370,8 +387,8 @@ console.log('orgInfo',orgInfo)
             </View>
             <View>
               <Text style={styles.label}>Address</Text>
-              {orgInfo?<Text style={styles.text}>
-                {`${orgInfo?.address}, ${orgInfo?.city}, ${orgInfo?.state} ${orgInfo?.zipcode}, ${orgInfo?.country}` || "-"}</Text>:null}
+              {orgInfo||data?<Text style={styles.text}>
+                {`${data?.venueFromAddress?data?.venueFromAddress:orgInfo?.address}, ${data?.venueFromCity?data?.venueFromCity:orgInfo?.city}, ${data?.venueFromState?data?.venueFromState:orgInfo?.state} ${data?.venueFromZip?data?.venueFromZip:orgInfo?.zipcode}, ${data?.venueFromCountry?data?.venueFromCountry:orgInfo?.country}` || "-"}</Text>:null}
             </View>
           </View>
 
@@ -382,7 +399,17 @@ console.log('orgInfo',orgInfo)
             <View>
               <Text style={styles.label}>Instructor</Text>
 
-              <Text style={styles.text}>{`${temp.toString() || "-"}`}</Text>
+              <Text style={styles.text}>
+                {insturctorsList.map((inst)=>{
+                  return(
+                   <Text>
+{  inst?.firstName} {inst.lastName}{insturctorsList.length>1?", ":''}
+                   </Text>  
+                  )
+                })}
+                
+                {/* {`${temp.toString() || "-"}`} */}
+                </Text>
             </View>
           </View>
         </View>

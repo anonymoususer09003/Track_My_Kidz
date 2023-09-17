@@ -66,6 +66,7 @@ const InstructionsModal = ({
     setPayment(false);
     setIsValid(false);
     setSelectedAmountIndex(null);
+    console.log('isVisible',isVisible,activity)
     if (isVisible) {
       if (group) {
         getGroupsOptInDetail();
@@ -76,7 +77,7 @@ const InstructionsModal = ({
     try {
       console.log("activity99", activity?.activityId);
       let res = await GetOptIn(activity?.activityId);
-
+console.log('resssss',res)
       setInformation({ ...infomation, ...res });
     } catch (err) {
       console.log("err", err);
@@ -93,6 +94,7 @@ const InstructionsModal = ({
     }
   };
 
+  console.log('infomation',infomation?.instructions)
   // @ts-ignore
   return (
     <Modal

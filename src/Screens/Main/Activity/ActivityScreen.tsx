@@ -1,3 +1,4 @@
+import { AppHeader } from "@/Components";
 import { actions } from "@/Context/state/Reducer";
 import { useStateValue } from "@/Context/state/State";
 import { GroupParticipantsModal, InstructionsModal, ShowInstructorsStudentsModal } from "@/Modals";
@@ -76,6 +77,7 @@ const ActivityScreen = ({ route }) => {
     });
 
     return (
+      <>
       <View
         style={{
           // flexDirection: "column",
@@ -93,14 +95,13 @@ const ActivityScreen = ({ route }) => {
                 subcollection: "parent",
                 user: {
                   _id: currentUser?.parentId,
-                  avatar:
-                    currentUser?.imageurl ||
+                  avatar: currentUser?.imageurl ||
                     "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
                   name: currentUser?.firstname
                     ? currentUser?.firstname[0].toUpperCase() +
-                      currentUser?.firstname.slice(1) +
-                      " " +
-                      currentUser?.lastname[0].toUpperCase()
+                    currentUser?.firstname.slice(1) +
+                    " " +
+                    currentUser?.lastname[0].toUpperCase()
                     : currentUser?.firstname + "" + currentUser?.lastname,
                 },
               })
@@ -112,7 +113,7 @@ const ActivityScreen = ({ route }) => {
               showHeader: true,
               fromChat: true,
             });
-          }}
+          } }
           style={{
             padding: 5,
             alignItems: "center",
@@ -132,8 +133,7 @@ const ActivityScreen = ({ route }) => {
             <Icon
               style={{ width: 40, height: 40 }}
               fill={Colors.primary}
-              name="trash"
-            />
+              name="trash" />
           </TouchableOpacity>
         )}
         <TouchableOpacity
@@ -142,11 +142,11 @@ const ActivityScreen = ({ route }) => {
             setParticipantMap(true);
             setSelectedActivity(item);
             getParticipantLocation(item?.activityId);
-          }}
+          } }
         >
           <Entypo size={40} color={Colors.primary} name="location-pin" />
         </TouchableOpacity>
-      </View>
+      </View></>
     );
   };
   const getParticipantLocation = async (activityId: any) => {
@@ -360,6 +360,7 @@ const ActivityScreen = ({ route }) => {
 
   return (
     <>
+      <AppHeader  isCalendar={true} />
       {selectedGroup && showModal && (
         <GroupParticipantsModal
           isVisible={showModal}
