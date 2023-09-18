@@ -1421,7 +1421,7 @@ console.log('details',details)
                           marginBottom: 20,
                         }}
                       >
-                        {instructors &&
+                        {instructors ?
                           instructors.map((instructor, index) => (
                             <View
                               style={{
@@ -1465,7 +1465,7 @@ console.log('details',details)
                                 />
                               </View>
                             </View>
-                          ))}
+                          )):null}
                       </ScrollView>
                     )}
                     {/* <View
@@ -1554,7 +1554,7 @@ console.log('details',details)
                             </View>
                           ))}
                       </ScrollView>
-                    )} */}
+                    )} 
                     <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"
