@@ -6,13 +6,13 @@ import Colors from "@/Theme/Colors";
 import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
 import { useNavigation } from "@react-navigation/native";
 import {
-  Icon,
   Text, TopNavigation,
   TopNavigationAction
 } from "@ui-kitten/components";
 import React from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from "react-redux";
 
 import { ModalState } from "@/Store/Modal";
@@ -105,7 +105,7 @@ const AppHeader = ({ showGlobe, ...props }) => {
   const renderHomeIcon = (props) => (
     <Image style={{ height: 27, width: 27 }} source={homeIcon} />
   );
-  console.log('props',props)
+
   //@ts-ignore
   const renderListItem = () => {
     return (
@@ -212,11 +212,14 @@ const AppHeader = ({ showGlobe, ...props }) => {
           style={{ marginLeft: 10 }}
           onPress={()=> {
             // if(props?.isCalendar){
-              dispatch(
-                ChangeModalState.action({
-                  showCalendar: true,
-                })
-              );
+              // if(props?.isCalendar &&
+              //   user_type !== 'parent'){
+                  dispatch(
+                    ChangeModalState.action({
+                      showCalendar: true,
+                    })
+                    );
+                  // }
             // }
             props?.setThumbnail && props?.setThumbnail(true)}}
         />
