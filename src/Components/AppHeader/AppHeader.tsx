@@ -6,13 +6,13 @@ import Colors from "@/Theme/Colors";
 import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
 import { useNavigation } from "@react-navigation/native";
 import {
+  Icon,
   Text, TopNavigation,
   TopNavigationAction
 } from "@ui-kitten/components";
 import React from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from "react-redux";
 
 import { ModalState } from "@/Store/Modal";
@@ -109,7 +109,11 @@ const AppHeader = ({ showGlobe, ...props }) => {
   //@ts-ignore
   const renderListItem = () => {
     return (
-      props?.thumbnail?<></>:!props?.isCalendar ?
+      props?.thumbnail ?
+      <></>
+      :
+      !props?.isCalendar &&
+      user_type === 'parent'?
     <Icon name="list" size={25} color="white" /> 
     : <Image style={{ height: 27, width: 27 }} source={calendarIcon} />
 
@@ -204,16 +208,16 @@ const AppHeader = ({ showGlobe, ...props }) => {
       )}
       {/* {!hideCalendar && ( */}
         <TopNavigationAction
-          icon={user_type === "parent"?renderListItem:undefined}
+          icon={renderListItem}
           style={{ marginLeft: 10 }}
           onPress={()=> {
-            if(props?.isCalendar){
+            // if(props?.isCalendar){
               dispatch(
                 ChangeModalState.action({
                   showCalendar: true,
                 })
               );
-            }
+            // }
             props?.setThumbnail && props?.setThumbnail(true)}}
         />
       {/* )} */}
