@@ -153,17 +153,16 @@ const InstructorActivityScreen = ({ route }: any) => {
       setRefreshing(true);
     }
     // Alert.alert("kjk");
-
     GetAllActivity(refreshing ? page : 0, pageSize, {
       cancelToken: source.token,
     })
       .then((res) => {
+        console.log('res',res)
         setRefreshing(false);
         setPageSize(pageSize);
 
         pageNumber(refreshing ? page + 1 : 1);
         setTotalRecords(res.totalRecords);
-        console.log("res", res.result);
 
         const data = res && res.result;
         if (page == 0) {
@@ -218,7 +217,7 @@ const InstructorActivityScreen = ({ route }: any) => {
       cancelToken: source.token,
     })
       .then((res) => {
-        console.log("res", res);
+        console.log("FindActivitiesByUserId", res);
         setTotalRecords(res.totalRecords);
 
         setRefreshing(false);
@@ -736,6 +735,7 @@ const InstructorActivityScreen = ({ route }: any) => {
 
   useEffect(() => {
     if (dropDownValue) {
+      console.log('dropDownValue',dropDownValue)
       if (dropDownValue.row === 0) {
         setSelectedInstructor(null);
         setSelectedInstructorActivities(null);
@@ -745,6 +745,8 @@ const InstructorActivityScreen = ({ route }: any) => {
             " " +
             instructors?.result[dropDownValue.row - 1]?.lastname
         );
+    console.log('idddddd',instructors?.result[dropDownValue.row - 1]?.instructorId)
+
         getActivitiesByInstructor(
           instructors?.result[dropDownValue.row - 1]?.instructorId
         );
@@ -758,6 +760,9 @@ const InstructorActivityScreen = ({ route }: any) => {
       setActivities(originalActivities);
     }
   }, [searchBarValue]);
+
+
+  console.log('activities',activities)
   return (
     <>
       {cancelModal && (
@@ -1158,7 +1163,8 @@ const styles = StyleSheet.create({
     marginHorizontal: "2%",
     // paddingHorizontal: 10,
     paddingTop: 10,
-    height: 175,
+    // height: 175,
+    paddingBottom:10
   },
   footer: {
     borderBottomLeftRadius: 10,

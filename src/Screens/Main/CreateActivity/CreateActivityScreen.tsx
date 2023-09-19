@@ -590,11 +590,11 @@ const CreateActivityScreen = ({ route }) => {
                   0;
                 // console.log("onBhelf", _instructor);
                 let totime = moment(values.toTime, ["h:mm A"]).format("HH:mm");
-                let todate = moment(values.to).format('MMM DD, YYYY');
+                let todate = moment(values.to).format("YYYY-MM-DD");
                 let fromtime = moment(values.fromTime, ["h:mm A"]).format(
                   "HH:mm"
                 );
-                let fromdate = moment(new Date(values.from)).format('MMM DD, YYYY');
+                let fromdate = moment(new Date(values.from)).format("YYYY-MM-DD");
                 // console.log("date", values.from + "----", +values.fromTime);
                 // console.log("fafaffafafafafa", date + "T" + time + ":00.000Z");
                 const data = {
