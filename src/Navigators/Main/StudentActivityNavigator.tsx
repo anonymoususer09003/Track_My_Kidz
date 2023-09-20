@@ -18,7 +18,7 @@ const StudentActivityNavigator = () => {
   const [selectedMonth, setSelectedMonth] = useState(
     moment(new Date()).month()
   );
-  
+  console.log('selectedMonth',selectedMonth)
   const dispatch = useDispatch()
   const { hideCalendar, showFamilyMap, showParticipantMap } = useSelector(
     (state: { studentActivity: StudentState }) => state.studentActivity

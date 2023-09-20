@@ -252,7 +252,6 @@ const ActivityScreen = ({ route }) => {
    
   let date = new Date().getFullYear() + "-" + month + "-" + day;
   let temp = []
-  console.log('originalActivities',originalActivities)
   if(originalActivities?.length){
     originalActivities.map((item)=>{
 console.log('item',item?.fromDate)
@@ -272,6 +271,12 @@ console.log('date2',date2)
   
 
 };
+useEffect(()=>{
+if(!isCalendarVisible){
+  setActivities(originalActivities);
+}
+},[isCalendarVisible])
+
 useEffect(() => {
   if (isCalendarVisible) {
     filterActivities(selectedMonthForFilter, selectedDayForFilter);

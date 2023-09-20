@@ -163,7 +163,6 @@ const InstructorActivityScreen = ({ route }: any) => {
       cancelToken: source.token,
     })
       .then((res) => {
-        console.log('res',res)
         setRefreshing(false);
         setPageSize(pageSize);
 
@@ -770,7 +769,6 @@ if(!isCalendarVisible){
   ]);
 
   useEffect(() => {
-    console.log('instructorsssss',instructors,dropDownValue)
     if (dropDownValue) {
       if (dropDownValue.row === 0) {
         setSelectedInstructor(null);
