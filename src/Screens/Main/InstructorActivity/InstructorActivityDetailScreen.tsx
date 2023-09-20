@@ -89,7 +89,6 @@ const InstructorActivityDetailScreen = ({ route }) => {
 
   },[selectedActivity?.activityId,selectionData?.status])
 
-  console.log('status-----',data?.status)
   return (
     <BackgroundLayout style={{ paddingBottom: 10 }}>
       {showInstructorModal && (

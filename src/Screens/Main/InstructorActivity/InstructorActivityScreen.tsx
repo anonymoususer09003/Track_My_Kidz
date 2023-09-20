@@ -92,7 +92,10 @@ const InstructorActivityScreen = ({ route }: any) => {
   const [page, pageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [userId, setUserId] = useState(null);
   const [selectedInstructorActivities, setSelectedInstructorActivities] =
+    useState(null);
+    const [originalInstructorActivities, setOriginalInstructorActivities] =
     useState(null);
   const isCalendarVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.showCalendar
@@ -273,7 +276,9 @@ const InstructorActivityScreen = ({ route }: any) => {
 
   const getInstructor = async () => {
     const userId = await loadUserId();
-
+    if(userId) {
+      setUserId(userId);
+    }
     try {
       if (Object.keys(currentUser).length == 0) {
         let res = await GetInstructor(userId);
@@ -369,7 +374,6 @@ const InstructorActivityScreen = ({ route }: any) => {
   };
 
   const getActivitiesByInstructor = async (id: number) => {
-    console.log(id);
     GetActivityByInstructor(id, 0, pageSize, {
       cancelToken: source.token,
     })
@@ -588,7 +592,6 @@ const InstructorActivityScreen = ({ route }: any) => {
   //     dispatch(ChangeModalState.action({ setupVehicleModal: true }));
   //   }
   // }, [selectedActivity]);
-
   const RightActions = (dragX: any, item) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
@@ -625,14 +628,26 @@ const InstructorActivityScreen = ({ route }: any) => {
 
   const renderIcon = (props: any) => <Icon {...props} name={"search"} />;
   const filterActivities = (month: any, day: any) => {
-    let allActivities = { ...activities };
-
+      let allActivities = { ...activities }
+     
     let date = new Date().getFullYear() + "-" + month + "-" + day;
-    console.log("date", date);
     let temp = [];
-    originalActivities?.result?.map((item, index) => {
+    if(originalInstructorActivities?.length){
+      originalInstructorActivities.map((item)=>{
+
+        const date1 = moment(item?.fromDate, ["YYYY-MM-DDTHH:mm:ss.SSSZ", "MMM DD, YYYYTHH:mm:ss.SSSZ"],true);
+        const date2 = moment(date, ["YYYY-M-D"],true);
+        if (
+          moment(date1).isSame(date2,'day') &&
+          moment(date1).isSame(date2,'month')
+        ) {
+          temp.push(item);
+        }
+      })
+      setSelectedInstructorActivities(temp)
+    }else{
+ originalActivities?.result?.map((item, index) => {
       // let itemDate = item?.date.split("T");
-      console.log("dsate----", moment(item?.fromDate).format("YYYY-MM-DD")); // console.log("itemdate", itemDate[0]);
 
       if (
         moment(item?.fromDate).format('MMM DD, YYYY') ==
@@ -641,9 +656,13 @@ const InstructorActivityScreen = ({ route }: any) => {
         temp.push(item);
       }
     });
+    }
+   
     allActivities.result = temp;
-    console.log("temp", temp);
+    
     setActivities(allActivities);
+ 
+
   };
   const filterInstructorActivities = (
     month: any,
@@ -652,19 +671,24 @@ const InstructorActivityScreen = ({ route }: any) => {
   ) => {
     let allActivities = [...activities];
 
-    let date = new Date().getFullYear() + "-" + month + "-" + day;
-    console.log("date", date);
-    let temp = [];
-    allActivities.map((item, index) => {
-      let itemDate = item?.date?.split(" ");
+    if(!isCalendarVisible){
+      setSelectedInstructorActivities(activities)
+      setOriginalInstructorActivities(activities);
+    } else{
+      let date = new Date().getFullYear() + "-" + month + "-" + day;
+      let temp = [];
+      allActivities.map((item, index) => {
+        let itemDate = item?.date?.split(" ");
+  
+        if (itemDate[0] == date) {
+          temp.push(item);
+        }
+      });
+      setSelectedInstructorActivities(temp);
+    }
 
-      if (itemDate[0] == date) {
-        temp.push(item);
-      }
-    });
-
-    setSelectedInstructorActivities(temp);
   };
+  
   useEffect(() => {
     if (isCalendarVisible) {
       filterActivities(selectedMonthForFilter, selectedDayForFilter);
@@ -705,7 +729,7 @@ const InstructorActivityScreen = ({ route }: any) => {
       console.log("err", err);
     }
   };
-
+console.log('selectedInstructorActivities',selectedInstructorActivities?.length)
   useEffect(() => {
     if (countries && isFocused) {
       let temp = [];
@@ -734,8 +758,8 @@ const InstructorActivityScreen = ({ route }: any) => {
   ]);
 
   useEffect(() => {
+    console.log('instructorsssss',instructors,dropDownValue)
     if (dropDownValue) {
-      console.log('dropDownValue',dropDownValue)
       if (dropDownValue.row === 0) {
         setSelectedInstructor(null);
         setSelectedInstructorActivities(null);
@@ -745,14 +769,17 @@ const InstructorActivityScreen = ({ route }: any) => {
             " " +
             instructors?.result[dropDownValue.row - 1]?.lastname
         );
-    console.log('idddddd',instructors?.result[dropDownValue.row - 1]?.instructorId)
 
         getActivitiesByInstructor(
           instructors?.result[dropDownValue.row - 1]?.instructorId
         );
       }
+    }else if (userId){
+      getActivitiesByInstructor(
+        userId
+      );
     }
-  }, [dropDownValue]);
+  }, [dropDownValue,userId]);
   useEffect(() => {
     if (searchBarValue) {
       search(searchBarValue);
@@ -762,7 +789,6 @@ const InstructorActivityScreen = ({ route }: any) => {
   }, [searchBarValue]);
 
 
-  console.log('activities',activities)
   return (
     <>
       {cancelModal && (
@@ -841,7 +867,8 @@ const InstructorActivityScreen = ({ route }: any) => {
       )}
 
       <View style={styles.layout}>
-        {activities?.result?.length == 0 && (
+        {
+        (activities?.result?.length == 0 && selectedInstructorActivities?.length == 0) && (
           <Text style={{ textAlign: "center", marginTop: 5 }}>
             You currently do not have any activities
           </Text>
@@ -1119,7 +1146,7 @@ const InstructorActivityScreen = ({ route }: any) => {
             );
           }}
           onEndReached={async () => {
-            if (totalRecords > originalActivities.result.length) {
+            if (totalRecords > originalActivities?.result?.length) {
               console.log("logs");
               const userId = await loadUserId();
               user?.isAdmin ? getActivities(true) : getActivitiesByUser(userId);
