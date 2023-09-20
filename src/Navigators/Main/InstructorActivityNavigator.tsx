@@ -132,7 +132,7 @@ const InstructorActivityNavigator = () => {
       setSelectedDay(moment().format("D"));
       dispatch(
         ChangeInstructorActivityState.action({
-          selectedMonthForFilter: moment().format("M"),
+          selectedMonthForFilter: moment().subtract(1,"M").format("M"),
           selectedDayForFilter: moment().format("DD"),
         })
       );
