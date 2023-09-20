@@ -40,6 +40,8 @@ import * as Stomp from "stompjs";
 import { actions } from "@/Context/state/Reducer";
 import { useStateValue } from "@/Context/state/State";
 import { GroupParticipantsModal, ShowInstructorsStudentsModal } from "@/Modals";
+import { InstructorState } from "@/Store/InstructorsActivity";
+import { ModalState } from "@/Store/Modal";
 import { StudentState } from "@/Store/StudentActivity";
 import SetChatParam from "@/Store/chat/SetChatParams";
 import BackgroundService from "react-native-background-actions";
@@ -85,10 +87,18 @@ const StudentActivityScreen = ({ route }) => {
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
+  const isCalendarVisible = useSelector(
+    (state: { modal: ModalState }) => state.modal.showCalendar
+  );
+  
   const instructorImage = require("@/Assets/Images/approval_icon2.png");
   const { showFamilyMap, showParticipantMap } = useSelector(
     (state: { studentActivity: StudentState }) => state.studentActivity
   );
+ const { selectedDayForFilter, selectedMonthForFilter } = useSelector(
+    (state: { instructorsActivity: InstructorState }) =>
+      state.instructorsActivity
+  )
 
   const ref = useRef();
   let prevOpenedRow: any;
@@ -192,6 +202,12 @@ const StudentActivityScreen = ({ route }) => {
     }
   };
 
+  useEffect(()=>{
+if(!isCalendarVisible){
+  setActivities(originalActivities)
+}
+  },[isCalendarVisible])
+  
   useEffect(() => {
     if (isFocused) {
       getCacheActivites();
@@ -568,6 +584,38 @@ const StudentActivityScreen = ({ route }) => {
     allActivities = temp;
     setActivities(allActivities);
   };
+  const filterActivities = (month: any, day: any) => {
+   
+  let date = new Date().getFullYear() + "-" + month + "-" + day;
+  let temp = []
+  console.log('originalActivities',originalActivities?.length)
+  if(originalActivities?.length){
+    originalActivities.map((item)=>{
+      console.log('item',item?.fromDate)
+      const date1 = moment(item?.fromDate, ["YYYY-MM-DDTHH:mm:ss.SSSZ", "MMM DD, YYYYTHH:mm:ss.SSSZ"],true);
+      const date2 = moment(date, ["YYYY-M-D"],true).add(1,'month').add(1,'day');
+console.log('date1',date1)
+console.log('date2',date2)
+      if (
+        moment(date1).isSame(date2,'day') &&
+        moment(date1).isSame(date2,'month')
+      ) {
+        temp.push(item);
+      }
+    })
+    setActivities(temp)
+  }
+  
+
+};
+useEffect(() => {
+  console.log('isCalendarVisible',isCalendarVisible)
+  if (isCalendarVisible) {
+    filterActivities(selectedMonthForFilter, selectedDayForFilter);
+  }
+}, [selectedDayForFilter, selectedMonthForFilter, isCalendarVisible]);
+
+  
   useEffect(() => {
     if (isFocused) {
       let temp = [];
