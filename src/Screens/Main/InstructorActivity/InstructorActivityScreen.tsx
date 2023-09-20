@@ -636,7 +636,9 @@ const InstructorActivityScreen = ({ route }: any) => {
       originalInstructorActivities.map((item)=>{
 
         const date1 = moment(item?.fromDate, ["YYYY-MM-DDTHH:mm:ss.SSSZ", "MMM DD, YYYYTHH:mm:ss.SSSZ"],true);
-        const date2 = moment(date, ["YYYY-M-D"],true);
+        const date2 = moment(date, ["YYYY-M-D"],true).add(1,'month').add(1,'day');
+        console.log('date1: ', date1)
+        console.log('date2: ', date2)
         if (
           moment(date1).isSame(date2,'day') &&
           moment(date1).isSame(date2,'month')

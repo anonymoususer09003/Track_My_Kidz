@@ -83,7 +83,6 @@ const AddStudentModal = () => {
   function getUriSource(): any {
     return { uri: selectedImage };
   }
-  console.log("selectedimage", selectedImage);
 
   const imageGalleryLaunch = () => {
     ImagePicker.openPicker({

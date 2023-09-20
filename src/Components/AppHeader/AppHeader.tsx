@@ -4,7 +4,7 @@ import { NavigationCustomState } from "@/Store/Navigation";
 import ChangeStudentActivityState from "@/Store/StudentActivity/ChangeStudentActivityState";
 import Colors from "@/Theme/Colors";
 import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Text, TopNavigation,
   TopNavigationAction
@@ -40,6 +40,7 @@ const AppHeader = ({ showGlobe, ...props }) => {
   );
 
   const navigation = useNavigation()
+  const route = useRoute();
   // const user_type = 'instructor';
   //@ts-ignore
   const renderSettingIcon = (props) => {
@@ -211,16 +212,15 @@ const AppHeader = ({ showGlobe, ...props }) => {
           icon={renderListItem}
           style={{ marginLeft: 10 }}
           onPress={()=> {
-            // if(props?.isCalendar){
-              // if(props?.isCalendar &&
-              //   user_type !== 'parent'){
-                  dispatch(
-                    ChangeModalState.action({
-                      showCalendar: true,
-                    })
-                    );
-                  // }
-            // }
+            console.log('props?.isCalendar',props?.isCalendar)
+            if(user_type === 'instructor' || route.name === 'Activity')
+            {
+              dispatch(
+                ChangeModalState.action({
+                  showCalendar: true,
+                })
+                );
+              }
             props?.setThumbnail && props?.setThumbnail(true)}}
         />
       {/* )} */}

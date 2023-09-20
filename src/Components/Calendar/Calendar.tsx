@@ -1,21 +1,19 @@
-import React, { useState, useRef, useEffect } from "react";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { UserTypeState } from "@/Store/UserType";
+import Colors from "@/Theme/Colors";
+import { useIsFocused, useRoute } from "@react-navigation/native";
+import { Select, SelectItem } from "@ui-kitten/components";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  ScrollView,
   FlatList,
   Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { useDispatch } from "react-redux";
-import { useIsFocused } from "@react-navigation/native";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { Button, Icon, Input, Select, SelectItem } from "@ui-kitten/components";
-import { useTheme } from "@/Theme";
-import Colors from "@/Theme/Colors";
-import moment from "moment";
+import { useDispatch, useSelector } from "react-redux";
 
 export interface CalendarProps {
   selectedMonth: number;
@@ -47,6 +45,10 @@ const Calendar = ({
   setSelectedDay,
   style,
 }: CalendarProps) => {
+
+  const user_type = useSelector(
+    (state: { userType: UserTypeState }) => state.userType.userType
+  );
   const getDays = (month: string) => {
     const year = moment(new Date()).year();
     console.log("year", month);
@@ -89,6 +91,7 @@ const Calendar = ({
       return data;
     }
   };
+  const isFirstRender = useRef(true);
   const ref = useRef();
   const focused = useIsFocused();
   const dispatch = useDispatch();
@@ -96,14 +99,17 @@ const Calendar = ({
   useEffect(() => {
     ref.current.scrollToIndex({ index: selectedDay, animated: true });
   }, []);
+
+  const route = useRoute();
   useEffect(() => {
-    if (!focused) {
+    if (!isFirstRender.current && !focused ) {
       dispatch(
         ChangeModalState.action({
           showCalendar: false,
         })
       );
     }
+    isFirstRender.current = false;
   }, [focused]);
 
   return (
@@ -114,6 +120,7 @@ const Calendar = ({
           value={months[selectedMonth]}
           placeholder="Grade"
           onSelect={(index: any) => {
+            console.log('index',index.row)
             setSelectedMonth(index.row);
             setDays(getDays(months[index.row]));
           }}

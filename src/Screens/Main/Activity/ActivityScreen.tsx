@@ -5,6 +5,8 @@ import { GroupParticipantsModal, InstructionsModal, ShowInstructorsStudentsModal
 import { Activity } from "@/Models/DTOs";
 import { GetActivitesCount, GetActivityByStudentId, ParticipantLocation } from "@/Services/Activity";
 import { loadToken } from "@/Storage/MainAppStorage";
+import { InstructorState } from "@/Store/InstructorsActivity";
+import { ModalState } from "@/Store/Modal";
 import SetChatParam from "@/Store/chat/SetChatParams";
 import Colors from "@/Theme/Colors";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
@@ -68,7 +70,14 @@ const ActivityScreen = ({ route }) => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [newParticipnatsArr, setnewParticipnatsArr] = useState([]);
 
-  console.log('activities',activities)
+  const { selectedDayForFilter, selectedMonthForFilter } = useSelector(
+    (state: { instructorsActivity: InstructorState }) =>
+      state.instructorsActivity
+  );
+  const isCalendarVisible = useSelector(
+    (state: { modal: ModalState }) => state.modal.showCalendar
+  );
+  
   const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
@@ -238,6 +247,37 @@ const ActivityScreen = ({ route }) => {
     setActivities(allActivities);
   };
 
+  const filterActivities = (month: any, day: any) => {
+    let allActivities = { ...activities }
+   
+  let date = new Date().getFullYear() + "-" + month + "-" + day;
+  let temp = []
+  console.log('originalActivities',originalActivities)
+  if(originalActivities?.length){
+    originalActivities.map((item)=>{
+console.log('item',item?.fromDate)
+      const date1 = moment(item?.fromDate, ["YYYY-MM-DDTHH:mm:ss.SSSZ", "MMM DD, YYYYTHH:mm:ss.SSSZ"],true);
+      const date2 = moment(date, ["YYYY-M-D"],true).add(1,'month').add(1,'day');
+console.log('date1',date1)
+console.log('date2',date2)
+      if (
+        moment(date1).isSame(date2,'day') &&
+        moment(date1).isSame(date2,'month')
+      ) {
+        temp.push(item);
+      }
+    })
+    setActivities(temp)
+  }
+  
+
+};
+useEffect(() => {
+  if (isCalendarVisible) {
+    filterActivities(selectedMonthForFilter, selectedDayForFilter);
+  }
+}, [selectedDayForFilter, selectedMonthForFilter, isCalendarVisible]);
+
   useEffect(() => {
     if (isFocused) {
       // if (selectedActivity) {
@@ -357,6 +397,7 @@ const ActivityScreen = ({ route }) => {
     setnewParticipnatsArr(groupedArray);
     setParticipants(temp);
   }, [trackingList]);
+
 
   return (
     <>
