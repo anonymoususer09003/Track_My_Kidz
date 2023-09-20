@@ -1243,8 +1243,9 @@ const styles = StyleSheet.create({
     marginHorizontal: "2%",
     // paddingHorizontal: 10,
     paddingTop: 10,
-    height: 185,
+    // height: 185,
     marginBottom: 20,
+    paddingBottom:10
   },
   footer: {
     borderBottomLeftRadius: 10,

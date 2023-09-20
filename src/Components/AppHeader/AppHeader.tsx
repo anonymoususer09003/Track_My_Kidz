@@ -43,6 +43,7 @@ const AppHeader = ({ showGlobe, ...props }) => {
   const route = useRoute();
   // const user_type = 'instructor';
   //@ts-ignore
+
   const renderSettingIcon = (props) => {
     return (
       <>
@@ -108,17 +109,30 @@ const AppHeader = ({ showGlobe, ...props }) => {
   );
 
   //@ts-ignore
+  console.log('routeName',route.name)
+  console.log('user_type',user_type)
+  
   const renderListItem = () => {
-    return (
-      props?.thumbnail ?
-      <></>
-      :
-      !props?.isCalendar &&
-      user_type === 'parent'?
-    <Icon name="list" size={25} color="white" /> 
-    : <Image style={{ height: 27, width: 27 }} source={calendarIcon} />
-
-  )};
+     if (user_type === 'instructor'){
+       if(route.name === 'InstructorActivity'){
+          return  <Image style={{ height: 27, width: 27 }} source={calendarIcon} />
+       }
+    }else if(user_type === 'parent'){
+      if(props?.thumbnail){
+        return <></>
+      }
+      switch(route.name){
+        case "Activity": 
+        return  <Image style={{ height: 27, width: 27 }} source={calendarIcon} />
+        case "HomeScreen":
+        return  <Icon name="list" size={25} color="white" />  
+      }
+    }else if (user_type === 'student'){
+      if(route.name !== 'StudentSettings')
+      return  <Image style={{ height: 27, width: 27 }} source={calendarIcon} />
+    }
+    return <></>
+};
 
   const isStack = props && props.isStack;
   const isBack = props && props.isBack;
@@ -212,15 +226,20 @@ const AppHeader = ({ showGlobe, ...props }) => {
           icon={renderListItem}
           style={{ marginLeft: 10 }}
           onPress={()=> {
-            console.log('props?.isCalendar',props?.isCalendar)
-            if(user_type === 'instructor' || route.name === 'Activity')
-            {
+            console.log('props?.isCalendar',props?.isCalendar,props?.thumbnail)
+            if(route.name === 'HomeScreen'){
               dispatch(
                 ChangeModalState.action({
-                  showCalendar: true,
+                  showCalendar:false,
                 })
                 );
-              }
+            }else{
+              dispatch(
+                ChangeModalState.action({
+                  showCalendar: isCalendarVisible ? false: true,
+                })
+                );
+            }
             props?.setThumbnail && props?.setThumbnail(true)}}
         />
       {/* )} */}

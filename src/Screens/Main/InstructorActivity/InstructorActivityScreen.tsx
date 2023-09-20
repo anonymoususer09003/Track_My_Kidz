@@ -63,6 +63,9 @@ const InstructorActivityScreen = ({ route }: any) => {
   const swipeableRef = useRef(null);
   const [activitiesCount, setActivitiesCount] = useState({});
   const dispatch = useDispatch();
+  const user_type = useSelector(
+    (state: { userType: UserTypeState }) => state.userType.userType
+  );
 
   const showVehicle = useSelector(
     (state: { modal: ModalState }) => state.modal.setupVehicleModal
@@ -731,7 +734,14 @@ const InstructorActivityScreen = ({ route }: any) => {
       console.log("err", err);
     }
   };
-console.log('selectedInstructorActivities',selectedInstructorActivities?.length)
+
+  useEffect(()=>{
+if(!isCalendarVisible){
+  if( user_type === 'instructor')
+  setSelectedInstructorActivities(originalInstructorActivities)
+}
+  },[isCalendarVisible])
+  
   useEffect(() => {
     if (countries && isFocused) {
       let temp = [];
