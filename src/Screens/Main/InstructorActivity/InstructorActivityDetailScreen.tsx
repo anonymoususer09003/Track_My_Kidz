@@ -134,7 +134,7 @@ const InstructorActivityDetailScreen = ({ route }) => {
             }}
           />
           <Text style={[styles.text, { color: Colors.white }]}>
-            {data?.status}
+            {data?.activityStatus}
           </Text>
         </View>
 

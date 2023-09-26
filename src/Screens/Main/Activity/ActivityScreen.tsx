@@ -178,6 +178,7 @@ const ActivityScreen = ({ route }) => {
   const getActivities = async () => {
     GetActivityByStudentId(child?.studentId)
       .then((res) => {
+        console.log('response:::',res)
         setActivities(res);
         setOriginalActivities(res);
       })
