@@ -280,17 +280,17 @@ const ActivityDetailsScreen = () => {
             //   latitudeDelta: 0.0922 + width / height,
             //   longitudeDelta: 0.0421,
             // }}
-            // onLayout={() => {
-            //   ref?.current?.fitToCoordinates(studentsEmails, {
-            //     edgePadding: {
-            //       top: 10,
-            //       right: 10,
-            //       bottom: 10,
-            //       left: 10,
-            //     },
-            //     animated: true,
-            //   });
-            // }}
+            onLayout={() => {
+              ref?.current?.fitToCoordinates(studentsEmails, {
+                edgePadding: {
+                  top: 10,
+                  right: 10,
+                  bottom: 10,
+                  left: 10,
+                },
+                animated: true,
+              });
+            }}
             style={{ flex: 1 }}
           >
             {newParticipnatsArr.map((item, index) => {
