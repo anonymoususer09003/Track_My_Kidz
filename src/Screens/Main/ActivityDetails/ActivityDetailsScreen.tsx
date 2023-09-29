@@ -1,35 +1,25 @@
-import React, { useEffect, useState, useRef } from "react";
+import { AppHeader } from "@/Components";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import { GroupParticipantsModal } from "@/Modals";
+import { ParticipantLocation } from "@/Services/Activity";
+import { loadToken } from "@/Storage/MainAppStorage";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import Colors from "@/Theme/Colors";
 import {
   useIsFocused,
   useNavigation,
   useRoute,
 } from "@react-navigation/native";
-import { Text, Icon } from "@ui-kitten/components";
-import { StyleSheet, View, FlatList, Switch, Alert, Image } from "react-native";
-import { loadToken } from "@/Storage/MainAppStorage";
-import * as Stomp from "stompjs";
-import SockJS from "sockjs-client";
-import { AppHeader } from "@/Components";
-import Fontisto from "react-native-vector-icons/Fontisto";
-import messaging from "@react-native-firebase/messaging";
-import { UpdateDeviceToken } from "@/Services/User";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeSearchString from "@/Store/Blogs/ChangeSearchString";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { navigateAndSimpleReset } from "@/Navigators/Functions";
-import { WelcomeMessageModal, EditDependentModal } from "@/Modals";
-import SearchBar from "@/Components/SearchBar/SearchBar";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { LinearGradientButton } from "@/Components";
-import MapView, { Marker } from "react-native-maps";
-import { ParticipantLocation } from "@/Services/Activity";
-import { AwsLocationTracker } from "@/Services/TrackController";
-import BackgroundLayout from "@/Components/BackgroundLayout";
-import { calculateDistance } from "../../../Utils/DistanceCalculator";
-import { GroupParticipantsModal } from "@/Modals";
+import { Text } from "@ui-kitten/components";
+import React, { useEffect, useRef, useState } from "react";
+import { FlatList, Image, StyleSheet, Switch, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import MapView, { Marker } from "react-native-maps";
+import Fontisto from "react-native-vector-icons/Fontisto";
+import { useDispatch } from "react-redux";
+import SockJS from "sockjs-client";
+import * as Stomp from "stompjs";
+import { calculateDistance } from "../../../Utils/DistanceCalculator";
 const ActivityDetailsScreen = () => {
   const ref = useRef();
   const navigation = useNavigation();
@@ -358,9 +348,9 @@ const ActivityDetailsScreen = () => {
                             {item?.image == "" && (
                               <View
                                 style={{
-                                  height: "100%",
-                                  width: "100%",
-                                  borderRadius: 80,
+                                  // height: "100%",
+                                  // width: "100%",
+                                  borderRadius: 20,
                                   backgroundColor: Colors.primary,
                                   justifyContent: "center",
                                   alignItems: "center",
@@ -382,9 +372,9 @@ const ActivityDetailsScreen = () => {
                                   uri: item?.image,
                                 }}
                                 style={{
-                                  height: "100%",
-                                  width: "100%",
-                                  borderRadius: 80,
+                                  height: 50,
+                                  width: 50,
+                                  borderRadius: 40,
                                   aspectRatio: 1.5,
                                 }}
                                 resizeMode="contain"

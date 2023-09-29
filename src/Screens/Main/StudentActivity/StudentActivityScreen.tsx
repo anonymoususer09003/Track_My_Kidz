@@ -1061,9 +1061,9 @@ useEffect(() => {
                           {item?.image == "" && (
                             <View
                               style={{
-                                height: "100%",
-                                width: "100%",
-                                borderRadius: 80,
+                                // height: "100%",
+                                // width: "100%",
+                                borderRadius: 20,
                                 backgroundColor: Colors.primary,
                                 justifyContent: "center",
                                 alignItems: "center",
@@ -1085,9 +1085,9 @@ useEffect(() => {
                                 uri: item?.image,
                               }}
                               style={{
-                                height: "100%",
-                                width: "100%",
-                                borderRadius: 80,
+                                height: 50,
+                                width: 50,
+                                borderRadius: 40,
                                 aspectRatio: 1.5,
                               }}
                               resizeMode="contain"
@@ -1215,9 +1215,9 @@ useEffect(() => {
                         {item?.studentImage == "" && (
                           <View
                             style={{
-                              height: "100%",
-                              width: "100%",
-                              borderRadius: 80,
+                              // height: "100%",
+                              // width: "100%",
+                              borderRadius: 20,
                               backgroundColor: Colors.primary,
                               justifyContent: "center",
                               alignItems: "center",
@@ -1238,9 +1238,9 @@ useEffect(() => {
                               uri: item?.studentImage,
                             }}
                             style={{
-                              height: "100%",
-                              width: "100%",
-                              borderRadius: 80,
+                              height: 50,
+                              width: 50,
+                              borderRadius: 40,
                               aspectRatio: 2,
                             }}
                             resizeMode="contain"

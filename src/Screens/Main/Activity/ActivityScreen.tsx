@@ -741,9 +741,9 @@ useEffect(() => {
                         <View style={{}}>
                           <View
                             style={{
-                              height: 30,
-                              width: 30,
-                              borderRadius: 80,
+                              // height: 30,
+                              // width: 30,
+                              borderRadius: 20,
                               overflow: "hidden",
                               // top: 33,
                               // zIndex: 10,
@@ -752,9 +752,9 @@ useEffect(() => {
                             {item?.image == "" && (
                               <View
                                 style={{
-                                  height: "100%",
-                                  width: "100%",
-                                  borderRadius: 80,
+                                  height: 50,
+                                  width: 50,
+                                  borderRadius: 40,
                                   backgroundColor: Colors.primary,
                                   justifyContent: "center",
                                   alignItems: "center",

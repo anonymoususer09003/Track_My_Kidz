@@ -595,15 +595,15 @@ const HomeScreen = () => {
             onLayout={() => {
               let temp = studentsEmails.filter((item) => item.latitude != null);
 
-              // ref?.current?.fitToCoordinates(temp, {
-              //   edgePadding: {
-              //     top: 10,
-              //     right: 10,
-              //     bottom: 10,
-              //     left: 10,
-              //   },
-              //   animated: true,
-              // });
+              ref?.current?.fitToCoordinates(temp, {
+                edgePadding: {
+                  top: 10,
+                  right: 10,
+                  bottom: 10,
+                  left: 10,
+                },
+                animated: true,
+              });
             }}
             style={{ flex: 1 }}
           >
@@ -668,9 +668,9 @@ const HomeScreen = () => {
                       <View style={{}}>
                         <View
                           style={{
-                            height: 30,
-                            width: 30,
-                            borderRadius: 80,
+                            // height: ,
+                            // width: 100,
+                            borderRadius: 20,
                             overflow: "hidden",
                             // top: 33,
                             // zIndex: 10,
@@ -679,9 +679,9 @@ const HomeScreen = () => {
                           {item?.studentImage == "" && (
                             <View
                               style={{
-                                height: "100%",
-                                width: "100%",
-                                borderRadius: 80,
+                                // height: "100%",
+                                // width: "100%",
+                                borderRadius: 20,
                                 backgroundColor: Colors.primary,
                                 justifyContent: "center",
                                 alignItems: "center",
@@ -703,10 +703,10 @@ const HomeScreen = () => {
                                 uri: item?.studentImage,
                               }}
                               style={{
-                                height: "100%",
-                                width: "100%",
-                                borderRadius: 80,
-                                aspectRatio: 1.5,
+                                height: 50,
+                                width: 50,
+                                borderRadius: 40,
+                                // aspectRatio: 5,
                               }}
                               resizeMode="contain"
                             />
