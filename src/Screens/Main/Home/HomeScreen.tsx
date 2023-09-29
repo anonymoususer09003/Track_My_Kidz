@@ -703,9 +703,9 @@ const HomeScreen = () => {
                                 uri: item?.studentImage,
                               }}
                               style={{
-                                height: 50,
-                                width: 50,
-                                borderRadius: 40,
+                                height: 40,
+                                width: 40,
+                                borderRadius: 30,
                                 // aspectRatio: 5,
                               }}
                               resizeMode="contain"
