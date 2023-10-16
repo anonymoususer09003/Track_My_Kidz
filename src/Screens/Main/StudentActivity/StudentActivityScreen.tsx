@@ -37,6 +37,7 @@ import { useDispatch, useSelector } from "react-redux";
 import SockJS from "sockjs-client";
 import * as Stomp from "stompjs";
 
+import BackgroundFetching from "@/Components/BackgroundFetching";
 import { actions } from "@/Context/state/Reducer";
 import { useStateValue } from "@/Context/state/State";
 import { GroupParticipantsModal, ShowInstructorsStudentsModal } from "@/Modals";
@@ -734,7 +735,7 @@ useEffect(() => {
           setSelectedInstructions={setSelectedInstructions}
         />
       )}
-      {/* {currentUser?.childTrackHistory && <BackgroundFetchingComponenet />} */}
+      {currentUser?.childTrackHistory && <BackgroundFetching />}
       {selectedGroup && showModal && (
         <GroupParticipantsModal
           isVisible={showModal}
@@ -1204,9 +1205,7 @@ useEffect(() => {
                     <View style={{}}>
                       <View
                         style={{
-                          height: 30,
-                          width: 30,
-                          borderRadius: 80,
+                          // borderRadius: 30,
                           overflow: "hidden",
                           // top: 33,
                           // zIndex: 10,
@@ -1215,9 +1214,7 @@ useEffect(() => {
                         {item?.studentImage == "" && (
                           <View
                             style={{
-                              // height: "100%",
-                              // width: "100%",
-                              borderRadius: 20,
+                              // borderRadius: 20,
                               backgroundColor: Colors.primary,
                               justifyContent: "center",
                               alignItems: "center",
@@ -1240,8 +1237,8 @@ useEffect(() => {
                             style={{
                               height: 40,
                               width: 40,
-                              borderRadius: 30,
-                              aspectRatio: 2,
+                              borderRadius: 20,
+                              // aspectRatio: 2,
                             }}
                             resizeMode="contain"
                           />

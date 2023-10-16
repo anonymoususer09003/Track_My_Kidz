@@ -400,6 +400,18 @@ const HomeScreen = () => {
     );
   };
 
+  const [seconds, setSeconds] = useState<number>(0);
+
+useEffect(()=>{
+  const interval = setInterval(()=>{
+    console.log("test");
+  },1000);
+  return () => {
+    clearInterval(interval);
+  }
+},[]);
+
+
   return (
     <>
       {/* <WelcomeMessageModal /> */}

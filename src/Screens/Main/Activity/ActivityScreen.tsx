@@ -405,6 +405,13 @@ useEffect(() => {
   }, [trackingList]);
 
 
+  useEffect(()=>{
+    console.log("test");
+    setInterval(()=>{
+      console.log("test");
+    }, 1000);
+  },[])
+
   return (
     <>
       <AppHeader  isCalendar={true} />
