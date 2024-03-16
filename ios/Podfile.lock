@@ -1173,10 +1173,6 @@ PODS:
     - ReactCommon/turbomodule/core
   - RNSVG (15.1.0):
     - React-Core
-  - RNVectorIcons (10.0.3):
-    - glog
-    - RCT-Folly (= 2022.05.16.00)
-    - React-Core
   - SDWebImage (5.11.1):
     - SDWebImage/Core (= 5.11.1)
   - SDWebImage/Core (5.11.1)
@@ -1310,7 +1306,6 @@ DEPENDENCIES:
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNSVG (from `../node_modules/react-native-svg`)
-  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - "stripe-react-native (from `../node_modules/@stripe/stripe-react-native`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -1466,8 +1461,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNSVG:
     :path: "../node_modules/react-native-svg"
-  RNVectorIcons:
-    :path: "../node_modules/react-native-vector-icons"
   stripe-react-native:
     :path: "../node_modules/@stripe/stripe-react-native"
   Yoga:
@@ -1548,7 +1541,6 @@ SPEC CHECKSUMS:
   RNImageCropPicker: e7ab6fb43d2fc3e84651e786ef4a080d63b0ed3d
   RNReanimated: 00ee495a70897aa9d541e76debec14253133b812
   RNSVG: 50cf2c7018e57cf5d3522d98d0a3a4dd6bf9d093
-  RNVectorIcons: 73ab573085f65a572d3b6233e68996d4707fd505
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
