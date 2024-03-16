@@ -13,15 +13,16 @@ plugins.push([
   },
 ]);
 
-// If you want to explicitly use the JSX transform plugin with the new JSX transform
-// Note: This is usually not necessary if you're using React 17+ with the appropriate Babel preset
+// If you're using React 17+ and want to explicitly use the new JSX transform
 plugins.push([
   "@babel/plugin-transform-react-jsx",
-  "react-native-reanimated/plugin",
   {
     runtime: "automatic", // This tells Babel to use the new JSX transform
   },
 ]);
+
+// Add react-native-reanimated plugin separately
+plugins.push("react-native-reanimated/plugin");
 
 module.exports = {
   presets,
