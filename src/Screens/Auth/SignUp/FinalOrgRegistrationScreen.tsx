@@ -1622,7 +1622,7 @@ console.log('details',details)
                       </LinearGradientButton>
                     </View>
                   )}
-                  {loading && <Spinner />}
+                  {/* {loading && <Spinner />} */}
                 </>
               )}
             </Formik>

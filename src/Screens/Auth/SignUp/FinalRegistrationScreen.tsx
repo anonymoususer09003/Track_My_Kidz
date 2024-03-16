@@ -1,60 +1,64 @@
-import { ProfileAvatarPicker } from "@/Components";
-import { ImagePickerModal } from "@/Modals";
-import { Login } from "@/Services/LoginServices";
-import { useIsFocused } from "@react-navigation/native";
+import {ProfileAvatarPicker} from '@/Components';
+import {ImagePickerModal} from '@/Modals';
+import {Login} from '@/Services/LoginServices';
+import {useIsFocused} from '@react-navigation/native';
 import {
   Autocomplete,
   AutocompleteItem,
   Button,
-  CheckBox, Icon, Input,
-  Layout, Select,
+  CheckBox,
+  Icon,
+  Input,
+  Layout,
+  Select,
   SelectItem,
   StyleService,
   Text,
-  useStyleSheet
-} from "@ui-kitten/components";
+  useStyleSheet,
+} from '@ui-kitten/components';
 import React, {
   ReactElement,
   ReactText,
   useContext,
   useEffect,
-  useState
-} from "react";
+  useState,
+} from 'react';
 import {
-  Alert, KeyboardAvoidingView, Linking, Platform,
+  Alert,
+  KeyboardAvoidingView,
+  Linking,
+  Platform,
   ScrollView,
   TouchableWithoutFeedback,
-  View
-} from "react-native";
-import { getDeviceId } from "react-native-device-info";
+  View,
+} from 'react-native';
+import {getDeviceId} from 'react-native-device-info';
 
-import { CompleteRegistration, Register } from "@//Services/SignUpServices";
-import {
-  LocationIcon, PersonIcon, PhoneIcon
-} from "@/Components/SignUp/icons";
-import { RegisterDTO, UserRegistrationDTO } from "@/Models/UserDTOs";
-import { Props } from "@ui-kitten/components/devsupport/services/props/props.service";
-import { Formik } from "formik";
-import * as yup from "yup";
+import {CompleteRegistration, Register} from '@//Services/SignUpServices';
+import {LocationIcon, PersonIcon, PhoneIcon} from '@/Components/SignUp/icons';
+import {RegisterDTO, UserRegistrationDTO} from '@/Models/UserDTOs';
+import {Props} from '@ui-kitten/components/devsupport/services/props/props.service';
+import {Formik} from 'formik';
+import * as yup from 'yup';
 
-import { LinearGradientButton } from "@/Components";
-import BackgroundLayout from "@/Components/BackgroundLayout";
-import { ParentPaymentModal } from "@/Modals";
-import { CountryDTO } from "@/Models/CountryDTOs";
-import { AuthContext } from "@/Navigators/Auth/AuthProvider";
-import { GetOrgByFilters } from "@/Services/Org";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import { GetSchoolByFilters } from "@/Services/School";
-import { storeToken, storeUserType } from "@/Storage/MainAppStorage";
-import LoginStore from "@/Store/Authentication/LoginStore";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { PlaceState } from "@/Store/Places";
-import Colors from "@/Theme/Colors";
-import moment from "moment";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import ImagePicker from "react-native-image-crop-picker";
-import Toast from "react-native-toast-message";
-import { useDispatch, useSelector } from "react-redux";
+import {LinearGradientButton} from '@/Components';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import {ParentPaymentModal} from '@/Modals';
+import {CountryDTO} from '@/Models/CountryDTOs';
+import {AuthContext} from '@/Navigators/Auth/AuthProvider';
+import {GetOrgByFilters} from '@/Services/Org';
+import {GetAllCities, GetAllStates} from '@/Services/PlaceServices';
+import {GetSchoolByFilters} from '@/Services/School';
+import {storeToken, storeUserType} from '@/Storage/MainAppStorage';
+import LoginStore from '@/Store/Authentication/LoginStore';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import {PlaceState} from '@/Store/Places';
+import Colors from '@/Theme/Colors';
+import moment from 'moment';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import ImagePicker from 'react-native-image-crop-picker';
+import Toast from 'react-native-toast-message';
+import {useDispatch, useSelector} from 'react-redux';
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -72,34 +76,34 @@ const filter = (item: String, query: string) => {
 };
 
 const user_types = [
-  { id: 1, label: "Parent", value: "Parent" },
-  { id: 2, label: "Instructor", value: "Instructor" },
-  { id: 3, label: "Student", value: "Student" },
+  {id: 1, label: 'Parent', value: 'Parent'},
+  {id: 2, label: 'Instructor', value: 'Instructor'},
+  {id: 3, label: 'Student', value: 'Student'},
 ];
 
 const organisations = [
-  { id: 1, label: "School", value: "School" },
-  { id: 2, label: "Organisation", value: "Organisation" },
+  {id: 1, label: 'School', value: 'School'},
+  {id: 2, label: 'Organisation', value: 'Organisation'},
 ];
 
-const FinalRegistrationScreen = ({ navigation, route }: Props) => {
-  const markerIcon = require("@/Assets/Images/marker.png");
+const FinalRegistrationScreen = ({navigation, route}: Props) => {
+  const markerIcon = require('@/Assets/Images/marker.png');
   const [unmount, setUnmount] = useState(false);
   const [reRender, setRerender] = useState(false);
   const isFocuesed = useIsFocused();
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] =
     React.useState<boolean>(false);
-  const [languages, setLanguages] = useState<Array<ReactText>>(["English"]);
+  const [languages, setLanguages] = useState<Array<ReactText>>(['English']);
   const [genders, setGenders] = useState<Array<ReactText>>([
-    "Female",
-    "Male",
-    "Other",
+    'Female',
+    'Male',
+    'Other',
   ]);
   const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries
+    (state: {places: PlaceState}) => state.places.countries,
   );
-  
+
   const [countriesData, setCountriesData] = React.useState(countries);
   const [schoolsData, setSchoolsData] = React.useState([]);
   const [schools, setSchools] = useState([]);
@@ -110,8 +114,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
   const [visibleImagePicker, setVisibleImagePicker] = useState(false);
   const [rows, setRows] = useState([
     {
-      grade: "",
-      subject: "",
+      grade: '',
+      subject: '',
     },
   ]);
   const [selectedGrades, setSelectedGrades] = useState([]);
@@ -119,60 +123,60 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
 
   const [states, setStates] = useState<Array<any>>([]);
   const [cities, setCities] = useState<Array<any>>([]);
-  const [phoneCode, setPhoneCode] = useState<string>("");
-  const [placement, setPlacement] = React.useState("bottom");
-  const [phoneCodeNumber, setPhoneCodeNumber] = useState<string>("");
+  const [phoneCode, setPhoneCode] = useState<string>('');
+  const [placement, setPlacement] = React.useState('bottom');
+  const [phoneCodeNumber, setPhoneCodeNumber] = useState<string>('');
 
-  const { register } = useContext(AuthContext);
+  const {register} = useContext(AuthContext);
 
   const styles = useStyleSheet(themedStyles);
-  const { emailAddress, user_type, student, activation_code } = route.params; //correct here
+  const {emailAddress, user_type, student, activation_code} = route.params; //correct here
 
-  console.log('student', student)
-  
+  console.log('student', student);
+
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
-    ""
+    '',
   );
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const [visible, setVisible] = React.useState(false);
   const dispatch = useDispatch();
   const [loginObj, setLoginObj] = useState(null);
-  const _user_type = user_types.find((u) => u.label === user_type);
+  const _user_type = user_types.find(u => u.label === user_type);
 
   const signUpValidationSchema = yup.object().shape({
-    firstName: yup.string().required("First name is required"),
-    lastName: yup.string().required("Last name is required"),
+    firstName: yup.string().required('First name is required'),
+    lastName: yup.string().required('Last name is required'),
     address: yup.string(),
     apartment: yup.string(),
-    zipcode: yup.string().required("Zip code is required"),
-    country: yup.string().required("Country is required"),
+    zipcode: yup.string().required('Zip code is required'),
+    country: yup.string().required('Country is required'),
     selectedCountry: yup.string(),
     selectedState: yup.string(),
     selectedCity: yup.string(),
-    city: yup.string().required("City is required"),
-    state: yup.string().required("State is required"),
+    city: yup.string().required('City is required'),
+    state: yup.string().required('State is required'),
     phoneNumber: yup.string(),
     password: yup
       .string()
-      .min(8, ({ min }) => `Password must be at least ${min} characters`)
-      .required("Password is required"),
+      .min(8, ({min}) => `Password must be at least ${min} characters`)
+      .required('Password is required'),
     confirmPassword: yup
       .string()
-      .when("password", {
+      .when('password', {
         is: (val: any) => (val && val.length > 0 ? true : false),
         then: yup
           .string()
           .oneOf(
-            [yup.ref("password")],
-            "Password & Confirm Password do not match"
+            [yup.ref('password')],
+            'Password & Confirm Password do not match',
           ),
       })
-      .required("Re-Password is required"),
+      .required('Re-Password is required'),
     termsAccepted: yup.boolean().required(),
   });
   const signUpStudentValidationSchema = yup.object().shape({
-    firstName: yup.string().required("First name is required"),
-    lastName: yup.string().required("Last name is required"),
+    firstName: yup.string().required('First name is required'),
+    lastName: yup.string().required('Last name is required'),
     address: yup.string(),
     apartment: yup.string(),
     // zipcode: yup.string(),
@@ -185,20 +189,20 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
     phoneNumber: yup.string(),
     password: yup
       .string()
-      .min(8, ({ min }) => `Password must be at least ${min} characters`)
-      .required("Password is required"),
+      .min(8, ({min}) => `Password must be at least ${min} characters`)
+      .required('Password is required'),
     confirmPassword: yup
       .string()
-      .when("password", {
+      .when('password', {
         is: (val: any) => (val && val.length > 0 ? true : false),
         then: yup
           .string()
           .oneOf(
-            [yup.ref("password")],
-            "Password & Confirm Password do not match"
+            [yup.ref('password')],
+            'Password & Confirm Password do not match',
           ),
       })
-      .required("Re-Password is required"),
+      .required('Re-Password is required'),
     termsAccepted: yup.boolean().required(),
   });
 
@@ -210,16 +214,11 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
     setConfirmPasswordVisible(!confirmPasswordVisible);
   };
 
-
-
-  
-
-
   const renderPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onPasswordIconPress}>
       <Icon
         {...props}
-        name={passwordVisible ? "eye-off" : "eye"}
+        name={passwordVisible ? 'eye-off' : 'eye'}
         color={Colors.secondary}
       />
     </TouchableWithoutFeedback>
@@ -229,54 +228,51 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
     <TouchableWithoutFeedback onPress={onConfirmPasswordIconPress}>
       <Icon
         {...props}
-        name={confirmPasswordVisible ? "eye-off" : "eye"}
+        name={confirmPasswordVisible ? 'eye-off' : 'eye'}
         color={Colors.secondary}
       />
     </TouchableWithoutFeedback>
   );
 
-
-  
-
-  const studentCountryName = student?.parents[0].country; 
+  const studentCountryName = student?.parents[0].country;
   const codeNumber = countries?.find(item => item.name === studentCountryName);
-  
+
   useEffect(() => {
     if (codeNumber) {
-      const formattedPhoneCode = codeNumber.phone_code.toString().startsWith("+")
+      const formattedPhoneCode = codeNumber.phone_code
+        .toString()
+        .startsWith('+')
         ? codeNumber.phone_code.toString()
-        : "+" + codeNumber.phone_code;
+        : '+' + codeNumber.phone_code;
       setPhoneCodeNumber(formattedPhoneCode);
     } else {
-      setPhoneCodeNumber(''); 
+      setPhoneCodeNumber('');
     }
   }, [codeNumber]);
-  
+  console.log('log-------------------------------------');
 
   const CheckboxLabel = (evaProps: any) => {
     return (
       <Text {...evaProps} style={styles.termsCheckBoxText}>
-        I have read and agree to the{" "}
+        I have read and agree to the{' '}
         <Text
-          style={{ color: Colors.primary, fontSize: 13 }}
+          style={{color: Colors.primary, fontSize: 13}}
           onPress={() => {
-            Linking.openURL("https://trackmykidz.com/terms/").then((r) => {});
-          }}
-        >
-          {" "}
-          Terms of Use{" "}
-        </Text>{" "}
+            Linking.openURL('https://trackmykidz.com/terms/').then(r => {});
+          }}>
+          {' '}
+          Terms of Use{' '}
+        </Text>{' '}
         and
         <Text
-          style={{ color: Colors.primary, fontSize: 13 }}
+          style={{color: Colors.primary, fontSize: 13}}
           onPress={() => {
-            Linking.openURL("https://trackmykidz.com/privacy-policy").then(
-              (r) => {}
+            Linking.openURL('https://trackmykidz.com/privacy-policy').then(
+              r => {},
             );
-          }}
-        >
-          {" "}
-          Privacy Policy{" "}
+          }}>
+          {' '}
+          Privacy Policy{' '}
         </Text>
         of TrackMyKidz
       </Text>
@@ -284,10 +280,10 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
   };
 
   const getSchoolsByFilter = (
-    country = "",
-    state = "",
-    city = "",
-    schoolName
+    country = '',
+    state = '',
+    city = '',
+    schoolName,
   ) => {
     const query = {
       country: country,
@@ -296,26 +292,26 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
       schoolName: schoolName,
     };
     GetSchoolByFilters(query)
-      .then((res) => {
+      .then(res => {
         const _data = {
           schoolId: 0,
-          name: "Other",
+          name: 'Other',
         };
         const _schools = [...res];
         _schools.unshift(_data);
         setSchools(_schools);
         setSchoolsData(_schools);
       })
-      .catch((err) => {
-        console.log("GetSchoolByFilters", err);
+      .catch(err => {
+        console.log('GetSchoolByFilters', err);
       });
   };
 
   const getOrgByFilter = (
-    country = "",
-    state = "",
-    city = "",
-    schoolName = ""
+    country = '',
+    state = '',
+    city = '',
+    schoolName = '',
   ) => {
     const query = {
       country: country,
@@ -324,18 +320,18 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
       schoolName: schoolName,
     };
     GetOrgByFilters(query)
-      .then((res) => {
+      .then(res => {
         const _data = {
           schoolId: 0,
-          name: "Other",
+          name: 'Other',
         };
         const _org = [...res];
         _org.unshift(_data);
         setOrg(_org);
         setOrgData(_org);
       })
-      .catch((err) => {
-        console.log("GetOrgByFilters", err);
+      .catch(err => {
+        console.log('GetOrgByFilters', err);
       });
   };
   const imageCameraLaunch = () => {
@@ -345,10 +341,10 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
       width: 139,
       height: 130,
       compressImageQuality: 0.2,
-      loadingLabelText: "Loading image",
-    }).then((image) => {
+      loadingLabelText: 'Loading image',
+    }).then(image => {
       if (image != null) {
-        const source = { uri: image?.path };
+        const source = {uri: image?.path};
         setUploadedImage(image);
         setSelectedImage(source.uri);
         // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
@@ -362,10 +358,10 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
       width: 139,
       height: 130,
       compressImageQuality: 0.2,
-      loadingLabelText: "Loading image",
-    }).then((image) => {
+      loadingLabelText: 'Loading image',
+    }).then(image => {
       if (image != null) {
-        const source = { uri: image?.path };
+        const source = {uri: image?.path};
         setUploadedImage(image);
         setSelectedImage(source.uri);
         // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
@@ -389,7 +385,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
       style: [buttonElement.props.style, styles.editButton],
     });
   };
-  const maxDateOfBirth = moment(new Date()).subtract("years", 13);
+  const maxDateOfBirth = moment(new Date()).subtract('years', 13);
 
   useEffect(() => {
     if (!isFocuesed) {
@@ -402,23 +398,23 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
   return (
     <BackgroundLayout title="Registration">
       {_user_type.id == 2 && (
-        <View style={{ width: "100%" }}>
-          {selectedImage != "" && (
+        <View style={{width: '100%'}}>
+          {selectedImage != '' && (
             <ProfileAvatarPicker
               style={styles.profileImage}
               // resizeMode='center'
               source={
-                Platform.OS == "android"
+                Platform.OS == 'android'
                   ? {
-                      uri: selectedImage + "?time" + new Date().getTime(),
-                      headers: { Pragma: "no-cache" },
+                      uri: selectedImage + '?time' + new Date().getTime(),
+                      headers: {Pragma: 'no-cache'},
                     }
-                  : { uri: selectedImage }
+                  : {uri: selectedImage}
               }
               editButton={true ? renderEditAvatarButton : null}
             />
           )}
-          {selectedImage == "" && (
+          {selectedImage == '' && (
             <View
               style={[
                 styles.profileImage,
@@ -427,19 +423,17 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   // justifyContent: "center",
                   backgroundColor: Colors.lightgray,
                 },
-              ]}
-            >
+              ]}>
               {/* <Text style={{ fontSize: 30 }}>
                       {user?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
                       {user?.lastname?.substring(0, 1)?.toUpperCase()}
                     </Text> */}
               <View
                 style={{
-                  position: "absolute",
+                  position: 'absolute',
                   marginTop: 70,
                   marginLeft: 75,
-                }}
-              >
+                }}>
                 {true && renderEditButtonElement()}
               </View>
             </View>
@@ -480,25 +474,23 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
         //   )}
         // </View>
 
-
-
-        <View style={{ width: "100%" }}>
-          {selectedImage != "" && (
+        <View style={{width: '100%'}}>
+          {selectedImage != '' && (
             <ProfileAvatarPicker
               style={styles.profileImage}
               // resizeMode='center'
               source={
-                Platform.OS == "android"
+                Platform.OS == 'android'
                   ? {
-                      uri: selectedImage + "?time" + new Date().getTime(),
-                      headers: { Pragma: "no-cache" },
+                      uri: selectedImage + '?time' + new Date().getTime(),
+                      headers: {Pragma: 'no-cache'},
                     }
-                  : { uri: selectedImage }
+                  : {uri: selectedImage}
               }
               editButton={true ? renderEditAvatarButton : null}
             />
           )}
-          {selectedImage == "" && (
+          {selectedImage == '' && (
             <View
               style={[
                 styles.profileImage,
@@ -507,34 +499,28 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   // justifyContent: "center",
                   backgroundColor: Colors.lightgray,
                 },
-              ]}
-            >
+              ]}>
               {/* <Text style={{ fontSize: 30 }}>
                       {user?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
                       {user?.lastname?.substring(0, 1)?.toUpperCase()}
                     </Text> */}
               <View
                 style={{
-                  position: "absolute",
+                  position: 'absolute',
                   marginTop: 70,
                   marginLeft: 75,
-                }}
-              >
+                }}>
                 {true && renderEditButtonElement()}
               </View>
             </View>
           )}
         </View>
-
-
-
       )}
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -150}
-      >
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{flex: 1}}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -150}>
         {visibleImagePicker && (
           <ImagePickerModal
             openCamera={imageCameraLaunch}
@@ -548,10 +534,10 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
             dispatch(
               ChangeModalState.action({
                 welcomeMessageModal: true,
-              })
+              }),
             );
           }}
-          onCancel={()=>{}}
+          onCancel={() => {}}
         />
         <ScrollView style={styles.container}>
           {_user_type.id === 1 ? (
@@ -559,23 +545,23 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               validationSchema={signUpValidationSchema}
               validateOnMount={true}
               initialValues={{
-                firstName: "",
-                lastName: "",
-                address: "",
-                apartment: "",
-                country: "",
-                selectedCountry: "",
-                selectedState: "",
-                selectedCity: "",
-                city: "",
-                state: "",
-                zipcode: "",
-                phoneNumber: "",
-                password: "",
-                confirmPassword: "",
+                firstName: '',
+                lastName: '',
+                address: '',
+                apartment: '',
+                country: '',
+                selectedCountry: '',
+                selectedState: '',
+                selectedCity: '',
+                city: '',
+                state: '',
+                zipcode: '',
+                phoneNumber: '',
+                password: '',
+                confirmPassword: '',
                 termsAccepted: false,
               }}
-              onSubmit={(values, { resetForm }) => {
+              onSubmit={(values, {resetForm}) => {
                 const registerObject: RegisterDTO = {
                   email: emailAddress,
                   password: values.password,
@@ -591,25 +577,25 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   city: values.city,
                   zipcode: values.zipcode,
                   phone: values.phoneNumber,
-                  status: "",
+                  status: '',
                   term: true,
                   apt: values?.apartment,
                   deviceId: getDeviceId(),
                 };
 
-                dispatch(ChangeModalState.action({ loading: true }));
-                console.log("userobject", userObject);
-                Register(registerObject, "parent")
-                  .then(async (res) => {
+                dispatch(ChangeModalState.action({loading: true}));
+                console.log('userobject', userObject);
+                Register(registerObject, 'parent')
+                  .then(async res => {
                     const _token = res.data.token;
                     await storeToken(_token);
-                    await storeUserType("parent");
-                    console.log("userobject", userObject);
-                    CompleteRegistration(userObject, "parent")
+                    await storeUserType('parent');
+                    console.log('userobject', userObject);
+                    CompleteRegistration(userObject, 'parent')
                       .then((response: any) => {
                         const obj = {
                           token: _token,
-                          userType: "parent",
+                          userType: 'parent',
                           id: response.data.parentId,
                           mainId: res.data.userId,
                         };
@@ -618,17 +604,17 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                           register(emailAddress, values.password);
 
                           dispatch(
-                              ChangeModalState.action({
-                                  parentPaymentModalVisibility: true,
-                              }),
-                          )
+                            ChangeModalState.action({
+                              parentPaymentModalVisibility: true,
+                            }),
+                          );
                         }
                       })
                       .catch((error: any) => {
                         console.log(error);
                         Toast.show({
-                          type: "info",
-                          position: "top",
+                          type: 'info',
+                          position: 'top',
                           text1: error.title,
                           text2: error?.data?.statusDescription,
                           visibilityTime: 4000,
@@ -641,17 +627,16 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         });
                       })
                       .finally(() => {
-                        dispatch(ChangeModalState.action({ loading: false }));
+                        dispatch(ChangeModalState.action({loading: false}));
                         // dispatch(ChangeModalState.action({ biometricRequestModal: true }))
                       });
                   })
-                  .catch((err) => {
+                  .catch(err => {
                     Alert.alert(err?.data?.statusDescription);
-                    dispatch(ChangeModalState.action({ loading: false }));
+                    dispatch(ChangeModalState.action({loading: false}));
                     console.log(err);
                   });
-              }}
-            >
+              }}>
               {({
                 handleChange,
                 setFieldValue,
@@ -668,7 +653,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       accessoryRight={PersonIcon}
-                      value={"Email: " + emailAddress}
+                      value={'Email: ' + emailAddress}
                       disabled={true}
                     />
                     <Input
@@ -678,8 +663,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placeholder={`Parent's First Name*`}
                       accessoryRight={PersonIcon}
                       value={values.firstName}
-                      onChangeText={handleChange("firstName")}
-                      onBlur={handleBlur("firstName")}
+                      onChangeText={handleChange('firstName')}
+                      onBlur={handleBlur('firstName')}
                     />
                     {errors.firstName && touched.firstName && (
                       <Text style={styles.errorText}>{errors.firstName}</Text>
@@ -691,8 +676,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placeholder={`Parent's Last Name*`}
                       accessoryRight={PersonIcon}
                       value={values.lastName}
-                      onChangeText={handleChange("lastName")}
-                      onBlur={handleBlur("lastName")}
+                      onChangeText={handleChange('lastName')}
+                      onBlur={handleBlur('lastName')}
                     />
                     {errors.lastName && touched.lastName && (
                       <Text style={styles.errorText}>{errors.lastName}</Text>
@@ -704,8 +689,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       autoCorrect={false}
                       placeholder={`Parent's Street Address*`}
                       value={values.address}
-                      onChangeText={handleChange("address")}
-                      onBlur={handleBlur("address")}
+                      onChangeText={handleChange('address')}
+                      onBlur={handleBlur('address')}
                     />
                     {errors.address && touched.address && (
                       <Text style={styles.errorText}>{errors.address}</Text>
@@ -717,8 +702,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       autoCorrect={false}
                       placeholder={`Ste/Apt`}
                       value={values.apartment}
-                      onChangeText={handleChange("apartment")}
-                      onBlur={handleBlur("apartment")}
+                      onChangeText={handleChange('apartment')}
+                      onBlur={handleBlur('apartment')}
                     />
                     {errors.apartment && touched.apartment && (
                       <Text style={styles.errorText}>{errors.apartment}</Text>
@@ -730,32 +715,31 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placement={placement}
                       style={styles.inputSettings}
                       // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue("country", query);
+                      onChangeText={query => {
+                        setFieldValue('country', query);
                         setCountriesData(
-                          countries.filter((item) =>
-                            filterCountries(item, query)
-                          )
+                          countries.filter(item =>
+                            filterCountries(item, query),
+                          ),
                         );
                       }}
-                      onSelect={(query) => {
+                      onSelect={query => {
                         const selectedCountry = countriesData[query];
-                        setFieldValue("country", selectedCountry.name);
-                        setFieldValue("selectedCountry", selectedCountry.name);
-                        setFieldValue("selectedState", "");
-                        setFieldValue("state", "");
+                        setFieldValue('country', selectedCountry.name);
+                        setFieldValue('selectedCountry', selectedCountry.name);
+                        setFieldValue('selectedState', '');
+                        setFieldValue('state', '');
                         setStates([]);
                         GetAllStates(
-                          selectedCountry.name.replace(/ /g, "")
-                        ).then((res) => {
+                          selectedCountry.name.replace(/ /g, ''),
+                        ).then(res => {
                           setStates(res.data);
                           setStatesData(states);
                         });
-                        selectedCountry.phone_code.toString().startsWith("+")
+                        selectedCountry.phone_code.toString().startsWith('+')
                           ? setPhoneCode(selectedCountry.phone_code.toString())
-                          : setPhoneCode("+" + selectedCountry.phone_code);
-                      }}
-                    >
+                          : setPhoneCode('+' + selectedCountry.phone_code);
+                      }}>
                       {countriesData.map((item, index) => {
                         return (
                           <AutocompleteItem key={index} title={item.name} />
@@ -769,27 +753,26 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placement={placement}
                       style={styles.inputSettings}
                       // label={evaProps => <Text {...evaProps}>State</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue("state", query);
+                      onChangeText={query => {
+                        setFieldValue('state', query);
                         setStatesData(
-                          states.filter((item) => filterStates(item, query))
+                          states.filter(item => filterStates(item, query)),
                         );
                       }}
-                      onSelect={(query) => {
+                      onSelect={query => {
                         const selectedState = statesData[query];
-                        setFieldValue("state", selectedState);
-                        setFieldValue("selectedState", selectedState);
-                        setFieldValue("selectedCity", "");
-                        setFieldValue("city", "");
+                        setFieldValue('state', selectedState);
+                        setFieldValue('selectedState', selectedState);
+                        setFieldValue('selectedCity', '');
+                        setFieldValue('city', '');
                         setCities([]);
                         GetAllCities(
                           values.selectedCountry,
-                          selectedState
-                        ).then((res) => {
+                          selectedState,
+                        ).then(res => {
                           setCities(res.data);
                         });
-                      }}
-                    >
+                      }}>
                       {statesData.map((item, index) => {
                         return <AutocompleteItem key={index} title={item} />;
                       })}
@@ -804,17 +787,16 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placement={placement}
                       style={styles.inputSettings}
                       // label={evaProps => <Text {...evaProps}>City</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue("city", query);
+                      onChangeText={query => {
+                        setFieldValue('city', query);
                         setCitiesData(
-                          cities.filter((item) => filterCities(item, query))
+                          cities.filter(item => filterCities(item, query)),
                         );
                       }}
-                      onSelect={(query) => {
-                        setFieldValue("city", citiesData[query]);
-                        setFieldValue("selectedCity", citiesData[query]);
-                      }}
-                    >
+                      onSelect={query => {
+                        setFieldValue('city', citiesData[query]);
+                        setFieldValue('selectedCity', citiesData[query]);
+                      }}>
                       {citiesData.map((item, index) => {
                         return <AutocompleteItem key={index} title={item} />;
                       })}
@@ -829,8 +811,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       autoCorrect={false}
                       placeholder={`Zip/Post Code*`}
                       value={values.zipcode}
-                      onChangeText={handleChange("zipcode")}
-                      onBlur={handleBlur("zipcode")}
+                      onChangeText={handleChange('zipcode')}
+                      onBlur={handleBlur('zipcode')}
                     />
                     {errors.zipcode && touched.zipcode && (
                       <Text style={styles.errorText}>{errors.zipcode}</Text>
@@ -852,7 +834,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         accessoryRight={PhoneIcon}
                         value={values.phoneNumber}
                         keyboardType="number-pad"
-                        onChangeText={handleChange("phoneNumber")}
+                        onChangeText={handleChange('phoneNumber')}
                       />
                     </View>
                     <Input
@@ -863,8 +845,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placeholder="Password*"
                       accessoryRight={renderPasswordIcon}
                       value={values.password}
-                      onChangeText={handleChange("password")}
-                      onBlur={handleBlur("password")}
+                      onChangeText={handleChange('password')}
+                      onBlur={handleBlur('password')}
                     />
                     {errors.password && touched.password && (
                       <Text style={styles.errorText}>{errors.password}</Text>
@@ -876,36 +858,34 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placeholder="Confirm Password*"
                       accessoryRight={renderConfirmPasswordIcon}
                       value={values.confirmPassword}
-                      onChangeText={handleChange("confirmPassword")}
-                      onBlur={handleBlur("confirmPassword")}
+                      onChangeText={handleChange('confirmPassword')}
+                      onBlur={handleBlur('confirmPassword')}
                     />
                     {errors.confirmPassword && touched.confirmPassword && (
                       <Text style={styles.errorText}>
                         {errors.confirmPassword}
                       </Text>
                     )}
-                    <View style={{ flexDirection: "row" }}>
+                    <View style={{flexDirection: 'row'}}>
                       <CheckBox
-                        style={[styles.termsCheckBox, { flex: 1 }]}
+                        style={[styles.termsCheckBox, {flex: 1}]}
                         checked={values.termsAccepted}
                         onChange={() =>
-                          setFieldValue("termsAccepted", !values.termsAccepted)
-                        }
-                      >
-                        {""}
+                          setFieldValue('termsAccepted', !values.termsAccepted)
+                        }>
+                        {''}
                       </CheckBox>
-                      <View style={[styles.termsCheckBox, { flex: 15 }]}>
+                      <View style={[styles.termsCheckBox, {flex: 15}]}>
                         <CheckboxLabel />
                       </View>
                     </View>
                   </Layout>
-                  <View style={{ marginTop: 18, marginBottom: 20 }}>
+                  <View style={{marginTop: 18, marginBottom: 20}}>
                     <LinearGradientButton
                       style={styles.signUpButton}
                       size="medium"
                       onPress={handleSubmit}
-                      disabled={!isValid || !values.termsAccepted}
-                    >
+                      disabled={!isValid || !values.termsAccepted}>
                       Sign Up
                     </LinearGradientButton>
                   </View>
@@ -917,32 +897,32 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               validationSchema={signUpValidationSchema}
               validateOnMount={true}
               initialValues={{
-                firstName: "",
-                lastName: "",
-                schoolName: "",
+                firstName: '',
+                lastName: '',
+                schoolName: '',
 
-                organizationName: "",
-                schoolAddress: "",
-                country: "",
-                selectedCountry: "",
-                selectedState: "",
-                selectedCity: "",
-                city: "",
-                state: "",
-                zipcode: "",
-                phoneNumber: "",
-                password: "",
-                confirmPassword: "",
+                organizationName: '',
+                schoolAddress: '',
+                country: '',
+                selectedCountry: '',
+                selectedState: '',
+                selectedCity: '',
+                city: '',
+                state: '',
+                zipcode: '',
+                phoneNumber: '',
+                password: '',
+                confirmPassword: '',
                 termsAccepted: false,
-                school: "",
-                organization: "",
+                school: '',
+                organization: '',
                 selected_entity: null,
                 schoolId: null,
 
                 orgId: null,
               }}
-              onSubmit={(values, { resetForm }) => {
-                dispatch(ChangeModalState.action({ loading: true }));
+              onSubmit={(values, {resetForm}) => {
+                dispatch(ChangeModalState.action({loading: true}));
                 const registerObject: RegisterDTO = {
                   email: emailAddress,
                   password: values.password,
@@ -956,7 +936,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                 let formData = new FormData();
 
                 formData.append(
-                  "image",
+                  'image',
                   uploadedImage
                     ? {
                         uri: uploadedImage?.path,
@@ -964,32 +944,31 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         type: uploadedImage.mime,
                       }
                     : {
-                        uri: "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
-                        name: "avatar",
-                        type: "image/png",
-                      }
+                        uri: 'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
+                        name: 'avatar',
+                        type: 'image/png',
+                      },
                 );
-                formData.append("firstname", values.firstName);
-                formData.append("lastname", values.lastName);
+                formData.append('firstname', values.firstName);
+                formData.append('lastname', values.lastName);
 
-                formData.append("address", values.schoolAddress || "");
-                formData.append("email", emailAddress);
-                formData.append("state", values.state);
-                formData.append("city", values.city);
-                formData.append("country", values.country);
-                formData.append("zipcode", values.zipcode);
-                formData.append("phone", values.phoneNumber);
-                formData.append("password", values.password);
-                formData.append("term", true);
-                formData.append("isAdmin", false);
-                formData.append("deviceId", getDeviceId());
+                formData.append('address', values.schoolAddress || '');
+                formData.append('email', emailAddress);
+                formData.append('state', values.state);
+                formData.append('city', values.city);
+                formData.append('country', values.country);
+                formData.append('zipcode', values.zipcode);
+                formData.append('phone', values.phoneNumber);
+                formData.append('password', values.password);
+                formData.append('term', true);
+                formData.append('isAdmin', false);
+                formData.append('deviceId', getDeviceId());
                 values.schoolId
-                  ? formData.append("schoolId", values.schoolId)
-                  : formData.append("schoolId", "");
+                  ? formData.append('schoolId', values.schoolId)
+                  : formData.append('schoolId', '');
                 values.orgId
-                  ? formData.append("orgId", values.orgId)
-                  : formData.append("orgId", "");
-                 
+                  ? formData.append('orgId', values.orgId)
+                  : formData.append('orgId', '');
 
                 const userObject: UserRegistrationDTO = {
                   firstname: values.firstName,
@@ -1006,11 +985,11 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   grades: [
                     {
                       id: 0,
-                      name: "Test",
+                      name: 'Test',
                       subject: [
                         {
                           id: 0,
-                          name: "Test",
+                          name: 'Test',
                         },
                       ],
                     },
@@ -1020,22 +999,22 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
 
                   orgId: values.orgId,
                 };
-                Register(registerObject, "instructor")
-                  .then(async (res) => {
-                    console.log("res---", res?.data);
+                Register(registerObject, 'instructor')
+                  .then(async res => {
+                    console.log('res---', res?.data);
                     await storeToken(res?.data?.token);
-                    console.log("userobject", JSON.stringify(formData));
-                    CompleteRegistration(formData, "instructor")
+                    console.log('userobject', JSON.stringify(formData));
+                    CompleteRegistration(formData, 'instructor')
                       .then(async (response: any) => {
-                        console.log("responsefromback", response);
+                        console.log('responsefromback', response);
                         await Login(loginObject, user_type.toLowerCase());
                         dispatch(
                           LoginStore.action({
                             token: response?.data?.token,
-                            userType: "instructor",
+                            userType: 'instructor',
                             id: response?.data.instructorId,
                             mainId: res?.data?.userId,
-                          })
+                          }),
                         );
                         if (response.status == 201) {
                           register(emailAddress, values.password);
@@ -1047,10 +1026,10 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         }
                       })
                       .catch((error: any) => {
-                        console.log("instructor err", error);
+                        console.log('instructor err', error);
                         Toast.show({
-                          type: "info",
-                          position: "top",
+                          type: 'info',
+                          position: 'top',
                           text1: error.data?.title,
                           text2: error?.data?.statusDescription,
                           visibilityTime: 4000,
@@ -1063,14 +1042,14 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         });
                       })
                       .finally(() => {
-                        dispatch(ChangeModalState.action({ loading: false }));
+                        dispatch(ChangeModalState.action({loading: false}));
                       });
                   })
-                  .catch((err) => {
-                    console.log("err", err);
+                  .catch(err => {
+                    console.log('err', err);
                     Toast.show({
-                      type: "info",
-                      position: "top",
+                      type: 'info',
+                      position: 'top',
 
                       visibilityTime: 4000,
                       autoHide: true,
@@ -1080,10 +1059,9 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       onHide: () => {},
                       onPress: () => {},
                     });
-                    dispatch(ChangeModalState.action({ loading: false }));
+                    dispatch(ChangeModalState.action({loading: false}));
                   });
-              }}
-            >
+              }}>
               {({
                 handleChange,
                 setFieldValue,
@@ -1103,12 +1081,11 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       // label={(evaProps: any) => <Text {...evaProps}>Entity</Text>}
                       onSelect={(index: any) => {
                         setFieldValue(
-                          "selected_entity",
-                          organisations[index.row].value
+                          'selected_entity',
+                          organisations[index.row].value,
                         );
-                      }}
-                    >
-                      {organisations.map((item) => {
+                      }}>
+                      {organisations.map(item => {
                         return <SelectItem key={item.id} title={item.label} />;
                       })}
                     </Select>
@@ -1116,7 +1093,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       accessoryRight={PersonIcon}
-                      value={"Email: " + emailAddress}
+                      value={'Email: ' + emailAddress}
                       disabled={true}
                     />
                     <Input
@@ -1126,8 +1103,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placeholder={`Instructor's First Name*`}
                       accessoryRight={PersonIcon}
                       value={values.firstName}
-                      onChangeText={handleChange("firstName")}
-                      onBlur={handleBlur("firstName")}
+                      onChangeText={handleChange('firstName')}
+                      onBlur={handleBlur('firstName')}
                     />
                     {errors.firstName && touched.firstName && (
                       <Text style={styles.errorText}>{errors.firstName}</Text>
@@ -1139,8 +1116,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placeholder={`Instructor's Last Name*`}
                       accessoryRight={PersonIcon}
                       value={values.lastName}
-                      onChangeText={handleChange("lastName")}
-                      onBlur={handleBlur("lastName")}
+                      onChangeText={handleChange('lastName')}
+                      onBlur={handleBlur('lastName')}
                     />
                     {errors.lastName && touched.lastName && (
                       <Text style={styles.errorText}>{errors.lastName}</Text>
@@ -1151,34 +1128,33 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placement={placement}
                       style={styles.inputSettings}
                       // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue("country", query);
+                      onChangeText={query => {
+                        setFieldValue('country', query);
                         setCountriesData(
-                          countries.filter((item) =>
-                            filterCountries(item, query)
-                          )
+                          countries.filter(item =>
+                            filterCountries(item, query),
+                          ),
                         );
                       }}
-                      onSelect={(query) => {
+                      onSelect={query => {
                         const selectedCountry = countriesData[query];
-                        setFieldValue("country", selectedCountry.name);
-                        setFieldValue("selectedCountry", selectedCountry.name);
-                        setFieldValue("selectedState", "");
-                        setFieldValue("state", "");
+                        setFieldValue('country', selectedCountry.name);
+                        setFieldValue('selectedCountry', selectedCountry.name);
+                        setFieldValue('selectedState', '');
+                        setFieldValue('state', '');
                         setStates([]);
                         GetAllStates(
-                          selectedCountry.name.replace(/ /g, "")
-                        ).then((res) => {
+                          selectedCountry.name.replace(/ /g, ''),
+                        ).then(res => {
                           setStates(res.data);
                           setStatesData(states);
                         });
-                        selectedCountry.phone_code.toString().startsWith("+")
+                        selectedCountry.phone_code.toString().startsWith('+')
                           ? setPhoneCode(selectedCountry.phone_code.toString())
-                          : setPhoneCode("+" + selectedCountry.phone_code);
+                          : setPhoneCode('+' + selectedCountry.phone_code);
                         getSchoolsByFilter(selectedCountry.name);
                         getOrgByFilter(selectedCountry.name);
-                      }}
-                    >
+                      }}>
                       {countriesData.map((item, index) => {
                         return (
                           <AutocompleteItem key={index} title={item.name} />
@@ -1192,29 +1168,28 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       disabled={!values.selectedCountry}
                       style={styles.inputSettings}
                       // label={evaProps => <Text {...evaProps}>State</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue("state", query);
+                      onChangeText={query => {
+                        setFieldValue('state', query);
                         setStatesData(
-                          states.filter((item) => filterStates(item, query))
+                          states.filter(item => filterStates(item, query)),
                         );
                       }}
-                      onSelect={(query) => {
+                      onSelect={query => {
                         const selectedState = statesData[query];
-                        setFieldValue("state", selectedState);
-                        setFieldValue("selectedState", selectedState);
-                        setFieldValue("selectedCity", "");
-                        setFieldValue("city", "");
+                        setFieldValue('state', selectedState);
+                        setFieldValue('selectedState', selectedState);
+                        setFieldValue('selectedCity', '');
+                        setFieldValue('city', '');
                         setCities([]);
                         GetAllCities(
                           values.selectedCountry,
-                          selectedState
-                        ).then((res) => {
+                          selectedState,
+                        ).then(res => {
                           setCities(res.data);
                         });
                         getSchoolsByFilter(values.country, selectedState);
                         getOrgByFilter(values.country, selectedState);
-                      }}
-                    >
+                      }}>
                       {statesData.map((item, index) => {
                         return <AutocompleteItem key={index} title={item} />;
                       })}
@@ -1226,28 +1201,27 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       disabled={!values.selectedState}
                       style={styles.inputSettings}
                       // label={evaProps => <Text {...evaProps}>City</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue("city", query);
+                      onChangeText={query => {
+                        setFieldValue('city', query);
                         setCitiesData(
-                          cities.filter((item) => filterCities(item, query))
+                          cities.filter(item => filterCities(item, query)),
                         );
                       }}
-                      onSelect={(query) => {
+                      onSelect={query => {
                         const selectedCity = citiesData[query];
-                        setFieldValue("city", selectedCity);
-                        setFieldValue("selectedCity", selectedCity);
+                        setFieldValue('city', selectedCity);
+                        setFieldValue('selectedCity', selectedCity);
                         getSchoolsByFilter(
                           values.country,
                           values.state,
-                          selectedCity
+                          selectedCity,
                         );
                         getOrgByFilter(
                           values.country,
                           values.state,
-                          selectedCity
+                          selectedCity,
                         );
-                      }}
-                    >
+                      }}>
                       {citiesData.map((item, index) => {
                         return <AutocompleteItem key={index} title={item} />;
                       })}
@@ -1258,35 +1232,34 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       autoCorrect={false}
                       placeholder={`Zip/Post Code*`}
                       value={values.zipcode}
-                      onChangeText={handleChange("zipcode")}
-                      onBlur={handleBlur("zipcode")}
+                      onChangeText={handleChange('zipcode')}
+                      onBlur={handleBlur('zipcode')}
                     />
-                    {values.selected_entity === "School" ? (
+                    {values.selected_entity === 'School' ? (
                       <Autocomplete
                         placeholder="School Name"
                         value={values.school}
                         placement={placement}
                         style={styles.inputSettings}
-                        onChangeText={(query) => {
-                          console.log("schools", schools);
-                          setFieldValue("school", query);
+                        onChangeText={query => {
+                          console.log('schools', schools);
+                          setFieldValue('school', query);
                           setSchoolsData(
-                            schools.filter((item) =>
-                              filterSchools(item.name, query)
-                            )
+                            schools.filter(item =>
+                              filterSchools(item.name, query),
+                            ),
                           );
                         }}
-                        onSelect={(query) => {
+                        onSelect={query => {
                           const selectedSchool = schoolsData[query];
-                          setFieldValue("school", selectedSchool.name);
-                          setFieldValue("schoolId", selectedSchool.schoolId);
-                          setFieldValue("schoolName", selectedSchool.name);
-                          setFieldValue("schoolAddress", "School Address");
-                          setFieldValue("schoolAddress", "School Address");
-                          setSelectedGrades(["1st"]);
-                          setSelectedSubjects(["Maths"]);
-                        }}
-                      >
+                          setFieldValue('school', selectedSchool.name);
+                          setFieldValue('schoolId', selectedSchool.schoolId);
+                          setFieldValue('schoolName', selectedSchool.name);
+                          setFieldValue('schoolAddress', 'School Address');
+                          setFieldValue('schoolAddress', 'School Address');
+                          setSelectedGrades(['1st']);
+                          setSelectedSubjects(['Maths']);
+                        }}>
                         {schoolsData.map((item, index) => {
                           return (
                             <AutocompleteItem key={index} title={item?.name} />
@@ -1299,57 +1272,55 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         value={values.organization}
                         placement={placement}
                         style={styles.inputSettings}
-                        label={(evaProps) => (
+                        label={evaProps => (
                           <Text {...evaProps}>Organization*</Text>
                         )}
-                        onChangeText={(query) => {
-                          setFieldValue("organization", query);
+                        onChangeText={query => {
+                          setFieldValue('organization', query);
                           setOrgData(
-                            org.filter((item) =>
-                              filterSchools(item.label, query)
-                            )
+                            org.filter(item =>
+                              filterSchools(item.label, query),
+                            ),
                           );
                         }}
-                        onSelect={(query) => {
+                        onSelect={query => {
                           const selectedOrg = orgData[query];
 
                           setFieldValue(
-                            "organizationId",
-                            selectedSchool.organizationId
+                            'organizationId',
+                            selectedSchool.organizationId,
                           );
-                          setFieldValue("organization", selectedOrg.name);
-                          setFieldValue("organizationName", selectedOrg.name);
-                        }}
-                      ></Autocomplete>
+                          setFieldValue('organization', selectedOrg.name);
+                          setFieldValue('organizationName', selectedOrg.name);
+                        }}></Autocomplete>
                     )}
-                    {console.log("values", values.school)}
+                    {console.log('values', values.school)}
                     <View
                       style={{
                         marginTop: 10,
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <Text style={{ fontSize: 13 }}>
-                        Can't find school/organization?{" "}
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                      }}>
+                      <Text style={{fontSize: 13}}>
+                        Can't find school/organization?{' '}
                       </Text>
                       <TouchableOpacity
                         onPress={() =>
                           Alert.alert(
-                            "Confirmation",
-                            "By registering your school or organisation, you accept to be the admin for that entity.",
+                            'Confirmation',
+                            'By registering your school or organisation, you accept to be the admin for that entity.',
                             [
                               {
-                                text: "Cancel",
+                                text: 'Cancel',
                               },
                               {
-                                text: "Confirm",
+                                text: 'Confirm',
                                 onPress: () =>
                                   navigation.navigate(
-                                    "FinalOrgRegistrationScreen",
+                                    'FinalOrgRegistrationScreen',
                                     {
                                       emailAddress: emailAddress,
-                                      registrationId: "test",
+                                      registrationId: 'test',
                                       user_type: user_type,
                                       activation_code: activation_code,
                                       details: {
@@ -1361,18 +1332,16 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                                         country: values.country,
                                         city: values.city,
                                         zipcode: values.zipcode,
-                                        selected_entity:values.selected_entity,
-                                       photo:uploadedImage?.path
-                                        
+                                        selected_entity: values.selected_entity,
+                                        photo: uploadedImage?.path,
                                       },
-                                    }
+                                    },
                                   ),
                               },
-                            ]
+                            ],
                           )
-                        }
-                      >
-                        <Text style={{ color: Colors.primary, fontSize: 13 }}>
+                        }>
+                        <Text style={{color: Colors.primary, fontSize: 13}}>
                           Register
                         </Text>
                       </TouchableOpacity>
@@ -1385,7 +1354,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       accessoryRight={PhoneIcon}
                       value={values.phoneNumber}
                       keyboardType="number-pad"
-                      onChangeText={handleChange("phoneNumber")}
+                      onChangeText={handleChange('phoneNumber')}
                     />
                     <Input
                       style={styles.inputSettings}
@@ -1395,8 +1364,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placeholder="Password*"
                       accessoryRight={renderPasswordIcon}
                       value={values.password}
-                      onChangeText={handleChange("password")}
-                      onBlur={handleBlur("password")}
+                      onChangeText={handleChange('password')}
+                      onBlur={handleBlur('password')}
                     />
                     {errors.password && touched.password && (
                       <Text style={styles.errorText}>{errors.password}</Text>
@@ -1408,36 +1377,34 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placeholder="Confirm Password*"
                       accessoryRight={renderConfirmPasswordIcon}
                       value={values.confirmPassword}
-                      onChangeText={handleChange("confirmPassword")}
-                      onBlur={handleBlur("confirmPassword")}
+                      onChangeText={handleChange('confirmPassword')}
+                      onBlur={handleBlur('confirmPassword')}
                     />
                     {errors.confirmPassword && touched.confirmPassword && (
                       <Text style={styles.errorText}>
                         {errors.confirmPassword}
                       </Text>
                     )}
-                    <View style={{ flexDirection: "row" }}>
+                    <View style={{flexDirection: 'row'}}>
                       <CheckBox
-                        style={[styles.termsCheckBox, { flex: 1 }]}
+                        style={[styles.termsCheckBox, {flex: 1}]}
                         checked={values.termsAccepted}
                         onChange={() =>
-                          setFieldValue("termsAccepted", !values.termsAccepted)
-                        }
-                      >
-                        {""}
+                          setFieldValue('termsAccepted', !values.termsAccepted)
+                        }>
+                        {''}
                       </CheckBox>
-                      <View style={[styles.termsCheckBox, { flex: 15 }]}>
+                      <View style={[styles.termsCheckBox, {flex: 15}]}>
                         <CheckboxLabel />
                       </View>
                     </View>
                   </Layout>
-                  <View style={{ marginTop: 18, marginBottom: 20 }}>
+                  <View style={{marginTop: 18, marginBottom: 20}}>
                     <LinearGradientButton
                       style={styles.signUpButton}
                       size="medium"
                       onPress={handleSubmit}
-                      disabled={!isValid || !values.termsAccepted}
-                    >
+                      disabled={!isValid || !values.termsAccepted}>
                       SIGN UP
                     </LinearGradientButton>
                   </View>
@@ -1449,23 +1416,22 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               validationSchema={signUpStudentValidationSchema}
               validateOnMount={true}
               initialValues={{
-                firstName: student ? student.firstname : "",
-                lastName: student ? student.lastname : "",
-                school: student ? student.school : "",
-                grade: student ? student.grade : "",
-                parentName: student ? student?.parentemail1 : "",
-                parentName2: student ? student?.parentemail2 : "",
-                password: "",
-                confirmPassword: "",
+                firstName: student ? student.firstname : '',
+                lastName: student ? student.lastname : '',
+                school: student ? student.school : '',
+                grade: student ? student.grade : '',
+                parentName: student ? student?.parentemail1 : '',
+                parentName2: student ? student?.parentemail2 : '',
+                password: '',
+                confirmPassword: '',
                 termsAccepted: false,
-                phoneNumber: student ? student.phone : "",
+                phoneNumber: student ? student.phone : '',
                 // countryCode: student ? phoneCodeNumber:"",
                 parentId:
                   student && student.parentIds ? student.parentIds[0] : 0,
               }}
-              
-              onSubmit={(values, { resetForm }) => {
-                dispatch(ChangeModalState.action({ loading: true }));
+              onSubmit={(values, {resetForm}) => {
+                dispatch(ChangeModalState.action({loading: true}));
                 const registerObject: RegisterDTO = {
                   email: student.email,
                   password: values.password,
@@ -1475,7 +1441,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   email: student.email,
                   password: values.password,
                 };
-                console.log("response", registerObject);
+                console.log('response', registerObject);
 
                 // const userObject: UserRegistrationDTO = {
                 //   firstname: values.firstName,
@@ -1486,28 +1452,28 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                 //   grade: values.grade,
                 //   parentId: values?.parentId || 0,
                 // };
-                Register(registerObject, "student")
-                  .then(async (response) => {
-                    console.log("response--", response.data);
+                Register(registerObject, 'student')
+                  .then(async response => {
+                    console.log('response--', response.data);
                     await Login(loginObject, user_type.toLowerCase());
                     dispatch(
                       LoginStore.action({
                         token: response?.data?.token,
-                        userType: "student",
+                        userType: 'student',
                         id: student.studentId,
-                      })
+                      }),
                     );
                     // register(emailAddress, values.password);
                     dispatch(
                       ChangeModalState.action({
                         welcomeMessageModal: true,
-                      })
+                      }),
                     );
                   })
-                  .catch((error) => {
+                  .catch(error => {
                     Toast.show({
-                      type: "info",
-                      position: "top",
+                      type: 'info',
+                      position: 'top',
                       text1: error.data.title,
                       text2: error?.data?.statusDescription,
                       visibilityTime: 4000,
@@ -1520,13 +1486,12 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                     });
                   })
                   .finally(() => {
-                    dispatch(ChangeModalState.action({ loading: false }));
+                    dispatch(ChangeModalState.action({loading: false}));
                     dispatch(
-                      ChangeModalState.action({ biometricRequestModal: true })
+                      ChangeModalState.action({biometricRequestModal: true}),
                     );
                   });
-              }}
-            >
+              }}>
               {({
                 handleChange,
                 setFieldValue,
@@ -1539,24 +1504,24 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
               }) => (
                 <>
                   <Layout style={styles.formContainer} level="1">
-                       <Input
-                      textStyle={{ color: Colors.gray }}
+                    <Input
+                      textStyle={{color: Colors.gray}}
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       accessoryRight={PersonIcon}
-                      value={"Email: " + (student?.email || "")}
+                      value={'Email: ' + (student?.email || '')}
                       disabled={true}
                     />
                     <Input
-                      textStyle={{ color: Colors.gray }}
+                      textStyle={{color: Colors.gray}}
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       autoCorrect={false}
                       placeholder={`Student's First Name*`}
                       accessoryRight={PersonIcon}
                       value={values.firstName}
-                      onChangeText={handleChange("firstName")}
-                      onBlur={handleBlur("firstName")}
+                      onChangeText={handleChange('firstName')}
+                      onBlur={handleBlur('firstName')}
                       placeholderTextColor={Colors.gray}
                       disabled
                     />
@@ -1564,15 +1529,15 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       <Text style={styles.errorText}>{errors.firstName}</Text>
                     )}
                     <Input
-                      textStyle={{ color: Colors.gray }}
+                      textStyle={{color: Colors.gray}}
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       autoCorrect={false}
                       placeholder={`Student's Last Name*`}
                       accessoryRight={PersonIcon}
                       value={values.lastName}
-                      onChangeText={handleChange("lastName")}
-                      onBlur={handleBlur("lastName")}
+                      onChangeText={handleChange('lastName')}
+                      onBlur={handleBlur('lastName')}
                       placeholderTextColor={Colors.gray}
                       disabled
                     />
@@ -1580,15 +1545,15 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       <Text style={styles.errorText}>{errors.lastName}</Text>
                     )}
                     <Input
-                      textStyle={{ color: Colors.gray }}
+                      textStyle={{color: Colors.gray}}
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       autoCorrect={false}
                       placeholder={`Student's School*`}
                       value={values.school}
-                      onChangeText={handleChange("school")}
+                      onChangeText={handleChange('school')}
                       placeholderTextColor={Colors.gray}
-                      onBlur={handleBlur("school")}
+                      onBlur={handleBlur('school')}
                       disabled
                     />
                     {errors.school && touched.school && (
@@ -1608,32 +1573,32 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                     <Text style={styles.errorText}>{errors.grade}</Text>
                   )} */}
                     <Input
-                      textStyle={{ color: Colors.gray }}
+                      textStyle={{color: Colors.gray}}
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       autoCorrect={false}
                       placeholder={`Parent1/Guardian1 Name*`}
                       accessoryRight={PersonIcon}
                       value={values.parentName}
-                      onChangeText={handleChange("parentName")}
+                      onChangeText={handleChange('parentName')}
                       placeholderTextColor={Colors.gray}
-                      onBlur={handleBlur("parentName")}
+                      onBlur={handleBlur('parentName')}
                       disabled
                     />
                     {errors.parentName && touched.parentName && (
                       <Text style={styles.errorText}>{errors.parentName}</Text>
                     )}
                     <Input
-                      textStyle={{ color: Colors.gray }}
+                      textStyle={{color: Colors.gray}}
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       autoCorrect={false}
                       placeholder={`Parent2/Guardian2 Email`}
                       accessoryRight={PersonIcon}
                       value={values.parentName2}
-                      onChangeText={handleChange("parentName2")}
+                      onChangeText={handleChange('parentName2')}
                       placeholderTextColor={Colors.gray}
-                      onBlur={handleBlur("parentName2")}
+                      onBlur={handleBlur('parentName2')}
                       disabled
                     />
                     {errors.parentName2 && touched.parentName2 && (
@@ -1641,7 +1606,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                     )}
                     <View style={styles.phoneNumber}>
                       <Input
-                        textStyle={{ color: Colors.gray }}
+                        textStyle={{color: Colors.gray}}
                         style={styles.prefixStyle}
                         editable={false}
                         disabled={true}
@@ -1651,7 +1616,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         placeholder="Prefix"
                       />
                       <Input
-                        textStyle={{ color: Colors.gray }}
+                        textStyle={{color: Colors.gray}}
                         style={styles.phoneStyle}
                         autoCapitalize="none"
                         autoCorrect={false}
@@ -1661,26 +1626,25 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         accessoryRight={PhoneIcon}
                         value={values.phoneNumber}
                         keyboardType="number-pad"
-                        onChangeText={handleChange("phoneNumber")}
+                        onChangeText={handleChange('phoneNumber')}
                         disabled
                       />
                     </View>
-                    <View style={{ marginVertical: 10 }}>
+                    <View style={{marginVertical: 10}}>
                       <Text
                         style={{
-                          color: "red",
-                          fontWeight: "600",
+                          color: 'red',
+                          fontWeight: '600',
                           fontSize: 16,
-                        }}
-                      >
+                        }}>
                         Do not proceed if any of the above information is not
                         correct. Ensure your parent/guardian has entered your
                         correct information.
                       </Text>
                     </View>
                     <Input
-                      textStyle={{ color: Colors.gray }}
-                      textStyle={{ color: Colors.gray }}
+                      textStyle={{color: Colors.gray}}
+                      textStyle={{color: Colors.gray}}
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       autoCorrect={false}
@@ -1688,23 +1652,23 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       placeholder="Password*"
                       accessoryRight={renderPasswordIcon}
                       value={values.password}
-                      onChangeText={handleChange("password")}
-                      onBlur={handleBlur("password")}
+                      onChangeText={handleChange('password')}
+                      onBlur={handleBlur('password')}
                       placeholderTextColor={Colors.gray}
                     />
                     {errors.password && touched.password && (
                       <Text style={styles.errorText}>{errors.password}</Text>
                     )}
                     <Input
-                      textStyle={{ color: Colors.gray }}
+                      textStyle={{color: Colors.gray}}
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       secureTextEntry={!confirmPasswordVisible}
                       placeholder="Confirm Password*"
                       accessoryRight={renderConfirmPasswordIcon}
                       value={values.confirmPassword}
-                      onChangeText={handleChange("confirmPassword")}
-                      onBlur={handleBlur("confirmPassword")}
+                      onChangeText={handleChange('confirmPassword')}
+                      onBlur={handleBlur('confirmPassword')}
                       placeholderTextColor={Colors.gray}
                     />
                     {/* {console.log("error", errors)} */}
@@ -1713,29 +1677,26 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         {errors.confirmPassword}
                       </Text>
                     )}
-                    <View style={{ flexDirection: "row" }}>
+                    <View style={{flexDirection: 'row'}}>
                       <CheckBox
-                        style={[styles.termsCheckBox, { flex: 1 }]}
+                        style={[styles.termsCheckBox, {flex: 1}]}
                         checked={values.termsAccepted}
                         onChange={() =>
-                          setFieldValue("termsAccepted", !values.termsAccepted)
-                        }
-                      >
-                        {""}
+                          setFieldValue('termsAccepted', !values.termsAccepted)
+                        }>
+                        {''}
                       </CheckBox>
-                      <View style={[styles.termsCheckBox, { flex: 15 }]}>
+                      <View style={[styles.termsCheckBox, {flex: 15}]}>
                         <CheckboxLabel />
                       </View>
                     </View>
                   </Layout>
-                  <View style={{ marginTop: 18, marginBottom: 20 }}>
+                  <View style={{marginTop: 18, marginBottom: 20}}>
                     <LinearGradientButton
                       style={styles.signUpButton}
                       size="medium"
                       onPress={handleSubmit}
-                      disabled={!isValid || !values.termsAccepted}
-                      
-                    >
+                      disabled={!isValid || !values.termsAccepted}>
                       SIGN UP
                     </LinearGradientButton>
                   </View>
@@ -1760,7 +1721,7 @@ const themedStyles = StyleService.create({
     borderRadius: 25,
   },
   content: {
-    backgroundColor: "red",
+    backgroundColor: 'red',
     width: 100,
     height: 100,
   },
@@ -1768,15 +1729,15 @@ const themedStyles = StyleService.create({
     width: 116,
     height: 116,
     borderRadius: 58,
-    alignSelf: "center",
-    backgroundColor: "color-primary-default",
-    tintColor: "background-basic-color-1",
+    alignSelf: 'center',
+    backgroundColor: 'color-primary-default',
+    tintColor: 'background-basic-color-1',
   },
   profileImage: {
     width: 116,
     height: 116,
     borderRadius: 58,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   editAvatarButton: {
     width: 40,
@@ -1797,7 +1758,7 @@ const themedStyles = StyleService.create({
     marginTop: 24,
   },
   termsCheckBoxText: {
-    color: "text-hint-color",
+    color: 'text-hint-color',
     marginLeft: 10,
     fontSize: 13,
   },
@@ -1814,25 +1775,25 @@ const themedStyles = StyleService.create({
   },
   errorText: {
     fontSize: 13,
-    color: "red",
+    color: 'red',
   },
   textArea: {
     marginTop: 10,
     height: 80,
   },
   phoneNumber: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   prefixStyle: {
     marginTop: 10,
-    width: "25%",
-    marginRight: "2%",
+    width: '25%',
+    marginRight: '2%',
     elevation: 1,
     borderRadius: 10,
     backgroundColor: Colors.white,
   },
   phoneStyle: {
-    width: "73%",
+    width: '73%',
     marginTop: 10,
     elevation: 1,
     borderRadius: 10,
@@ -1840,36 +1801,36 @@ const themedStyles = StyleService.create({
   },
   label: {
     fontSize: 15,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.fieldLabel,
   },
   multiSelectMenuStyle: {
-    backgroundColor: "#f7f9fc",
-    borderColor: "#e4e9f2",
+    backgroundColor: '#f7f9fc',
+    borderColor: '#e4e9f2',
     borderWidth: 1,
     borderRadius: 3,
     paddingLeft: 16,
   },
   searchInputStyle: {
-    color: "#000",
-    backgroundColor: "#fff",
+    color: '#000',
+    backgroundColor: '#fff',
   },
   dropdownMenuStyle: {
-    fontWeight: "400",
+    fontWeight: '400',
     fontSize: 16,
     color: Colors.primary,
   },
   selectedDropdownStyle: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 15,
   },
   itemsContainerStyle: {
     paddingVertical: 10,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   selectorContainerStyle: {
     height: 200,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   rowListStyle: {
     paddingVertical: 5,
@@ -1878,15 +1839,15 @@ const themedStyles = StyleService.create({
     width: 116,
     height: 116,
     borderRadius: 58,
-    alignSelf: "center",
-    backgroundColor: "color-primary-default",
-    tintColor: "background-basic-color-1",
+    alignSelf: 'center',
+    backgroundColor: 'color-primary-default',
+    tintColor: 'background-basic-color-1',
   },
   profileImage: {
     width: 116,
     height: 116,
     borderRadius: 58,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   editAvatarButton: {
     width: 40,
@@ -1896,7 +1857,7 @@ const themedStyles = StyleService.create({
   inputSettings: {
     marginTop: 7,
     backgroundColor: Colors.white,
-    width: "100%",
+    width: '100%',
     elevation: 1,
     borderRadius: 10,
     // maxHeight: 35

@@ -1,6 +1,6 @@
 //Activiation code
-import React, { useState, useEffect } from "react";
-import { Alert, Image, KeyboardAvoidingView, View } from "react-native";
+import React, {useState, useEffect} from 'react';
+import {Alert, Image, KeyboardAvoidingView, View} from 'react-native';
 import {
   Button,
   Input,
@@ -10,75 +10,70 @@ import {
   useStyleSheet,
   Select,
   SelectItem,
-} from "@ui-kitten/components";
-import { Formik } from "formik";
-import * as yup from "yup";
+} from '@ui-kitten/components';
+import {Formik} from 'formik';
+import * as yup from 'yup';
 import {
   CheckToken,
   ReactivateUser,
   ResendRegistrationCode,
-} from "@//Services/SignUpServices";
-import { GetActivationCode } from "@/Services/ActivationCode";
-import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
-import LoginStore from "@/Store/Authentication/LoginStore";
-import { useDispatch } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { LinearGradientButton } from "@/Components";
-import FastImage from "react-native-fast-image";
-import Colors from "@/Theme/Colors";
-import BackgroundLayout from "@/Components/BackgroundLayout";
-import CustomDropdown from "@/Components/CustomDropDown";
-import { VerifyCode } from "@/Services/LoginServices";
+} from '@//Services/SignUpServices';
+import {GetActivationCode} from '@/Services/ActivationCode';
+import {Normalize} from '@/Utils/Shared/NormalizeDisplay';
+import LoginStore from '@/Store/Authentication/LoginStore';
+import {useDispatch} from 'react-redux';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import {LinearGradientButton} from '@/Components';
+import FastImage from 'react-native-fast-image';
+import Colors from '@/Theme/Colors';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import CustomDropdown from '@/Components/CustomDropDown';
+import {VerifyCode} from '@/Services/LoginServices';
 const user_types = [
-  { id: 1, label: "Parent", value: "Parent" },
-  { id: 2, label: "Instructor", value: "Instructor" },
-  { id: 3, label: "Student", value: "Student" },
+  {id: 1, label: 'Parent', value: 'Parent'},
+  {id: 2, label: 'Instructor', value: 'Instructor'},
+  {id: 3, label: 'Student', value: 'Student'},
 ];
 // @ts-ignore
-const EmailConfirmationScreen = ({ route, navigation }) => {
+const EmailConfirmationScreen = ({route, navigation}) => {
   const dispatch = useDispatch();
   const styles = useStyleSheet(themedStyles);
   const [resendCode, setResendCode] = useState(false);
-  const {
-    emailAddress,
-    user_type,
-    activation_code,
-    student,
-    isDesignatedAdmin,
-  } = route.params;
-  console.log("email address", emailAddress);
+  const {emailAddress, user_type, activation_code, student, isDesignatedAdmin} =
+    route.params;
+  console.log('email address', emailAddress);
   const [activationCode, setActivationCode] = useState(activation_code);
-  const { reactivate } = route.params;
+  const {reactivate} = route.params;
 
   const codeValidationSchema = yup.object().shape({
     code: yup
       .string()
       //@ts-ignore
-      .test("code", "Must be exactly 6 characters", (val) => val.length === 6)
-      .required("Code is required"),
+      .test('code', 'Must be exactly 6 characters', val => val.length === 6)
+      .required('Code is required'),
   });
   const codeValidationSchemaStudents = yup.object().shape({
     code: yup
       .string()
       //@ts-ignore
-      .test("code", "Must be exactly 32 characters", (val) => val.length === 36)
-      .required("Code is required"),
+      .test('code', 'Must be exactly 32 characters', val => val.length === 36)
+      .required('Code is required'),
   });
 
   const onResendButtonPress = async () => {
     if (emailAddress) {
-      let res = await GetActivationCode({ email: emailAddress }, user_type);
+      let res = await GetActivationCode({email: emailAddress}, user_type);
       setResendCode(true);
-      console.log("res----", res);
+      console.log('res----', res);
       setActivationCode(res.activation_code);
     }
   };
   const openLogin = () => {
-    navigation && navigation.navigate("Login");
+    navigation && navigation.navigate('Login');
   };
 
   const openSignUp = () => {
-    navigation && navigation.navigate("SignUp1");
+    navigation && navigation.navigate('SignUp1');
   };
 
   const verifyOtpCode = async (code: any) => {
@@ -88,15 +83,15 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
         message: emailAddress,
       });
       return true;
-      console.log("res", res.data);
+      console.log('res', res.data);
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
 
   useEffect(() => {
     return () => {
-      setActivationCode("");
+      setActivationCode('');
     };
   }, []);
 
@@ -106,12 +101,12 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
         <View style={styles.headerContainer}>
           <Image
             style={{
-              justifyContent: "center",
-              alignItems: "center",
+              justifyContent: 'center',
+              alignItems: 'center',
               maxHeight: Normalize(160),
               maxWidth: Normalize(160),
             }}
-            source={require("@/Assets/Images/logo1.png")}
+            source={require('@/Assets/Images/logo1.png')}
             resizeMode="contain"
           />
 
@@ -120,25 +115,25 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
 
         <Formik
           validationSchema={
-            user_type == "Student"
+            user_type == 'Student'
               ? codeValidationSchemaStudents
               : codeValidationSchema
           }
           initialValues={{
             code:
-              user_type == "Student" && activationCode ? activationCode : "",
+              user_type == 'Student' && activationCode ? activationCode : '',
           }}
           validateOnMount={true}
-          onSubmit={async (values, { resetForm }) => {
-            console.log("isDesignatedAdmin", isDesignatedAdmin);
+          onSubmit={async (values, {resetForm}) => {
+            // console.log("isDesignatedAdmin", isDesignatedAdmin);
 
             let res = await verifyOtpCode(values.code);
 
             if (isDesignatedAdmin) {
               if (res) {
-                navigation.navigate("FinalOrgRegistrationScreen", {
+                navigation.navigate('FinalOrgRegistrationScreen', {
                   emailAddress: emailAddress,
-                  registrationId: "test",
+                  registrationId: 'test',
                   user_type: user_type,
                   activation_code: values.code,
                 });
@@ -148,9 +143,9 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
               if (!reactivate) {
                 if (res) {
                   navigation &&
-                    navigation.navigate("FinalRegistrationScreen", {
+                    navigation.navigate('FinalRegistrationScreen', {
                       emailAddress: emailAddress,
-                      registrationId: "test",
+                      registrationId: 'test',
                       user_type: user_type,
                       activation_code: values.code,
                       student: student,
@@ -164,8 +159,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
               }
               resetForm();
             }
-          }}
-        >
+          }}>
           {({
             handleChange,
             handleBlur,
@@ -178,14 +172,14 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
           }) => (
             <>
               <Layout style={styles.formContainer}>
-                <View style={{ marginTop: 80, marginBottom: 30 }}>
+                <View style={{marginTop: 80, marginBottom: 30}}>
                   <CustomDropdown
                     disable={true}
                     placeholder="Select User"
                     value={user_type}
                     onSelect={(index: any) => {
-                      console.log("index", index);
-                      setFieldValue("user_type", user_type[index].value);
+                      console.log('index', index);
+                      setFieldValue('user_type', user_type[index].value);
                     }}
                     dropDownList={user_types}
                   />
@@ -196,10 +190,10 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
                   placeholderTextColor={Colors.white}
                   placeholder="Activation Code"
                   value={values.code}
-                  onChangeText={handleChange("code")}
-                  onBlur={handleBlur("code")}
+                  onChangeText={handleChange('code')}
+                  onBlur={handleBlur('code')}
                   keyboardType="numeric"
-                  textStyle={{ color: Colors.white }}
+                  textStyle={{color: Colors.white}}
                   style={styles.selectSettings}
                 />
                 {errors.code && touched.code && (
@@ -209,9 +203,8 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
                 <Text
                   style={[
                     styles.errorText,
-                    { textAlign: "center", fontSize: 15, marginBottom: 10 },
-                  ]}
-                >
+                    {textAlign: 'center', fontSize: 15, marginBottom: 10},
+                  ]}>
                   Check email for activation code
                 </Text>
                 <LinearGradientButton
@@ -219,8 +212,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
                   style={styles.signUpButton}
                   size="medium"
                   onPress={handleSubmit}
-                  disabled={!isValid || values.code.length === 0}
-                >
+                  disabled={!isValid || values.code.length === 0}>
                   Confirm
                 </LinearGradientButton>
               </Layout>
@@ -230,12 +222,8 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
 
         {resendCode && (
           <Text
-            style={[
-              styles.buttonMessage,
-              { textAlign: "center", color: "red" },
-            ]}
-          >
-            {" "}
+            style={[styles.buttonMessage, {textAlign: 'center', color: 'red'}]}>
+            {' '}
             Check email for activation code*
           </Text>
         )}
@@ -244,16 +232,14 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
             appearance="ghost"
             status="basic"
             size="medium"
-            onPress={openLogin}
-          >
+            onPress={openLogin}>
             {() => <Text style={styles.buttonMessage}> Login </Text>}
           </Button>
           <Button
             appearance="ghost"
             status="basic"
             size="medium"
-            onPress={openSignUp}
-          >
+            onPress={openSignUp}>
             {() => <Text style={styles.buttonMessage}> Register </Text>}
           </Button>
           {emailAddress.length > 0 && (
@@ -261,8 +247,7 @@ const EmailConfirmationScreen = ({ route, navigation }) => {
               appearance="ghost"
               status="basic"
               size="medium"
-              onPress={onResendButtonPress}
-            >
+              onPress={onResendButtonPress}>
               {() => <Text style={styles.buttonMessage}> Resend Code </Text>}
             </Button>
           )}
@@ -275,13 +260,13 @@ export default EmailConfirmationScreen;
 const themedStyles = StyleService.create({
   container: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   headerContainer: {
     flex: 1,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 30,
   },
   logoText: {
@@ -289,12 +274,12 @@ const themedStyles = StyleService.create({
     fontSize: 30,
   },
   formContainer: {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     paddingHorizontal: 20,
   },
   welcomeMessage: {
     marginTop: 16,
-    color: "color-primary-default",
+    color: 'color-primary-default',
   },
   signUpButton: {
     marginHorizontal: 2,
@@ -302,7 +287,7 @@ const themedStyles = StyleService.create({
   },
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
   },
   bottomView: {
     flex: 3,
@@ -314,7 +299,7 @@ const themedStyles = StyleService.create({
   },
   selectSettings: {
     marginTop: 18,
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     borderWidth: 0,
     borderBottomWidth: 2,
     borderBottomColor: Colors.white,

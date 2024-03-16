@@ -1,25 +1,21 @@
-import {
-  CustomTextDropDown,
-  LinearGradientButton,
-  Spinner
-} from "@/Components";
-import ProfileAvatarPicker from "@/Components/ProfileAvatar";
-import { ImagePickerModal } from "@/Modals";
-import { CountryDTO } from "@/Models/CountryDTOs";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
+import {CustomTextDropDown, LinearGradientButton, Spinner} from '@/Components';
+import ProfileAvatarPicker from '@/Components/ProfileAvatar';
+import {ImagePickerModal} from '@/Modals';
+import {CountryDTO} from '@/Models/CountryDTOs';
+import {GetAllCities, GetAllStates} from '@/Services/PlaceServices';
 import {
   GetAllSchools,
   GetSchoolByFilters,
-  UpdateSchool
-} from "@/Services/School";
-import { UpdateStudent } from "@/Services/Student";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { PlaceState } from "@/Store/Places";
-import { UserState } from "@/Store/User";
-import Colors from "@/Theme/Colors";
-import { useIsFocused } from "@react-navigation/native";
+  UpdateSchool,
+} from '@/Services/School';
+import {UpdateStudent} from '@/Services/Student';
+import {loadUserId} from '@/Storage/MainAppStorage';
+import {ModalState} from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import {PlaceState} from '@/Store/Places';
+import {UserState} from '@/Store/User';
+import Colors from '@/Theme/Colors';
+import {useIsFocused} from '@react-navigation/native';
 import {
   Autocomplete,
   AutocompleteItem,
@@ -29,16 +25,16 @@ import {
   Icon,
   Input,
   Modal,
-  Text
-} from "@ui-kitten/components";
-import { Formik } from "formik";
-import React, { useEffect, useState } from "react";
-import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
-import ImagePicker from "react-native-image-crop-picker";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { useDispatch, useSelector } from "react-redux";
-import * as yup from "yup";
+  Text,
+} from '@ui-kitten/components';
+import {Formik} from 'formik';
+import React, {useEffect, useState} from 'react';
+import {Dimensions, ScrollView, StyleSheet, View} from 'react-native';
+import ImagePicker from 'react-native-image-crop-picker';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import {useDispatch, useSelector} from 'react-redux';
+import * as yup from 'yup';
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -48,7 +44,7 @@ const filterStates = (item: string, query: string) => {
 const filterCities = (item: string, query: string) => {
   return item?.toLowerCase().includes(query.toLowerCase());
 };
-const screenHeight = Dimensions.get("screen").height;
+const screenHeight = Dimensions.get('screen').height;
 const EditDependentModal = ({
   selectedDependent,
   setSelectedDependent,
@@ -60,18 +56,18 @@ const EditDependentModal = ({
   const [student, setStudent] = useState(null);
   const [schools, setSchools] = useState([]);
   const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
+    (state: {user: UserState}) => state.user.item,
   );
 
   const grades =
     schools &&
     schools.length > 0 &&
-    schools.find((s) => s.name === selectedDependent?.school) &&
-    schools?.find((s) => s.name === selectedDependent?.school)?.gradeEntities;
+    schools.find(s => s.name === selectedDependent?.school) &&
+    schools?.find(s => s.name === selectedDependent?.school)?.gradeEntities;
   const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries
+    (state: {places: PlaceState}) => state.places.countries,
   );
-  console.log("selectedepenedted", selectedDependent);
+  console.log('selectedepenedted', selectedDependent);
   const [countriesData, setCountriesData] = React.useState(countries);
   const [statesData, setStatesData] = React.useState<Array<any>>([]);
   const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
@@ -79,7 +75,7 @@ const EditDependentModal = ({
   const [cities, setCities] = useState<Array<any>>([]);
   const [uploadedImage, setUploadedImage] = React.useState();
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -87,28 +83,28 @@ const EditDependentModal = ({
   const [checkBox, setCheckBox] = useState(false);
   const [schoolsData, setSchoolsData] = React.useState([]);
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.editDependentModalVisibility
+    (state: {modal: ModalState}) => state.modal.editDependentModalVisibility,
   );
   const validationSchema = yup.object().shape({
-    firstName: yup.string().required("First Name is required"),
-    lastName: yup.string().required("Last Name is required"),
+    firstName: yup.string().required('First Name is required'),
+    lastName: yup.string().required('Last Name is required'),
     email: yup
       .string()
-      .email("Please enter valid email")
-      .required("Email is required"),
-    country: yup.string().required("Please select country"),
-    state: yup.string().required("Please select state"),
-    school: yup.string().required("Please select school"),
+      .email('Please enter valid email')
+      .required('Email is required'),
+    country: yup.string().required('Please select country'),
+    state: yup.string().required('Please select state'),
+    school: yup.string().required('Please select school'),
   });
   const dispatch = useDispatch();
 
   const getSchools = () => {
     GetAllSchools(0, 30)
-      .then((res) => {
+      .then(res => {
         setSchools(res.result);
         setSchoolsData(res.result);
       })
-      .catch((err) => {});
+      .catch(err => {});
   };
   const imageGalleryLaunch = () => {
     ImagePicker.openPicker({
@@ -117,10 +113,10 @@ const EditDependentModal = ({
       width: 139,
       height: 130,
       compressImageQuality: 0.2,
-      loadingLabelText: "Loading image",
-    }).then((image) => {
+      loadingLabelText: 'Loading image',
+    }).then(image => {
       if (image != null) {
-        const source = { uri: image?.path };
+        const source = {uri: image?.path};
         setUploadedImage(image);
         setSelectedImage(source.uri);
         // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
@@ -134,10 +130,10 @@ const EditDependentModal = ({
       width: 139,
       height: 130,
       compressImageQuality: 0.2,
-      loadingLabelText: "Loading image",
-    }).then((image) => {
+      loadingLabelText: 'Loading image',
+    }).then(image => {
       if (image != null) {
-        const source = { uri: image?.path };
+        const source = {uri: image?.path};
         setUploadedImage(image);
         setSelectedImage(source.uri);
         // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
@@ -163,18 +159,18 @@ const EditDependentModal = ({
   };
   const handleSubmit = () => {
     UpdateSchool()
-      .then((res) => {})
-      .catch((err) => {});
-    dispatch(ChangeModalState.action({ editDependentModalVisibility: false }));
+      .then(res => {})
+      .catch(err => {});
+    dispatch(ChangeModalState.action({editDependentModalVisibility: false}));
     setSelectedDependent(null);
     setStudent(null);
   };
   const validations = (name, value) => {};
   const getSchoolsByFilter = (
-    country = "",
-    state = "",
-    city = "",
-    schoolName: any
+    country = '',
+    state = '',
+    city = '',
+    schoolName: any,
   ) => {
     const query = {
       country: country,
@@ -183,10 +179,10 @@ const EditDependentModal = ({
       schoolName: schoolName,
     };
     GetSchoolByFilters(query)
-      .then((res) => {
+      .then(res => {
         const _data = {
           schoolId: 0,
-          name: "Other",
+          name: 'Other',
         };
 
         const _schools = [...res];
@@ -194,7 +190,7 @@ const EditDependentModal = ({
         setSchools(_schools);
         setSchoolsData(_schools);
       })
-      .catch((err) => {});
+      .catch(err => {});
   };
 
   // useEffect(() => {
@@ -206,14 +202,14 @@ const EditDependentModal = ({
       setStudent(selectedDependent);
     }
   };
-  console.log("school data", schoolsData);
+  console.log('school data', schoolsData);
   useEffect(() => {
     if (isFocused) {
       handleSetStudent();
       getSchoolsByFilter(
         selectedDependent?.country,
         selectedDependent?.state,
-        selectedDependent?.city
+        selectedDependent?.city,
       );
       // setSelectedImage(selectedDependent?.studentImage);
       // setUploadedImage(selectedDependent?.studentImage);
@@ -223,7 +219,7 @@ const EditDependentModal = ({
     }
   }, [isFocused, selectedDependent]);
   function getUriSource(): any {
-    return { uri: selectedImage };
+    return {uri: selectedImage};
   }
   // @ts-ignore
   return (
@@ -233,12 +229,11 @@ const EditDependentModal = ({
       backdropStyle={styles.backdrop}
       onBackdropPress={() => {
         dispatch(
-          ChangeModalState.action({ editDependentModalVisibility: false })
+          ChangeModalState.action({editDependentModalVisibility: false}),
         );
         setSelectedDependent(null);
         setStudent(null);
-      }}
-    >
+      }}>
       {visible && (
         <ImagePickerModal
           openCamera={imageCameraLaunch}
@@ -247,29 +242,27 @@ const EditDependentModal = ({
         />
       )}
       <KeyboardAwareScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ flex: 1 }}
-      >
+        style={{flex: 1}}
+        contentContainerStyle={{flex: 1}}>
         {isFocused && (
-          <ScrollView style={{ flex: 1 }}>
+          <ScrollView style={{flex: 1}}>
             <Card style={styles.modal} disabled={true}>
               <View style={styles.body}>
-                <View style={{ paddingBottom: 10, paddingTop: 10 }}>
+                <View style={{paddingBottom: 10, paddingTop: 10}}>
                   <Text
-                    textBreakStrategy={"highQuality"}
+                    textBreakStrategy={'highQuality'}
                     style={{
-                      textAlign: "center",
-                      color: "#606060",
+                      textAlign: 'center',
+                      color: '#606060',
                       fontSize: 18,
-                    }}
-                  >
+                    }}>
                     Edit Dependent
                   </Text>
                 </View>
               </View>
 
-              <View style={{ width: "100%" }}>
-                {(selectedImage != "" || selectedDependent?.studentImage) && (
+              <View style={{width: '100%'}}>
+                {(selectedImage != '' || selectedDependent?.studentImage) && (
                   <View>
                     <ProfileAvatarPicker
                       style={styles.profileImage}
@@ -287,15 +280,14 @@ const EditDependentModal = ({
                     style={[
                       styles.profileImage,
                       {
-                        alignItems: "center",
-                        justifyContent: "center",
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         backgroundColor: Colors.lightgray,
                       },
-                    ]}
-                  >
+                    ]}>
                     <Text>
-                      {student?.firstname?.substring(0, 1)?.toUpperCase() || ""}
-                      {student?.lastname?.substring(0, 1)?.toUpperCase() || ""}
+                      {student?.firstname?.substring(0, 1)?.toUpperCase() || ''}
+                      {student?.lastname?.substring(0, 1)?.toUpperCase() || ''}
                     </Text>
                     {/* <ProfileIcon
                   size={110}
@@ -311,10 +303,9 @@ const EditDependentModal = ({
                     {
                       marginTop: 20,
                       lineHeight: 17,
-                      textAlign: "center",
+                      textAlign: 'center',
                     },
-                  ]}
-                >
+                  ]}>
                   Headshots preffered
                 </Text>
               </View>
@@ -326,30 +317,30 @@ const EditDependentModal = ({
                   firstName: selectedDependent?.firstname,
                   lastName: selectedDependent?.lastname,
                   school: selectedDependent?.childSchool,
-                  selectedSchool: "",
-                  grade: "",
-                  parentName: "",
-                  parentName2: "",
-                  password: "",
-                  confirmPassword: "",
+                  selectedSchool: '',
+                  grade: '',
+                  parentName: '',
+                  parentName2: '',
+                  password: '',
+                  confirmPassword: '',
                   termsAccepted: false,
                   phoneNumber: selectedDependent?.childPhone,
                   email: selectedDependent?.childEmail,
-                  country: selectedDependent?.country || "",
-                  state: selectedDependent?.state || "",
-                  city: selectedDependent?.city || "",
-                  selectedCountry: selectedDependent?.country || "",
-                  selectedState: selectedDependent?.state || "",
-                  selectedCity: selectedDependent?.city || "",
-                  selectedSchool: "",
+                  country: selectedDependent?.country || '',
+                  state: selectedDependent?.state || '',
+                  city: selectedDependent?.city || '',
+                  selectedCountry: selectedDependent?.country || '',
+                  selectedState: selectedDependent?.state || '',
+                  selectedCity: selectedDependent?.city || '',
+                  selectedSchool: '',
                 }}
-                onSubmit={async (values, { resetForm }) => {
+                onSubmit={async (values, {resetForm}) => {
                   const userId = await loadUserId();
 
                   setLoading(true);
                   let formData = new FormData();
                   formData.append(
-                    "image",
+                    'image',
                     uploadedImage
                       ? {
                           uri: uploadedImage?.path,
@@ -359,46 +350,46 @@ const EditDependentModal = ({
                       : {
                           uri:
                             selectedDependent?.studentImage ||
-                            "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
-                          name: "avatar",
-                          type: "image/png",
-                        }
+                            'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
+                          name: 'avatar',
+                          type: 'image/png',
+                        },
                   );
-                  formData.append("id", parseInt(student?.studentId));
-                  formData.append("parentId", parseInt(userId, 0));
-                  formData.append("firstname", values.firstName);
-                  formData.append("lastname", values.lastName);
-                  formData.append("phone", values.phoneNumber);
-                  formData.append("email", values?.email);
+                  formData.append('id', parseInt(student?.studentId));
+                  formData.append('parentId', parseInt(userId, 0));
+                  formData.append('firstname', values.firstName);
+                  formData.append('lastname', values.lastName);
+                  formData.append('phone', values.phoneNumber);
+                  formData.append('email', values?.email);
                   formData.append(
-                    "school",
-                    values.selectedSchool != ""
+                    'school',
+                    values.selectedSchool != ''
                       ? values.selectedSchool
-                      : values.school
+                      : values.school,
                   );
-                  formData.append("country", values.country);
+                  formData.append('country', values.country);
 
-                  formData.append("state", values.state);
-                  formData.append("city", values.city);
-                  formData.append("parentemail1", currentUser.email);
-                  formData.append("parentemail2", "");
+                  formData.append('state', values.state);
+                  formData.append('city', values.city);
+                  formData.append('parentemail1', currentUser.email);
+                  formData.append('parentemail2', '');
 
-                  console.log("data", JSON.stringify(formData));
+                  console.log('data', JSON.stringify(formData));
                   UpdateStudent(formData)
-                    .then((response) => {
-                      console.log("response", response);
+                    .then(response => {
+                      console.log('response', response);
                       dispatch(
                         ChangeModalState.action({
                           editDependentModalVisibility: false,
-                        })
+                        }),
                       );
                       setSelectedImage(null);
                       setUploadedImage(null);
                       setSelectedDependent(null);
                       setStudent(null);
                       Toast.show({
-                        type: "success",
-                        position: "top",
+                        type: 'success',
+                        position: 'top',
                         text1: `Dependent Info has been successfully updated`,
                       });
                       // resetForm();
@@ -406,19 +397,18 @@ const EditDependentModal = ({
                       //     ChangeModalState.action({ addStudentModal: false })
                       //   );
                     })
-                    .catch((err) => {
-                      console.log("err", err);
+                    .catch(err => {
+                      console.log('err', err);
                       Toast.show({
-                        type: "info",
-                        position: "top",
+                        type: 'info',
+                        position: 'top',
                         text1: `An error occured`,
                       });
                     })
                     .finally(() => {
                       setLoading(false);
                     });
-                }}
-              >
+                }}>
                 {({
                   handleChange,
                   setFieldValue,
@@ -430,14 +420,13 @@ const EditDependentModal = ({
                   isValid,
                 }) => (
                   <>
-                    <View style={{ marginTop: 30, padding: 10 }}>
+                    <View style={{marginTop: 30, padding: 10}}>
                       <View
                         style={{
-                          flexDirection: "row",
+                          flexDirection: 'row',
 
-                          alignItems: "center",
-                        }}
-                      >
+                          alignItems: 'center',
+                        }}>
                         <Text
                           style={{
                             marginRight: 20,
@@ -445,57 +434,55 @@ const EditDependentModal = ({
                             color: Colors.black,
                             fontSize: 14,
                             marginLeft: 5,
-                          }}
-                        >
+                          }}>
                           Use my address
                         </Text>
                         <CheckBox
-                          style={[{ flex: 1, marginTop: 13 }]}
+                          style={[{flex: 1, marginTop: 13}]}
                           checked={checkBox}
-                          onChange={(checked) => {
+                          onChange={checked => {
                             if (checked) {
                               setCheckBox(checked);
                               setFieldValue(
-                                "country",
-                                currentUser?.country || ""
+                                'country',
+                                currentUser?.country || '',
                               );
                               setFieldValue(
-                                "selectedCountry",
-                                currentUser?.country || ""
+                                'selectedCountry',
+                                currentUser?.country || '',
                               );
-                              setFieldValue("state", currentUser?.state || "");
+                              setFieldValue('state', currentUser?.state || '');
                               setFieldValue(
-                                "selectedState",
-                                currentUser?.state || ""
+                                'selectedState',
+                                currentUser?.state || '',
                               );
-                              setFieldValue("city", currentUser?.city || "");
+                              setFieldValue('city', currentUser?.city || '');
                               setFieldValue(
-                                "selectedCity",
-                                currentUser?.city || ""
+                                'selectedCity',
+                                currentUser?.city || '',
                               );
 
                               getSchoolsByFilter(
                                 currentUser?.country,
                                 currentUser?.state,
-                                currentUser?.city
+                                currentUser?.city,
                               );
                             } else {
                               setCheckBox(checked);
-                              setFieldValue("country", "");
-                              setFieldValue("selectedCountry", "");
-                              setFieldValue("selectedCity", "");
-                              setFieldValue("selectedState", "");
-                              setFieldValue("state", "");
-                              setFieldValue("city", "");
-                              setFieldValue("school", "");
+                              setFieldValue('country', '');
+                              setFieldValue('selectedCountry', '');
+                              setFieldValue('selectedCity', '');
+                              setFieldValue('selectedState', '');
+                              setFieldValue('state', '');
+                              setFieldValue('city', '');
+                              setFieldValue('school', '');
                             }
                             // if (checked) {
                             //   Alert.alert(checked);
                             // } else {
                             //   Alert.alert(checked);
                             // }
-                          }}
-                        ></CheckBox>
+                          }}></CheckBox>
                       </View>
                       <Input
                         style={styles.textInput}
@@ -503,8 +490,8 @@ const EditDependentModal = ({
                         autoCorrect={false}
                         placeholder={`First Name`}
                         value={values?.firstName}
-                        onChangeText={handleChange("firstName")}
-                        onBlur={handleBlur("firstName")}
+                        onChangeText={handleChange('firstName')}
+                        onBlur={handleBlur('firstName')}
                         // onChangeText={(value: string) =>
                         //   setStudent({
                         //     ...student,
@@ -521,8 +508,8 @@ const EditDependentModal = ({
                         autoCorrect={false}
                         placeholder={`Last Name`}
                         value={values.lastName}
-                        onChangeText={handleChange("lastName")}
-                        onBlur={handleBlur("lastName")}
+                        onChangeText={handleChange('lastName')}
+                        onBlur={handleBlur('lastName')}
                         // value={student?.lastname}
                         // onChangeText={(value: string) =>
                         //   setStudent({
@@ -540,8 +527,8 @@ const EditDependentModal = ({
                         autoCorrect={false}
                         value={values.email}
                         placeholder="Email*"
-                        onChangeText={handleChange("email")}
-                        onBlur={handleBlur("email")}
+                        onChangeText={handleChange('email')}
+                        onBlur={handleBlur('email')}
                         // placeholder={`Email*`}
 
                         // value={student?.email}
@@ -562,7 +549,7 @@ const EditDependentModal = ({
                         placeholder={`Phone # (Optional)`}
                         value={values.phoneNumber}
                         keyboardType="number-pad"
-                        onChangeText={handleChange("phoneNumber")}
+                        onChangeText={handleChange('phoneNumber')}
                         // value={student?.phone}
                         // onChangeText={(value: string) =>
                         //   setStudent({
@@ -576,34 +563,33 @@ const EditDependentModal = ({
                         value={values?.country}
                         placement="bottom"
                         style={styles.textInput}
-                        onChangeText={(query) => {
-                          setFieldValue("country", query);
+                        onChangeText={query => {
+                          setFieldValue('country', query);
                           setCountriesData(
-                            countries.filter((item) =>
-                              filterCountries(item, query)
-                            )
+                            countries.filter(item =>
+                              filterCountries(item, query),
+                            ),
                           );
                         }}
-                        onSelect={(query) => {
+                        onSelect={query => {
                           const selectedCountry = countriesData[query];
-                          setFieldValue("country", selectedCountry.name);
+                          setFieldValue('country', selectedCountry.name);
                           setFieldValue(
-                            "selectedCountry",
-                            selectedCountry.name
+                            'selectedCountry',
+                            selectedCountry.name,
                           );
-                          setFieldValue("selectedState", "");
-                          setFieldValue("state", "");
+                          setFieldValue('selectedState', '');
+                          setFieldValue('state', '');
                           setStates([]);
                           GetAllStates(
-                            selectedCountry.name.replace(/ /g, "")
-                          ).then((res) => {
+                            selectedCountry.name.replace(/ /g, ''),
+                          ).then(res => {
                             setStates(res.data);
                             setStatesData(states);
                           });
                           getSchoolsByFilter(selectedCountry);
                           // getSchoolsByFilter(selectedCountry.name);
-                        }}
-                      >
+                        }}>
                         {countriesData.map((item, index) => {
                           return (
                             <AutocompleteItem
@@ -624,32 +610,31 @@ const EditDependentModal = ({
                         placement="bottom"
                         style={styles.textInput}
                         disabled={!values.selectedCountry}
-                        onChangeText={(query) => {
-                          setFieldValue("state", query);
+                        onChangeText={query => {
+                          setFieldValue('state', query);
                           setStatesData(
-                            states.filter((item) => filterStates(item, query))
+                            states.filter(item => filterStates(item, query)),
                           );
                         }}
-                        onSelect={(query) => {
+                        onSelect={query => {
                           const selectedState = statesData[query];
-                          setFieldValue("state", selectedState);
-                          setFieldValue("selectedState", selectedState);
-                          setFieldValue("selectedCity", "");
-                          setFieldValue("city", "");
+                          setFieldValue('state', selectedState);
+                          setFieldValue('selectedState', selectedState);
+                          setFieldValue('selectedCity', '');
+                          setFieldValue('city', '');
                           setCities([]);
                           GetAllCities(
                             values.selectedCountry,
-                            selectedState
-                          ).then((res) => {
+                            selectedState,
+                          ).then(res => {
                             setCities(res.data);
                           });
                           getSchoolsByFilter(
                             values.selectedCountry,
-                            selectedState
+                            selectedState,
                           );
                           // getSchoolsByFilter(values.selectedCountry, selectedState);
-                        }}
-                      >
+                        }}>
                         {statesData.map((item, index) => {
                           return (
                             <AutocompleteItem
@@ -671,25 +656,24 @@ const EditDependentModal = ({
                         disabled={!values.selectedState}
                         // disabled={!student?.selectedState}
                         style={styles.textInput}
-                        onChangeText={(query) => {
-                          setFieldValue("city", query);
+                        onChangeText={query => {
+                          setFieldValue('city', query);
                           // setFieldValue("selectedCity", query);
                           setCitiesData(
-                            cities.filter((item) => filterCities(item, query))
+                            cities.filter(item => filterCities(item, query)),
                           );
                         }}
-                        onSelect={(query) => {
+                        onSelect={query => {
                           const selectedCity = citiesData[query];
-                          setFieldValue("city", selectedCity);
-                          setFieldValue("selectedCity", selectedCity);
+                          setFieldValue('city', selectedCity);
+                          setFieldValue('selectedCity', selectedCity);
                           getSchoolsByFilter(
                             values.selectedCountry,
                             values.selectedState,
-                            selectedCity
+                            selectedCity,
                           );
                           // getSchoolsByFilter("", "", selectedCity);
-                        }}
-                      >
+                        }}>
                         {citiesData.map((item, index) => {
                           return (
                             <AutocompleteItem
@@ -705,17 +689,17 @@ const EditDependentModal = ({
                         placeholder="Select School"
                         value={values.school}
                         onSelect={(index: any) => {
-                          console.log("index", index);
+                          console.log('index', index);
 
                           let school = schoolsData[index];
-                          setFieldValue("school", school.name);
-                          setFieldValue("selectedSchool", "");
-                          if (school.name != "Other") {
-                            setFieldValue("schoolName", school.name);
-                            setFieldValue("schoolAddress", school.address);
+                          setFieldValue('school', school.name);
+                          setFieldValue('selectedSchool', '');
+                          if (school.name != 'Other') {
+                            setFieldValue('schoolName', school.name);
+                            setFieldValue('schoolAddress', school.address);
                           } else {
-                            setFieldValue("schoolName", "");
-                            setFieldValue("schoolAdress", "");
+                            setFieldValue('schoolName', '');
+                            setFieldValue('schoolAdress', '');
                           }
                         }}
                         dropDownList={schoolsData}
@@ -752,7 +736,7 @@ const EditDependentModal = ({
                             );
                           })}
                       </Autocomplete> */}
-                      {values.school == "Other" && (
+                      {values.school == 'Other' && (
                         <>
                           <Input
                             style={styles.inputSettings}
@@ -760,13 +744,13 @@ const EditDependentModal = ({
                             // accessoryRight={PersonIcon}
                             value={values.selectedSchool}
                             placeholder="School Name*"
-                            onChangeText={handleChange("selectedSchool")}
-                            onBlur={handleBlur("selectedSchool")}
+                            onChangeText={handleChange('selectedSchool')}
+                            onBlur={handleBlur('selectedSchool')}
                           />
-                          {values.selectedSchool == "" &&
+                          {values.selectedSchool == '' &&
                             touched.selectedSchool && (
                               <Text style={styles.errorText}>
-                                {"School is required"}
+                                {'School is required'}
                               </Text>
                             )}
                         </>
@@ -779,20 +763,20 @@ const EditDependentModal = ({
                             borderRadius: 25,
                             flex: 1,
                             backgroundColor:
-                              isValid && selectedImage != ""
+                              isValid && selectedImage != ''
                                 ? Colors.primary
                                 : Colors.gray,
                           }}
                           appearance="ghost"
                           size="medium"
                           status="control"
-                          onPress={() => selectedImage != "" && handleSubmit()}
-                        >
+                          onPress={() => selectedImage != '' && handleSubmit()}>
                           I'm done
                         </LinearGradientButton>
                       </View>
                     ) : (
-                      <Spinner />
+                      // <Spinner />
+                      <></>
                     )}
                     <View style={styles.buttonText}>
                       <LinearGradientButton
@@ -807,16 +791,15 @@ const EditDependentModal = ({
                           dispatch(
                             ChangeModalState.action({
                               editDependentModalVisibility: false,
-                            })
+                            }),
                           );
                           setSelectedDependent(null);
                           setStudent(null);
-                        }}
-                      >
+                        }}>
                         Cancel
                       </LinearGradientButton>
                     </View>
-                    <View style={{ marginBottom: 50 }} />
+                    <View style={{marginBottom: 50}} />
                   </>
                 )}
               </Formik>
@@ -833,20 +816,20 @@ const styles = StyleSheet.create({
   container: {
     maxHeight: screenHeight * 0.85,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
     backgroundColor: Colors.newBackgroundColor,
   },
   inputSettings: {
     marginTop: 7,
   },
-  modal: { borderRadius: 10, backgroundColor: Colors.newBackgroundColor },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
-  body: { flex: 3 },
+  modal: {borderRadius: 10, backgroundColor: Colors.newBackgroundColor},
+  header: {flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20},
+  body: {flex: 3},
   background: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
 
     zIndex: -1,
     backgroundColor: Colors.newBackgroundColor,
@@ -856,67 +839,67 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   bottom: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 45,
     marginTop: 10,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   buttonText: {
     zIndex: -1,
     flex: 1,
     borderRadius: 25,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     margin: 2,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
-    shadowOffset: { height: 1, width: 1 }, // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
+    shadowOffset: {height: 1, width: 1}, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
     marginTop: 10,
   },
   errorText: {
-    color: "red",
+    color: 'red',
 
     fontSize: 12,
     marginLeft: 10,
     marginTop: 5,
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   editButton: {
-    position: "absolute",
-    alignSelf: "flex-end",
+    position: 'absolute',
+    alignSelf: 'flex-end',
     bottom: 0,
   },
   profileAvatar: {
     width: 116,
     height: 116,
     borderRadius: 58,
-    alignSelf: "center",
-    backgroundColor: "color-primary-default",
-    tintColor: "background-basic-color-1",
+    alignSelf: 'center',
+    backgroundColor: 'color-primary-default',
+    tintColor: 'background-basic-color-1',
   },
   profileImage: {
     width: 116,
     height: 116,
     borderRadius: 58,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   editAvatarButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    position: "absolute",
+    position: 'absolute',
     top: 70,
     right: 90,
     // alignSelf: "center",
@@ -924,16 +907,16 @@ const styles = StyleSheet.create({
   },
   textInput: {
     marginTop: 10,
-    alignSelf: "center",
-    width: "100%",
+    alignSelf: 'center',
+    width: '100%',
 
     borderRadius: 8,
     elevation: 2,
   },
   autoCompleteItem: {
     // elevation: 2,
-    backgroundColor: "transparent",
-    width: "100%",
+    backgroundColor: 'transparent',
+    width: '100%',
   },
   inputLabels: {
     color: Colors.black,

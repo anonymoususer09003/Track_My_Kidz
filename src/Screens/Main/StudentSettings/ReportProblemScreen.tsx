@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -10,8 +10,8 @@ import {
   SafeAreaView,
   TouchableWithoutFeedback,
   Keyboard,
-} from "react-native";
-import { useTheme } from "@/Theme";
+} from 'react-native';
+import {useTheme} from '@/Theme';
 import {
   Card,
   Text,
@@ -19,38 +19,38 @@ import {
   RadioGroup,
   Spinner,
   Input,
-} from "@ui-kitten/components";
+} from '@ui-kitten/components';
 // @ts-ignore
-import { ReportAProblem } from "../../../Services/SettingsServies";
-import LinearGradient from "react-native-linear-gradient";
-import * as yup from "yup";
-import { Formik } from "formik";
-import { AppHeader } from "@/Components";
-import { useHeaderHeight } from "react-native-screens/native-stack";
-import { ScrollView } from "react-native-gesture-handler";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Colors from "@/Theme/Colors";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import CreateReport from "@/Services/Settings/CreateReport";
+import {ReportAProblem} from '../../../Services/SettingsServies';
+import LinearGradient from 'react-native-linear-gradient';
+import * as yup from 'yup';
+import {Formik} from 'formik';
+import {AppHeader} from '@/Components';
+import {useHeaderHeight} from 'react-native-screens/native-stack';
+import {ScrollView} from 'react-native-gesture-handler';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import Colors from '@/Theme/Colors';
+import {loadUserId} from '@/Storage/MainAppStorage';
+import CreateReport from '@/Services/Settings/CreateReport';
 const Divider = () => (
   <View
     style={{
-      borderBottomColor: "#E0E0E0",
+      borderBottomColor: '#E0E0E0',
       borderBottomWidth: 1,
     }}
   />
 );
 
 const issues = [
-  "User interface issues",
-  "",
-  "App performance and response",
-  "",
-  "Functionality missing or not working properly",
-  "",
-  "Device compatibility",
-  "",
-  "Other",
+  'User interface issues',
+  '',
+  'App performance and response',
+  '',
+  'Functionality missing or not working properly',
+  '',
+  'Device compatibility',
+  '',
+  'Other',
 ];
 
 const RadioOptions = ({
@@ -64,19 +64,17 @@ const RadioOptions = ({
     <React.Fragment>
       <RadioGroup
         selectedIndex={selectedIndex}
-        onChange={(index) => setSelectedIndex(index)}
-      >
+        onChange={index => setSelectedIndex(index)}>
         <Radio
           style={{
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
+            flexDirection: 'row-reverse',
+            justifyContent: 'space-between',
             paddingLeft: 20,
             marginVertical: 15,
-          }}
-        >
-          {(evaProps) => (
-            <Text {...evaProps} style={{ fontSize: 14 }}>
-              {" "}
+          }}>
+          {evaProps => (
+            <Text {...evaProps} style={{fontSize: 14}}>
+              {' '}
               User interface issues
             </Text>
           )}
@@ -84,14 +82,13 @@ const RadioOptions = ({
         <Divider />
         <Radio
           style={{
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
+            flexDirection: 'row-reverse',
+            justifyContent: 'space-between',
             paddingLeft: 20,
             marginVertical: 15,
-          }}
-        >
-          {(evaProps) => (
-            <Text {...evaProps} style={{ fontSize: 14, marginLeft: 4 }}>
+          }}>
+          {evaProps => (
+            <Text {...evaProps} style={{fontSize: 14, marginLeft: 4}}>
               App performance and response
             </Text>
           )}
@@ -99,15 +96,14 @@ const RadioOptions = ({
         <Divider />
         <Radio
           style={{
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
+            flexDirection: 'row-reverse',
+            justifyContent: 'space-between',
             paddingLeft: 20,
             marginVertical: 15,
-          }}
-        >
-          {(evaProps) => (
-            <Text {...evaProps} style={{ fontSize: 14 }}>
-              {" "}
+          }}>
+          {evaProps => (
+            <Text {...evaProps} style={{fontSize: 14}}>
+              {' '}
               Functionality missing or not working properly
             </Text>
           )}
@@ -115,15 +111,14 @@ const RadioOptions = ({
         <Divider />
         <Radio
           style={{
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
+            flexDirection: 'row-reverse',
+            justifyContent: 'space-between',
             paddingLeft: 20,
             marginVertical: 15,
-          }}
-        >
-          {(evaProps) => (
-            <Text {...evaProps} style={{ fontSize: 14 }}>
-              {" "}
+          }}>
+          {evaProps => (
+            <Text {...evaProps} style={{fontSize: 14}}>
+              {' '}
               Device compatibility
             </Text>
           )}
@@ -131,15 +126,14 @@ const RadioOptions = ({
         <Divider />
         <Radio
           style={{
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
+            flexDirection: 'row-reverse',
+            justifyContent: 'space-between',
             paddingLeft: 20,
             marginVertical: 15,
-          }}
-        >
-          {(evaProps) => (
-            <Text {...evaProps} style={{ fontSize: 14 }}>
-              {" "}
+          }}>
+          {evaProps => (
+            <Text {...evaProps} style={{fontSize: 14}}>
+              {' '}
               Other
             </Text>
           )}
@@ -151,14 +145,14 @@ const RadioOptions = ({
   );
 };
 
-const ReportProblemScreen = ({ navigation }) => {
-  const { Layout } = useTheme();
+const ReportProblemScreen = ({navigation}) => {
+  const {Layout} = useTheme();
   const reportAProblemValidationSchema = yup.object().shape({
     message: yup
       .string()
-      .max(200, "Message cannot be more than 200 characters")
-      .min(20, ({ min }) => `Message needs to be at least ${min} characters`)
-      .required("Message is required"),
+      .max(200, 'Message cannot be more than 200 characters')
+      .min(20, ({min}) => `Message needs to be at least ${min} characters`)
+      .required('Message is required'),
   });
   const [userId, setUserId] = useState();
 
@@ -183,11 +177,10 @@ const ReportProblemScreen = ({ navigation }) => {
         extraHeight={10}
         enableOnAndroid={true}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ flex: 1 }}
-      >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        contentContainerStyle={{flex: 1}}>
+        <ScrollView contentContainerStyle={{flexGrow: 1}}>
           <View style={styles.layout}>
-            <View style={[styles.mainLayout, { paddingLeft: 20 }]}>
+            <View style={[styles.mainLayout, {paddingLeft: 20}]}>
               {isSending ? (
                 isSent ? (
                   <View style={styles.sppinerContainer}>
@@ -198,12 +191,12 @@ const ReportProblemScreen = ({ navigation }) => {
                   </View>
                 ) : (
                   <View style={styles.sppinerContainer}>
-                    <Spinner status="primary" />
+                    {/* <Spinner status="primary" /> */}
                   </View>
                 )
               ) : (
                 <>
-                  <Text style={{ marginBottom: 15 }}>
+                  <Text style={{marginBottom: 15}}>
                     Report the problem you are experiencing.
                   </Text>
                   <RadioOptions
@@ -214,16 +207,15 @@ const ReportProblemScreen = ({ navigation }) => {
                     style={{
                       marginVertical: 20,
                       fontSize: 15,
-                      fontWeight: "800",
-                    }}
-                  >
+                      fontWeight: '800',
+                    }}>
                     Explain (Min 20 & Max 200 Characters)
                   </Text>
                   <Formik
                     validationSchema={reportAProblemValidationSchema}
                     validateOnMount={true}
-                    initialValues={{ message: "" }}
-                    onSubmit={(values, { resetForm }) => {
+                    initialValues={{message: ''}}
+                    onSubmit={(values, {resetForm}) => {
                       setisSending(true);
                       let objectToPass = {
                         userId: userId,
@@ -246,14 +238,13 @@ const ReportProblemScreen = ({ navigation }) => {
                             error.data.title,
 
                             error.message,
-                            [{ text: "OK", style: "cancel" }]
+                            [{text: 'OK', style: 'cancel'}],
                           );
 
                           setisSending(false);
                         });
                       resetForm();
-                    }}
-                  >
+                    }}>
                     {({
                       handleChange,
                       handleSubmit,
@@ -264,14 +255,14 @@ const ReportProblemScreen = ({ navigation }) => {
                       <>
                         <View style={styles.formContainer}>
                           <Input
-                            style={{ marginRight: 20 }}
-                            textStyle={{ minHeight: 200, marginLeft: -1 }}
+                            style={{marginRight: 20}}
+                            textStyle={{minHeight: 200, marginLeft: -1}}
                             placeholder="Type your feedback"
-                            onChangeText={handleChange("message")}
+                            onChangeText={handleChange('message')}
                             value={values.message}
                             multiline={true}
                             maxLength={500}
-                            status={isTouched && errors.message ? "danger" : ""}
+                            status={isTouched && errors.message ? 'danger' : ''}
                           />
                           {errors.message && isTouched ? (
                             <Text style={styles.errorText}>
@@ -289,8 +280,7 @@ const ReportProblemScreen = ({ navigation }) => {
                                       ? Colors.lightgray
                                       : Colors.primary,
                                 },
-                              ]}
-                            >
+                              ]}>
                               <TouchableOpacity
                                 style={[
                                   styles.background,
@@ -303,16 +293,14 @@ const ReportProblemScreen = ({ navigation }) => {
                                   },
                                 ]}
                                 disabled={!isValid}
-                                onPress={handleSubmit}
-                              >
+                                onPress={handleSubmit}>
                                 <Text style={styles.button}>Send</Text>
                               </TouchableOpacity>
                             </View>
                             <View style={styles.cancelBackground}>
                               <TouchableOpacity
                                 style={styles.cancelBackground}
-                                onPress={() => navigation.goBack()}
-                              >
+                                onPress={() => navigation.goBack()}>
                                 <Text style={styles.cancelButton}>Cancel</Text>
                               </TouchableOpacity>
                             </View>
@@ -336,7 +324,7 @@ export default ReportProblemScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    justifyContent: "space-around",
+    justifyContent: 'space-around',
     backgroundColor: Colors.white,
   },
   mainLayout: {
@@ -345,35 +333,35 @@ const styles = StyleSheet.create({
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 16,
     marginLeft: 10,
     marginTop: 10,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.gray,
-    textAlign: "center",
+    textAlign: 'center',
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
   cancelBackground: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
   },
   button: {
@@ -392,15 +380,15 @@ const styles = StyleSheet.create({
   },
   buttonSettings: {
     marginTop: 20,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     marginLeft: -20,
   },
 
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
     marginLeft: 10,
     marginTop: 10,
   },

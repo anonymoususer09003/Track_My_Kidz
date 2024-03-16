@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from 'react';
 import {
   View,
   KeyboardAvoidingView,
@@ -6,10 +6,10 @@ import {
   Image,
   TouchableOpacity,
   Linking,
-} from "react-native";
+} from 'react-native';
 
-import LinearGradient from "react-native-linear-gradient";
-import { AppHeader } from "@/Components";
+import LinearGradient from 'react-native-linear-gradient';
+import {AppHeader} from '@/Components';
 import {
   Button,
   Input,
@@ -18,14 +18,14 @@ import {
   Layout,
   Text,
   Spinner,
-} from "@ui-kitten/components";
+} from '@ui-kitten/components';
 // @ts-ignore
-import { ContactUs } from "../../../Services/ContactUsServices";
-import * as yup from "yup";
-import { Formik } from "formik";
-import Colors from "@/Theme/Colors";
-import { useIsFocused } from "@react-navigation/native";
-import { loadId, loadUserId } from "@/Storage/MainAppStorage";
+import {ContactUs} from '../../../Services/ContactUsServices';
+import * as yup from 'yup';
+import {Formik} from 'formik';
+import Colors from '@/Theme/Colors';
+import {useIsFocused} from '@react-navigation/native';
+import {loadId, loadUserId} from '@/Storage/MainAppStorage';
 
 const ContactUsScreen = () => {
   const isFocuesed = useIsFocused();
@@ -34,8 +34,8 @@ const ContactUsScreen = () => {
   const contactUsValidationSchema = yup.object().shape({
     message: yup
       .string()
-      .min(50, ({ min }) => `Message needs to be at least ${min} characters`)
-      .required("Message is required"),
+      .min(50, ({min}) => `Message needs to be at least ${min} characters`)
+      .required('Message is required'),
   });
   const [isTouched, setisTouched] = useState(false);
   const [isSending, setisSending] = useState(false);
@@ -55,8 +55,8 @@ const ContactUsScreen = () => {
           <Formik
             validationSchema={contactUsValidationSchema}
             validateOnMount={true}
-            initialValues={{ message: "" }}
-            onSubmit={async (values, { resetForm }) => {
+            initialValues={{message: ''}}
+            onSubmit={async (values, {resetForm}) => {
               setisSending(true);
               const userId = await loadId();
               let objectToPass = {
@@ -66,7 +66,7 @@ const ContactUsScreen = () => {
               };
               ContactUs(objectToPass)
                 .then((response: any) => {
-                  console.log("res", response);
+                  console.log('res', response);
                   if (response.status == 200) {
                     setisSent(true);
                     setTimeout(() => {
@@ -77,42 +77,41 @@ const ContactUsScreen = () => {
                   }
                 })
                 .catch((error: any) => {
-                  console.log("err", error);
-                  Alert.alert("An error occured", "Please try again", [
-                    { text: "OK", style: "cancel" },
+                  console.log('err', error);
+                  Alert.alert('An error occured', 'Please try again', [
+                    {text: 'OK', style: 'cancel'},
                   ]);
 
                   setisSending(false);
                 });
               resetForm();
-            }}
-          >
-            {({ handleChange, handleSubmit, values, errors, isValid }) => (
+            }}>
+            {({handleChange, handleSubmit, values, errors, isValid}) => (
               <>
                 {isSending ? (
                   isSent ? (
                     <View style={styles.sppinerContainer}>
                       <Text style={styles.sent}>
-                        Your message has been successfully submited.{"\n"}Thank
+                        Your message has been successfully submited.{'\n'}Thank
                         you for contacting us!
                       </Text>
                     </View>
                   ) : (
                     <View style={styles.sppinerContainer}>
-                      <Spinner status="primary" />
+                      {/* <Spinner status="primary" /> */}
                     </View>
                   )
                 ) : (
                   <Layout style={styles.formContainer}>
                     <Input
-                      style={{ marginTop: 20, fontSize: 20 }}
+                      style={{marginTop: 20, fontSize: 20}}
                       textStyle={{
                         minHeight: 200,
                         marginLeft: -1,
                         fontSize: 18,
                       }}
                       placeholder="Add your message here"
-                      onChangeText={handleChange("message")}
+                      onChangeText={handleChange('message')}
                       onBlur={() => {
                         setisTouched(true);
                         setShowErrors(true);
@@ -120,7 +119,7 @@ const ContactUsScreen = () => {
                       value={values.message}
                       multiline={true}
                       maxLength={500}
-                      status={isTouched && errors.message ? "danger" : ""}
+                      status={isTouched && errors.message ? 'danger' : ''}
                     />
                     <Text style={styles.message}>Min 50 characters</Text>
                     {errors.message && isTouched && showErrors ? (
@@ -132,8 +131,7 @@ const ContactUsScreen = () => {
                           <TouchableOpacity
                             style={styles.background}
                             disabled={!isValid}
-                            onPress={handleSubmit}
-                          >
+                            onPress={handleSubmit}>
                             <Text style={styles.button}>Send</Text>
                           </TouchableOpacity>
                         </View>
@@ -142,9 +140,8 @@ const ContactUsScreen = () => {
                           <TouchableOpacity
                             style={styles.disabledBackground}
                             disabled={!isValid}
-                            onPress={handleSubmit}
-                          >
-                            <Text style={[styles.button, { color: "#fff" }]}>
+                            onPress={handleSubmit}>
+                            <Text style={[styles.button, {color: '#fff'}]}>
                               Send
                             </Text>
                           </TouchableOpacity>
@@ -167,30 +164,30 @@ export default ContactUsScreen;
 const themedStyles = StyleService.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   mainLayout: {
     flex: 9,
   },
   container: {
     flex: 2,
-    flexDirection: "column",
-    backgroundColor: "background-basic-color-1",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    backgroundColor: 'background-basic-color-1',
+    justifyContent: 'flex-start',
   },
   headerContainer: {
     flex: 2,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   formContainer: {
     flex: 1,
   },
   buttonSettings: {
     marginTop: 20,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   signInButton: {
     marginHorizontal: 2,
@@ -200,60 +197,60 @@ const themedStyles = StyleService.create({
 
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
     marginLeft: 10,
     marginTop: 10,
   },
   message: {
     fontSize: 10,
-    color: "#000000",
+    color: '#000000',
     marginLeft: 10,
     marginTop: 10,
   },
   socialIcons: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     marginTop: 30,
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 16,
     marginLeft: 10,
     marginTop: 10,
-    fontWeight: "bold",
-    color: "grey",
-    textAlign: "center",
+    fontWeight: 'bold',
+    color: 'grey',
+    textAlign: 'center',
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
   disabledBackground: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.lightgray,
   },
   button: {
     paddingTop: 5,
     fontSize: 17,
-    color: "white",
+    color: 'white',
     borderRadius: 10,
   },
 });

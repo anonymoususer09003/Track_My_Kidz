@@ -1,33 +1,36 @@
-import {
-  AppHeader,
-  LinearGradientButton
-} from "@/Components";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { useTheme } from "@/Theme";
+import {AppHeader, LinearGradientButton} from '@/Components';
+import {loadUserId} from '@/Storage/MainAppStorage';
+import {useTheme} from '@/Theme';
 import {
   Autocomplete,
-  AutocompleteItem, Button, Icon,
-  Input, Spinner,
-  Text
-} from "@ui-kitten/components";
-import { Formik } from "formik";
-import React, { ReactText, useEffect, useState } from "react";
+  AutocompleteItem,
+  Button,
+  Icon,
+  Input,
+  Spinner,
+  Text,
+} from '@ui-kitten/components';
+import {Formik} from 'formik';
+import React, {ReactText, useEffect, useState} from 'react';
 import {
-  Alert, Image, ScrollView,
+  Alert,
+  Image,
+  ScrollView,
   StyleSheet,
-  TouchableOpacity, View
-} from "react-native";
-import ImagePicker from "react-native-image-crop-picker";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import * as yup from "yup";
-import { UpdateUser } from "../../../Services/SettingsServies";
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import ImagePicker from 'react-native-image-crop-picker';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import * as yup from 'yup';
+import {UpdateUser} from '../../../Services/SettingsServies';
 // @ts-ignore
-import BackgroundLayout from "@/Components/BackgroundLayout";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import { PlaceState } from "@/Store/Places";
-import { UserState } from "@/Store/User";
-import Colors from "@/Theme/Colors";
-import { useDispatch, useSelector } from "react-redux";
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import {GetAllCities, GetAllStates} from '@/Services/PlaceServices';
+import {PlaceState} from '@/Store/Places';
+import {UserState} from '@/Store/User';
+import Colors from '@/Theme/Colors';
+import {useDispatch, useSelector} from 'react-redux';
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -40,28 +43,28 @@ const filterCities = (item: string, query: string) => {
 };
 
 const PersonalProfileScreen = () => {
-  const userIcon = require("@/Assets/Images/approval_icon2.png");
-  const phone = require("@/Assets/Images/phone.png");
-  const marker = require("@/Assets/Images/marker.png");
-  const email = require("@/Assets/Images/email.png");
-  const { Layout } = useTheme();
+  const userIcon = require('@/Assets/Images/approval_icon2.png');
+  const phone = require('@/Assets/Images/phone.png');
+  const marker = require('@/Assets/Images/marker.png');
+  const email = require('@/Assets/Images/email.png');
+  const {Layout} = useTheme();
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
-    undefined
+    undefined,
   );
-  const [languages, setLanguages] = useState<Array<ReactText>>(["English"]);
+  const [languages, setLanguages] = useState<Array<ReactText>>(['English']);
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries
+    (state: {places: PlaceState}) => state.places.countries,
   );
   const [isEditMode, setisEditMode] = useState(false);
   const [isSending, setisSending] = useState(false);
   const [isSent, setisSent] = useState(false);
   const [userId, setuserId] = useState(null);
-  const user = useSelector((state: { user: UserState }) => state.user.item);
+  const user = useSelector((state: {user: UserState}) => state.user.item);
   const isLoading = useSelector(
-    (state: { user: UserState }) => state.user.fetchOne.loading
+    (state: {user: UserState}) => state.user.fetchOne.loading,
   );
-  const [placement, setPlacement] = React.useState("bottom");
+  const [placement, setPlacement] = React.useState('bottom');
   const [countriesData, setCountriesData] = React.useState(countries);
   const [statesData, setStatesData] = React.useState<Array<any>>([]);
   const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
@@ -81,33 +84,33 @@ const PersonalProfileScreen = () => {
   }, []);
 
   function getUriSource(): any {
-    return { uri: selectedImage };
+    return {uri: selectedImage};
   }
   const renderPersonIcon = (props: any) => (
     <Image
       source={userIcon}
-      style={{ height: 18, width: 18, marginRight: 10 }}
+      style={{height: 18, width: 18, marginRight: 10}}
       resizeMode="contain"
     />
   );
   const renderLocationIcon = (props: any) => (
     <Image
       source={marker}
-      style={{ height: 20, width: 20 }}
+      style={{height: 20, width: 20}}
       resizeMode="contain"
     />
   );
   const renderEmailIcon = (props: any) => (
     <Image
       source={email}
-      style={{ height: 18, width: 18, marginRight: 12 }}
+      style={{height: 18, width: 18, marginRight: 12}}
       resizeMode="contain"
     />
   );
   const renderPhoneIcon = (props: any) => (
     <Image
       source={phone}
-      style={{ height: 20, width: 20, marginRight: 10 }}
+      style={{height: 20, width: 20, marginRight: 10}}
       resizeMode="contain"
     />
   );
@@ -128,10 +131,10 @@ const PersonalProfileScreen = () => {
       width: 139,
       height: 130,
       compressImageQuality: 0.2,
-      loadingLabelText: "Loading image",
-    }).then((image) => {
+      loadingLabelText: 'Loading image',
+    }).then(image => {
       if (image != null) {
-        const source = { uri: image?.path };
+        const source = {uri: image?.path};
         setSelectedImage(source.uri);
       }
     });
@@ -140,8 +143,8 @@ const PersonalProfileScreen = () => {
   const personalProfileValidationSchema = yup.object().shape({
     username: yup
       .string()
-      .min(4, ({ min }) => `Username is not up to ${min} characters`)
-      .required("Username is required"),
+      .min(4, ({min}) => `Username is not up to ${min} characters`)
+      .required('Username is required'),
   });
 
   return (
@@ -150,34 +153,34 @@ const PersonalProfileScreen = () => {
       {isLoading ? (
         <View style={styles.sppinerContainer}>
           <View style={styles.sppinerContainer}>
-            <Spinner status="primary" />
+            {/* <Spinner status="primary" /> */}
           </View>
         </View>
       ) : (
         <BackgroundLayout title="Profile">
-          <KeyboardAwareScrollView style={{ flex: 1 }} extraScrollHeight={150}>
+          <KeyboardAwareScrollView style={{flex: 1}} extraScrollHeight={150}>
             <ScrollView style={styles.container}>
               <View style={[[Layout.column, Layout.justifyContentCenter]]}>
                 <Formik
                   validateOnMount={true}
                   initialValues={{
-                    username: user?.username || "",
-                    firstName: user?.firstname || "",
-                    lastName: user?.lastname || "",
-                    address: user?.address || "",
-                    apartment: user?.apartment || "",
-                    country: user?.country || "",
-                    email: user?.email || "",
-                    zipcode: user?.zipcode || "",
-                    city: user?.city || "",
-                    apt: user?.apt || "",
-                    state: user?.state || "",
-                    phone: user?.phone || "",
-                    selectedCountry: user?.country || "",
-                    seletedState: user?.state || "",
-                    selectedCity: user?.city || "",
+                    username: user?.username || '',
+                    firstName: user?.firstname || '',
+                    lastName: user?.lastname || '',
+                    address: user?.address || '',
+                    apartment: user?.apartment || '',
+                    country: user?.country || '',
+                    email: user?.email || '',
+                    zipcode: user?.zipcode || '',
+                    city: user?.city || '',
+                    apt: user?.apt || '',
+                    state: user?.state || '',
+                    phone: user?.phone || '',
+                    selectedCountry: user?.country || '',
+                    seletedState: user?.state || '',
+                    selectedCity: user?.city || '',
                   }}
-                  onSubmit={(values, { resetForm }) => {
+                  onSubmit={(values, {resetForm}) => {
                     setisSending(true);
                     let objectToPass = {
                       firstname: values.firstName,
@@ -192,7 +195,7 @@ const PersonalProfileScreen = () => {
                       term: true,
                       apt: values?.apt,
                     };
-                    UpdateUser(objectToPass, "parent")
+                    UpdateUser(objectToPass, 'parent')
                       .then((response: any) => {
                         if (response.status == 200) {
                           setisEditMode(false);
@@ -201,15 +204,14 @@ const PersonalProfileScreen = () => {
                         }
                       })
                       .catch((error: any) => {
-                        console.log("Error", error);
+                        console.log('Error', error);
                         Alert.alert(error?.data.title, error?.data.detail, [
-                          { text: "OK", style: "cancel" },
+                          {text: 'OK', style: 'cancel'},
                         ]);
                         setisSending(false);
                         setisEditMode(!isEditMode);
                       });
-                  }}
-                >
+                  }}>
                   {({
                     handleChange,
                     handleSubmit,
@@ -221,39 +223,35 @@ const PersonalProfileScreen = () => {
                     <>
                       {isSending ? (
                         <View style={styles.sppinerContainer}>
-                          <Spinner status="primary" />
+                          {/* <Spinner status="primary" /> */}
                         </View>
                       ) : (
                         <>
-                          <View style={{ flexDirection: "column" }}>
+                          <View style={{flexDirection: 'column'}}>
                             <Text style={styles.editLabel}>Email</Text>
                             <View style={styles.editField}>
                               {renderEmailIcon()}
-                              <Text style={{ fontSize: 15 }}>
-                                {values.email}
-                              </Text>
+                              <Text style={{fontSize: 15}}>{values.email}</Text>
                             </View>
                           </View>
                           <View
                             style={{
-                              flexDirection: "row",
-                              justifyContent: "space-between",
-                              width: "100%",
-                            }}
-                          >
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              width: '100%',
+                            }}>
                             {!isEditMode ? (
                               <View
                                 style={{
-                                  flexDirection: "column",
-                                  width: "45%",
-                                }}
-                              >
+                                  flexDirection: 'column',
+                                  width: '45%',
+                                }}>
                                 <Text style={styles.editLabel}>First Name</Text>
 
                                 <View style={styles.editField}>
                                   {renderPersonIcon()}
-                                  <Text style={{ fontSize: 15 }}>
-                                    {" "}
+                                  <Text style={{fontSize: 15}}>
+                                    {' '}
                                     {values.firstName}
                                   </Text>
                                 </View>
@@ -261,29 +259,28 @@ const PersonalProfileScreen = () => {
                             ) : (
                               <Input
                                 accessoryLeft={renderPersonIcon}
-                                style={[styles.inputSettings, { width: "45%" }]}
+                                style={[styles.inputSettings, {width: '45%'}]}
                                 autoCapitalize="none"
-                                label={(evaProps) => (
+                                label={evaProps => (
                                   <Text {...evaProps}>First Name</Text>
                                 )}
                                 value={values.firstName}
-                                onChangeText={handleChange("firstName")}
+                                onChangeText={handleChange('firstName')}
                               />
                             )}
 
                             {!isEditMode ? (
                               <View
                                 style={{
-                                  flexDirection: "column",
-                                  width: "45%",
-                                }}
-                              >
+                                  flexDirection: 'column',
+                                  width: '45%',
+                                }}>
                                 <Text style={styles.editLabel}>Last Name</Text>
 
                                 <View style={styles.editField}>
                                   {renderPersonIcon()}
-                                  <Text style={{ fontSize: 15 }}>
-                                    {" "}
+                                  <Text style={{fontSize: 15}}>
+                                    {' '}
                                     {values.lastName}
                                   </Text>
                                 </View>
@@ -291,23 +288,23 @@ const PersonalProfileScreen = () => {
                             ) : (
                               <Input
                                 accessoryLeft={renderPersonIcon}
-                                style={[styles.inputSettings, { width: "45%" }]}
+                                style={[styles.inputSettings, {width: '45%'}]}
                                 autoCapitalize="none"
-                                label={(evaProps) => (
+                                label={evaProps => (
                                   <Text {...evaProps}>Last Name</Text>
                                 )}
                                 value={values.lastName}
-                                onChangeText={handleChange("lastName")}
+                                onChangeText={handleChange('lastName')}
                               />
                             )}
                           </View>
 
                           {!isEditMode ? (
-                            <View style={{ flexDirection: "column" }}>
+                            <View style={{flexDirection: 'column'}}>
                               <Text style={styles.editLabel}>Phone Number</Text>
                               <View style={styles.editField}>
                                 {renderPhoneIcon()}
-                                <Text style={{ fontSize: 15 }}>
+                                <Text style={{fontSize: 15}}>
                                   {values.phone}
                                 </Text>
                               </View>
@@ -317,24 +314,24 @@ const PersonalProfileScreen = () => {
                               keyboardType="number-pad"
                               style={styles.inputSettings}
                               autoCapitalize="none"
-                              label={(evaProps) => (
+                              label={evaProps => (
                                 <Text {...evaProps}>Phone Number</Text>
                               )}
                               value={values.phone}
-                              onChangeText={handleChange("phone")}
+                              onChangeText={handleChange('phone')}
                             />
                           )}
 
                           {!isEditMode ? (
-                            <View style={{ flexDirection: "column" }}>
+                            <View style={{flexDirection: 'column'}}>
                               <Text style={styles.editLabel}>
                                 Street Address
                               </Text>
 
                               <View style={styles.editField}>
                                 {renderLocationIcon()}
-                                <Text style={{ marginLeft: 8, fontSize: 15 }}>
-                                  {" "}
+                                <Text style={{marginLeft: 8, fontSize: 15}}>
+                                  {' '}
                                   {values.address}
                                 </Text>
                               </View>
@@ -344,47 +341,43 @@ const PersonalProfileScreen = () => {
                               accessoryLeft={renderLocationIcon}
                               style={styles.inputSettings}
                               autoCapitalize="none"
-                              label={(evaProps) => (
+                              label={evaProps => (
                                 <Text {...evaProps}>Street Address</Text>
                               )}
                               value={values.address}
-                              onChangeText={handleChange("address")}
+                              onChangeText={handleChange('address')}
                             />
                           )}
 
                           {!isEditMode ? (
                             <View
                               style={{
-                                flexDirection: "column",
+                                flexDirection: 'column',
                                 marginBottom: 5,
-                              }}
-                            >
+                              }}>
                               <Text style={styles.editLabel}> Ste/Apt</Text>
                               <View style={styles.editField}>
                                 {renderLocationIcon()}
-                                <Text style={{ fontSize: 15 }}>
+                                <Text style={{fontSize: 15}}>
                                   {values?.apt}
                                 </Text>
                               </View>
                             </View>
                           ) : (
                             <Input
-                              style={[
-                                styles.inputSettings,
-                                { marginBottom: 5 },
-                              ]}
+                              style={[styles.inputSettings, {marginBottom: 5}]}
                               accessoryLeft={renderLocationIcon}
                               autoCapitalize="none"
-                              label={(evaProps) => (
+                              label={evaProps => (
                                 <Text {...evaProps}>Ste/Apt</Text>
                               )}
                               value={values?.apt}
-                              onChangeText={handleChange("apt")}
+                              onChangeText={handleChange('apt')}
                             />
                           )}
                           {!isEditMode && (
                             <Autocomplete
-                              label={(evaProps) => (
+                              label={evaProps => (
                                 <Text {...evaProps} style={styles.editLabel}>
                                   City
                                 </Text>
@@ -400,22 +393,21 @@ const PersonalProfileScreen = () => {
                                 elevation: 1,
                               }}
                               // label={evaProps => <Text {...evaProps}>City</Text>}
-                              onChangeText={(query) => {
-                                setFieldValue("city", query);
+                              onChangeText={query => {
+                                setFieldValue('city', query);
                                 setCitiesData(
-                                  cities.filter((item) =>
-                                    filterCities(item, query)
-                                  )
+                                  cities.filter(item =>
+                                    filterCities(item, query),
+                                  ),
                                 );
                               }}
-                              onSelect={(query) => {
-                                setFieldValue("city", citiesData[query]);
+                              onSelect={query => {
+                                setFieldValue('city', citiesData[query]);
                                 setFieldValue(
-                                  "selectedCity",
-                                  citiesData[query]
+                                  'selectedCity',
+                                  citiesData[query],
                                 );
-                              }}
-                            >
+                              }}>
                               {citiesData.map((item, index) => {
                                 return (
                                   <AutocompleteItem key={index} title={item} />
@@ -426,11 +418,10 @@ const PersonalProfileScreen = () => {
 
                           {isEditMode && (
                             <Autocomplete
-                              label={(evaProps) => (
+                              label={evaProps => (
                                 <Text
                                   {...evaProps}
-                                  style={[styles.editLabel, { marginTop: 4 }]}
-                                >
+                                  style={[styles.editLabel, {marginTop: 4}]}>
                                   Country
                                 </Text>
                               )}
@@ -445,32 +436,31 @@ const PersonalProfileScreen = () => {
                                 borderRadius: 10,
                                 elevation: 1,
                               }}
-                              onChangeText={(query) => {
-                                setFieldValue("country", query);
+                              onChangeText={query => {
+                                setFieldValue('country', query);
                                 setCountriesData(
-                                  countries.filter((item) =>
-                                    filterCountries(item, query)
-                                  )
+                                  countries.filter(item =>
+                                    filterCountries(item, query),
+                                  ),
                                 );
                               }}
-                              onSelect={(query) => {
+                              onSelect={query => {
                                 const selectedCountry = countriesData[query];
-                                setFieldValue("country", selectedCountry.name);
+                                setFieldValue('country', selectedCountry.name);
                                 setFieldValue(
-                                  "selectedCountry",
-                                  selectedCountry.name
+                                  'selectedCountry',
+                                  selectedCountry.name,
                                 );
-                                setFieldValue("selectedState", "");
-                                setFieldValue("state", "");
+                                setFieldValue('selectedState', '');
+                                setFieldValue('state', '');
                                 setStates([]);
                                 GetAllStates(
-                                  selectedCountry.name.replace(/ /g, "")
-                                ).then((res) => {
+                                  selectedCountry.name.replace(/ /g, ''),
+                                ).then(res => {
                                   setStates(res.data);
                                   setStatesData(states);
                                 });
-                              }}
-                            >
+                              }}>
                               {countriesData.map((item, index) => {
                                 return (
                                   <AutocompleteItem
@@ -482,7 +472,7 @@ const PersonalProfileScreen = () => {
                             </Autocomplete>
                           )}
                           <Autocomplete
-                            label={(evaProps) => (
+                            label={evaProps => (
                               <Text {...evaProps} style={styles.editLabel}>
                                 State
                               </Text>
@@ -498,29 +488,28 @@ const PersonalProfileScreen = () => {
                               elevation: 1,
                             }}
                             // label={evaProps => <Text {...evaProps}>State</Text>}
-                            onChangeText={(query) => {
-                              setFieldValue("state", query);
+                            onChangeText={query => {
+                              setFieldValue('state', query);
                               setStatesData(
-                                states.filter((item) =>
-                                  filterStates(item, query)
-                                )
+                                states.filter(item =>
+                                  filterStates(item, query),
+                                ),
                               );
                             }}
-                            onSelect={(query) => {
+                            onSelect={query => {
                               const selectedState = statesData[query];
-                              setFieldValue("state", selectedState);
-                              setFieldValue("selectedState", selectedState);
-                              setFieldValue("selectedCity", "");
-                              setFieldValue("city", "");
+                              setFieldValue('state', selectedState);
+                              setFieldValue('selectedState', selectedState);
+                              setFieldValue('selectedCity', '');
+                              setFieldValue('city', '');
                               setCities([]);
                               GetAllCities(
                                 values.selectedCountry,
-                                selectedState
-                              ).then((res) => {
+                                selectedState,
+                              ).then(res => {
                                 setCities(res.data);
                               });
-                            }}
-                          >
+                            }}>
                             {statesData.map((item, index) => {
                               return (
                                 <AutocompleteItem key={index} title={item} />
@@ -529,7 +518,7 @@ const PersonalProfileScreen = () => {
                           </Autocomplete>
                           {isEditMode && (
                             <Autocomplete
-                              label={(evaProps) => (
+                              label={evaProps => (
                                 <Text {...evaProps} style={styles.editLabel}>
                                   City
                                 </Text>
@@ -545,22 +534,21 @@ const PersonalProfileScreen = () => {
                                 elevation: 1,
                               }}
                               // label={evaProps => <Text {...evaProps}>City</Text>}
-                              onChangeText={(query) => {
-                                setFieldValue("city", query);
+                              onChangeText={query => {
+                                setFieldValue('city', query);
                                 setCitiesData(
-                                  cities.filter((item) =>
-                                    filterCities(item, query)
-                                  )
+                                  cities.filter(item =>
+                                    filterCities(item, query),
+                                  ),
                                 );
                               }}
-                              onSelect={(query) => {
-                                setFieldValue("city", citiesData[query]);
+                              onSelect={query => {
+                                setFieldValue('city', citiesData[query]);
                                 setFieldValue(
-                                  "selectedCity",
-                                  citiesData[query]
+                                  'selectedCity',
+                                  citiesData[query],
                                 );
-                              }}
-                            >
+                              }}>
                               {citiesData.map((item, index) => {
                                 return (
                                   <AutocompleteItem key={index} title={item} />
@@ -569,14 +557,14 @@ const PersonalProfileScreen = () => {
                             </Autocomplete>
                           )}
                           {!isEditMode ? (
-                            <View style={{ flexDirection: "column" }}>
+                            <View style={{flexDirection: 'column'}}>
                               <Text style={styles.editLabel}>
-                                {" "}
+                                {' '}
                                 Zip/Post code
                               </Text>
                               <View style={styles.editField}>
                                 {renderLocationIcon()}
-                                <Text style={{ fontSize: 15, marginLeft: 10 }}>
+                                <Text style={{fontSize: 15, marginLeft: 10}}>
                                   {values.zipcode}
                                 </Text>
                               </View>
@@ -584,21 +572,18 @@ const PersonalProfileScreen = () => {
                           ) : (
                             <Input
                               accessoryLeft={renderLocationIcon}
-                              style={[
-                                styles.inputSettings,
-                                { marginBottom: 10 },
-                              ]}
+                              style={[styles.inputSettings, {marginBottom: 10}]}
                               autoCapitalize="none"
-                              label={(evaProps) => (
+                              label={evaProps => (
                                 <Text {...evaProps}>Zip/Post code</Text>
                               )}
                               value={values.zipcode}
-                              onChangeText={handleChange("zipcode")}
+                              onChangeText={handleChange('zipcode')}
                             />
                           )}
                           {!isEditMode && (
                             <Autocomplete
-                              label={(evaProps) => (
+                              label={evaProps => (
                                 <Text {...evaProps} style={styles.editLabel}>
                                   Country
                                 </Text>
@@ -614,32 +599,31 @@ const PersonalProfileScreen = () => {
                                 borderRadius: 10,
                                 elevation: 1,
                               }}
-                              onChangeText={(query) => {
-                                setFieldValue("country", query);
+                              onChangeText={query => {
+                                setFieldValue('country', query);
                                 setCountriesData(
-                                  countries.filter((item) =>
-                                    filterCountries(item, query)
-                                  )
+                                  countries.filter(item =>
+                                    filterCountries(item, query),
+                                  ),
                                 );
                               }}
-                              onSelect={(query) => {
+                              onSelect={query => {
                                 const selectedCountry = countriesData[query];
-                                setFieldValue("country", selectedCountry.name);
+                                setFieldValue('country', selectedCountry.name);
                                 setFieldValue(
-                                  "selectedCountry",
-                                  selectedCountry.name
+                                  'selectedCountry',
+                                  selectedCountry.name,
                                 );
-                                setFieldValue("selectedState", "");
-                                setFieldValue("state", "");
+                                setFieldValue('selectedState', '');
+                                setFieldValue('state', '');
                                 setStates([]);
                                 GetAllStates(
-                                  selectedCountry.name.replace(/ /g, "")
-                                ).then((res) => {
+                                  selectedCountry.name.replace(/ /g, ''),
+                                ).then(res => {
                                   setStates(res.data);
                                   setStatesData(states);
                                 });
-                              }}
-                            >
+                              }}>
                               {countriesData.map((item, index) => {
                                 return (
                                   <AutocompleteItem
@@ -652,37 +636,34 @@ const PersonalProfileScreen = () => {
                           )}
 
                           {isEditMode ? (
-                            <View style={{ marginVertical: 10 }}>
+                            <View style={{marginVertical: 10}}>
                               <LinearGradientButton onPress={handleSubmit}>
                                 Submit
                               </LinearGradientButton>
 
                               <TouchableOpacity
                                 onPress={() => {
-                                  setFieldValue("firstName", user?.firstname);
-                                  setFieldValue("lastName", user?.lastname);
-                                  setFieldValue("country", user?.country);
-                                  setFieldValue("state", user?.state);
-                                  setFieldValue("city", user?.city);
+                                  setFieldValue('firstName', user?.firstname);
+                                  setFieldValue('lastName', user?.lastname);
+                                  setFieldValue('country', user?.country);
+                                  setFieldValue('state', user?.state);
+                                  setFieldValue('city', user?.city);
                                   setisEditMode(false);
                                 }}
-                                style={{ width: "100%", marginTop: 10 }}
-                              >
+                                style={{width: '100%', marginTop: 10}}>
                                 <Text
                                   style={{
                                     color: Colors.primary,
-                                    textAlign: "center",
-                                  }}
-                                >
+                                    textAlign: 'center',
+                                  }}>
                                   Cancel
                                 </Text>
                               </TouchableOpacity>
                             </View>
                           ) : (
-                            <View style={{ marginTop: 10 }}>
+                            <View style={{marginTop: 10}}>
                               <LinearGradientButton
-                                onPress={() => setisEditMode(true)}
-                              >
+                                onPress={() => setisEditMode(true)}>
                                 Edit
                               </LinearGradientButton>
                               <View style={styles.background}></View>
@@ -694,7 +675,7 @@ const PersonalProfileScreen = () => {
                   )}
                 </Formik>
               </View>
-              <View style={{ height: 80 }} />
+              <View style={{height: 80}} />
             </ScrollView>
           </KeyboardAwareScrollView>
         </BackgroundLayout>
@@ -715,7 +696,7 @@ const styles = StyleSheet.create({
   },
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   mainLayout: {
     flex: 9,
@@ -725,15 +706,15 @@ const styles = StyleSheet.create({
     width: 116,
     height: 116,
     borderRadius: 58,
-    alignSelf: "center",
-    backgroundColor: "#3AA5A2",
-    tintColor: "#ECF1F7",
+    alignSelf: 'center',
+    backgroundColor: '#3AA5A2',
+    tintColor: '#ECF1F7',
   },
   profileImage: {
     width: 126,
     height: 126,
     borderRadius: 63,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   editAvatarButton: {
     width: 40,
@@ -746,7 +727,7 @@ const styles = StyleSheet.create({
   inputSettings: {
     marginTop: 7,
     backgroundColor: Colors.white,
-    width: "100%",
+    width: '100%',
     elevation: 1,
     borderRadius: 10,
     // maxHeight: 35
@@ -758,17 +739,17 @@ const styles = StyleSheet.create({
     marginTop: 7,
     borderColor: Colors.transparent,
     backgroundColor: Colors.transparent,
-    color: "black",
-    tintColor: "black",
+    color: 'black',
+    tintColor: 'black',
   },
 
   background: {
-    width: "100%",
+    width: '100%',
     borderRadius: 10,
     marginBottom: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
   },
   button: {
@@ -779,25 +760,25 @@ const styles = StyleSheet.create({
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   editField: {
     paddingLeft: 10,
     backgroundColor: Colors.white,
     elevation: 2,
     paddingVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     borderRadius: 10,
   },
   editLabel: {
     fontSize: 15,
-    color: "#8f9bb3",
+    color: '#8f9bb3',
     marginBottom: 4,
     marginTop: 8,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   professionalCheckbox: {
     marginTop: 10,
@@ -806,16 +787,16 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   termsCheckBoxText: {
-    color: "text-hint-color",
+    color: 'text-hint-color',
     marginLeft: 10,
   },
   errorText: {
     fontSize: 13,
-    color: "red",
+    color: 'red',
   },
   label: {
     fontSize: 15,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.fieldLabel,
   },
 });

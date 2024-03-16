@@ -1,6 +1,0 @@
-export { default as AddComment } from './AddComment'
-export { default as DeleteComment } from './DeleteComment'
-export {default as FlagComment } from './FlagComment'
-export {default as GetPostComments } from './GetPostComments'
-export  {default as LikeComment } from './LikeComment'
-export  {default as RepliesComment } from './RepliesComment'

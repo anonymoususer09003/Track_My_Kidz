@@ -1,6 +1,0 @@
-export { default as AddNewProduct } from './AddNewProduct'
-export { default as DeleteProduct } from './DeleteProduct'
-export {default as GetMyProducts } from './GetMyProducts'
-export {default as GetProducts } from './GetProducts'
-export {default as GetSingleProduct } from './GetSingleProduct'
-export {default as UpdateProduct } from './UpdateProduct'

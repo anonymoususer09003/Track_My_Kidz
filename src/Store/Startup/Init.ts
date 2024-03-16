@@ -2,22 +2,22 @@ import {
   buildAsyncState,
   buildAsyncActions,
   buildAsyncReducers,
-} from "@thecodingmachine/redux-toolkit-wrapper";
+} from '@thecodingmachine/redux-toolkit-wrapper';
 import {
   clearToken,
   loadId,
   loadToken,
   loadUserId,
   loadUserType,
-} from "@/Storage/MainAppStorage";
-import LoginStore from "@/Store/Authentication/LoginStore";
-import LogoutStore from "@/Store/Authentication/LogoutStore";
-import ChangeStartUpState from "@/Store/Startup/ChangeStartUpState";
-import FetchCountries from "@/Store/Places/FetchCountries";
+} from '@/Storage/MainAppStorage';
+import LoginStore from '../../Store/Authentication/LoginStore';
+import LogoutStore from '../../Store/Authentication/LogoutStore';
+import ChangeStartUpState from '@/Store/Startup/ChangeStartUpState';
+// import FetchCountries from '@/Store/Places/FetchCountries';
 
 export default {
   initialState: buildAsyncState(),
-  action: buildAsyncActions("startup/init", async (args, { dispatch }) => {
+  action: buildAsyncActions('startup/init', async (args, {dispatch}) => {
     // Timeout to fake waiting some process
     const token = await loadToken();
     const user_type = await loadUserType();
@@ -31,14 +31,14 @@ export default {
           id: userId,
           mainId: mainId,
           // callApi: true,
-        })
+        }),
       );
     } else {
       await dispatch(LogoutStore.action());
     }
     // dispatch(FetchCountries.action())
 
-    await dispatch(ChangeStartUpState.action({ loadingInitialData: false }));
+    await dispatch(ChangeStartUpState.action({loadingInitialData: false}));
   }),
-  reducers: buildAsyncReducers({ itemKey: null }), // We do not want to modify some item by default
+  reducers: buildAsyncReducers({itemKey: null}), // We do not want to modify some item by default
 };

@@ -5,19 +5,15 @@
  * @format
  */
 
-const MetroConfig = require("@ui-kitten/metro-config");
-const blacklist = require("metro-config/src/defaults/exclusionList");
-const evaConfig = {
-  evaPackage: "@eva-design/eva",
-  customMappingPath: "./mapping.json",
-};
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
-module.exports = MetroConfig.create(evaConfig, {
-  resolver: {
-    blacklistRE: blacklist([
-      /ios\/Pods\/JitsiMeetSDK\/Frameworks\/JitsiMeet.framework\/assets\/node_modules\/react-native\/.*/,
-    ]),
-  },
+const defaultConfig = getDefaultConfig(__dirname);
+
+const {
+  resolver: {sourceExts, assetExts},
+} = getDefaultConfig(__dirname);
+
+const config = {
   transformer: {
     getTransformOptions: async () => ({
       transform: {
@@ -25,5 +21,12 @@ module.exports = MetroConfig.create(evaConfig, {
         inlineRequires: true,
       },
     }),
+    babelTransformerPath: require.resolve('react-native-svg-transformer'),
   },
-});
+  resolver: {
+    assetExts: assetExts.filter(ext => ext !== 'svg'),
+    sourceExts: [...sourceExts, 'svg'],
+  },
+};
+
+module.exports = mergeConfig(defaultConfig, config);

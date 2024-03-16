@@ -1,39 +1,39 @@
-import { GetParent } from "@/Services/Parent";
-import { ModalState } from "@/Store/Modal";
+import {GetParent} from '@/Services/Parent';
+import {ModalState} from '@/Store/Modal';
 import {
   Card,
   IndexPath,
   Modal,
   Radio,
   RadioGroup,
-  Text
-} from "@ui-kitten/components";
-import { useDispatch, useSelector } from "react-redux";
+  Text,
+} from '@ui-kitten/components';
+import {useDispatch, useSelector} from 'react-redux';
 
-import { LinearGradientButton } from "@/Components";
-import { DeclineToGift } from "@/Services/GiftService";
-import { CreateSinglePaymentIntent } from "@/Services/Payments";
-import { UpdateUser } from "@/Services/SettingsServies";
-import { loadUserId, storeIsSubscribed } from "@/Storage/MainAppStorage";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import { useTheme } from "@/Theme";
-import Colors from "@/Theme/Colors";
+import {LinearGradientButton} from '@/Components';
+// import { DeclineToGift } from "@/Services/GiftService";
+import {CreateSinglePaymentIntent} from '@/Services/Payments';
+import {UpdateUser} from '@/Services/SettingsServies';
+import {loadUserId, storeIsSubscribed} from '@/Storage/MainAppStorage';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import {UserState} from '@/Store/User';
+import {useTheme} from '@/Theme';
+import Colors from '@/Theme/Colors';
 import {
   CardField,
   useConfirmPayment,
-  useStripe
-} from "@stripe/stripe-react-native";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
-import Toast from "react-native-toast-message";
-const ParentPaymentModal = ({ onPay, onCancel }) => {
-  const user = useSelector((state: { user: UserState }) => state.user.item);
-  const { createToken } = useStripe();
-  const { confirmPayment, loading } = useConfirmPayment();
+  useStripe,
+} from '@stripe/stripe-react-native';
+import React, {useEffect, useState} from 'react';
+import {ActivityIndicator, Alert, StyleSheet, View} from 'react-native';
+import Toast from 'react-native-toast-message';
+const ParentPaymentModal = ({onPay, onCancel}) => {
+  const user = useSelector((state: {user: UserState}) => state.user.item);
+  const {createToken} = useStripe();
+  const {confirmPayment, loading} = useConfirmPayment();
 
   const [intervalOption, setIntervalOption] = useState(0);
-  const { Layout } = useTheme();
+  const {Layout} = useTheme();
 
   const [selectedAmountIndex, setSelectedAmountIndex] =
     useState<IndexPath | null>(null);
@@ -47,18 +47,18 @@ const ParentPaymentModal = ({ onPay, onCancel }) => {
   const availableAmounts = [
     {
       amount: 1,
-      label: "$50 - Annually (Best Deal)",
+      label: '$50 - Annually (Best Deal)',
     },
     {
       amount: 5,
-      label: "$4.99 - Monthly",
+      label: '$4.99 - Monthly',
     },
   ];
-  const intervals = ["YEAR", "MONTH"];
+  const intervals = ['YEAR', 'MONTH'];
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.parentPaymentModalVisibility
+    (state: {modal: ModalState}) => state.modal.parentPaymentModalVisibility,
   );
-console.log('isVisible',isVisible)
+  console.log('isVisible', isVisible);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -78,16 +78,14 @@ console.log('isVisible',isVisible)
       <React.Fragment>
         <RadioGroup
           selectedIndex={selectedIndex}
-          onChange={(index) => setSelectedIndex(index)}
-        >
-          {availableAmounts.map((it) => {
+          onChange={index => setSelectedIndex(index)}>
+          {availableAmounts.map(it => {
             return (
               <Radio
                 key={it.amount}
-                style={{ paddingLeft: 20, marginVertical: 15 }}
-              >
-                {(evaProps) => (
-                  <Text {...evaProps} style={{ fontSize: 20, paddingLeft: 15 }}>
+                style={{paddingLeft: 20, marginVertical: 15}}>
+                {evaProps => (
+                  <Text {...evaProps} style={{fontSize: 20, paddingLeft: 15}}>
                     {it.label}
                   </Text>
                 )}
@@ -104,8 +102,8 @@ console.log('isVisible',isVisible)
   };
   const getUser = async () => {
     const id = await loadUserId();
-    GetParent(parseInt(id, 0)).then((response) => {
-      console.log("res-00-20-20--0", response);
+    GetParent(parseInt(id, 0)).then(response => {
+      console.log('res-00-20-20--0', response);
       setParent(response);
     });
   };
@@ -117,7 +115,7 @@ console.log('isVisible',isVisible)
     // });
     // console.log("res", res);
     const paymentIntent = await CreateSinglePaymentIntent(
-      selectedIndex == 0 ? 50 : 4.99
+      selectedIndex == 0 ? 50 : 4.99,
     );
     return paymentIntent;
     // setPayment(paymentIntent);
@@ -139,23 +137,23 @@ console.log('isVisible',isVisible)
     const int = intervals[selectedIndex];
 
     //@ts-ignore
-    const { clientSecret } = await fetchPaymentIntentClientSecret(int);
+    const {clientSecret} = await fetchPaymentIntentClientSecret(int);
 
     const billingDetails = {
       email: user?.email,
     };
 
     // Confirm the payment with the card details
-    const { paymentIntent, error } = await confirmPayment(clientSecret, {
-      paymentMethodType: "Card",
+    const {paymentIntent, error} = await confirmPayment(clientSecret, {
+      paymentMethodType: 'Card',
       paymentMethodData: billingDetails,
     });
-    console.log("paymentIntent", paymentIntent);
+    console.log('paymentIntent', paymentIntent);
     if (error) {
-      console.log("err", error);
+      console.log('err', error);
       setIsLoading(false);
-      Alert.alert("Payment confirmation error.", error.message, [
-        { text: "OK", style: "cancel" },
+      Alert.alert('Payment confirmation error.', error.message, [
+        {text: 'OK', style: 'cancel'},
       ]);
     } else if (paymentIntent) {
       setIsLoading(false);
@@ -165,27 +163,27 @@ console.log('isVisible',isVisible)
       //   dispatch(FetchOne.action(userId));
       // }
       Toast.show({
-        type: "success",
-        position: "top",
-        text1: "Payment Successfull",
+        type: 'success',
+        position: 'top',
+        text1: 'Payment Successfull',
       });
       dispatch(
         ChangeModalState.action({
           parentPaymentModalVisibility: false,
-        })
+        }),
       );
     }
   };
   const updateUser = async () => {
     try {
       let res = await UpdateUser(
-        { ...user, id: user?.parentId, isSubscribed: true },
-        "parent"
+        {...user, id: user?.parentId, isSubscribed: true},
+        'parent',
       );
-      console.log("res", res);
+      console.log('res', res);
       await storeIsSubscribed(true);
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
   useEffect(() => {
@@ -202,19 +200,17 @@ console.log('isVisible',isVisible)
         // dispatch(
         //     ChangeModalState.action({ parentPaymentModalVisibility: false }),
         // )
-      }}
-    >
+      }}>
       <Card style={styles.modal} disabled={true}>
         <View style={styles.body}>
-          <View style={{ paddingBottom: 10, paddingTop: 10 }}>
+          <View style={{paddingBottom: 10, paddingTop: 10}}>
             <Text
-              textBreakStrategy={"highQuality"}
+              textBreakStrategy={'highQuality'}
               style={{
-                textAlign: "center",
-                color: "#606060",
+                textAlign: 'center',
+                color: '#606060',
                 fontSize: 18,
-              }}
-            >
+              }}>
               Payment Info
             </Text>
           </View>
@@ -223,22 +219,22 @@ console.log('isVisible',isVisible)
             setSelectedIndex={setSelectedIndex}
           />
         </View>
-        <View style={{ marginTop: 30 }}>
+        <View style={{marginTop: 30}}>
           <CardField
             postalCodeEnabled={true}
             placeholder={{
-              number: "4242 4242 4242 4242",
+              number: '4242 4242 4242 4242',
             }}
             cardStyle={{
               backgroundColor: Colors.white,
               textColor: Colors.black,
             }}
             style={{
-              width: "100%",
+              width: '100%',
               height: 50,
               marginVertical: 30,
             }}
-            onCardChange={(cardDetails) => {
+            onCardChange={cardDetails => {
               setIsCardCompleted(cardDetails?.complete);
               setCardData(cardDetails);
               if (cardDetails.complete) {
@@ -247,7 +243,7 @@ console.log('isVisible',isVisible)
                 setIsValid(false);
               }
             }}
-            onFocus={(focusedField) => {}}
+            onFocus={focusedField => {}}
           />
         </View>
         <View style={styles.bottom}>
@@ -264,8 +260,7 @@ console.log('isVisible',isVisible)
                 status="control"
                 onPress={() => {
                   activateSubscription();
-                }}
-              >
+                }}>
                 Pay
               </LinearGradientButton>
             </View>
@@ -284,15 +279,14 @@ console.log('isVisible',isVisible)
                 size="medium"
                 status="control"
                 onPress={() => {
-                  DeclineToGift().then();
+                  // DeclineToGift().then();
                   dispatch(
                     ChangeModalState.action({
                       parentPaymentModalVisibility: false,
-                    })
+                    }),
                   );
                   onCancel();
-                }}
-              >
+                }}>
                 Cancel
               </LinearGradientButton>
             </View>
@@ -308,16 +302,16 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
-  modal: { borderRadius: 10 },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
-  body: { flex: 3 },
+  modal: {borderRadius: 10},
+  header: {flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20},
+  body: {flex: 3},
   background: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     color: Colors.white,
     zIndex: -1,
   },
@@ -326,33 +320,33 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   bottom: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     minHeight: 50,
     // maxHeight: 58,
     marginTop: 10,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   buttonText: {
     flex: 1,
     borderRadius: 25,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     margin: 2,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
-    shadowOffset: { height: 1, width: 1 }, // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
+    shadowOffset: {height: 1, width: 1}, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

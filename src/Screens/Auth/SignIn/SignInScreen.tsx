@@ -1,77 +1,81 @@
 import {
-  Button, Input,
+  Button,
+  Input,
   Layout,
   StyleService,
   Text,
-  useStyleSheet
-} from "@ui-kitten/components";
-import { Formik } from "formik";
-import React, { useContext, useEffect, useState } from "react";
+  useStyleSheet,
+} from '@ui-kitten/components';
+import {Formik} from 'formik';
+import React, {useContext, useEffect, useState} from 'react';
 import {
-  Dimensions, Image, ImageBackground, TouchableWithoutFeedback,
-  View
-} from "react-native";
+  Dimensions,
+  Image,
+  ImageBackground,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 
-import CustomDropdown from "@/Components/CustomDropDown";
-import { Login } from "@/Services/LoginServices";
-import LoginStore from "@/Store/Authentication/LoginStore";
-import { useIsFocused } from "@react-navigation/native";
-import { getDeviceId } from "react-native-device-info";
-import * as yup from "yup";
-import { Normalize } from "../../../Utils/Shared/NormalizeDisplay";
+import CustomDropdown from '@/Components/CustomDropDown';
+import {Login} from '@/Services/LoginServices';
+import LoginStore from '@/Store/Authentication/LoginStore';
+import {useIsFocused} from '@react-navigation/native';
+import {getDeviceId} from 'react-native-device-info';
+import * as yup from 'yup';
+import {Normalize} from '../../../Utils/Shared/NormalizeDisplay';
 // import { useDispatch } from "react-redux";
-import { UpdateDeviceToken } from "@/Services/User";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import messaging from "@react-native-firebase/messaging";
-import Toast from "react-native-toast-message";
+import {UpdateDeviceToken} from '@/Services/User';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+// import messaging from "@react-native-firebase/messaging";
+import Toast from 'react-native-toast-message';
 
-import { LinearGradientButton } from "@/Components";
-import { ParentPaymentModal } from "@/Modals";
-import { GetAllCountries } from "@/Services/PlaceServices";
-import ChangeCountryState from "@/Store/Places/FetchCountries";
-import Colors from "@/Theme/Colors";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { useDispatch, useSelector } from "react-redux";
-import { AuthContext } from "../../../Navigators/Auth/AuthProvider";
+import {LinearGradientButton} from '@/Components';
+import {ParentPaymentModal} from '@/Modals';
+import {GetAllCountries} from '@/Services/PlaceServices';
+import ChangeCountryState from '@/Store/Places/FetchCountries';
+import Colors from '@/Theme/Colors';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useDispatch, useSelector} from 'react-redux';
+import {AuthContext} from '../../../Navigators/Auth/AuthProvider';
 
 const user_type = [
-  { id: 1, label: "Parent", value: "Parent" },
-  { id: 2, label: "Instructor", value: "Instructor" },
-  { id: 3, label: "Student", value: "Student" },
+  {id: 1, label: 'Parent', value: 'Parent'},
+  {id: 2, label: 'Instructor', value: 'Instructor'},
+  {id: 3, label: 'Student', value: 'Student'},
 ];
-const screenHeight = Dimensions.get("screen").height;
+const screenHeight = Dimensions.get('screen').height;
 // @ts-ignore
-const SignInScreen = ({ navigation }) => {
+const SignInScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const isFocuesed = useIsFocused();
   const [loading, setLoading] = useState(false);
   const [loginObj, setLoginObj] = useState(null);
   // const dispatch = useDispatch();
   const countries = useSelector(
-    (state: { state: any }) => state.places.countries
+    (state: {state: any}) => state.places.countries,
   );
-  let values = { email: "", password: "", user_type: "", is_default: false };
+  let values = {email: '', password: '', user_type: '', is_default: false};
   const [intitialValues, setInitialValues] = useState({
-    email: "",
-    password: "",
-    user_type: "",
+    email: '',
+    password: '',
+    user_type: '',
     is_default: false,
   });
   // const deviceId = DeviceInfo.getUniqueID();
   // console.log("------deviceId", deviceId);
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
-  const { login, register } = useContext(AuthContext);
+  const {login, register} = useContext(AuthContext);
   const fetchCountries = async () => {
     try {
       if (!countries) {
         let res = await GetAllCountries();
-        dispatch(ChangeCountryState.action({ countries: res }));
+        dispatch(ChangeCountryState.action({countries: res}));
       }
     } catch (err) {
-      console.log("err fetch coutnries", err);
+      console.log('err fetch coutnries', err);
     }
   };
-  console.log("getniqueid", getDeviceId());
+  console.log('getniqueid', getDeviceId());
   useEffect(() => {
     fetchCountries();
     // return () => setInitialValues(intitialValues);
@@ -99,20 +103,20 @@ const SignInScreen = ({ navigation }) => {
 
   //#region Button functions
   const OnRegisterButtonPress = (): void => {
-    navigation && navigation.navigate("SignUp1");
+    navigation && navigation.navigate('SignUp1');
   };
   const onForgotPasswordButtonPress = (): void => {
-    navigation && navigation.navigate("ForgotPassword");
+    navigation && navigation.navigate('ForgotPassword');
     // navigation && navigation.navigate('FinalOrgRegistrationScreen', {
     //   email: 'test@test.com'
     // })
   };
   const onResendActivationButtonPress = (value: boolean): void => {
     navigation &&
-      navigation.navigate("ResendConfirmation", { resendCode: value });
+      navigation.navigate('ResendConfirmation', {resendCode: value});
   };
   const onReactivateButtonPress = (): void => {
-    navigation && navigation.navigate("ReactivateAccount");
+    navigation && navigation.navigate('ReactivateAccount');
   };
   //#endregion
 
@@ -121,76 +125,74 @@ const SignInScreen = ({ navigation }) => {
   };
 
   // @ts-ignore
-  const renderPasswordIcon = (props) => (
+  const renderPasswordIcon = props => (
     <TouchableWithoutFeedback onPress={onPasswordIconPress}>
       <Image
-        source={require("@/Assets/Images/lock.png")}
-        style={{ height: 20, width: 20 }}
-        resizeMode='contain'
+        source={require('@/Assets/Images/lock.png')}
+        style={{height: 20, width: 20}}
+        resizeMode="contain"
       />
     </TouchableWithoutFeedback>
   );
   const renderPersonIcon = (props: any) => (
     <Image
-      source={require("@/Assets/Images/email.png")}
-      style={{ height: 20, width: 20 }}
-      resizeMode='contain'
+      source={require('@/Assets/Images/email.png')}
+      style={{height: 20, width: 20}}
+      resizeMode="contain"
     />
   );
 
   const loginValidationSchema = yup.object().shape({
     email: yup
       .string()
-      .email("Please enter valid email")
-      .required("Email is required"),
+      .email('Please enter valid email')
+      .required('Email is required'),
     password: yup
       .string()
-      .min(8, ({ min }) => `Password must be at least ${min} characters`)
-      .required("Password is required"),
-    user_type: yup.string().required("User type is required"),
+      .min(8, ({min}) => `Password must be at least ${min} characters`)
+      .required('Password is required'),
+    user_type: yup.string().required('User type is required'),
   });
 
   const saveTokenToDatabase = (token: string) => {
     UpdateDeviceToken(token)
-      .then((data) => {})
-      .catch((err) => {});
+      .then(data => {})
+      .catch(err => {});
   };
 
   const requestUserPermission = async () => {
-    const authorizationStatus = await messaging().requestPermission();
-
-    if (authorizationStatus) {
-    }
+    // const authorizationStatus = await messaging().requestPermission();
+    // if (authorizationStatus) {
+    // }
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.primary }}>
+    <View style={{flex: 1, backgroundColor: Colors.primary}}>
       <ImageBackground
-        style={{ flex: 1 }}
-        source={require("../../../Assets/Images/childBackground.png")}
-        resizeMode='stretch'
-      >
-        <KeyboardAwareScrollView style={{ flex: 1 }}>
-        <ParentPaymentModal
-          onPay={() => {
-            dispatch(LoginStore.action(loginObj));
-            dispatch(ChangeModalState.action({ loading: false }));
-          }}
-          onCancel={()=>{
-            dispatch(ChangeModalState.action({ loading: false }));
-          }}
-        />
-          <View style={{ flex: 1 }}>
+        style={{flex: 1}}
+        source={require('../../../Assets/Images/childBackground.png')}
+        resizeMode="stretch">
+        <KeyboardAwareScrollView style={{flex: 1}}>
+          <ParentPaymentModal
+            onPay={() => {
+              dispatch(LoginStore.action(loginObj));
+              dispatch(ChangeModalState.action({loading: false}));
+            }}
+            onCancel={() => {
+              dispatch(ChangeModalState.action({loading: false}));
+            }}
+          />
+          <View style={{flex: 1}}>
             <View style={styles.headerContainer}>
               <Image
                 style={{
-                  justifyContent: "center",
-                  alignItems: "center",
+                  justifyContent: 'center',
+                  alignItems: 'center',
                   maxHeight: Normalize(160),
                   maxWidth: Normalize(160),
                 }}
-                source={require("@/Assets/Images/logo1.png")}
-                resizeMode='contain'
+                source={require('@/Assets/Images/logo1.png')}
+                resizeMode="contain"
               />
 
               <Text style={styles.logoText}>Login</Text>
@@ -200,17 +202,17 @@ const SignInScreen = ({ navigation }) => {
                 validationSchema={loginValidationSchema}
                 validateOnMount={true}
                 initialValues={intitialValues}
-                onSubmit={(values) => {
-                  console.log('values.user_type',values.user_type)
+                onSubmit={values => {
+                  console.log('values.user_type', values.user_type);
                   let objectToPass = {
                     email: values.email,
                     password: values.password,
                   };
                   setLoading(true);
 
-                  dispatch(ChangeModalState.action({ loading: true }));
+                  dispatch(ChangeModalState.action({loading: true}));
                   Login(objectToPass, values.user_type.toLowerCase())
-                    .then((res) => {
+                    .then(res => {
                       // console.log('res',res.data);
                       const obj = {
                         token: res.data?.token,
@@ -221,37 +223,39 @@ const SignInScreen = ({ navigation }) => {
                           res.data?.isSubscribed == false) && {
                           isSubscribed: res.data?.isSubscribed,
                         }),
-                     
                       };
-                      setLoginObj(obj)
+                      setLoginObj(obj);
                       //show the modal if not subscribed
-                      if(!res.data?.isSubscribed && values.user_type === 'Parent'){
+                      if (
+                        !res.data?.isSubscribed &&
+                        values.user_type === 'Parent'
+                      ) {
                         dispatch(
                           ChangeModalState.action({
-                              parentPaymentModalVisibility: true,
+                            parentPaymentModalVisibility: true,
                           }),
-                      )
-                      }else{
+                        );
+                      } else {
                         console.log(obj);
                         dispatch(LoginStore.action(obj));
-                        dispatch(ChangeModalState.action({ loading: false }));
+                        dispatch(ChangeModalState.action({loading: false}));
                       }
                       setLoading(false);
                     })
-                    .catch((err) => {
+                    .catch(err => {
                       setLoading(false);
-                      console.log("err", err);
-                      dispatch(ChangeModalState.action({ loading: false }));
+                      console.log('err', err);
+                      dispatch(ChangeModalState.action({loading: false}));
                       if (
                         err?.data &&
-                        err?.data?.detail === "Account is not active."
+                        err?.data?.detail === 'Account is not active.'
                       ) {
                         Toast.show({
-                          type: "info",
-                          position: "top",
-                          text1: "Info",
+                          type: 'info',
+                          position: 'top',
+                          text1: 'Info',
                           text2:
-                            "This account was temporarily deactivated. Reactivate below",
+                            'This account was temporarily deactivated. Reactivate below',
                           visibilityTime: 4000,
                           autoHide: true,
                           topOffset: 30,
@@ -262,11 +266,11 @@ const SignInScreen = ({ navigation }) => {
                         });
                       } else {
                         Toast.show({
-                          type: "info",
-                          position: "top",
-                          text1: "Info",
+                          type: 'info',
+                          position: 'top',
+                          text1: 'Info',
                           text2:
-                            "Please check your email address or password and try again",
+                            'Please check your email address or password and try again',
                           visibilityTime: 4000,
                           autoHide: true,
                           topOffset: 30,
@@ -277,8 +281,7 @@ const SignInScreen = ({ navigation }) => {
                         });
                       }
                     });
-                }}
-              >
+                }}>
                 {({
                   handleChange,
                   handleBlur,
@@ -292,11 +295,11 @@ const SignInScreen = ({ navigation }) => {
                   <>
                     <Layout style={styles.formContainer}>
                       <CustomDropdown
-                        placeholder='Select User'
+                        placeholder="Select User"
                         value={values.user_type}
                         onSelect={(index: any) => {
-                          console.log("index", index);
-                          setFieldValue("user_type", user_type[index].value);
+                          console.log('index', index);
+                          setFieldValue('user_type', user_type[index].value);
                         }}
                         dropDownList={user_type}
                       />
@@ -304,15 +307,15 @@ const SignInScreen = ({ navigation }) => {
                       <Input
                         selectionColor={Colors.white}
                         placeholderTextColor={Colors.white}
-                        placeholder='Email'
+                        placeholder="Email"
                         style={styles.selectSettings}
                         accessoryLeft={renderPersonIcon}
-                        onChangeText={handleChange("email")}
-                        onBlur={handleBlur("email")}
+                        onChangeText={handleChange('email')}
+                        onBlur={handleBlur('email')}
                         value={values.email}
-                        keyboardType='email-address'
-                        autoCapitalize='none'
-                        textStyle={{ color: Colors.white }}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        textStyle={{color: Colors.white}}
                         autoCorrect={false}
                       />
                       {errors.email && touched.email && (
@@ -321,35 +324,33 @@ const SignInScreen = ({ navigation }) => {
                       <Input
                         selectionColor={Colors.white}
                         placeholderTextColor={Colors.white}
-                        autoCapitalize='none'
+                        autoCapitalize="none"
                         style={styles.passwordInput}
-                        placeholder='Password'
+                        placeholder="Password"
                         accessoryLeft={renderPasswordIcon}
-                        onChangeText={handleChange("password")}
-                        onBlur={handleBlur("password")}
+                        onChangeText={handleChange('password')}
+                        onBlur={handleBlur('password')}
                         value={values.password}
                         secureTextEntry={!passwordVisible}
-                        textStyle={{ color: Colors.white }}
+                        textStyle={{color: Colors.white}}
                       />
                       {errors.password && touched.password && (
                         <Text style={styles.errorText}>{errors.password}</Text>
                       )}
                       <Button
-                        style={{ alignSelf: "flex-end", marginTop: 10 }}
-                        appearance='ghost'
-                        status='basic'
-                        size='small'
-                        onPress={onForgotPasswordButtonPress}
-                      >
+                        style={{alignSelf: 'flex-end', marginTop: 10}}
+                        appearance="ghost"
+                        status="basic"
+                        size="small"
+                        onPress={onForgotPasswordButtonPress}>
                         {() => (
                           <Text
                             style={[
                               styles.buttonMessage,
-                              { textAlign: "right" },
-                            ]}
-                          >
-                            {" "}
-                            Forgot Password{" "}
+                              {textAlign: 'right'},
+                            ]}>
+                            {' '}
+                            Forgot Password{' '}
                           </Text>
                         )}
                       </Button>
@@ -357,10 +358,9 @@ const SignInScreen = ({ navigation }) => {
                         <LinearGradientButton
                           gradient={[Colors.secondaryTint, Colors.primaryLight]}
                           style={styles.signInButton}
-                          size='medium'
+                          size="medium"
                           onPress={handleSubmit}
-                          disabled={!isValid}
-                        >
+                          disabled={!isValid}>
                           Login
                         </LinearGradientButton>
                       </Layout>
@@ -389,19 +389,17 @@ const SignInScreen = ({ navigation }) => {
         <View
           style={{
             paddingBottom: 20,
-          }}
-        >
+          }}>
           <Button
-            appearance='ghost'
-            status='basic'
-            size='small'
-            onPress={OnRegisterButtonPress}
-          >
+            appearance="ghost"
+            status="basic"
+            size="small"
+            onPress={OnRegisterButtonPress}>
             {() => (
               <Text style={styles.buttonMessage}>
-                {" "}
-                Don't have an account?{" "}
-                <Text style={{ color: Colors.secondary }}>Sign up</Text>
+                {' '}
+                Don't have an account?{' '}
+                <Text style={{color: Colors.secondary}}>Sign up</Text>
               </Text>
             )}
           </Button>
@@ -414,9 +412,9 @@ export default SignInScreen;
 const themedStyles = StyleService.create({
   container: {
     // flex: 1,
-    flexDirection: "column",
-    backgroundColor: "background-basic-color-1",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    backgroundColor: 'background-basic-color-1',
+    justifyContent: 'flex-start',
   },
   background: {
     backgroundColor: Colors.green,
@@ -424,20 +422,20 @@ const themedStyles = StyleService.create({
   headerContainer: {
     // flex: 2,
     height: screenHeight * 0.25,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginVertical: 20,
   },
   formContainer: {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     paddingHorizontal: 20,
     // flex: 4,
   },
   buttonSettings: {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     // flex: 1,
-    justifyContent: "space-evenly",
+    justifyContent: 'space-evenly',
     marginTop: 20,
   },
   welcomeMessage: {
@@ -459,62 +457,62 @@ const themedStyles = StyleService.create({
   passwordInput: {
     marginTop: 10,
     maxHeight: 40,
-    borderColor: "transparent",
+    borderColor: 'transparent',
     borderWidth: 0,
     borderBottomWidth: 2,
     borderBottomColor: Colors.white,
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     zIndex: -1,
   },
   errorText: {
     fontSize: 12,
-    color: "red",
+    color: 'red',
   },
   bottomView: {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     // zIndex: 1,
     // flex: 2,
   },
   selectSettings: {
     marginTop: 18,
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     borderWidth: 0,
     borderBottomWidth: 2,
     borderBottomColor: Colors.white,
     color: Colors.white,
     zIndex: -2,
-    caretColor: "red",
+    caretColor: 'red',
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "transparent",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   terms: {
-    color: "text-hint-color",
+    color: 'text-hint-color',
   },
   logoText: {
     color: Colors.white,
     fontSize: 30,
   },
   dropdownContainer: {
-    width: "100%",
+    width: '100%',
     height: 40,
     marginBottom: 10,
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
   },
   dropdown: {
     // backgroundColor: "#fafafa",
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     borderWidth: 0,
     borderColor: Colors.white,
     borderBottomWidth: 2,
   },
   dropdownItem: {
-    justifyContent: "flex-start",
+    justifyContent: 'flex-start',
   },
   dropdownDropdown: {
-    backgroundColor: "#fafafa",
+    backgroundColor: '#fafafa',
   },
   placeholder: {
     color: Colors.white,

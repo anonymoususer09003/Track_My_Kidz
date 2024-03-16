@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -6,7 +6,7 @@ import {
   KeyboardAvoidingView,
   Alert,
   TouchableOpacity,
-} from "react-native";
+} from 'react-native';
 import {
   Button,
   Input,
@@ -14,17 +14,17 @@ import {
   useStyleSheet,
   Layout,
   Spinner,
-} from "@ui-kitten/components";
+} from '@ui-kitten/components';
 // @ts-ignore
-import { loadUserId } from "@/Storage/MainAppStorage";
+import {loadUserId} from '@/Storage/MainAppStorage';
 
-import LinearGradient from "react-native-linear-gradient";
-import { UpdateUser } from "../../../Services/SettingsServies";
-import { Formik } from "formik";
-import { useSelector, useDispatch } from "react-redux";
-import { UserState } from "@/Store/User";
-import FetchOne from "@/Store/User/FetchOne";
-import Colors from "@/Theme/Colors";
+import LinearGradient from 'react-native-linear-gradient';
+import {UpdateUser} from '../../../Services/SettingsServies';
+import {Formik} from 'formik';
+import {useSelector, useDispatch} from 'react-redux';
+import {UserState} from '@/Store/User';
+import FetchOne from '@/Store/User/FetchOne';
+import Colors from '@/Theme/Colors';
 
 const SocialMediaProfileScreen = () => {
   const dispatch = useDispatch();
@@ -32,9 +32,9 @@ const SocialMediaProfileScreen = () => {
   const [isEditMode, setisEditMode] = useState(false);
   const [isSending, setisSending] = useState(false);
   const [isSent, setisSent] = useState(false);
-  const user = useSelector((state: { user: UserState }) => state.user.item);
+  const user = useSelector((state: {user: UserState}) => state.user.item);
   const isLoading = useSelector(
-    (state: { user: UserState }) => state.user.fetchOne.loading
+    (state: {user: UserState}) => state.user.fetchOne.loading,
   );
   const [userId, setuserId] = useState(null);
   const getUserId = async () => {
@@ -50,7 +50,7 @@ const SocialMediaProfileScreen = () => {
       {isLoading ? (
         <View style={styles.sppinerContainer}>
           <View style={styles.sppinerContainer}>
-            <Spinner status="primary" />
+            {/* <Spinner status="primary" /> */}
           </View>
         </View>
       ) : (
@@ -59,12 +59,12 @@ const SocialMediaProfileScreen = () => {
             <Formik
               validateOnMount={true}
               initialValues={{
-                facebook: user?.fbAccount || "",
-                instagram: user?.instagramAccount || "",
-                twitter: user?.twitterAccount || "",
-                website: user?.websiteUrl || "",
+                facebook: user?.fbAccount || '',
+                instagram: user?.instagramAccount || '',
+                twitter: user?.twitterAccount || '',
+                website: user?.websiteUrl || '',
               }}
-              onSubmit={(values, { resetForm }) => {
+              onSubmit={(values, {resetForm}) => {
                 setisSending(true);
                 let objectToPass = {
                   fbAccount: values.facebook,
@@ -86,15 +86,14 @@ const SocialMediaProfileScreen = () => {
                     Alert.alert(
                       error && error.data && error.data.title,
                       error && error.data && error.data.detail,
-                      [{ text: "OK", style: "cancel" }]
+                      [{text: 'OK', style: 'cancel'}],
                     );
                     // setisSent(true)
                     setisSending(false);
                     setisEditMode(!isEditMode);
                   });
-              }}
-            >
-              {({ handleChange, handleSubmit, values }) => (
+              }}>
+              {({handleChange, handleSubmit, values}) => (
                 <>
                   {isSending ? (
                     isSent ? (
@@ -103,129 +102,125 @@ const SocialMediaProfileScreen = () => {
                       </View>
                     ) : (
                       <View style={styles.sppinerContainer}>
-                        <Spinner status="primary" />
+                        {/* <Spinner status="primary" /> */}
                       </View>
                     )
                   ) : (
                     <Layout style={styles.formContainer}>
                       <View
                         style={{
-                          flexDirection: "row",
-                          justifyContent: "flex-start",
-                          alignItems: "center",
-                        }}
-                      >
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                        }}>
                         <Text style={styles.label}>Facebook</Text>
 
                         {isEditMode ? (
                           <Input
                             style={{
                               marginTop: 20,
-                              width: "75%",
+                              width: '75%',
                               backgroundColor: Colors.white,
                             }}
-                            textStyle={{ color: Colors.primary }}
-                            placeholderTextColor={"#9DD5D3"}
-                            onChangeText={handleChange("facebook")}
+                            textStyle={{color: Colors.primary}}
+                            placeholderTextColor={'#9DD5D3'}
+                            onChangeText={handleChange('facebook')}
                             value={values.facebook}
                             placeholder={
-                              values.instagram === ""
-                                ? "Facebook username"
+                              values.instagram === ''
+                                ? 'Facebook username'
                                 : null
                             }
                           />
                         ) : (
                           <Text style={styles.value}>
-                            {user?.fbAccount || "Facebook username"}
+                            {user?.fbAccount || 'Facebook username'}
                           </Text>
                         )}
                       </View>
                       <View
                         style={{
-                          flexDirection: "row",
-                          justifyContent: "flex-start",
-                          alignItems: "center",
-                        }}
-                      >
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                        }}>
                         <Text style={styles.label}>Instagram</Text>
                         {isEditMode ? (
                           <Input
                             style={{
                               marginTop: 20,
-                              width: "75%",
+                              width: '75%',
                               backgroundColor: Colors.white,
                             }}
-                            textStyle={{ color: Colors.primary }}
-                            placeholderTextColor={"#9DD5D3"}
+                            textStyle={{color: Colors.primary}}
+                            placeholderTextColor={'#9DD5D3'}
                             placeholder={
-                              values.instagram === ""
-                                ? "Instagram username"
+                              values.instagram === ''
+                                ? 'Instagram username'
                                 : null
                             }
                             value={values.instagram}
-                            onChangeText={handleChange("instagram")}
+                            onChangeText={handleChange('instagram')}
                           />
                         ) : (
                           <Text style={styles.value}>
-                            {user?.instagramAccount || "Instagram username"}
+                            {user?.instagramAccount || 'Instagram username'}
                           </Text>
                         )}
                       </View>
                       <View
                         style={{
-                          flexDirection: "row",
-                          justifyContent: "flex-start",
-                          alignItems: "center",
-                        }}
-                      >
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                        }}>
                         <Text style={styles.label}>Twitter</Text>
                         {isEditMode ? (
                           <Input
                             style={{
                               marginTop: 20,
-                              width: "75%",
+                              width: '75%',
                               backgroundColor: Colors.white,
                             }}
-                            textStyle={{ color: Colors.primary }}
-                            placeholderTextColor={"#9DD5D3"}
+                            textStyle={{color: Colors.primary}}
+                            placeholderTextColor={'#9DD5D3'}
                             placeholder={
-                              values.twitter === "" ? "Twitter username" : null
+                              values.twitter === '' ? 'Twitter username' : null
                             }
                             value={values.twitter}
-                            onChangeText={handleChange("twitter")}
+                            onChangeText={handleChange('twitter')}
                           />
                         ) : (
                           <Text style={styles.value}>
-                            {user?.twitterAccount || "Twitter username"}
+                            {user?.twitterAccount || 'Twitter username'}
                           </Text>
                         )}
                       </View>
                       <View
                         style={{
-                          flexDirection: "row",
-                          justifyContent: "flex-start",
-                          alignItems: "center",
-                        }}
-                      >
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                        }}>
                         <Text style={styles.label}>Website</Text>
                         {isEditMode ? (
                           <Input
                             style={{
                               marginTop: 20,
-                              width: "75%",
+                              width: '75%',
                               backgroundColor: Colors.white,
                             }}
-                            textStyle={{ color: Colors.primary }}
-                            placeholderTextColor={"#9DD5D3"}
+                            textStyle={{color: Colors.primary}}
+                            placeholderTextColor={'#9DD5D3'}
                             placeholder={
-                              values.website === "" ? "Website URL" : null
+                              values.website === '' ? 'Website URL' : null
                             }
                             value={values.website}
-                            onChangeText={handleChange("website")}
+                            onChangeText={handleChange('website')}
                           />
                         ) : (
                           <Text style={styles.value}>
-                            {user?.websiteUrl || "Website URL"}
+                            {user?.websiteUrl || 'Website URL'}
                           </Text>
                         )}
                       </View>
@@ -234,8 +229,7 @@ const SocialMediaProfileScreen = () => {
                           <View style={styles.background}>
                             <TouchableOpacity
                               style={styles.background}
-                              onPress={handleSubmit}
-                            >
+                              onPress={handleSubmit}>
                               <Text style={styles.button}>Submit</Text>
                             </TouchableOpacity>
                           </View>
@@ -243,8 +237,7 @@ const SocialMediaProfileScreen = () => {
                           <View style={styles.background}>
                             <TouchableOpacity
                               style={styles.background}
-                              onPress={() => setisEditMode(true)}
-                            >
+                              onPress={() => setisEditMode(true)}>
                               <Text style={styles.button}>Edit</Text>
                             </TouchableOpacity>
                           </View>
@@ -267,21 +260,21 @@ export default SocialMediaProfileScreen;
 const themedStyles = StyleService.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   mainLayout: {
     flex: 9,
   },
   container: {
     flex: 2,
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    backgroundColor: "background-basic-color-1",
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    backgroundColor: 'background-basic-color-1',
   },
   headerContainer: {
     flex: 2,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   formContainer: {
     flex: 1,
@@ -289,7 +282,7 @@ const themedStyles = StyleService.create({
   buttonSettings: {
     marginTop: 20,
     flex: 1,
-    justifyContent: "flex-end",
+    justifyContent: 'flex-end',
   },
   signInButton: {
     marginHorizontal: 2,
@@ -298,45 +291,45 @@ const themedStyles = StyleService.create({
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 16,
     marginLeft: 10,
     marginTop: 10,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.primary,
   },
   label: {
     marginHorizontal: 10,
     marginTop: 15,
     fontSize: 16,
-    width: "20%",
+    width: '20%',
   },
   value: {
     fontSize: 15,
     color: Colors.primary,
     marginTop: 20,
-    width: "75%",
+    width: '75%',
     marginLeft: 20,
     paddingVertical: 10,
   },
   background: {
-    width: "100%",
+    width: '100%',
     borderTopRadius: 10,
     paddingBottom: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 5,
     backgroundColor: Colors.primary,
   },
   button: {
     paddingTop: 5,
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.white,
     borderRadius: 10,
   },

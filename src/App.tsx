@@ -1,39 +1,40 @@
-import { Config } from "@/Config";
-import { ApplicationNavigator } from "@/Navigators";
-import { persistor, store } from "@/Store";
-import { StripeProvider, initStripe } from "@stripe/stripe-react-native";
-import { IconRegistry } from "@ui-kitten/components";
-import { EvaIconsPack } from "@ui-kitten/eva-icons";
-import React, { useEffect } from "react";
-import { LogBox } from "react-native";
-import "react-native-gesture-handler";
-import { MenuProvider } from "react-native-popup-menu";
-import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/lib/integration/react";
-import { initialState } from "./Context/state/InitialState";
-import { reducer } from "./Context/state/Reducer";
-import { StateProvider } from "./Context/state/State";
-import "./Translations";
+import React, {useEffect} from 'react';
+import {Config} from './Config/index';
+import {ApplicationNavigator} from './Navigators/index';
+import {persistor, store} from './Store/index';
+import {StripeProvider, initStripe} from '@stripe/stripe-react-native';
+import {IconRegistry} from '@ui-kitten/components';
+import {EvaIconsPack} from '@ui-kitten/eva-icons';
 
-LogBox.ignoreLogs(["Reanimated 2"]);
+import {LogBox} from 'react-native';
+import 'react-native-gesture-handler';
+import {MenuProvider} from 'react-native-popup-menu';
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/lib/integration/react';
+import {initialState} from './Context/state/InitialState';
+import {reducer} from './Context/state/Reducer';
+import {StateProvider} from './Context/state/State';
+// import './Translations';
+
+LogBox.ignoreLogs(['Reanimated 2']);
 export default function App() {
   useEffect(() => {
     initStripe({
       publishableKey: Config.STRIPE_PK,
     });
-  },[]);
-  XMLHttpRequest = GLOBAL.originalXMLHttpRequest
-    ? GLOBAL.originalXMLHttpRequest
-    : GLOBAL.XMLHttpRequest;
+  }, []);
+  // XMLHttpRequest = GLOBAL.originalXMLHttpRequest
+  //   ? GLOBAL.originalXMLHttpRequest
+  //   : GLOBAL.XMLHttpRequest;
 
-  // fetch logger
-  global._fetch = fetch;
-  global.fetch = function (uri, options, ...args) {
-    return global._fetch(uri, options, ...args).then((response) => {
-      // console.log("Fetch", { request: { uri, options, ...args }, response });
-      return response;
-    });
-  };
+  // // fetch logger
+  // global._fetch = fetch;
+  // global.fetch = function (uri, options, ...args) {
+  //   return global._fetch(uri, options, ...args).then(response => {
+  //     // console.log("Fetch", { request: { uri, options, ...args }, response });
+  //     return response;
+  //   });
+  // };
 
   return (
     <StripeProvider publishableKey={Config.STRIPE_PK}>

@@ -1,9 +1,7 @@
-import { buildSlice } from "@thecodingmachine/redux-toolkit-wrapper";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { LivestreamPostDTO } from "@/Models/LivestreamDTOs/livestream.interface";
-import { PostGetDto } from "@/Models/PostDTOS/post.interface";
+import {buildSlice} from '@thecodingmachine/redux-toolkit-wrapper';
+import ChangeModalState from '../../Store/Modal/ChangeModalState';
 
-export default buildSlice("modal", [ChangeModalState], {
+export default buildSlice('modal', [ChangeModalState], {
   welcomeMessageModal: false,
   imagePickerModal: false,
   dependentAddImport: false,
