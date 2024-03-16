@@ -1,0 +1,281 @@
+diff --git a/node_modules/react-native-flipper/android/build.gradle b/node_modules/react-native-flipper/android/build.gradle
+index 90d8fca..dd715bd 100644
+--- a/node_modules/react-native-flipper/android/build.gradle
++++ b/node_modules/react-native-flipper/android/build.gradle
+@@ -79,7 +79,7 @@ dependencies {
+     //noinspection GradleDynamicVersion
+     implementation 'com.facebook.react:react-native:+'  // From node_modules
+ 
+-    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
++    debugImplementation("com.facebook.flipper:flipper:0.212.0") {
+         exclude group:'com.facebook.fbjni'
+     }
+ }
+diff --git a/node_modules/react-native-flipper/android/build/.transforms/6da7b297685720d3279df1a36a47fe4d/results.bin b/node_modules/react-native-flipper/android/build/.transforms/6da7b297685720d3279df1a36a47fe4d/results.bin
+new file mode 100644
+index 0000000..e3f0ff0
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/.transforms/6da7b297685720d3279df1a36a47fe4d/results.bin
+@@ -0,0 +1 @@
++i/classes_global-synthetics
+diff --git a/node_modules/react-native-flipper/android/build/.transforms/f1d9bd3fb980658917aa48a1fb5fce3a/results.bin b/node_modules/react-native-flipper/android/build/.transforms/f1d9bd3fb980658917aa48a1fb5fce3a/results.bin
+new file mode 100644
+index 0000000..61a58fa
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/.transforms/f1d9bd3fb980658917aa48a1fb5fce3a/results.bin
+@@ -0,0 +1 @@
++i/classes_dex
+diff --git a/node_modules/react-native-flipper/android/build/.transforms/fc55f99eff0f11f8ba44b9fbb56cd8f2/results.bin b/node_modules/react-native-flipper/android/build/.transforms/fc55f99eff0f11f8ba44b9fbb56cd8f2/results.bin
+new file mode 100644
+index 0000000..0d259dd
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/.transforms/fc55f99eff0f11f8ba44b9fbb56cd8f2/results.bin
+@@ -0,0 +1 @@
++o/classes
+diff --git a/node_modules/react-native-flipper/android/build/.transforms/fc55f99eff0f11f8ba44b9fbb56cd8f2/transformed/classes/classes_dex/classes.dex b/node_modules/react-native-flipper/android/build/.transforms/fc55f99eff0f11f8ba44b9fbb56cd8f2/transformed/classes/classes_dex/classes.dex
+new file mode 100644
+index 0000000..cd90932
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/.transforms/fc55f99eff0f11f8ba44b9fbb56cd8f2/transformed/classes/classes_dex/classes.dex differ
+diff --git a/node_modules/react-native-flipper/android/build/generated/source/buildConfig/debug/com/facebook/flipper/reactnative/BuildConfig.java b/node_modules/react-native-flipper/android/build/generated/source/buildConfig/debug/com/facebook/flipper/reactnative/BuildConfig.java
+new file mode 100644
+index 0000000..1dff110
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/generated/source/buildConfig/debug/com/facebook/flipper/reactnative/BuildConfig.java
+@@ -0,0 +1,10 @@
++/**
++ * Automatically generated file. DO NOT MODIFY
++ */
++package com.facebook.flipper.reactnative;
++
++public final class BuildConfig {
++  public static final boolean DEBUG = Boolean.parseBoolean("true");
++  public static final String LIBRARY_PACKAGE_NAME = "com.facebook.flipper.reactnative";
++  public static final String BUILD_TYPE = "debug";
++}
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml b/node_modules/react-native-flipper/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml
+new file mode 100644
+index 0000000..51b431b
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:tools="http://schemas.android.com/tools"
++    package="com.facebook.flipper.reactnative" >
++
++    <uses-sdk android:minSdkVersion="21" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json b/node_modules/react-native-flipper/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json
+new file mode 100644
+index 0000000..3119e8b
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json
+@@ -0,0 +1,18 @@
++{
++  "version": 3,
++  "artifactType": {
++    "type": "AAPT_FRIENDLY_MERGED_MANIFESTS",
++    "kind": "Directory"
++  },
++  "applicationId": "com.facebook.flipper.reactnative",
++  "variantName": "debug",
++  "elements": [
++    {
++      "type": "SINGLE",
++      "filters": [],
++      "attributes": [],
++      "outputFile": "AndroidManifest.xml"
++    }
++  ],
++  "elementType": "File"
++}
+\ No newline at end of file
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/aar_metadata/debug/aar-metadata.properties b/node_modules/react-native-flipper/android/build/intermediates/aar_metadata/debug/aar-metadata.properties
+new file mode 100644
+index 0000000..776557e
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/aar_metadata/debug/aar-metadata.properties
+@@ -0,0 +1,5 @@
++aarFormatVersion=1.0
++aarMetadataVersion=1.0
++minCompileSdk=1
++minCompileSdkExtension=0
++minAndroidGradlePluginVersion=1.0.0
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json b/node_modules/react-native-flipper/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
+new file mode 100644
+index 0000000..9e26dfe
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
+@@ -0,0 +1 @@
++{}
+\ No newline at end of file
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/compile_library_classes_jar/debug/classes.jar b/node_modules/react-native-flipper/android/build/intermediates/compile_library_classes_jar/debug/classes.jar
+new file mode 100644
+index 0000000..9291af3
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/intermediates/compile_library_classes_jar/debug/classes.jar differ
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/compile_r_class_jar/debug/R.jar b/node_modules/react-native-flipper/android/build/intermediates/compile_r_class_jar/debug/R.jar
+new file mode 100644
+index 0000000..1fa0295
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/intermediates/compile_r_class_jar/debug/R.jar differ
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/compile_symbol_list/debug/R.txt b/node_modules/react-native-flipper/android/build/intermediates/compile_symbol_list/debug/R.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/react-native-flipper/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+new file mode 100644
+index 0000000..100248c
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+@@ -0,0 +1 @@
++#Sat Mar 16 16:39:49 GMT 2024
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/react-native-flipper/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+new file mode 100644
+index 0000000..94f0580
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/build/generated/res/resValues/debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/build/generated/res/resValues/debug"/></dataSet><mergedItems/></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml b/node_modules/react-native-flipper/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+new file mode 100644
+index 0000000..a48d418
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/main/jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/jniLibs"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/incremental/mergeDebugShaders/merger.xml b/node_modules/react-native-flipper/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+new file mode 100644
+index 0000000..892ac3d
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/main/shaders"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/shaders"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/incremental/packageDebugAssets/merger.xml b/node_modules/react-native-flipper/android/build/intermediates/incremental/packageDebugAssets/merger.xml
+new file mode 100644
+index 0000000..55d3413
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/incremental/packageDebugAssets/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/main/assets"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/assets"/></dataSet><dataSet config="generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/build/intermediates/shader_assets/debug/out"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/BuildConfig.class b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/BuildConfig.class
+new file mode 100644
+index 0000000..5410cd1
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/BuildConfig.class differ
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperModule.class b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperModule.class
+new file mode 100644
+index 0000000..32f0148
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperModule.class differ
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperPackage.class b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperPackage.class
+new file mode 100644
+index 0000000..a61c1a8
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperPackage.class differ
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptPlugin.class b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptPlugin.class
+new file mode 100644
+index 0000000..ee1940d
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptPlugin.class differ
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptPluginManager$1.class b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptPluginManager$1.class
+new file mode 100644
+index 0000000..122be39
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptPluginManager$1.class differ
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptPluginManager.class b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptPluginManager.class
+new file mode 100644
+index 0000000..4cca73e
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptPluginManager.class differ
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptReceiver.class b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptReceiver.class
+new file mode 100644
+index 0000000..b268bbc
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/intermediates/javac/debug/classes/com/facebook/flipper/reactnative/FlipperReactNativeJavaScriptReceiver.class differ
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/local_only_symbol_list/debug/R-def.txt b/node_modules/react-native-flipper/android/build/intermediates/local_only_symbol_list/debug/R-def.txt
+new file mode 100644
+index 0000000..78ac5b8
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/local_only_symbol_list/debug/R-def.txt
+@@ -0,0 +1,2 @@
++R_DEF: Internal format may change without notice
++local
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt b/node_modules/react-native-flipper/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+new file mode 100644
+index 0000000..1945765
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+@@ -0,0 +1,8 @@
++1<?xml version="1.0" encoding="utf-8"?>
++2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++3    xmlns:tools="http://schemas.android.com/tools"
++4    package="com.facebook.flipper.reactnative" >
++5
++6    <uses-sdk android:minSdkVersion="21" />
++7
++8</manifest>
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml b/node_modules/react-native-flipper/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml
+new file mode 100644
+index 0000000..51b431b
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:tools="http://schemas.android.com/tools"
++    package="com.facebook.flipper.reactnative" >
++
++    <uses-sdk android:minSdkVersion="21" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/navigation_json/debug/navigation.json b/node_modules/react-native-flipper/android/build/intermediates/navigation_json/debug/navigation.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/navigation_json/debug/navigation.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar b/node_modules/react-native-flipper/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar
+new file mode 100644
+index 0000000..8824f44
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar differ
+diff --git a/node_modules/react-native-flipper/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt b/node_modules/react-native-flipper/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt
+new file mode 100644
+index 0000000..561dd7b
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt
+@@ -0,0 +1 @@
++com.facebook.flipper.reactnative
+diff --git a/node_modules/react-native-flipper/android/build/outputs/logs/manifest-merger-debug-report.txt b/node_modules/react-native-flipper/android/build/outputs/logs/manifest-merger-debug-report.txt
+new file mode 100644
+index 0000000..bc20ede
+--- /dev/null
++++ b/node_modules/react-native-flipper/android/build/outputs/logs/manifest-merger-debug-report.txt
+@@ -0,0 +1,20 @@
++-- Merging decision tree log ---
++manifest
++ADDED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/main/AndroidManifest.xml:1:1-4:12
++MERGED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/main/AndroidManifest.xml:1:1-4:12
++INJECTED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/AndroidManifest.xml:1:1-4:12
++	package
++		ADDED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/main/AndroidManifest.xml:2:11-53
++		INJECTED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/AndroidManifest.xml
++	xmlns:tools
++		ADDED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/AndroidManifest.xml:2:5-51
++	xmlns:android
++		ADDED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/main/AndroidManifest.xml:1:11-69
++uses-sdk
++INJECTED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/AndroidManifest.xml reason: use-sdk injection requested
++INJECTED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/AndroidManifest.xml
++INJECTED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/AndroidManifest.xml
++	android:targetSdkVersion
++		INJECTED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/AndroidManifest.xml
++	android:minSdkVersion
++		INJECTED from /Users/noumansaeed/Documents/mobile/node_modules/react-native-flipper/android/src/debug/AndroidManifest.xml
+diff --git a/node_modules/react-native-flipper/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin b/node_modules/react-native-flipper/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin
+new file mode 100644
+index 0000000..69bf4f2
+Binary files /dev/null and b/node_modules/react-native-flipper/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin differ
