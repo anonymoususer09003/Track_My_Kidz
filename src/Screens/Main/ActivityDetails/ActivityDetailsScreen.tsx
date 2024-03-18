@@ -1,31 +1,25 @@
-import React, {useEffect, useState, useRef} from 'react';
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import {Text, Icon} from '@ui-kitten/components';
-import {StyleSheet, View, FlatList, Switch, Alert, Image} from 'react-native';
-import {loadToken} from '@/Storage/MainAppStorage';
-import * as Stomp from 'stompjs';
-import SockJS from 'sockjs-client';
-import {AppHeader} from '@/Components';
-import Fontisto from 'react-native-vector-icons/Fontisto';
-// import messaging from "@react-native-firebase/messaging";
-import {UpdateDeviceToken} from '@/Services/User';
-import {useDispatch, useSelector} from 'react-redux';
-import ChangeSearchString from '@/Store/Blogs/ChangeSearchString';
-import ChangeModalState from '@/Store/Modal/ChangeModalState';
-import {navigateAndSimpleReset} from '@/Navigators/Functions';
-import {WelcomeMessageModal, EditDependentModal} from '@/Modals';
-import SearchBar from '@/Components/SearchBar/SearchBar';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
-import Colors from '@/Theme/Colors';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {LinearGradientButton} from '@/Components';
-import MapView, {Marker} from 'react-native-maps';
-import {ParticipantLocation} from '@/Services/Activity';
-import {AwsLocationTracker} from '@/Services/TrackController';
-import BackgroundLayout from '@/Components/BackgroundLayout';
-import {calculateDistance} from '../../../Utils/DistanceCalculator';
-import {GroupParticipantsModal} from '@/Modals';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import { AppHeader } from "@/Components";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import { GroupParticipantsModal } from "@/Modals";
+import { ParticipantLocation } from "@/Services/Activity";
+import { loadToken } from "@/Storage/MainAppStorage";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import Colors from "@/Theme/Colors";
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
+import { Text } from "@ui-kitten/components";
+import React, { useEffect, useRef, useState } from "react";
+import { FlatList, Image, StyleSheet, Switch, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import MapView, { Marker } from "react-native-maps";
+import Fontisto from "react-native-vector-icons/Fontisto";
+import { useDispatch } from "react-redux";
+import SockJS from "sockjs-client";
+import * as Stomp from "stompjs";
+import { calculateDistance } from "../../../Utils/DistanceCalculator";
 const ActivityDetailsScreen = () => {
   const ref = useRef();
   const navigation = useNavigation();
@@ -33,10 +27,10 @@ const ActivityDetailsScreen = () => {
   const activity = route?.params?.activity || null;
   const swipeableRef = useRef(null);
   const dispatch = useDispatch();
-  const [initialRoute, setInitialRoute] = useState('FeaturedScreen');
+  const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
   const [loading, setLoading] = useState(true);
   const [thumbnail, setThumbnail] = useState(false);
-  const [searchParam, setSearchParam] = useState('');
+  const [searchParam, setSearchParam] = useState("");
   const [selectedDependent, setSelectedDependent] = useState(null);
   const [participantsEmail, setParticipantsEmail] = useState([]);
   const [partcipants, setParticipants] = useState([]);
@@ -63,17 +57,17 @@ const ActivityDetailsScreen = () => {
     try {
       let res = await ParticipantLocation(activity?.activityId);
       let deviceIds = [];
-      res.map(item => {
+      res.map((item) => {
         item?.childDeviceId && deviceIds.push(item?.childDeviceId);
       });
 
       setParticipantsIds(deviceIds);
       deviceIds.length > 0 &&
-        turnOnTracker(activity?.activityId, deviceIds, 'activity');
+        turnOnTracker(activity?.activityId, deviceIds, "activity");
       // , { childDeviceId: 1 }, { childDeviceId: 2 }
       setParticipants([...res]);
     } catch (err) {
-      console.log('err', err);
+      console.log("err", err);
     }
   };
   let stompClient: any = React.createRef<Stomp.Client>();
@@ -81,15 +75,15 @@ const ActivityDetailsScreen = () => {
     try {
       const token = await loadToken();
 
-      const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
+      const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
       stompClient = Stomp.over(socket);
-      stompClient.connect({token}, () => {
-        deviceIds.map(item => {
+      stompClient.connect({ token }, () => {
+        deviceIds.map((item) => {
           stompClient.subscribe(`/device/${item}`, subscriptionCallback);
         });
       });
     } catch (err) {
-      console.log('Error:', err);
+      console.log("Error:", err);
     }
   };
   const subscriptionCallback = (subscriptionMessage: any) => {
@@ -109,7 +103,7 @@ const ActivityDetailsScreen = () => {
       getParticipantLocation();
     }
     if (selectedDependent) {
-      dispatch(ChangeModalState.action({editDependentModalVisibility: true}));
+      dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
   }, [selectedDependent, isFocused]);
 
@@ -150,18 +144,18 @@ const ActivityDetailsScreen = () => {
           latitude1,
           longititude1,
           latitude2,
-          longititude2,
+          longititude2
         );
         const isUnderEqual100Meters = distance <= 100;
         let participant = partcipants.find(
-          pers => pers.childDeviceId == nextParticipant.childDeviceId,
+          (pers) => pers.childDeviceId == nextParticipant.childDeviceId
         );
         if (isUnderEqual100Meters) {
-          participant['group'] = true;
-          participant['groupName'] = index + 1;
+          participant["group"] = true;
+          participant["groupName"] = index + 1;
           temp.push(participant);
           if (groups[index + 1]) {
-            let tempValue = {...groups[index + 1]};
+            let tempValue = { ...groups[index + 1] };
 
             tempValue.participants = [...tempValue.participants, participant];
             groups[index + 1] = tempValue;
@@ -176,18 +170,20 @@ const ActivityDetailsScreen = () => {
         }
       }
 
-      let firstPers = partcipants.find(firPer => firPer?.childDeviceId == item);
+      let firstPers = partcipants.find(
+        (firPer) => firPer?.childDeviceId == item
+      );
 
       let isAnyParticipantExist = temp.find(
-        temMember => temMember?.groupName == index + 1,
+        (temMember) => temMember?.groupName == index + 1
       );
       if (isAnyParticipantExist) {
-        firstPers['group'] = true;
-        firstPers['groupName'] = index + 1;
+        firstPers["group"] = true;
+        firstPers["groupName"] = index + 1;
         temp.push(firstPers);
 
         if (groups[index + 1]) {
-          let tempValue = {...groups[index + 1]};
+          let tempValue = { ...groups[index + 1] };
           tempValue.participants = [...tempValue.participants, firstPers];
           groups[index + 1] = tempValue;
         }
@@ -208,7 +204,7 @@ const ActivityDetailsScreen = () => {
     let groupedArray = [];
     let groupNames = [];
 
-    temp.forEach(item => {
+    temp.forEach((item) => {
       if (!item?.groupName || !groupNames.includes(item?.groupName)) {
         groupedArray.push(item);
         if (item?.groupName) {
@@ -222,7 +218,7 @@ const ActivityDetailsScreen = () => {
   }, [trackingList]);
 
   return (
-    <BackgroundLayout title={'Participants'}>
+    <BackgroundLayout title={"Participants"}>
       <AppHeader title="" hideCalendar={true} hideCenterIcon={true} />
       {selectedGroup && showModal && (
         <GroupParticipantsModal
@@ -233,18 +229,19 @@ const ActivityDetailsScreen = () => {
       )}
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '60%',
-          alignSelf: 'center',
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "60%",
+          alignSelf: "center",
           marginVertical: 20,
-          backgroundColor: 'transparent',
+          backgroundColor: "transparent",
           padding: 10,
-        }}>
-        <Text style={{color: Colors.white}}>List View</Text>
+        }}
+      >
+        <Text style={{ color: Colors.white }}>List View</Text>
         <Switch
-          trackColor={{false: '#767577', true: '#50CBC7'}}
+          trackColor={{ false: "#767577", true: "#50CBC7" }}
           thumbColor={Colors.white}
           ios_backgroundColor="#3e3e3e"
           onValueChange={() => {
@@ -252,20 +249,18 @@ const ActivityDetailsScreen = () => {
           }}
           value={thumbnail}
         />
-        <Text style={{color: Colors.white}}>Map View</Text>
+        <Text style={{ color: Colors.white }}>Map View</Text>
       </View>
       <View style={styles.layout}>
         {!thumbnail ? (
           <FlatList
             data={partcipants || []}
-            style={{padding: 10, width: '100%'}}
-            renderItem={({item, index}) => (
+            style={{ padding: 10, width: "100%" }}
+            renderItem={({ item, index }) => (
               <View style={[styles.item]}>
                 <Text
-                  style={[
-                    styles.text,
-                    {fontWeight: '600'},
-                  ]}>{`${item?.firstName} ${item?.lastName}`}</Text>
+                  style={[styles.text, { fontWeight: "600" }]}
+                >{`${item?.firstName} ${item?.lastName}`}</Text>
               </View>
             )}
           />
@@ -285,27 +280,28 @@ const ActivityDetailsScreen = () => {
             //   latitudeDelta: 0.0922 + width / height,
             //   longitudeDelta: 0.0421,
             // }}
-            // onLayout={() => {
-            //   ref?.current?.fitToCoordinates(studentsEmails, {
-            //     edgePadding: {
-            //       top: 10,
-            //       right: 10,
-            //       bottom: 10,
-            //       left: 10,
-            //     },
-            //     animated: true,
-            //   });
-            // }}
-            style={{flex: 1}}>
+            onLayout={() => {
+              ref?.current?.fitToCoordinates(studentsEmails, {
+                edgePadding: {
+                  top: 10,
+                  right: 10,
+                  bottom: 10,
+                  left: 10,
+                },
+                animated: true,
+              });
+            }}
+            style={{ flex: 1 }}
+          >
             {newParticipnatsArr.map((item, index) => {
               let latitude = trackingList[item?.childDeviceId]?.lat;
               let longititude = trackingList[item?.childDeviceId]?.lang;
 
               return (
-                <View style={{flex: 1}}>
+                <View style={{ flex: 1 }}>
                   {latitude && longititude && (
                     <Marker
-                      onSelect={() => console.log('pressed')}
+                      onSelect={() => console.log("pressed")}
                       onPress={() => {
                         if (!item?.group) {
                           ref.current.fitToSuppliedMarkers(
@@ -318,7 +314,7 @@ const ActivityDetailsScreen = () => {
                                   ? parseFloat(longititude)
                                   : parseFloat(10),
                               },
-                            ],
+                            ]
                             // false, // not animated
                           );
                         } else {
@@ -335,7 +331,8 @@ const ActivityDetailsScreen = () => {
                         longitude: longititude
                           ? parseFloat(longititude)
                           : parseFloat(10),
-                      }}>
+                      }}
+                    >
                       {!item?.group && (
                         <View style={{}}>
                           <View
@@ -343,39 +340,41 @@ const ActivityDetailsScreen = () => {
                               height: 30,
                               width: 30,
                               borderRadius: 80,
-                              overflow: 'hidden',
+                              overflow: "hidden",
                               // top: 33,
                               // zIndex: 10,
-                            }}>
-                            {item?.image == '' && (
+                            }}
+                          >
+                            {item?.image == "" && (
                               <View
                                 style={{
-                                  height: '100%',
-                                  width: '100%',
-                                  borderRadius: 80,
+                                  // height: "100%",
+                                  // width: "100%",
+                                  borderRadius: 20,
                                   backgroundColor: Colors.primary,
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                }}>
-                                <Text style={{color: Colors.white}}>
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Text style={{ color: Colors.white }}>
                                   {item?.firstName
                                     ?.substring(0, 1)
-                                    ?.toUpperCase() || ''}
+                                    ?.toUpperCase() || ""}
                                   {item?.lastName
                                     ?.substring(0, 1)
-                                    ?.toUpperCase() || ''}
+                                    ?.toUpperCase() || ""}
                                 </Text>
                               </View>
                             )}
-                            {item?.image != '' && (
+                            {item?.image != "" && (
                               <Image
                                 source={{
                                   uri: item?.image,
                                 }}
                                 style={{
-                                  height: '100%',
-                                  width: '100%',
-                                  borderRadius: 80,
+                                  height: 40,
+                                  width: 40,
+                                  borderRadius: 30,
                                   aspectRatio: 1.5,
                                 }}
                                 resizeMode="contain"
@@ -389,8 +388,9 @@ const ActivityDetailsScreen = () => {
                       {item?.group && (
                         <TouchableOpacity
                           style={{
-                            alignItems: 'center',
-                          }}>
+                            alignItems: "center",
+                          }}
+                        >
                           <View
                             style={{
                               // position: "absolute",
@@ -400,8 +400,9 @@ const ActivityDetailsScreen = () => {
                               // width: 80,
                               // backgroundColor: Colors.primary,
                               // opacity: 0.7,
-                            }}>
-                            <Text style={{fontWeight: 'bold'}}>
+                            }}
+                          >
+                            <Text style={{ fontWeight: "bold" }}>
                               {groups[item?.groupName]?.participants?.length}
                             </Text>
                           </View>
@@ -432,34 +433,34 @@ export default ActivityDetailsScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: "column",
     backgroundColor: Colors.newBackgroundColor,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
   item: {
     borderRadius: 10,
-    width: '96%',
-    backgroundColor: '#fff',
+    width: "96%",
+    backgroundColor: "#fff",
     marginVertical: 10,
-    marginHorizontal: '2%',
+    marginHorizontal: "2%",
     padding: 10,
   },
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   text: {
     fontSize: 16,
     marginVertical: 4,
   },
   background: {
-    width: '80%',
+    width: "80%",
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 10,
     backgroundColor: Colors.primary,
   },

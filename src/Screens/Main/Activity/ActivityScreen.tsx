@@ -1,9 +1,12 @@
+import { AppHeader } from "@/Components";
 import { actions } from "@/Context/state/Reducer";
 import { useStateValue } from "@/Context/state/State";
 import { GroupParticipantsModal, InstructionsModal, ShowInstructorsStudentsModal } from "@/Modals";
 import { Activity } from "@/Models/DTOs";
 import { GetActivitesCount, GetActivityByStudentId, ParticipantLocation } from "@/Services/Activity";
 import { loadToken } from "@/Storage/MainAppStorage";
+import { InstructorState } from "@/Store/InstructorsActivity";
+import { ModalState } from "@/Store/Modal";
 import SetChatParam from "@/Store/chat/SetChatParams";
 import Colors from "@/Theme/Colors";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
@@ -45,6 +48,7 @@ const ActivityScreen = ({ route }) => {
   });
   const instructorImage = require("@/Assets/Images/approval_icon2.png");
   const dependent = route && route.params && route.params.dependent;
+  console.log('setThumbnail',route)
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
@@ -65,6 +69,15 @@ const ActivityScreen = ({ route }) => {
   const [showModal, setModal] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [newParticipnatsArr, setnewParticipnatsArr] = useState([]);
+
+  const { selectedDayForFilter, selectedMonthForFilter } = useSelector(
+    (state: { instructorsActivity: InstructorState }) =>
+      state.instructorsActivity
+  );
+  const isCalendarVisible = useSelector(
+    (state: { modal: ModalState }) => state.modal.showCalendar
+  );
+  
   const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
@@ -73,6 +86,7 @@ const ActivityScreen = ({ route }) => {
     });
 
     return (
+      <>
       <View
         style={{
           // flexDirection: "column",
@@ -90,14 +104,13 @@ const ActivityScreen = ({ route }) => {
                 subcollection: "parent",
                 user: {
                   _id: currentUser?.parentId,
-                  avatar:
-                    currentUser?.imageurl ||
+                  avatar: currentUser?.imageurl ||
                     "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
                   name: currentUser?.firstname
                     ? currentUser?.firstname[0].toUpperCase() +
-                      currentUser?.firstname.slice(1) +
-                      " " +
-                      currentUser?.lastname[0].toUpperCase()
+                    currentUser?.firstname.slice(1) +
+                    " " +
+                    currentUser?.lastname[0].toUpperCase()
                     : currentUser?.firstname + "" + currentUser?.lastname,
                 },
               })
@@ -109,7 +122,7 @@ const ActivityScreen = ({ route }) => {
               showHeader: true,
               fromChat: true,
             });
-          }}
+          } }
           style={{
             padding: 5,
             alignItems: "center",
@@ -129,8 +142,7 @@ const ActivityScreen = ({ route }) => {
             <Icon
               style={{ width: 40, height: 40 }}
               fill={Colors.primary}
-              name="trash"
-            />
+              name="trash" />
           </TouchableOpacity>
         )}
         <TouchableOpacity
@@ -139,11 +151,11 @@ const ActivityScreen = ({ route }) => {
             setParticipantMap(true);
             setSelectedActivity(item);
             getParticipantLocation(item?.activityId);
-          }}
+          } }
         >
           <Entypo size={40} color={Colors.primary} name="location-pin" />
         </TouchableOpacity>
-      </View>
+      </View></>
     );
   };
   const getParticipantLocation = async (activityId: any) => {
@@ -166,6 +178,7 @@ const ActivityScreen = ({ route }) => {
   const getActivities = async () => {
     GetActivityByStudentId(child?.studentId)
       .then((res) => {
+        console.log('response:::',res)
         setActivities(res);
         setOriginalActivities(res);
       })
@@ -234,6 +247,42 @@ const ActivityScreen = ({ route }) => {
     allActivities = temp;
     setActivities(allActivities);
   };
+
+  const filterActivities = (month: any, day: any) => {
+    let allActivities = { ...activities }
+   
+  let date = new Date().getFullYear() + "-" + month + "-" + day;
+  let temp = []
+  if(originalActivities?.length){
+    originalActivities.map((item)=>{
+console.log('item',item?.fromDate)
+      const date1 = moment(item?.fromDate, ["YYYY-MM-DDTHH:mm:ss.SSSZ", "MMM DD, YYYYTHH:mm:ss.SSSZ"],true);
+      const date2 = moment(date, ["YYYY-M-D"],true).add(1,'month').add(1,'day');
+console.log('date1',date1)
+console.log('date2',date2)
+      if (
+        moment(date1).isSame(date2,'day') &&
+        moment(date1).isSame(date2,'month')
+      ) {
+        temp.push(item);
+      }
+    })
+    setActivities(temp)
+  }
+  
+
+};
+useEffect(()=>{
+if(!isCalendarVisible){
+  setActivities(originalActivities);
+}
+},[isCalendarVisible])
+
+useEffect(() => {
+  if (isCalendarVisible) {
+    filterActivities(selectedMonthForFilter, selectedDayForFilter);
+  }
+}, [selectedDayForFilter, selectedMonthForFilter, isCalendarVisible]);
 
   useEffect(() => {
     if (isFocused) {
@@ -355,8 +404,17 @@ const ActivityScreen = ({ route }) => {
     setParticipants(temp);
   }, [trackingList]);
 
+
+  useEffect(()=>{
+    console.log("test");
+    setInterval(()=>{
+      console.log("test");
+    }, 1000);
+  },[])
+
   return (
     <>
+      <AppHeader  isCalendar={true} />
       {selectedGroup && showModal && (
         <GroupParticipantsModal
           isVisible={showModal}
@@ -690,9 +748,9 @@ const ActivityScreen = ({ route }) => {
                         <View style={{}}>
                           <View
                             style={{
-                              height: 30,
-                              width: 30,
-                              borderRadius: 80,
+                              // height: 30,
+                              // width: 30,
+                              borderRadius: 20,
                               overflow: "hidden",
                               // top: 33,
                               // zIndex: 10,
@@ -701,9 +759,9 @@ const ActivityScreen = ({ route }) => {
                             {item?.image == "" && (
                               <View
                                 style={{
-                                  height: "100%",
-                                  width: "100%",
-                                  borderRadius: 80,
+                                  height: 40,
+                                  width: 40,
+                                  borderRadius: 30,
                                   backgroundColor: Colors.primary,
                                   justifyContent: "center",
                                   alignItems: "center",

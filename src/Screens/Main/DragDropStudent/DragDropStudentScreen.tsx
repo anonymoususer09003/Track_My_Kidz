@@ -553,7 +553,7 @@ export default function App({ route }: any) {
   return (
     <BackgroundLayout>
       <GestureHandlerRootView style={gestureRootViewStyle}>
-        <AppHeader hideCenterIcon={true} hideCalendar={true} />
+         <AppHeader hideCenterIcon={true} hideCalendar={true} />
         {loading ? (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}

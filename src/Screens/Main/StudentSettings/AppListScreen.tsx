@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+// @ts-ignore
 
 import { AppHeader } from "@/Components";
 import GetApps from "@/Services/Settings/GetApps";

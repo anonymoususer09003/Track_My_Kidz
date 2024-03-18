@@ -1,27 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { Button, TabBar } from "@ui-kitten/components";
-import { StyleSheet, View, TouchableOpacity, Text, Image } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import ChangeInstructorState from "@/Store/InstructorsActivity/ChangeInstructorActivityState";
-import { InstructorActivityScreen, InstructorGroupScreen } from "@/Screens";
-import { AppHeader, Calendar } from "@/Components";
-import Colors from "@/Theme/Colors";
-import { useSelector, useDispatch } from "react-redux";
-import moment from "moment";
-import { ModalState } from "@/Store/Modal";
+import { Calendar, LinearGradientButton } from "@/Components";
+import BackgroundLayout from "@/Components/BackgroundLayout";
 import { actions } from "@/Context/state/Reducer";
 import { useStateValue } from "@/Context/state/State";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import ChangeInstructorActivityState from "@/Store/InstructorsActivity/ChangeInstructorActivityState";
-import { LinearGradientButton } from "@/Components";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import { InstructorActivityScreen, InstructorGroupScreen } from "@/Screens";
 import {
-  GetAllInstructors,
-  GetInstructor,
   FindInstructorBySchoolOrg,
+  GetInstructor
 } from "@/Services/Instructor";
+import ChangeInstructorActivityState from "@/Store/InstructorsActivity/ChangeInstructorActivityState";
+import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import Colors from "@/Theme/Colors";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { TabBar } from "@ui-kitten/components";
 import axios from "axios";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 // @refresh reset
 const InstructorActivityNavigator = () => {
   const dispatch = useDispatch();
@@ -136,7 +132,7 @@ const InstructorActivityNavigator = () => {
       setSelectedDay(moment().format("D"));
       dispatch(
         ChangeInstructorActivityState.action({
-          selectedMonthForFilter: moment().format("M"),
+          selectedMonthForFilter: moment().subtract(1,"M").format("M"),
           selectedDayForFilter: moment().format("DD"),
         })
       );
@@ -196,7 +192,7 @@ const InstructorActivityNavigator = () => {
         >
           <TabNavigator.Screen
             name="InstructorActivity"
-            options={{ title: "Activity" }}
+            options={{ title: "Activity", }}
             component={InstructorActivityScreen}
           />
           <TabNavigator.Screen

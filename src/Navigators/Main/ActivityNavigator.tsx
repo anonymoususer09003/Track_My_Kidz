@@ -1,17 +1,32 @@
-import { LinearGradientButton } from "@/Components";
+import { Calendar, LinearGradientButton } from "@/Components";
 import BackgroundLayout from "@/Components/BackgroundLayout";
 import { useStateValue } from "@/Context/state/State";
 import { ActivityScreen, GroupScreen } from "@/Screens";
+import ChangeInstructorActivityState from "@/Store/InstructorsActivity/ChangeInstructorActivityState";
+import { ModalState } from "@/Store/Modal";
 import Colors from "@/Theme/Colors";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { TabBar } from "@ui-kitten/components";
-import React from "react";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 // @refresh reset
 const ActivityNavigator = ({ route }) => {
   const TabNavigator = createMaterialTopTabNavigator();
   const tabNames = ["Activity", "Group"];
+  const dispatch = useDispatch();
+  
+  const [selectedMonth, setSelectedMonth] = useState(
+    moment(new Date()).month()
+  );
+  const [selectedDay, setSelectedDay] = useState(moment().format("D"));
 
+  const isCalendarVisible = useSelector(
+    (state: { modal: ModalState }) => state.modal.showCalendar
+  );
+
+  
   const [{ childName }] = useStateValue();
   //@ts-ignore
   const TopTabBar = ({ navigation, state }) => (
@@ -49,8 +64,47 @@ const ActivityNavigator = ({ route }) => {
       })}
     </TabBar>
   );
+
+  useEffect(() => {
+    if (!isCalendarVisible) {
+      setSelectedDay(moment().format("D"));
+      dispatch(
+        ChangeInstructorActivityState.action({
+          selectedMonthForFilter: moment().subtract(1,'M').format("M"),
+          selectedDayForFilter: moment().format("DD"),
+        })
+      );
+    }
+  }, [isCalendarVisible]);
+
+
+  
+  console.log('isCalendarVisible',isCalendarVisible)
   return (
     <BackgroundLayout title="Event Information" rightIcon={true}>
+       {isCalendarVisible && (
+          <Calendar
+            selectedMonth={selectedMonth}
+            setSelectedMonth={(value) => {
+              setSelectedMonth(value);
+              dispatch(
+                ChangeInstructorActivityState.action({
+                  selectedMonthForFilter: value,
+                })
+              );
+            }}
+            selectedDay={parseInt(selectedDay)}
+            setSelectedDay={(value: any) => {
+              console.log('value',value)
+              setSelectedDay(value);
+              dispatch(
+                ChangeInstructorActivityState.action({
+                  selectedDayForFilter: value,
+                })
+              );
+            }}
+          />
+        )}
       <TabNavigator.Navigator
         screenOptions={{ lazy: true, swipeEnabled: false }}
         tabBar={(props) => <TopTabBar {...props} />}

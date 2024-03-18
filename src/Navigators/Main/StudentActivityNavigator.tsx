@@ -1,18 +1,16 @@
-import React, { useState } from "react";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { Button, TabBar } from "@ui-kitten/components";
-import { StyleSheet, View, Alert } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
-import { StudentGroupScreen, StudentActivityScreen } from "@/Screens";
-import { AppHeader } from "@/Components";
-import Colors from "@/Theme/Colors";
-import moment from "moment";
-import { ModalState } from "@/Store/Modal";
-import { useSelector } from "react-redux";
-import { Calendar } from "@/Components";
-import { StudentState } from "@/Store/StudentActivity";
-import { LinearGradientButton } from "@/Components";
+import { AppHeader, Calendar, LinearGradientButton } from "@/Components";
 import BackgroundLayout from "@/Components/BackgroundLayout";
+import { StudentActivityScreen, StudentGroupScreen } from "@/Screens";
+import ChangeInstructorActivityState from "@/Store/InstructorsActivity/ChangeInstructorActivityState";
+import { ModalState } from "@/Store/Modal";
+import { StudentState } from "@/Store/StudentActivity";
+import Colors from "@/Theme/Colors";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { TabBar } from "@ui-kitten/components";
+import moment from "moment";
+import React, { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 // @refresh reset
 const StudentActivityNavigator = () => {
   const TabNavigator = createMaterialTopTabNavigator();
@@ -20,6 +18,8 @@ const StudentActivityNavigator = () => {
   const [selectedMonth, setSelectedMonth] = useState(
     moment(new Date()).month()
   );
+  console.log('selectedMonth',selectedMonth)
+  const dispatch = useDispatch()
   const { hideCalendar, showFamilyMap, showParticipantMap } = useSelector(
     (state: { studentActivity: StudentState }) => state.studentActivity
   );
@@ -29,6 +29,8 @@ const StudentActivityNavigator = () => {
   const isCalendarVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.showCalendar
   );
+
+
   //@ts-ignore
   const TopTabBar = ({ navigation, state }) => (
     <TabBar
@@ -74,9 +76,23 @@ const StudentActivityNavigator = () => {
       {isCalendarVisible && (
         <Calendar
           selectedMonth={selectedMonth}
-          setSelectedMonth={setSelectedMonth}
+          setSelectedMonth={(m)=>{setSelectedMonth(m)
+            dispatch(
+              ChangeInstructorActivityState.action({
+                selectedMonthForFilter: m,
+              })
+            );
+          }}
           selectedDay={selectedDay}
-          setSelectedDay={setSelectedDay}
+          setSelectedDay={(d)=>{
+            setSelectedDay(d);
+            dispatch(
+              ChangeInstructorActivityState.action({
+                selectedDayForFilter: d,
+              })
+            );
+          
+          }}
         />
       )}
       <TabNavigator.Navigator

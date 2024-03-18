@@ -1,40 +1,27 @@
-import React, { useEffect, useState, useRef } from "react";
+import { LinearGradientButton } from "@/Components";
+import { actions } from "@/Context/state/Reducer";
+import { useStateValue } from "@/Context/state/State";
+import {
+  FindAllIstructorActivities,
+  FindAllStudentsWhichActivity
+} from "@/Services/Activity";
+import Colors from "@/Theme/Colors";
 import { useNavigation } from "@react-navigation/native";
 import {
   Text,
-  CheckBox,
-  TopNavigation,
-  TopNavigationAction,
-  Icon,
+  TopNavigation
 } from "@ui-kitten/components";
+import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
   ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  View
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
+import Modal from "react-native-modal";
 import Entypo from "react-native-vector-icons/Entypo";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { LinearGradientButton } from "@/Components";
-import moment from "moment";
-import { InstructionsModal, DeclineActivityModal } from "@/Modals";
-import SearchBar from "@/Components/SearchBar/SearchBar";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Modal from "react-native-modal";
-import Toast from "react-native-toast-message";
-import { useStateValue } from "@/Context/state/State";
-import { actions } from "@/Context/state/Reducer";
-import {
-  FindAllStudentsWhichActivity,
-  FindAllIstructorActivities,
-  SendEmailToPendingStudent,
-} from "@/Services/Activity";
+import { useDispatch } from "react-redux";
 
 const InstructorsStudentsModal = ({
   isVisible,
@@ -43,7 +30,6 @@ const InstructorsStudentsModal = ({
   type,
 }: any) => {
   const [{ selectedActivity }, _dispatch] = useStateValue();
-  console.log("selectedActivity", selectedActivity);
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
@@ -88,7 +74,6 @@ const InstructorsStudentsModal = ({
         console.log("err", err);
       });
   };
-  console.log("selected", selectedActivity);
   const getInstructors = async (refreshing: any) => {
     let pageNumberStudentCount = refreshing ? pageInstructors : 0;
     let body = {
@@ -97,6 +82,7 @@ const InstructorsStudentsModal = ({
       page: pageNumberStudentCount,
       page_size: pageSizeStudents,
     };
+    console.log('body',body)
     FindAllIstructorActivities(body)
       .then((res) => {
         console.log(
@@ -111,6 +97,7 @@ const InstructorsStudentsModal = ({
         if (refreshing) {
           setInstructors([...instructors, ...res]);
         } else {
+          console.log('rrrrr',res)
           setInstructors(res);
         }
       })

@@ -1,38 +1,33 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Text, Icon } from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Image,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
 import { InstructionsModal } from "@/Modals";
-import MapView, { Marker, Circle } from "react-native-maps";
-import * as Stomp from "stompjs";
-import SockJS from "sockjs-client";
-import { loadToken } from "@/Storage/MainAppStorage";
 import {
   DeleteGroup,
-  GetAllGroup,
-  GetGroupByStudentId,
-  GetGroupCount,
   FindGroupsByName,
+  GetGroupByStudentId,
+  GetGroupCount
 } from "@/Services/Group";
-import { UserState } from "@/Store/User";
-import {
-  storeHomeScreenCacheInfo,
-  getHomeScreenCacheInfo,
-} from "@/Storage/MainAppStorage";
+import { getHomeScreenCacheInfo, loadToken, storeHomeScreenCacheInfo } from "@/Storage/MainAppStorage";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import { StudentState } from "@/Store/StudentActivity";
-import Entypo from "react-native-vector-icons/Entypo";
+import { UserState } from "@/Store/User";
 import SetChatParam from "@/Store/chat/SetChatParams";
+import Colors from "@/Theme/Colors";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Icon, Text } from "@ui-kitten/components";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import MapView, { Marker } from "react-native-maps";
+import Entypo from "react-native-vector-icons/Entypo";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useDispatch, useSelector } from "react-redux";
+import SockJS from "sockjs-client";
+import * as Stomp from "stompjs";
 const StudentGroupScreen = ({ route }) => {
   const navigation = useNavigation();
   const [children, setChildren] = useState([]);
@@ -591,9 +586,9 @@ const StudentGroupScreen = ({ route }) => {
                           {item?.studentImage == "" && (
                             <View
                               style={{
-                                height: "100%",
-                                width: "100%",
-                                borderRadius: 80,
+                                // height: "100%",
+                                // width: "100%",
+                                borderRadius: 20,
                                 backgroundColor: Colors.primary,
                                 justifyContent: "center",
                                 alignItems: "center",
@@ -615,9 +610,9 @@ const StudentGroupScreen = ({ route }) => {
                                 uri: item?.studentImage,
                               }}
                               style={{
-                                height: "100%",
-                                width: "100%",
-                                borderRadius: 80,
+                                height: 40,
+                                width: 40,
+                                borderRadius: 30,
                                 aspectRatio: 2,
                               }}
                               resizeMode="contain"

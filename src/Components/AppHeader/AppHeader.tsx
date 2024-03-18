@@ -4,7 +4,7 @@ import { NavigationCustomState } from "@/Store/Navigation";
 import ChangeStudentActivityState from "@/Store/StudentActivity/ChangeStudentActivityState";
 import Colors from "@/Theme/Colors";
 import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Text, TopNavigation,
   TopNavigationAction
@@ -40,9 +40,10 @@ const AppHeader = ({ showGlobe, ...props }) => {
   );
 
   const navigation = useNavigation()
-  console.log('navigation',navigation?.getState()?.index)
+  const route = useRoute();
   // const user_type = 'instructor';
   //@ts-ignore
+
   const renderSettingIcon = (props) => {
     return (
       <>
@@ -106,10 +107,32 @@ const AppHeader = ({ showGlobe, ...props }) => {
   const renderHomeIcon = (props) => (
     <Image style={{ height: 27, width: 27 }} source={homeIcon} />
   );
+
   //@ts-ignore
-  const renderListItem = (props) => (
-    <Icon name="list" size={25} color="white" />
-  );
+  console.log('routeName',route.name)
+  console.log('user_type',user_type)
+  
+  const renderListItem = () => {
+     if (user_type === 'instructor'){
+       if(route.name === 'InstructorActivity'){
+          return  <Image style={{ height: 27, width: 27 }} source={calendarIcon} />
+       }
+    }else if(user_type === 'parent'){
+      if(props?.thumbnail){
+        return <></>
+      }
+      switch(route.name){
+        case "Activity": 
+        return  <Image style={{ height: 27, width: 27 }} source={calendarIcon} />
+        case "HomeScreen":
+        return  <Icon name="list" size={25} color="white" />  
+      }
+    }else if (user_type === 'student'){
+      if(route.name !== 'StudentSettings')
+      return  <Image style={{ height: 27, width: 27 }} source={calendarIcon} />
+    }
+    return <></>
+};
 
   const isStack = props && props.isStack;
   const isBack = props && props.isBack;
@@ -183,9 +206,10 @@ const AppHeader = ({ showGlobe, ...props }) => {
                 })
               );
             } else {
-              // nav.navigate("Home");
-              if (props?.thumbnail) {
+              // if(user_type === "parent"){
                 nav.navigate("Home");
+              // }
+              if (props?.thumbnail) {
                 dispatch(
                   ChangeModalState.action({
                     showCalendar: false,
@@ -199,9 +223,24 @@ const AppHeader = ({ showGlobe, ...props }) => {
       )}
       {/* {!hideCalendar && ( */}
         <TopNavigationAction
-          icon={user_type === "parent"?renderListItem:undefined}
+          icon={renderListItem}
           style={{ marginLeft: 10 }}
-          onPress={()=> props?.setThumbnail && props?.setThumbnail(true)}
+          onPress={()=> {
+            console.log('props?.isCalendar',props?.isCalendar,props?.thumbnail)
+            if(route.name === 'HomeScreen'){
+              dispatch(
+                ChangeModalState.action({
+                  showCalendar:false,
+                })
+                );
+            }else{
+              dispatch(
+                ChangeModalState.action({
+                  showCalendar: isCalendarVisible ? false: true,
+                })
+                );
+            }
+            props?.setThumbnail && props?.setThumbnail(true)}}
         />
       {/* )} */}
     </View>

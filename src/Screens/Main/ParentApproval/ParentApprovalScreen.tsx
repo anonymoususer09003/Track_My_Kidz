@@ -194,13 +194,14 @@ const ParentApprovalScreen = ({ route }) => {
       </View>
     );
   };
-  console.log("selected child", selectedChild);
+  console.log("aaaaaaa", activities);
 
   return (
     <>
       <InstructionsModal
         selectedInstructions={selectedInstructions}
         setSelectedInstructions={setSelectedInstructions}
+        activity={selectedInstructions?.activity}
       />
       {declineActivity && (
         <ChildrenSelectionModal
@@ -344,19 +345,17 @@ const ParentApprovalScreen = ({ route }) => {
                           item?.activity?.fromDate == "string"
                             ? new Date()
                             : item?.activity?.fromDate
-                         ).format("MMM DD YYYY")} at ${moment(
+                         ).format("MMM DD YYYY")} at ${moment.utc(
                           item?.activity?.fromDate == "string"
                             ? new Date()
                             : item?.activity?.fromDate
                           )
-                          .subtract("hours", 5)
                           .format("hh:mm a")} `}</Text>
                         <Text style={styles.text}>{`${moment(
                           item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
-                        ).format("MMM DD YYYY")} at ${moment(
+                        ).format("MMM DD YYYY")} at ${moment.utc(
                           item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
                         )
-                          .subtract("hours", 5)
                           .format("hh:mm a")} `}</Text>
                       </View>
                     </View>

@@ -38,7 +38,7 @@ const HomeScreen = () => {
   const focused = useIsFocused();
   const swipeableRef = useRef(null);
   const ref = useRef();
-  const [, _dispatch] = useStateValue();
+  const [_, _dispatch] = useStateValue();
   let row: Array<any> = [];
   let prevOpenedRow: any;
   const dispatch = useDispatch();
@@ -49,6 +49,7 @@ const HomeScreen = () => {
     latitudeDelta: 0.001,
     longitudeDelta: 0.001,
   });
+
   useEffect(() => {
     Geolocation.getCurrentPosition((pos) => {
       const crd = pos.coords;
@@ -61,7 +62,8 @@ const HomeScreen = () => {
     });
   }, []);
   useEffect(() => {
-    setThumbnail(false);
+    
+    // setThumbnail(false);
   }, [focused]);
   const [children, setChildren] = useState([]);
   const [trackingList, setTrackingList] = useState({});
@@ -398,6 +400,18 @@ const HomeScreen = () => {
     );
   };
 
+  const [seconds, setSeconds] = useState<number>(0);
+
+useEffect(()=>{
+  const interval = setInterval(()=>{
+    console.log("test");
+  },1000);
+  return () => {
+    clearInterval(interval);
+  }
+},[]);
+
+
   return (
     <>
       {/* <WelcomeMessageModal /> */}
@@ -667,9 +681,9 @@ const HomeScreen = () => {
                       <View style={{}}>
                         <View
                           style={{
-                            height: 30,
-                            width: 30,
-                            borderRadius: 80,
+                            // height: ,
+                            // width: 100,
+                            borderRadius: 20,
                             overflow: "hidden",
                             // top: 33,
                             // zIndex: 10,
@@ -678,9 +692,9 @@ const HomeScreen = () => {
                           {item?.studentImage == "" && (
                             <View
                               style={{
-                                height: "100%",
-                                width: "100%",
-                                borderRadius: 80,
+                                // height: "100%",
+                                // width: "100%",
+                                borderRadius: 20,
                                 backgroundColor: Colors.primary,
                                 justifyContent: "center",
                                 alignItems: "center",
@@ -702,10 +716,10 @@ const HomeScreen = () => {
                                 uri: item?.studentImage,
                               }}
                               style={{
-                                height: "100%",
-                                width: "100%",
-                                borderRadius: 80,
-                                aspectRatio: 1.5,
+                                height: 40,
+                                width: 40,
+                                borderRadius: 30,
+                                // aspectRatio: 5,
                               }}
                               resizeMode="contain"
                             />

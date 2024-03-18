@@ -1,39 +1,29 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { Text, Icon, Select, SelectItem, Button } from "@ui-kitten/components";
+import { AppHeader, Calendar } from "@/Components";
+import BackgroundLayout from "@/Components/BackgroundLayout";
+import SearchBar from "@/Components/SearchBar/SearchBar";
 import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-  Linking,
-  Image,
-} from "react-native";
-import { AppHeader } from "@/Components";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import {
-  WelcomeMessageModal,
   EditDependentModal,
   OtherTrackingModal,
+  WelcomeMessageModal,
 } from "@/Modals";
-import { useIsFocused } from "@react-navigation/native";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import SearchBar from "@/Components/SearchBar/SearchBar";
-import Colors from "@/Theme/Colors";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Entypo from "react-native-vector-icons/Entypo";
-import Fontisto from "react-native-vector-icons/Fontisto";
-import MapView, { Marker, Circle } from "react-native-maps";
-import { ModalState } from "@/Store/Modal";
-import moment from "moment";
-import { Calendar } from "@/Components";
-import { UserState } from "@/Store/User";
 import { GetChildTrackHistory } from "@/Services/Parent";
-import FetchOne from "@/Services/User/FetchOne";
-import { parse } from "date-fns";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import { ModalState } from "@/Store/Modal";
+import ChangeModalState from "@/Store/Modal/ChangeModalState";
+import { UserState } from "@/Store/User";
+import Colors from "@/Theme/Colors";
+import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
+import { Button, Text } from "@ui-kitten/components";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import {
+  Image,
+  Linking,
+  StyleSheet,
+  View
+} from "react-native";
+import MapView, { Circle, Marker } from "react-native-maps";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { useDispatch, useSelector } from "react-redux";
 
 const StudentLocationScreen = () => {
   const route = useRoute();
@@ -340,9 +330,9 @@ const StudentLocationScreen = () => {
                     {student?.studentImage == "" && (
                       <View
                         style={{
-                          height: "100%",
-                          width: "100%",
-                          borderRadius: 80,
+                          // height: "100%",
+                          // width: "100%",
+                          borderRadius: 20,
                           backgroundColor: Colors.primary,
                           justifyContent: "center",
                           alignItems: "center",
@@ -362,9 +352,9 @@ const StudentLocationScreen = () => {
                           uri: student?.studentImage,
                         }}
                         style={{
-                          height: "100%",
-                          width: "100%",
-                          borderRadius: 80,
+                          height: 40,
+                          width: 40,
+                          borderRadius: 30,
                           aspectRatio: 1.5,
                         }}
                         resizeMode="contain"
