@@ -1,6 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from "react-native-toast-message";
-import jwt_decode from "jwt-decode";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
 
 interface JwtBaftrendsPayload {
   sub: string;
@@ -12,7 +11,7 @@ interface JwtBaftrendsPayload {
 export const storeToken = async (value: string) => {
   try {
     await AsyncStorage.setItem("login_token", value);
-    const decoded = jwt_decode<JwtBaftrendsPayload>(value);
+    const decoded = jwtDecode<JwtBaftrendsPayload>(value);
     await storeUserId(decoded.jti);
     return true;
   } catch (e) {
@@ -30,9 +29,7 @@ export const storeInstructors = async (instructors: any) => {
 };
 export const getOrgInstructors = async (instructors: any) => {
   try {
-  let res=  await AsyncStorage.getItem("instructors");
-
-    return res;
+    return await AsyncStorage.getItem("instructors");
   } catch (e) {
     return false;
   }

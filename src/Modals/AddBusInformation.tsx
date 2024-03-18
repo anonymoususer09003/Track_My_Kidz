@@ -32,8 +32,8 @@ const AddBusInformation = ({
   activity?: any;
   buses?: Array<object>;
   setBuses?: Function;
-  selectedItem: any;
-  fromActivity: any;
+  selectedItem?: any;
+  fromActivity?: any;
 }) => {
   console.log("selectedItem", selectedItem);
   const dispatch = useDispatch();
@@ -41,10 +41,6 @@ const AddBusInformation = ({
     (state: { modal: ModalState }) =>
       state.modal.previewButInformationModalVisibility
   );
-  const [approvals, setApprovals] = useState([]);
-  const [rollCall, setRollCall] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [searchParam, setSearchParam] = useState("");
   const [busName, setBusName] = useState(selectedItem?.busName || "");
 
   const [numberOfRows, setNumberOfRows] = useState(
@@ -64,6 +60,11 @@ const AddBusInformation = ({
     selectedItem?.numberOfKidsOnLongSeat || ""
   );
 
+  const isVisible = useSelector(
+    (state: { modal: ModalState }) =>
+      state.modal.addButInformationModalVisibility
+  );
+
   useEffect(() => {
     if (selectedItem && Object.keys(selectedItem).length > 0) {
       setBusName(selectedItem?.busName);
@@ -78,11 +79,6 @@ const AddBusInformation = ({
       );
     }
   }, [selectedItem, isVisible]);
-
-  const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.addButInformationModalVisibility
-  );
   useEffect(() => {
     if (!isVisible) {
       setNumberOfKidsLongSeat("");

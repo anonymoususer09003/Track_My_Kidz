@@ -1,17 +1,17 @@
-import { Gender } from "@/Enums";
 
 export class EmailDTO {
   email: string = "";
 }
 
 export class UserRegistrationDTO {
+  name?:string
   bio?: string = "";
   birthDate?: string = "";
   city?: string = "";
   country?: string = "";
   fbAccount?: string = "";
   firstname: string = "";
-  gender?: string = Gender.male;
+  gender?: string = "Male";
   instagramAccount?: string = "";
   lastname: string = "";
   password?: string = "";
@@ -63,7 +63,7 @@ export class RegisterDTO {
 export class Grade {
   id?: string;
   name: string = "";
-  subject?: Subject;
+  subject?: Subject | Subject[];
 }
 
 export class Subject {

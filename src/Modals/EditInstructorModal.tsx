@@ -12,7 +12,7 @@ import { Instructor } from "@/Models/UserDTOs";
 import { SafeAreaView } from 'react-native'
 interface InstructorModal {
   instructors: Array<Instructor>;
-  setInstructors: (data: Array<Instructor>) => {};
+  setInstructors: (data: Array<Instructor>) => void;
   selectedInstructor: any;
 }
 
@@ -35,7 +35,7 @@ const EditInstructorFormModal = ({
   console.log("instructor", selectedInstructor);
   return (
     <Modal
-      visible={isVisible}
+      isVisible={isVisible}
       style={styles.modal}
       onBackdropPress={() => {
         dispatch(
@@ -51,7 +51,7 @@ const EditInstructorFormModal = ({
             marginHorizontal:20,
             padding: 20,
             borderRadius: 5,
-         
+
           }}
         >
           <Text style={[styles.heading, { textAlign: "center" }]}>
@@ -174,7 +174,7 @@ const EditInstructorFormModal = ({
           </Formik>
         </ScrollView>
         </View>
-     
+
     </Modal>
   );
 };
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     // height: 300,
     // elevation: 5,
- 
+
     // shadowColor: Colors.primaryGray,
     // shadowOffset: {
     //   height: 5,

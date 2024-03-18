@@ -1,57 +1,57 @@
-import { CompleteRegistration, Register } from "@//Services/SignUpServices";
-import { LinearGradientButton, ProfileAvatarPicker, Spinner } from "@/Components";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import { CompleteRegistration, Register } from '@//Services/SignUpServices';
+import { LinearGradientButton, ProfileAvatarPicker } from '@/Components';
+import BackgroundLayout from '@/Components/BackgroundLayout';
 import {
   PersonIcon,
-  PhoneIcon
-} from "@/Components/SignUp/icons";
-import { AddInstructorsModal, EditInstructorsModal, ImagePickerModal } from "@/Modals";
-import AddBusInformation from "@/Modals/AddBusInformation";
-import { CountryDTO } from "@/Models/CountryDTOs";
-import { RegisterDTO, UserRegistrationDTO } from "@/Models/UserDTOs";
-import { AuthContext } from "@/Navigators/Auth/AuthProvider";
-import { Login } from "@/Services/LoginServices";
-import { GetAllOrg, GetOrgByFilters } from "@/Services/Org";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import { GetAllSchools, GetSchoolByFilters } from "@/Services/School";
-import { storeInstructors, storeToken } from "@/Storage/MainAppStorage";
-import LoginStore from "@/Store/Authentication/LoginStore";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { PlaceState } from "@/Store/Places";
-import Colors from "@/Theme/Colors";
-import { useIsFocused } from "@react-navigation/native";
+  PhoneIcon,
+} from '@/Components/SignUp/icons';
+import { AddInstructorsModal, EditInstructorsModal, ImagePickerModal } from '@/Modals';
+import AddBusInformation from '@/Modals/AddBusInformation';
+import { CountryDTO } from '@/Models/CountryDTOs';
+import { RegisterDTO, UserRegistrationDTO } from '@/Models/UserDTOs';
+import { AuthContext } from '@/Navigators/Auth/AuthProvider';
+import { Login } from '@/Services/LoginServices';
+import { GetAllOrg, GetOrgByFilters } from '@/Services/Org';
+import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
+import { GetAllSchools, GetSchoolByFilters } from '@/Services/School';
+import { storeInstructors, storeToken } from '@/Storage/MainAppStorage';
+import LoginStore from '@/Store/Authentication/LoginStore';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { PlaceState } from '@/Store/Places';
+import Colors from '@/Theme/Colors';
+import { useIsFocused } from '@react-navigation/native';
 import {
   Autocomplete,
   AutocompleteItem,
-  Button,
+  Button, ButtonElement, ButtonProps,
   CheckBox, Icon, Input,
   Layout, Select,
   SelectItem,
   StyleService,
   Text,
-  useStyleSheet
-} from "@ui-kitten/components";
-import { Props } from "@ui-kitten/components/devsupport/services/props/props.service";
-import { Formik } from "formik";
+  useStyleSheet,
+} from '@ui-kitten/components';
+import { Props } from '@ui-kitten/components/devsupport/services/props/props.service';
+import { Formik } from 'formik';
 import React, {
   ReactElement,
-  ReactText,
   useContext,
   useEffect,
-  useState
-} from "react";
+  useState,
+} from 'react';
 import {
   KeyboardAvoidingView, Linking, Platform,
   ScrollView, TouchableOpacity, TouchableWithoutFeedback,
-  View
-} from "react-native";
-import { getDeviceId } from "react-native-device-info";
-import ImagePicker from "react-native-image-crop-picker";
-import Toast from "react-native-toast-message";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Feather from "react-native-vector-icons/Feather";
-import { useDispatch, useSelector } from "react-redux";
-import * as yup from "yup";
+  View,
+} from 'react-native';
+import { getDeviceId } from 'react-native-device-info';
+import ImagePicker from 'react-native-image-crop-picker';
+import Toast from 'react-native-toast-message';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Feather from 'react-native-vector-icons/Feather';
+import { useDispatch, useSelector } from 'react-redux';
+import * as yup from 'yup';
+import { ModalState } from '@/Store/Modal';
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -62,134 +62,114 @@ const filterStates = (item: string, query: string) => {
 const filterCities = (item: string, query: string) => {
   return item?.toLowerCase().includes(query.toLowerCase());
 };
-const filterSchools = (item: string, query: string) => {
-  return item?.toLowerCase().includes(query.toLowerCase());
-};
-const filter = (item: String, query: string) => {
-  return item.toLowerCase().includes(query.toLowerCase());
-};
 
-const user_types = [
-  { id: 1, label: "Parent", value: "Parent" },
-  { id: 2, label: "Instructor", value: "Instructor" },
-  { id: 3, label: "Student", value: "Student" },
-];
+// const user_types = [
+//     {id: 1, label: "Parent", value: "Parent"},
+//     {id: 2, label: "Instructor", value: "Instructor"},
+//     {id: 3, label: "Student", value: "Student"},
+// ];
 
 const organisations = [
-  { id: 1, label: "School", value: "School" },
-  { id: 2, label: "Organisation", value: "Organisation" },
+  { id: 1, label: 'School', value: 'School' },
+  { id: 2, label: 'Organisation', value: 'Organisation' },
 ];
 
-const schools = [
-  { id: 1, label: "School 1", value: "School 1" },
-  { id: 2, label: "School 2", value: "School 2" },
-  { id: 3, label: "New School", value: "New School" },
-];
+// const schools = [
+//     {id: 1, label: "School 1", value: "School 1"},
+//     {id: 2, label: "School 2", value: "School 2"},
+//     {id: 3, label: "New School", value: "New School"},
+// ];
 
-const _instructors = [];
+const _instructors: any[] = [];
 
-const FinalOrgRegistrationScreen = ({ navigation, route }: Props) => {
+const FinalOrgRegistrationScreen = ({ route }: Props) => {
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] =
     React.useState<boolean>(false);
-  const [languages, setLanguages] = useState<Array<ReactText>>(["English"]);
   const isFocuesed = useIsFocused();
-  const [genders, setGenders] = useState<Array<ReactText>>([
-    "Female",
-    "Male",
-    "Other",
-  ]);
   const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries
+    (state: { places: PlaceState }) => state.places.countries,
   );
   const isVisibleAddInstructor = useSelector(
-    (state: { modal: ModalState }) => state.modal.addInstructorModalVisibility
+    (state: { modal: ModalState }) => state.modal.addInstructorModalVisibility,
   );
   const isVisible = useSelector(
     (state: { modal: ModalState }) =>
-      state.modal.addButInformationModalVisibility
+      state.modal.addButInformationModalVisibility,
   );
-  const [countriesData, setCountriesData] = React.useState(countries);
-  const [schoolsData, setSchoolsData] = React.useState(schools);
-  const [schools, setSchools] = useState([]);
-  const [statesData, setStatesData] = React.useState<Array<any>>([]);
-  const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
-  const [orgData, setOrgData] = React.useState([]);
-  const [org, setOrg] = useState([]);
-  const [rows, setRows] = useState([
-    {
-      grade: "",
-      subject: "",
-    },
-  ]);
-  const [selectedGrades, setSelectedGrades] = useState([]);
-  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [countriesData, setCountriesData] = React.useState<any[]>(countries);
+  const [schools, setSchools] = useState<any[]>([]);
+  const [schoolsData, setSchoolsData] = React.useState<any[]>(schools);
+  const [statesData, setStatesData] = React.useState<any[]>([]);
+  const [citiesData, setCitiesData] = React.useState<any[]>([]);
+  const [orgData, setOrgData] = React.useState<any[]>([]);
+  const [, setOrg] = useState<any[]>([]);
 
-  const [reRender, setRerender] = useState(false);
-  const [states, setStates] = useState<Array<any>>([]);
-  const [cities, setCities] = useState<Array<any>>([]);
-  const [phoneCode, setPhoneCode] = useState<string>("");
-  const [placement, setPlacement] = React.useState("bottom");
-  const [instructors, setInstructors] = useState(_instructors);
+  const [reRender, setRerender] = useState<boolean>(false);
+  const [states, setStates] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+  const [, setPhoneCode] = useState<string>('');
+  const [placement] = React.useState('bottom');
+  const [instructors, setInstructors] = useState<any[]>(_instructors);
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
-    route.params?.details?.photo||""
+    route.params?.details?.photo || '',
   );
-  console.log('route.params?.details?.photo',route.params?.details?.photo)
-  const [visibleImagePicker, setVisibleImagePicker] = useState(false);
-  const [buses, setBuses] = useState([]);
-  const [uploadedImage, setUploadedImage] = React.useState(null);
-  const [selectedInstructor, setSelectedInstructor] = useState({});
+  console.log('route.params?.details?.photo', route.params?.details?.photo);
+  const [visibleImagePicker, setVisibleImagePicker] = useState<boolean>(false);
+  const [buses, setBuses] = useState<any[]>([]);
+  const [uploadedImage, setUploadedImage] = React.useState<any>(null);
+  const [selectedInstructor, setSelectedInstructor] = useState<any>({});
   const { register } = useContext(AuthContext);
 
   const styles = useStyleSheet(themedStyles);
   const { emailAddress, user_type, details } = route.params;
-  const { registrationId, activation_code } = route.params;
+  const { activation_code } = route.params;
 
-const country = details?.country
-const state = details?.state
-const city = details?.city
-const zipcode = details?.zipcode
-const selected_entity = details?.selected_entity
+  const country = details?.country;
+  const state = details?.state;
+  const city = details?.city;
+  const zipcode = details?.zipcode;
+  const selected_entity = details?.selected_entity;
 
-  console.log('country',country)
-console.log('details',details)
-  const [visible, setVisible] = React.useState(false);
+  console.log('country', country);
+  console.log('details', details);
   const dispatch = useDispatch();
 
-  const _user_type = user_types.find((u) => u.label === user_type);
 
   const signUpValidationSchema = yup.object().shape({
-    firstName: yup.string().required("First name is required"),
-    lastName: yup.string().required("Last name is required"),
-    zipcode: yup.string().required("Zip code is required"),
-    // schoolName: yup.string().required("School name is required"),
+    firstName: yup.string().required('First name is required'),
+    lastName: yup.string().required('Last name is required'),
+    zipcode: yup.string().required('Zip code is required'),
     address: yup.string(),
 
     country: yup.string(),
-    schoolAddress: yup.string().required("School address is required"),
+    schoolAddress: yup.string().required('School address is required'),
     selectedCountry: yup.string(),
     selectedState: yup.string(),
     selectedCity: yup.string(),
-    city: yup.string().required("City is required"),
-    state: yup.string().required("State is required"),
+    city: yup.string().required('City is required'),
+    state: yup.string().required('State is required'),
     phoneNumber: yup.string(),
     password: yup
       .string()
       .min(8, ({ min }) => `Password must be at least ${min} characters`)
-      .required("Password is required"),
+      .required('Password is required'),
     confirmPassword: yup
       .string()
-      .when("password", {
-        is: (val: any) => (val && val.length > 0 ? true : false),
+      .when('password', {
+        // TODO: remove it
+        // @ts-ignore
+        is: (val: any) => (!!(val && val.length > 0)),
         then: yup
           .string()
           .oneOf(
-            [yup.ref("password")],
-            "Password & Confirm Password do not match"
+            [yup.ref('password')],
+            'Password & Confirm Password do not match',
           ),
+        otherwise: yup.string().notRequired(),
       })
-      .required("Re-Password is required"),
+      .required('Re-Password is required'),
     termsAccepted: yup.boolean().required(),
   });
 
@@ -203,13 +183,13 @@ console.log('details',details)
 
   const renderPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onPasswordIconPress}>
-      <Icon {...props} name={passwordVisible ? "eye-off" : "eye"} />
+      <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
     </TouchableWithoutFeedback>
   );
 
   const renderConfirmPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onConfirmPasswordIconPress}>
-      <Icon {...props} name={confirmPasswordVisible ? "eye-off" : "eye"} />
+      <Icon {...props} name={confirmPasswordVisible ? 'eye-off' : 'eye'} />
     </TouchableWithoutFeedback>
   );
   const renderEditAvatarButton = (): React.ReactElement => (
@@ -241,27 +221,29 @@ console.log('details',details)
   const CheckboxLabel = (evaProps: any) => {
     return (
       <Text {...evaProps} style={styles.termsCheckBoxText}>
-        I have read and agree to the{" "}
+        I have read and agree to the{' '}
         <Text
           style={{ color: Colors.primary }}
           onPress={() => {
-            Linking.openURL("https://trackmykidz.com/terms/").then((r) => {});
+            Linking.openURL('https://trackmykidz.com/terms/').then(() => {
+            });
           }}
         >
-          {" "}
-          Terms of Use{" "}
-        </Text>{" "}
+          {' '}
+          Terms of Use{' '}
+        </Text>{' '}
         and
         <Text
           style={{ color: Colors.primary }}
           onPress={() => {
-            Linking.openURL("https://trackmykidz.com/privacy-policy").then(
-              (r) => {}
+            Linking.openURL('https://trackmykidz.com/privacy-policy').then(
+              () => {
+              },
             );
           }}
         >
-          {" "}
-          Privacy Policy{" "}
+          {' '}
+          Privacy Policy{' '}
         </Text>
         of TrackMyKidz
       </Text>
@@ -286,7 +268,7 @@ console.log('details',details)
       .then((res) => {
         const _data = {
           schoolId: 0,
-          name: "Other",
+          name: 'Other',
         };
         const _schools = [...res];
         _schools.unshift(_data);
@@ -298,7 +280,7 @@ console.log('details',details)
         const data = [
           {
             schoolId: 0,
-            name: "Other",
+            name: 'Other',
           },
         ];
         setSchoolsData(data);
@@ -309,7 +291,7 @@ console.log('details',details)
       .then((res) => {
         const _data = {
           orgId: 0,
-          name: "Other",
+          name: 'Other',
         };
         const _org = [...res.result];
         _org.unshift(_data);
@@ -321,11 +303,10 @@ console.log('details',details)
         const data = [
           {
             schoolId: 0,
-            name: "Other",
+            name: 'Other',
           },
         ];
         setOrgData(data);
-        // setSchoolsData(data);
       });
   };
 
@@ -335,10 +316,10 @@ console.log('details',details)
   }, []);
 
   const getSchoolsByFilter = (
-    country = "",
-    state = "",
-    city = "",
-    schoolName = ""
+    country = '',
+    state = '',
+    city = '',
+    schoolName = '',
   ) => {
     const query = {
       country: country,
@@ -350,26 +331,26 @@ console.log('details',details)
       .then((res) => {
         const _data = {
           schoolId: 0,
-          name: "Other",
+          name: 'Other',
         };
-        console.log("res school", res);
+        console.log('res school', res);
         const _schools = [...res];
         _schools.unshift(_data);
 
-        console.log("_school0000", _schools);
+        console.log('_school0000', _schools);
         setSchools(_schools);
         setSchoolsData(_schools);
-        console.log("_schools", _schools);
+        console.log('_schools', _schools);
       })
       .catch((err) => {
-        console.log("GetSchoolByFilters", err);
+        console.log('GetSchoolByFilters', err);
       });
   };
   const getOrgByFilter = (
-    country = "",
-    state = "",
-    city = "",
-    orgName = ""
+    country = '',
+    state = '',
+    city = '',
+    orgName = '',
   ) => {
     const query = {
       country: country,
@@ -381,7 +362,7 @@ console.log('details',details)
       .then((res) => {
         const _data = {
           schoolId: 0,
-          name: "Other",
+          name: 'Other',
         };
         const _org = [...res];
         _org.unshift(_data);
@@ -389,21 +370,16 @@ console.log('details',details)
         setOrgData(_org);
       })
       .catch((err) => {
-        console.log("GetOrgByFilters", err);
+        console.log('GetOrgByFilters', err);
       });
   };
   const handleInstructorEdit = (item: any, index: any) => {
     setSelectedInstructor({ ...item, index });
     dispatch(
       ChangeModalState.action({
-        // previewInstructorModalVisibility: false,
         editInstructorFormModalVisibility: true,
-      })
+      }),
     );
-    // );
-    // let temp = [...instructors];
-    // temp.splice(index, 1);
-    // setInstructors(temp);
   };
 
   const imageCameraLaunch = () => {
@@ -413,13 +389,12 @@ console.log('details',details)
       width: 139,
       height: 130,
       compressImageQuality: 0.2,
-      loadingLabelText: "Loading image",
+      loadingLabelText: 'Loading image',
     }).then((image) => {
       if (image != null) {
         const source = { uri: image?.path };
         setUploadedImage(image);
         setSelectedImage(source.uri);
-        // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
       }
     });
   };
@@ -430,7 +405,7 @@ console.log('details',details)
       width: 139,
       height: 130,
       compressImageQuality: 0.2,
-      loadingLabelText: "Loading image",
+      loadingLabelText: 'Loading image',
     }).then((image) => {
       if (image != null) {
         const source = { uri: image?.path };
@@ -443,9 +418,9 @@ console.log('details',details)
   return (
     <BackgroundLayout title="Registration">
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -150}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -150}
       >
         {visibleImagePicker && (
           <ImagePickerModal
@@ -472,45 +447,38 @@ console.log('details',details)
         )}
         {isVisible && <AddBusInformation buses={buses} setBuses={setBuses} />}
 
-        <View style={{ width: "100%" }}>
-          {selectedImage != "" && (
+        <View style={{ width: '100%' }}>
+          {selectedImage != '' && (
             <ProfileAvatarPicker
               style={styles.profileImage}
-              // resizeMode='center'
               source={
-                Platform.OS == "android"
+                Platform.OS == 'android'
                   ? {
-                      uri: selectedImage + "?time" + new Date().getTime(),
-                      headers: { Pragma: "no-cache" },
-                    }
+                    uri: selectedImage + '?time' + new Date().getTime(),
+                    headers: { Pragma: 'no-cache' },
+                  }
                   : { uri: selectedImage }
               }
-              editButton={false ? renderEditAvatarButton : null}
+              editButton={null}
             />
           )}
-          {selectedImage == "" && (
+          {selectedImage == '' && (
             <View
               style={[
                 styles.profileImage,
                 {
-                  // alignItems: "center",
-                  // justifyContent: "center",
                   backgroundColor: Colors.lightgray,
                 },
               ]}
             >
-              {/* <Text style={{ fontSize: 30 }}>
-                      {user?.firstname?.substring(0, 1)?.toUpperCase()}{" "}
-                      {user?.lastname?.substring(0, 1)?.toUpperCase()}
-                    </Text> */}
               <View
                 style={{
-                  position: "absolute",
+                  position: 'absolute',
                   marginTop: 70,
                   marginLeft: 85,
                 }}
               >
-                {true && renderEditButtonElement()}
+                {renderEditButtonElement()}
               </View>
             </View>
           )}
@@ -523,41 +491,41 @@ console.log('details',details)
               validateOnMount={true}
               initialValues={{
                 firstName:
-                  details && details.firstname ? details.firstname : "",
-                lastName: details && details.lastname ? details.lastname : "",
-                schoolName: "",
-                school_name: "",
-                schoolAddress: "",
-                country:details && country ? country : "",
-                selectedCountry: "",
-                selectedState: "",
-                selectedCity: "",
-                city: details && city?city:'',
-                state: details && state?state:'',
-                zipcode:details && zipcode?zipcode:'',
+                  details && details.firstname ? details.firstname : '',
+                lastName: details && details.lastname ? details.lastname : '',
+                schoolName: '',
+                school_name: '',
+                schoolAddress: '',
+                country: details && country ? country : '',
+                selectedCountry: '',
+                selectedState: '',
+                selectedCity: '',
+                city: details && city ? city : '',
+                state: details && state ? state : '',
+                zipcode: details && zipcode ? zipcode : '',
 
                 phoneNumber:
-                  details && details.phoneNumber ? details.phoneNumber : "",
-                password: "",
-                confirmPassword: "",
+                  details && details.phoneNumber ? details.phoneNumber : '',
+                password: '',
+                confirmPassword: '',
                 termsAccepted: false,
-                school: "",
-                organization: "",
-                selected_entity: details && selected_entity?selected_entity:"",
-                organizationName: "",
+                school: '',
+                organization: '',
+                selected_entity: details && selected_entity ? selected_entity : '',
+                organizationName: '',
               }}
-              onSubmit={(values, { resetForm }) => {
+              onSubmit={(values, {}) => {
                 dispatch(ChangeModalState.action({ loading: true }));
                 const school_name =
-                  values.schoolName === "Other"
+                  values.schoolName === 'Other'
                     ? values.school_name
                     : values.schoolName;
-                console.log("schooldata", school_name);
+                console.log('schooldata', school_name);
                 let schoolId =
-                  values.schoolName === "Other"
+                  values.schoolName === 'Other'
                     ? { schoolId: 0 }
                     : schoolsData.find((s) => s.name === school_name);
-                console.log("----school", schoolId);
+                console.log('----school', schoolId);
                 schoolId = Array.isArray(schoolId)
                   ? schoolId[0].schoolId
                   : schoolId?.schoolId;
@@ -565,10 +533,10 @@ console.log('details',details)
                 let schoolAddress = Array.isArray(schoolId)
                   ? schoolId[0]?.address
                   : schoolId?.address;
-                console.log("----888school", schoolId);
+                console.log('----888school', schoolId);
                 const org_name = values.schoolName;
                 const orgId =
-                  values.schoolName === "Other"
+                  values.schoolName === 'Other'
                     ? null
                     : orgData.find((s) => s.name === org_name)?.orgId;
                 const registerObject: RegisterDTO = {
@@ -578,43 +546,45 @@ console.log('details',details)
                 };
                 let formData = new FormData();
                 formData.append(
-                  "image",
+                  'image',
                   uploadedImage
                     ? {
-                        uri: uploadedImage?.path,
-                        name: uploadedImage.mime,
-                        type: uploadedImage.mime,
-                      }
+                      uri: uploadedImage?.path,
+                      name: uploadedImage.mime,
+                      type: uploadedImage.mime,
+                    }
                     : {
-                        uri: "https://pictures-tmk.s3.amazonaws.com/images/image/man.png",
-                        name: "avatar",
-                        type: "image/png",
-                      }
+                      uri: 'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
+                      name: 'avatar',
+                      type: 'image/png',
+                    },
                 );
-                formData.append("firstname", values.firstName);
-                formData.append("lastname", values.lastName);
+                formData.append('firstname', values.firstName);
+                formData.append('lastname', values.lastName);
 
-                formData.append("address", values.schoolAddress || "");
-                formData.append("email", emailAddress);
-                formData.append("state", values.state);
-                formData.append("city", values.city);
-                formData.append("country", values.country);
-                formData.append("zipcode", values.zipcode);
-                formData.append("phone", values.phoneNumber);
-                formData.append("password", values.password);
-                formData.append("term", true);
-                formData.append("isAdmin", true);
-                formData.append("deviceId", getDeviceId());
-                // formData.append("schoolId", schoolId || "");
-                // formData.append("orgId", orgId || "");
-                values.schoolId
-                  ? formData.append("schoolId", values.schoolId)
-                  : formData.append("schoolId", "");
-                values.orgId
-                  ? formData.append("orgId", values.orgId)
-                  : formData.append("orgId", "");
-                
-                console.log("formData0202002020200202", formData);
+                formData.append('address', values.schoolAddress || '');
+                formData.append('email', emailAddress);
+                formData.append('state', values.state);
+                formData.append('city', values.city);
+                formData.append('country', values.country);
+                formData.append('zipcode', values.zipcode);
+                formData.append('phone', values.phoneNumber);
+                formData.append('password', values.password);
+                formData.append('term', true);
+                formData.append('isAdmin', true);
+                formData.append('deviceId', getDeviceId());
+
+                // TODO check how it works
+                formData.append("schoolId", schoolId || "");
+                formData.append("orgId", orgId || "");
+                // values.schoolId
+                //   ? formData.append('schoolId', values.schoolId)
+                //   : formData.append('schoolId', '');
+                // values.orgId
+                //   ? formData.append('orgId', values.orgId)
+                //   : formData.append('orgId', '');
+
+                console.log('formData0202002020200202', formData);
 
                 const userObject: UserRegistrationDTO = {
                   firstname: values.firstName,
@@ -634,12 +604,12 @@ console.log('details',details)
                   isAdmin: true,
                   grades: [
                     {
-                      id: 0,
-                      name: "Test",
+                      id: '0',
+                      name: 'Test',
                       subject: [
                         {
-                          id: 0,
-                          name: "Test",
+                          id: '0',
+                          name: 'Test',
                         },
                       ],
                     },
@@ -647,10 +617,11 @@ console.log('details',details)
                   schoolId: schoolId,
                   orgId: orgId,
                 };
-                console.log("values", values.schoolName);
-                const schoolObject: UserRegistrationDTO = {
+                console.log('values', values.schoolName);
+                // TODO: check in swagger real type
+                const schoolObject: UserRegistrationDTO | any= {
                   name:
-                    values.school === "Other"
+                    values.school === 'Other'
                       ? values.school_name
                       : values.schoolName,
                   address:
@@ -661,83 +632,63 @@ console.log('details',details)
                   zipcode: values.zipcode,
                   city: values.city,
                   state: values.state,
-                  grades: null,
-                  // representatives:
-                  //   instructors && instructors.length > 0
-                  //     ? instructors.map((i) => ({
-                  //         email: i.email,
-                  //         firstname: i.firstName,
-                  //         lastname: i.lastName,
-                  //         isnew: true,
-                  //         type: values.selected_entity.toLowerCase(),
-                  //       }))
-                  //     : [],
                 };
                 setLoading(true);
-                const orgObject: UserRegistrationDTO = {
-                  name: values.organizationName,
-                  address: values.schoolAddress,
-                  country: values.country,
-                  zipcode: values.zipcode,
-                  city: values.city,
-                  state: values.state,
-                  grades: null,
-                  representatives: [],
-                };
+
                 let loginObject = {
                   email: emailAddress,
                   password: values.password,
                 };
 
-                Register(registerObject, "instructor")
+                Register(registerObject, 'instructor')
                   .then(async (response) => {
-                    console.log("response1111111", response.data);
+                    console.log('response1111111', response.data);
                     await storeToken(response.data.token);
-                    console.log("schoolId", schoolId);
+                    console.log('schoolId', schoolId);
                     if (
-                      values.selected_entity == "School" &&
+                      values.selected_entity == 'School' &&
                       (schoolId == 0 || !schoolId)
                     ) {
-                      CompleteRegistration(schoolObject, "school")
+                      CompleteRegistration(schoolObject, 'school')
                         .then((_res) => {
-                          console.log("response1.1", {
+                          console.log('response1.1', {
                             ...userObject,
                             schoolId: _res?.data?.schoolId,
                           });
 
-                          formData.append("schoolId", _res?.data?.schoolId);
+                          formData.append('schoolId', _res?.data?.schoolId);
 
-                          console.log("formdata---------------", formData);
+                          console.log('formdata---------------', formData);
                           // {
                           //   ...userObject,
                           //   schoolId: _res.data.schoolId,
                           // }
-                          CompleteRegistration(formData, "instructor")
+                          CompleteRegistration(formData, 'instructor')
                             .then(async (response: any) => {
-                              console.log("response1.3", response);
+                              console.log('response1.3', response);
                               let obj = {
                                 token: response.data.token,
-                                userType: "instructor",
+                                userType: 'instructor',
                                 id: response.data.instructorId,
                                 mainId: _res.data?.userId,
                               };
                               let _instructors = instructors.map((item) => ({
-                                firstName: item?.firstName || "",
-                                lastName: item?.lastName || "",
-                                email: item?.email || "",
-                                phoneNumber: item?.phoneNumber || "",
+                                firstName: item?.firstName || '',
+                                lastName: item?.lastName || '',
+                                email: item?.email || '',
+                                phoneNumber: item?.phoneNumber || '',
                                 isAdmin: item?.isAdmin || false,
                               }));
                               await Login(loginObject, user_type.toLowerCase());
                               await storeInstructors(
-                                JSON.stringify(_instructors)
+                                JSON.stringify(_instructors),
                               );
                               dispatch(LoginStore.action(obj));
 
-                              console.log("_instructors", _instructors);
+                              console.log('_instructors', _instructors);
                               console.log(
-                                "_instructors",
-                                response.data.instructorId
+                                '_instructors',
+                                response.data.instructorId,
                               );
 
                               if (response.status == 201) {
@@ -750,51 +701,54 @@ console.log('details',details)
                               }
                             })
                             .catch((error: any) => {
-                              console.log("error1111", error);
+                              console.log('error1111', error);
                               Toast.show({
-                                type: "info",
-                                position: "top",
+                                type: 'info',
+                                position: 'top',
                                 text1: error,
                                 text2: error?.data?.statusDescription,
                                 visibilityTime: 4000,
                                 autoHide: true,
                                 topOffset: 30,
                                 bottomOffset: 40,
-                                onShow: () => {},
-                                onHide: () => {},
-                                onPress: () => {},
+                                onShow: () => {
+                                },
+                                onHide: () => {
+                                },
+                                onPress: () => {
+                                },
                               });
                             })
                             .finally(() => {
                               dispatch(
-                                ChangeModalState.action({ loading: false })
+                                ChangeModalState.action({ loading: false }),
                               );
                             });
                         })
                         .catch((err) => {
-                          console.log("err1111", err);
+                          console.log('err1111', err);
                         });
                     } else if (
-                      values.selected_entity == "School" &&
+                      values.selected_entity == 'School' &&
                       schoolId != 0
                     ) {
-                      formData.append("schoolId", schoolId);
+                      formData.append('schoolId', schoolId);
 
-                      CompleteRegistration(formData, "instructor")
+                      CompleteRegistration(formData, 'instructor')
                         .then(async (res: any) => {
-                          console.log("response2", res);
+                          console.log('response2', res);
                           let obj = {
                             token: res.data.token,
-                            userType: "instructor",
+                            userType: 'instructor',
                             id: res.data.instructorId,
                             mainId: response.data?.userId,
                           };
-                          console.log("obj", obj);
+                          console.log('obj', obj);
                           let _instructors = instructors.map((item) => ({
-                            firstName: item?.firstName || "",
-                            lastName: item?.lastName || "",
-                            email: item?.email || "",
-                            phoneNumber: item?.phoneNumber || "",
+                            firstName: item?.firstName || '',
+                            lastName: item?.lastName || '',
+                            email: item?.email || '',
+                            phoneNumber: item?.phoneNumber || '',
                             isAdmin: item?.isAdmin || false,
                           }));
                           await Login(loginObject, user_type.toLowerCase());
@@ -811,69 +765,72 @@ console.log('details',details)
                           }
                         })
                         .catch((error: any) => {
-                          console.log("error2", error);
+                          console.log('error2', error);
                           Toast.show({
-                            type: "info",
-                            position: "top",
+                            type: 'info',
+                            position: 'top',
                             text1: error,
                             text2: error?.data?.statusDescription,
                             visibilityTime: 4000,
                             autoHide: true,
                             topOffset: 30,
                             bottomOffset: 40,
-                            onShow: () => {},
-                            onHide: () => {},
-                            onPress: () => {},
+                            onShow: () => {
+                            },
+                            onHide: () => {
+                            },
+                            onPress: () => {
+                            },
                           });
                         })
                         .finally(() => {
                           dispatch(ChangeModalState.action({ loading: false }));
                         });
-                    } else if (values.selected_entity != "School" && !orgId) {
-                      CompleteRegistration(schoolObject, "org")
+                    } else if (values.selected_entity != 'School' && !orgId) {
+                      CompleteRegistration(schoolObject, 'org')
                         .then((_res) => {
                           console.log({
                             ...userObject,
                             orgId: _res.data.orgId,
                           });
-                          console.log('response3')
-                          formData.append("orgId", _res.data.orgId);
-                          formData.append("schoolId", null);
+                          console.log('response3');
+                          formData.append('orgId', _res.data.orgId);
+                          formData.append('schoolId', null);
                           // {
                           //   ...userObject,
                           //   orgId: _res.data.orgId,
                           //   schoolId: null,
                           // },
-                          CompleteRegistration(formData, "instructor")
+                          CompleteRegistration(formData, 'instructor')
                             .then(async (response: any) => {
                               let obj = {
                                 token: response.data.token,
-                                userType: "instructor",
+                                userType: 'instructor',
                                 id: response.data.instructorId,
                                 mainId: _res.data?.userId,
                               };
                               let _instructors = instructors.map((item) => ({
-                                firstName: item?.firstName || "",
-                                lastName: item?.lastName || "",
-                                email: item?.email || "",
-                                phoneNumber: item?.phoneNumber || "",
+                                firstName: item?.firstName || '',
+                                lastName: item?.lastName || '',
+                                email: item?.email || '',
+                                phoneNumber: item?.phoneNumber || '',
                                 isAdmin: item?.isAdmin || false,
                               }));
                               await Login(loginObject, user_type.toLowerCase());
                               await storeInstructors(
-                                JSON.stringify(_instructors)
+                                JSON.stringify(_instructors),
                               );
                               dispatch(LoginStore.action(obj));
 
-                              console.log("_instructors", _instructors);
+                              console.log('_instructors', _instructors);
                               console.log(
-                                "_instructors",
-                                response.data.instructorId
+                                '_instructors',
+                                response.data.instructorId,
                               );
-                              console.log('response4', response.status)
+                              console.log('response4', response.status);
 
                               if (response.status == 201) {
-                                console.log("response4.1")
+                                console.log('response4.1');
                                 register(emailAddress, values.password);
                                 // dispatch(
                                 //   ChangeModalState.action({
@@ -883,59 +840,62 @@ console.log('details',details)
                               }
                             })
                             .catch((error: any) => {
-                              console.log("error333", error);
+                              console.log('error333', error);
                               Toast.show({
-                                type: "info",
-                                position: "top",
+                                type: 'info',
+                                position: 'top',
                                 text1: error,
                                 text2: error?.data?.statusDescription,
                                 visibilityTime: 4000,
                                 autoHide: true,
                                 topOffset: 30,
                                 bottomOffset: 40,
-                                onShow: () => {},
-                                onHide: () => {},
-                                onPress: () => {},
+                                onShow: () => {
+                                },
+                                onHide: () => {
+                                },
+                                onPress: () => {
+                                },
                               });
                             })
                             .finally(() => {
                               dispatch(
-                                ChangeModalState.action({ loading: false })
+                                ChangeModalState.action({ loading: false }),
                               );
                             });
                         })
                         .catch((err) => {
-                          console.log("err444", err);
+                          console.log('err444', err);
                         });
-                    } else if (values.selected_entity != "School" && orgId) {
-                      formData.append("schoolId", null);
-                      formData.append("orgId", orgId);
-                      console.log('response5', formData)
-                      CompleteRegistration(formData, "instructor")
+                    } else if (values.selected_entity != 'School' && orgId) {
+                      formData.append('schoolId', null);
+                      formData.append('orgId', orgId);
+                      console.log('response5', formData);
+                      CompleteRegistration(formData, 'instructor')
                         .then(async (res: any) => {
-                          console.log("response5.1", res);
+                          console.log('response5.1', res);
                           let obj = {
                             token: res.data.token,
-                            userType: "instructor",
+                            userType: 'instructor',
                             id: res.data.instructorId,
                             mainId: response.data?.userId,
                           };
-                          console.log("obj", obj);
+                          console.log('obj', obj);
                           let _instructors = instructors.map((item) => ({
-                            firstName: item?.firstName || "",
-                            lastName: item?.lastName || "",
-                            email: item?.email || "",
-                            phoneNumber: item?.phoneNumber || "",
+                            firstName: item?.firstName || '',
+                            lastName: item?.lastName || '',
+                            email: item?.email || '',
+                            phoneNumber: item?.phoneNumber || '',
                             isAdmin: item?.isAdmin || false,
                           }));
                           await Login(loginObject, user_type.toLowerCase());
                           await storeInstructors(JSON.stringify(_instructors));
                           dispatch(LoginStore.action(obj));
 
-                          console.log("_instructors", _instructors);
+                          console.log('_instructors', _instructors);
                           console.log(
-                            "_instructors",
-                            response.data.instructorId
+                            '_instructors',
+                            response.data.instructorId,
                           );
 
                           if (response.status == 201) {
@@ -948,19 +908,22 @@ console.log('details',details)
                           }
                         })
                         .catch((error: any) => {
-                          console.log("error third", error);
+                          console.log('error third', error);
                           Toast.show({
-                            type: "info",
-                            position: "top",
+                            type: 'info',
+                            position: 'top',
                             text1: error,
                             text2: error?.data?.statusDescription,
                             visibilityTime: 4000,
                             autoHide: true,
                             topOffset: 30,
                             bottomOffset: 40,
-                            onShow: () => {},
-                            onHide: () => {},
-                            onPress: () => {},
+                            onShow: () => {
+                            },
+                            onHide: () => {
+                            },
+                            onPress: () => {
+                            },
                           });
                         })
                         .finally(() => {
@@ -969,20 +932,23 @@ console.log('details',details)
                     }
                   })
                   .catch((error) => {
-                    console.log('error SignUP',error)
+                    console.log('error SignUP', error);
                     dispatch(ChangeModalState.action({ loading: false }));
                     Toast.show({
-                      type: "info",
-                      position: "top",
+                      type: 'info',
+                      position: 'top',
                       text1: error,
                       text2: error?.data?.statusDescription,
                       visibilityTime: 4000,
                       autoHide: true,
                       topOffset: 30,
                       bottomOffset: 40,
-                      onShow: () => {},
-                      onHide: () => {},
-                      onPress: () => {},
+                      onShow: () => {
+                      },
+                      onHide: () => {
+                      },
+                      onPress: () => {
+                      },
                     });
                   })
                   .finally(() => {
@@ -991,16 +957,16 @@ console.log('details',details)
               }}
             >
               {({
-                handleChange,
-                setFieldValue,
-                handleBlur,
-                handleSubmit,
-                resetForm,
-                values,
-                errors,
-                touched,
-                isValid,
-              }) => (
+                  handleChange,
+                  setFieldValue,
+                  handleBlur,
+                  handleSubmit,
+                  resetForm,
+                  values,
+                  errors,
+                  touched,
+                  isValid,
+                }) => (
                 <>
                   <Layout style={styles.formContainer} level="1">
                     <Select
@@ -1011,8 +977,8 @@ console.log('details',details)
                       onSelect={(index: any) => {
                         resetForm();
                         setFieldValue(
-                          "selected_entity",
-                          organisations[index.row].value
+                          'selected_entity',
+                          organisations[index.row].value,
                         );
                       }}
                     >
@@ -1024,7 +990,7 @@ console.log('details',details)
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       accessoryRight={PersonIcon}
-                      value={"Email: " + emailAddress}
+                      value={'Email: ' + emailAddress}
                       disabled={true}
                     />
                     <Input
@@ -1034,11 +1000,11 @@ console.log('details',details)
                       placeholder={`Instructor's First Name*`}
                       accessoryRight={PersonIcon}
                       value={values.firstName}
-                      onChangeText={handleChange("firstName")}
-                      onBlur={handleBlur("firstName")}
+                      onChangeText={handleChange('firstName')}
+                      onBlur={handleBlur('firstName')}
                     />
                     {errors.firstName && touched.firstName && (
-                      <Text style={styles.errorText}>{errors.firstName}</Text>
+                      <Text style={styles.errorText}>{String(errors.firstName)}</Text>
                     )}
                     <Input
                       style={styles.inputSettings}
@@ -1047,18 +1013,18 @@ console.log('details',details)
                       placeholder={`Instructor's Last Name*`}
                       accessoryRight={PersonIcon}
                       value={values.lastName}
-                      onChangeText={handleChange("lastName")}
-                      onBlur={handleBlur("lastName")}
+                      onChangeText={handleChange('lastName')}
+                      onBlur={handleBlur('lastName')}
                     />
                     {errors.lastName && touched.lastName && (
-                      <Text style={styles.errorText}>{errors.lastName}</Text>
+                      <Text style={styles.errorText}>{String(errors.lastName)}</Text>
                     )}
-                    {values.selected_entity === "School" ? (
+                    {values.selected_entity === 'School' ? (
                       <Text
                         style={{
                           color: Colors.primary,
                           fontSize: 18,
-                          fontWeight: "700",
+                          fontWeight: '700',
                           marginTop: 5,
                         }}
                       >
@@ -1069,7 +1035,7 @@ console.log('details',details)
                         style={{
                           color: Colors.primary,
                           fontSize: 18,
-                          fontWeight: "700",
+                          fontWeight: '700',
                           marginTop: 5,
                         }}
                       >
@@ -1082,29 +1048,29 @@ console.log('details',details)
                       placement={placement}
                       style={styles.inputSettings}
                       onChangeText={(query) => {
-                        setFieldValue("country", query);
+                        setFieldValue('country', query);
                         setCountriesData(
                           countries.filter((item) =>
-                            filterCountries(item, query)
-                          )
+                            filterCountries(item, query),
+                          ),
                         );
                       }}
                       onSelect={(query) => {
                         const selectedCountry = countriesData[query];
-                        setFieldValue("country", selectedCountry.name);
-                        setFieldValue("selectedCountry", selectedCountry.name);
-                        setFieldValue("selectedState", "");
-                        setFieldValue("state", "");
+                        setFieldValue('country', selectedCountry.name);
+                        setFieldValue('selectedCountry', selectedCountry.name);
+                        setFieldValue('selectedState', '');
+                        setFieldValue('state', '');
                         setStates([]);
                         GetAllStates(
-                          selectedCountry.name.replace(/ /g, "")
+                          selectedCountry.name.replace(/ /g, ''),
                         ).then((res) => {
                           setStates(res.data);
                           setStatesData(res.data);
                         });
-                        selectedCountry.phone_code.toString().startsWith("+")
+                        selectedCountry.phone_code.toString().startsWith('+')
                           ? setPhoneCode(selectedCountry.phone_code.toString())
-                          : setPhoneCode("+" + selectedCountry.phone_code);
+                          : setPhoneCode('+' + selectedCountry.phone_code);
                         getSchoolsByFilter(selectedCountry.name);
                         getOrgByFilter(selectedCountry.name);
                       }}
@@ -1123,28 +1089,28 @@ console.log('details',details)
                       disabled={!values.selectedCountry}
                       // label={evaProps => <Text {...evaProps}>State</Text>}
                       onChangeText={(query) => {
-                        setFieldValue("state", query);
+                        setFieldValue('state', query);
                         setStatesData(
-                          states.filter((item) => filterStates(item, query))
+                          states.filter((item) => filterStates(item, query)),
                         );
                       }}
                       onSelect={(query) => {
                         const selectedState = statesData[query];
-                        setFieldValue("state", selectedState);
-                        setFieldValue("selectedState", selectedState);
-                        setFieldValue("selectedCity", "");
-                        setFieldValue("city", "");
+                        setFieldValue('state', selectedState);
+                        setFieldValue('selectedState', selectedState);
+                        setFieldValue('selectedCity', '');
+                        setFieldValue('city', '');
                         setCities([]);
                         GetAllCities(
                           values.selectedCountry,
-                          selectedState
+                          selectedState,
                         ).then((res) => {
                           setCities(res.data);
                           setCitiesData(res.data);
                         });
                         getSchoolsByFilter(
                           values.selectedCountry,
-                          selectedState
+                          selectedState,
                         );
                         getOrgByFilter(values.selectedCountry, selectedState);
                       }}
@@ -1161,15 +1127,15 @@ console.log('details',details)
                       style={styles.inputSettings}
                       // label={evaProps => <Text {...evaProps}>City</Text>}
                       onChangeText={(query) => {
-                        setFieldValue("city", query);
+                        setFieldValue('city', query);
                         setCitiesData(
-                          cities.filter((item) => filterCities(item, query))
+                          cities.filter((item) => filterCities(item, query)),
                         );
                       }}
                       onSelect={(query) => {
                         const selectedCity = citiesData[query];
-                        setFieldValue("city", selectedCity);
-                        setFieldValue("selectedCity", selectedCity);
+                        setFieldValue('city', selectedCity);
+                        setFieldValue('selectedCity', selectedCity);
                         // getSchoolsByFilter('', '', selectedCity)
                         // getOrgByFilter('', '', selectedCity)
                       }}
@@ -1184,13 +1150,13 @@ console.log('details',details)
                       autoCorrect={false}
                       placeholder={`Zip/Post Code*`}
                       value={values.zipcode}
-                      onChangeText={handleChange("zipcode")}
-                      onBlur={handleBlur("zipcode")}
+                      onChangeText={handleChange('zipcode')}
+                      onBlur={handleBlur('zipcode')}
                     />
                     {errors.zipcode && touched.zipcode && (
-                      <Text style={styles.errorText}>{errors.zipcode}</Text>
+                      <Text style={styles.errorText}>{String(errors.zipcode)}</Text>
                     )}
-                    {values.selected_entity === "School" && (
+                    {values.selected_entity === 'School' && (
                       <>
                         {/* <Autocomplete
                         placeholder="School Name*"
@@ -1237,14 +1203,14 @@ console.log('details',details)
                           placeholder="Select School*"
                           onSelect={(index: any) => {
                             let school = schoolsData[index.row];
-                            setFieldValue("school", school.name);
-                            setFieldValue("selectedSchool", school.name);
-                            if (school.name != "Other") {
-                              setFieldValue("schoolName", school.name);
-                              setFieldValue("schoolAddress", school.address);
+                            setFieldValue('school', school.name);
+                            setFieldValue('selectedSchool', school.name);
+                            if (school.name != 'Other') {
+                              setFieldValue('schoolName', school.name);
+                              setFieldValue('schoolAddress', school.address);
                             } else {
-                              setFieldValue("schoolName", "");
-                              setFieldValue("schoolAdress", "");
+                              setFieldValue('schoolName', '');
+                              setFieldValue('schoolAdress', '');
                             }
                           }}
                           label={(evaProps: any) => <Text {...evaProps}></Text>}
@@ -1254,8 +1220,8 @@ console.log('details',details)
                           })}
                         </Select>
 
-                        {(values.schoolName === "Other" ||
-                          values.school === "Other") && (
+                        {(values.schoolName === 'Other' ||
+                          values.school === 'Other') && (
                           <>
                             <Input
                               style={styles.inputSettings}
@@ -1263,8 +1229,8 @@ console.log('details',details)
                               autoCorrect={false}
                               placeholder={`Enter School Name*`}
                               value={values.school_name}
-                              onChangeText={handleChange("school_name")}
-                              onBlur={handleBlur("school_name")}
+                              onChangeText={handleChange('school_name')}
+                              onBlur={handleBlur('school_name')}
                             />
                             {errors.school_name && touched.school_name && (
                               <Text style={styles.errorText}>
@@ -1278,8 +1244,8 @@ console.log('details',details)
                               autoCorrect={false}
                               placeholder={`School Street Address*`}
                               value={values.schoolAddress}
-                              onChangeText={handleChange("schoolAddress")}
-                              onBlur={handleBlur("schoolAddress")}
+                              onChangeText={handleChange('schoolAddress')}
+                              onBlur={handleBlur('schoolAddress')}
                             />
                             {errors.schoolAddress && touched.schoolAddress && (
                               <Text style={styles.errorText}>
@@ -1303,22 +1269,22 @@ console.log('details',details)
                     )} */}
                       </>
                     )}
-                    {values.selected_entity === "Organisation" && (
+                    {values.selected_entity === 'Organisation' && (
                       <>
                         <Select
-                          style={{ width: "100%" }}
+                          style={{ width: '100%' }}
                           value={values.school}
                           placeholder="Select Organization*"
                           onSelect={(index: any) => {
                             let org = orgData[index.row];
-                            setFieldValue("school", org.name);
-                            setFieldValue("selectedSchool", org.name);
-                            if (org.name != "Other") {
-                              setFieldValue("schoolName", org.name);
-                              setFieldValue("schoolAddress", org.address);
+                            setFieldValue('school', org.name);
+                            setFieldValue('selectedSchool', org.name);
+                            if (org.name != 'Other') {
+                              setFieldValue('schoolName', org.name);
+                              setFieldValue('schoolAddress', org.address);
                             } else {
-                              setFieldValue("schoolName", "");
-                              setFieldValue("schoolAdress", "");
+                              setFieldValue('schoolName', '');
+                              setFieldValue('schoolAdress', '');
                             }
                           }}
                           label={(evaProps: any) => <Text {...evaProps}></Text>}
@@ -1328,7 +1294,7 @@ console.log('details',details)
                           })}
                         </Select>
 
-                        {values.school === "Other" && (
+                        {values.school === 'Other' && (
                           <>
                             <Input
                               style={styles.inputSettings}
@@ -1336,8 +1302,8 @@ console.log('details',details)
                               autoCorrect={false}
                               placeholder={`Organisation Name*`}
                               value={values.schoolName}
-                              onChangeText={handleChange("schoolName")}
-                              onBlur={handleBlur("schoolName")}
+                              onChangeText={handleChange('schoolName')}
+                              onBlur={handleBlur('schoolName')}
                             />
                             {errors.schoolName && touched.schoolName && (
                               <Text style={styles.errorText}>
@@ -1350,8 +1316,8 @@ console.log('details',details)
                               autoCorrect={false}
                               placeholder={`Organization Address*`}
                               value={values.schoolAddress}
-                              onChangeText={handleChange("schoolAddress")}
-                              onBlur={handleBlur("schoolAddress")}
+                              onChangeText={handleChange('schoolAddress')}
+                              onBlur={handleBlur('schoolAddress')}
                             />
                             {errors.schoolAddress && touched.schoolAddress && (
                               <Text style={styles.errorText}>
@@ -1391,15 +1357,15 @@ console.log('details',details)
                           onPress={() =>
                             Alert.alert(
                               "Why Add Instructors?",
-                              `(Suggested) As admin, you may wish to: 
- (A) Create an activity or group on behalf of any instructor 
+                              `(Suggested) As admin, you may wish to:
+ (A) Create an activity or group on behalf of any instructor
 (B) View each instructor's list of created activities and/or groups.`,
                               [{ text: "OK" }]
                             )
                           }
                         />
                       </View> */}
-                      {/* <AntDesign
+                    {/* <AntDesign
                         name="pluscircle"
                         size={25}
                         color={Colors.secondaryDark}
@@ -1425,19 +1391,19 @@ console.log('details',details)
                           instructors.map((instructor, index) => (
                             <View
                               style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "space-between",
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
                                 padding: 5,
                               }}
                             >
                               <Text>{`${instructor.firstName} ${instructor.lastName}`}</Text>
                               <View
                                 style={{
-                                  width: "15%",
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                  justifyContent: "space-evenly",
+                                  width: '15%',
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-evenly',
                                 }}
                               >
                                 <TouchableOpacity
@@ -1529,19 +1495,19 @@ console.log('details',details)
                           buses.map((bus, index) => (
                             <View
                               style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "space-between",
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
                                 padding: 5,
                               }}
                             >
                               <Text>{`${bus?.busName}`}</Text>
                               <View
                                 style={{
-                                  width: "15%",
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                  justifyContent: "space-evenly",
+                                  width: '15%',
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-evenly',
                                 }}
                               >
                                 <AntDesign
@@ -1554,7 +1520,7 @@ console.log('details',details)
                             </View>
                           ))}
                       </ScrollView>
-                    )} */}
+                    )}
                     <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"
@@ -1563,7 +1529,7 @@ console.log('details',details)
                       accessoryRight={PhoneIcon}
                       value={values.phoneNumber}
                       keyboardType="number-pad"
-                      onChangeText={handleChange("phoneNumber")}
+                      onChangeText={handleChange('phoneNumber')}
                     />
                     <Input
                       style={styles.inputSettings}
@@ -1573,8 +1539,8 @@ console.log('details',details)
                       placeholder="Password*"
                       accessoryRight={renderPasswordIcon}
                       value={values.password}
-                      onChangeText={handleChange("password")}
-                      onBlur={handleBlur("password")}
+                      onChangeText={handleChange('password')}
+                      onBlur={handleBlur('password')}
                     />
                     {errors.password && touched.password && (
                       <Text style={styles.errorText}>{errors.password}</Text>
@@ -1586,23 +1552,23 @@ console.log('details',details)
                       placeholder="Confirm Password*"
                       accessoryRight={renderConfirmPasswordIcon}
                       value={values.confirmPassword}
-                      onChangeText={handleChange("confirmPassword")}
-                      onBlur={handleBlur("confirmPassword")}
+                      onChangeText={handleChange('confirmPassword')}
+                      onBlur={handleBlur('confirmPassword')}
                     />
                     {errors.confirmPassword && touched.confirmPassword && (
                       <Text style={styles.errorText}>
                         {errors.confirmPassword}
                       </Text>
                     )}
-                    <View style={{ flexDirection: "row" }}>
+                    <View style={{ flexDirection: 'row' }}>
                       <CheckBox
                         style={[styles.termsCheckBox, { flex: 1 }]}
                         checked={values.termsAccepted}
                         onChange={() =>
-                          setFieldValue("termsAccepted", !values.termsAccepted)
+                          setFieldValue('termsAccepted', !values.termsAccepted)
                         }
                       >
-                        {""}
+                        {''}
                       </CheckBox>
                       <View style={[styles.termsCheckBox, { flex: 15 }]}>
                         <CheckboxLabel />
@@ -1645,7 +1611,7 @@ const themedStyles = StyleService.create({
   },
   content: {
     // flexDirection: 'row',
-    backgroundColor: "red",
+    backgroundColor: 'red',
     width: 100,
     height: 100,
   },
@@ -1653,15 +1619,9 @@ const themedStyles = StyleService.create({
     width: 116,
     height: 116,
     borderRadius: 58,
-    alignSelf: "center",
-    backgroundColor: "color-primary-default",
-    tintColor: "background-basic-color-1",
-  },
-  profileImage: {
-    width: 116,
-    height: 116,
-    borderRadius: 58,
-    alignSelf: "center",
+    alignSelf: 'center',
+    backgroundColor: 'color-primary-default',
+    tintColor: 'background-basic-color-1',
   },
   editAvatarButton: {
     width: 40,
@@ -1681,7 +1641,7 @@ const themedStyles = StyleService.create({
     marginTop: 24,
   },
   termsCheckBoxText: {
-    color: "text-hint-color",
+    color: 'text-hint-color',
     marginLeft: 10,
   },
   signUpButton: {
@@ -1697,56 +1657,56 @@ const themedStyles = StyleService.create({
   },
   errorText: {
     fontSize: 13,
-    color: "red",
+    color: 'red',
   },
   textArea: {
     marginTop: 10,
     height: 80,
   },
   phoneNumber: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   prefixStyle: {
     marginTop: 10,
-    width: "25%",
-    marginRight: "2%",
+    width: '25%',
+    marginRight: '2%',
   },
   phoneStyle: {
-    width: "73%",
+    width: '73%',
     marginTop: 10,
   },
   label: {
     fontSize: 15,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.fieldLabel,
   },
   multiSelectMenuStyle: {
-    backgroundColor: "#f7f9fc",
-    borderColor: "#e4e9f2",
+    backgroundColor: '#f7f9fc',
+    borderColor: '#e4e9f2',
     borderWidth: 1,
     borderRadius: 3,
     paddingLeft: 16,
   },
   searchInputStyle: {
-    color: "#000",
-    backgroundColor: "#fff",
+    color: '#000',
+    backgroundColor: '#fff',
   },
   dropdownMenuStyle: {
-    fontWeight: "400",
+    fontWeight: '400',
     fontSize: 16,
     color: Colors.primary,
   },
   selectedDropdownStyle: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 15,
   },
   itemsContainerStyle: {
     paddingVertical: 10,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   selectorContainerStyle: {
     height: 200,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   rowListStyle: {
     paddingVertical: 5,
@@ -1755,19 +1715,14 @@ const themedStyles = StyleService.create({
     width: 126,
     height: 126,
     borderRadius: 63,
-    alignSelf: "center",
-  },
-  editAvatarButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    alignSelf: 'center',
   },
   inputSettings: {
     marginTop: 7,
     backgroundColor: Colors.white,
-    width: "100%",
+    width: '100%',
     elevation: 1,
     borderRadius: 10,
-    // maxHeight: 35
   },
+  editButton: {},
 });

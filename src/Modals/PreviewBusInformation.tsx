@@ -52,6 +52,7 @@ const PreviewBusInformation = ({
   setNumberOfKidsLongSeat: Function;
   activity?: any;
   selectedItem: any;
+  fromActivity?: any
 }) => {
   const deviceWidth = Dimensions.get("screen").width;
   const dispatch = useDispatch();

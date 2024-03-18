@@ -37,6 +37,7 @@ export default buildSlice('modal', [ChangeModalState], {
 }).reducer;
 
 export interface ModalState {
+  biometricRequestModal: boolean
   welcomeMessageModal: boolean;
   dependentAddImport: boolean;
   parentPaymentModalVisibility: boolean;

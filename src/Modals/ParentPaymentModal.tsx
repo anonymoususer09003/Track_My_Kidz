@@ -1,48 +1,42 @@
-import {GetParent} from '@/Services/Parent';
-import {ModalState} from '@/Store/Modal';
-import {
-  Card,
-  IndexPath,
-  Modal,
-  Radio,
-  RadioGroup,
-  Text,
-} from '@ui-kitten/components';
-import {useDispatch, useSelector} from 'react-redux';
-
-import {LinearGradientButton} from '@/Components';
-// import { DeclineToGift } from "@/Services/GiftService";
-import {CreateSinglePaymentIntent} from '@/Services/Payments';
-import {UpdateUser} from '@/Services/SettingsServies';
-import {loadUserId, storeIsSubscribed} from '@/Storage/MainAppStorage';
-import ChangeModalState from '@/Store/Modal/ChangeModalState';
-import {UserState} from '@/Store/User';
-import {useTheme} from '@/Theme';
-import Colors from '@/Theme/Colors';
-import {
-  CardField,
-  useConfirmPayment,
-  useStripe,
-} from '@stripe/stripe-react-native';
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, Alert, StyleSheet, View} from 'react-native';
+import { Card, IndexPath, Modal, Radio, RadioGroup, Text } from '@ui-kitten/components';
+import { useDispatch, useSelector } from 'react-redux';
+import { CardField, useConfirmPayment } from '@stripe/stripe-react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-const ParentPaymentModal = ({onPay, onCancel}) => {
-  const user = useSelector((state: {user: UserState}) => state.user.item);
-  const {createToken} = useStripe();
-  const {confirmPayment, loading} = useConfirmPayment();
 
-  const [intervalOption, setIntervalOption] = useState(0);
-  const {Layout} = useTheme();
+import { GetParent } from '@/Services/Parent';
+import { ModalState } from '@/Store/Modal';
+import { LinearGradientButton } from '@/Components';
+import { CreateSinglePaymentIntent } from '@/Services/Payments';
+import { UpdateUser } from '@/Services/SettingsServies';
+import { loadUserId, storeIsSubscribed } from '@/Storage/MainAppStorage';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserState } from '@/Store/User';
+import Colors from '@/Theme/Colors';
 
-  const [selectedAmountIndex, setSelectedAmountIndex] =
+interface ParentPaymentModalProps {
+  onPay: any,
+  onCancel: any
+}
+
+const ParentPaymentModal = ({ onCancel }: ParentPaymentModalProps) => {
+  const user = useSelector((state: { user: UserState }) => state.user.item);
+  console.log(user);
+  // const {createToken} = useStripe();
+  const { confirmPayment } = useConfirmPayment();
+
+  // const [, setIntervalOption] = useState(0);
+  // const {Layout} = useTheme();
+
+  const [, setSelectedAmountIndex] =
     useState<IndexPath | null>(null);
-  const [cardData, setCardData] = useState({});
-  const [isValid, setIsValid] = useState(false);
-  const [isCardCompleted, setIsCardCompleted] = useState(false);
-  const [payment, setPayment] = useState(false);
+  const [cardData, setCardData] = useState<any>({});
+  const [, setIsValid] = useState<boolean>(false);
+  const [isCardCompleted, setIsCardCompleted] = useState<boolean>(false);
+  const [, setPayment] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [parent, setParent] = useState(null);
+  const [, setParent] = useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const availableAmounts = [
     {
@@ -56,21 +50,23 @@ const ParentPaymentModal = ({onPay, onCancel}) => {
   ];
   const intervals = ['YEAR', 'MONTH'];
   const isVisible = useSelector(
-    (state: {modal: ModalState}) => state.modal.parentPaymentModalVisibility,
+    (state: { modal: ModalState }) => state.modal.parentPaymentModalVisibility,
   );
   console.log('isVisible', isVisible);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    console.log('----------------------------');
+    console.log('inside useEffect');
     setPayment(false);
     setIsValid(false);
     setSelectedAmountIndex(null);
   }, [isVisible]);
 
   const RadioOptions = ({
-    selectedIndex,
-    setSelectedIndex,
-  }: {
+                          selectedIndex,
+                          setSelectedIndex,
+                        }: {
     selectedIndex: any;
     setSelectedIndex: any;
   }) => {
@@ -83,9 +79,9 @@ const ParentPaymentModal = ({onPay, onCancel}) => {
             return (
               <Radio
                 key={it.amount}
-                style={{paddingLeft: 20, marginVertical: 15}}>
+                style={{ paddingLeft: 20, marginVertical: 15 }}>
                 {evaProps => (
-                  <Text {...evaProps} style={{fontSize: 20, paddingLeft: 15}}>
+                  <Text {...evaProps} style={{ fontSize: 20, paddingLeft: 15 }}>
                     {it.label}
                   </Text>
                 )}
@@ -97,27 +93,27 @@ const ParentPaymentModal = ({onPay, onCancel}) => {
     );
   };
 
-  const setOption = (opt: any) => {
-    setIntervalOption(opt);
-  };
+  // const setOption = (opt: any) => {
+  //   setIntervalOption(opt);
+  // };
   const getUser = async () => {
-    const id = await loadUserId();
+    const id = await loadUserId() || '';
     GetParent(parseInt(id, 0)).then(response => {
       console.log('res-00-20-20--0', response);
       setParent(response);
     });
   };
   const fetchPaymentIntentClientSecret = async (data: any) => {
+    console.log(data);
     // let res = await createToken({
     //   type: "Card",
     //   name: "David Wallace",
     //   currency: "usd",
     // });
     // console.log("res", res);
-    const paymentIntent = await CreateSinglePaymentIntent(
+    return await CreateSinglePaymentIntent(
       selectedIndex == 0 ? 50 : 4.99,
     );
-    return paymentIntent;
     // setPayment(paymentIntent);
     // console.log("paymentIntent", paymentIntent);
   };
@@ -137,27 +133,29 @@ const ParentPaymentModal = ({onPay, onCancel}) => {
     const int = intervals[selectedIndex];
 
     //@ts-ignore
-    const {clientSecret} = await fetchPaymentIntentClientSecret(int);
+    const { clientSecret } = await fetchPaymentIntentClientSecret(int);
 
     const billingDetails = {
       email: user?.email,
     };
 
     // Confirm the payment with the card details
-    const {paymentIntent, error} = await confirmPayment(clientSecret, {
+    const { paymentIntent, error } = await confirmPayment(clientSecret, {
       paymentMethodType: 'Card',
-      paymentMethodData: billingDetails,
+      paymentMethodData: {
+        billingDetails,
+      },
     });
     console.log('paymentIntent', paymentIntent);
     if (error) {
       console.log('err', error);
       setIsLoading(false);
       Alert.alert('Payment confirmation error.', error.message, [
-        {text: 'OK', style: 'cancel'},
+        { text: 'OK', style: 'cancel' },
       ]);
     } else if (paymentIntent) {
       setIsLoading(false);
-      updateUser();
+      await updateUser();
       // const userId = await loadUserId();
       // if (userId != null) {
       //   dispatch(FetchOne.action(userId));
@@ -177,7 +175,7 @@ const ParentPaymentModal = ({onPay, onCancel}) => {
   const updateUser = async () => {
     try {
       let res = await UpdateUser(
-        {...user, id: user?.parentId, isSubscribed: true},
+        { ...user, id: (user as any)?.parentId, isSubscribed: true },
         'parent',
       );
       console.log('res', res);
@@ -187,7 +185,7 @@ const ParentPaymentModal = ({onPay, onCancel}) => {
     }
   };
   useEffect(() => {
-    getUser();
+    getUser().catch(console.error);
   }, []);
   // @ts-ignore
   return (
@@ -203,7 +201,7 @@ const ParentPaymentModal = ({onPay, onCancel}) => {
       }}>
       <Card style={styles.modal} disabled={true}>
         <View style={styles.body}>
-          <View style={{paddingBottom: 10, paddingTop: 10}}>
+          <View style={{ paddingBottom: 10, paddingTop: 10 }}>
             <Text
               textBreakStrategy={'highQuality'}
               style={{
@@ -219,12 +217,12 @@ const ParentPaymentModal = ({onPay, onCancel}) => {
             setSelectedIndex={setSelectedIndex}
           />
         </View>
-        <View style={{marginTop: 30}}>
+        <View style={{ marginTop: 30 }}>
           <CardField
             postalCodeEnabled={true}
-            placeholder={{
-              number: '4242 4242 4242 4242',
-            }}
+            // placeholder={{
+            // number: '4242 4242 4242 4242',
+            // }}
             cardStyle={{
               backgroundColor: Colors.white,
               textColor: Colors.black,
@@ -243,14 +241,15 @@ const ParentPaymentModal = ({onPay, onCancel}) => {
                 setIsValid(false);
               }
             }}
-            onFocus={focusedField => {}}
+            // onFocus={focusedField => {
+            // }}
           />
         </View>
         <View style={styles.bottom}>
           {!isLoading ? (
             <View style={styles.buttonText}>
               <LinearGradientButton
-                disabled={isCardCompleted ? false : true}
+                disabled={!isCardCompleted}
                 style={{
                   borderRadius: 25,
                   flex: 1,
@@ -259,7 +258,7 @@ const ParentPaymentModal = ({onPay, onCancel}) => {
                 size="medium"
                 status="control"
                 onPress={() => {
-                  activateSubscription();
+                  activateSubscription().catch(console.error);
                 }}>
                 Pay
               </LinearGradientButton>
@@ -306,9 +305,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '90%',
   },
-  modal: {borderRadius: 10},
-  header: {flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20},
-  body: {flex: 3},
+  modal: { borderRadius: 10 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
+  body: { flex: 3 },
   background: {
     flex: 1,
     flexDirection: 'row',
@@ -338,7 +337,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 2,
     shadowColor: 'rgba(0,0,0, .4)', // IOS
-    shadowOffset: {height: 1, width: 1}, // IOS
+    shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
     justifyContent: 'center',

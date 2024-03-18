@@ -14,8 +14,6 @@ import { ModalState } from "@/Store/Modal";
 import ChangeModalState from "@/Store/Modal/ChangeModalState";
 import Modal from "react-native-modal";
 import PreviewInstructorsModal from "./PreviewInstructorsModal";
-import DocumentPicker from "react-native-document-picker";
-import Papa from "papaparse";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import AddInstructorFormModal from "./AddInstructorFormModal";
 import EditInstructorsModal from "./EditInstructorModal";
@@ -23,7 +21,7 @@ import { Instructor } from "@/Models/UserDTOs";
 import { LinearGradientButton } from "@/Components";
 interface InstructorModal {
   instructors: Array<Instructor>;
-  setInstructors: (data: Array<Instructor>) => {};
+  setInstructors: (data: Array<Instructor>) => void;
 }
 
 const AddInstructorsModal = ({

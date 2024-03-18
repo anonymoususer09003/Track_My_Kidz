@@ -40,7 +40,10 @@ const user_type = [
 
 // @ts-ignore
 const screenHeight = Dimensions.get("screen").height;
-const FirstSignUpScreen = ({ navigation }) => {
+interface FirstSignUpScreenProps{
+  navigation:any
+}
+const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
   const styles = useStyleSheet(themedStyles);
   const dispatch = useDispatch();
   const isFocuesed = useIsFocused();
