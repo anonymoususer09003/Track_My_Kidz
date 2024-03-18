@@ -15,28 +15,27 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import {getDeviceId} from 'react-native-device-info';
+import * as yup from 'yup';
+import Toast from 'react-native-toast-message';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useDispatch, useSelector} from 'react-redux';
+// import { useDispatch } from "react-redux";
+// import messaging from "@react-native-firebase/messaging";
 
 import CustomDropdown from '@/Components/CustomDropDown';
 import {Login} from '@/Services/LoginServices';
 import LoginStore from '@/Store/Authentication/LoginStore';
 import {useIsFocused} from '@react-navigation/native';
-import {getDeviceId} from 'react-native-device-info';
-import * as yup from 'yup';
-import {Normalize} from '../../../Utils/Shared/NormalizeDisplay';
-// import { useDispatch } from "react-redux";
+import {Normalize} from '@/Utils/Shared/NormalizeDisplay';
 import {UpdateDeviceToken} from '@/Services/User';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
-// import messaging from "@react-native-firebase/messaging";
-import Toast from 'react-native-toast-message';
-
 import {LinearGradientButton} from '@/Components';
-import {ParentPaymentModal} from '@/Modals';
 import {GetAllCountries} from '@/Services/PlaceServices';
 import ChangeCountryState from '@/Store/Places/FetchCountries';
 import Colors from '@/Theme/Colors';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {useDispatch, useSelector} from 'react-redux';
-import {AuthContext} from '../../../Navigators/Auth/AuthProvider';
+import {AuthContext} from '@/Navigators/Auth/AuthProvider';
+import { ParentPaymentModal } from "@/Modals";
 
 const user_type = [
   {id: 1, label: 'Parent', value: 'Parent'},
@@ -52,7 +51,7 @@ const SignInScreen = ({navigation}) => {
   const [loginObj, setLoginObj] = useState(null);
   // const dispatch = useDispatch();
   const countries = useSelector(
-    (state: {state: any}) => state.places.countries,
+    (state: {places: any}) => state?.places.countries,
   );
   let values = {email: '', password: '', user_type: '', is_default: false};
   const [intitialValues, setInitialValues] = useState({
@@ -173,15 +172,6 @@ const SignInScreen = ({navigation}) => {
         source={require('../../../Assets/Images/childBackground.png')}
         resizeMode="stretch">
         <KeyboardAwareScrollView style={{flex: 1}}>
-          <ParentPaymentModal
-            onPay={() => {
-              dispatch(LoginStore.action(loginObj));
-              dispatch(ChangeModalState.action({loading: false}));
-            }}
-            onCancel={() => {
-              dispatch(ChangeModalState.action({loading: false}));
-            }}
-          />
           <View style={{flex: 1}}>
             <View style={styles.headerContainer}>
               <Image
@@ -230,11 +220,7 @@ const SignInScreen = ({navigation}) => {
                         !res.data?.isSubscribed &&
                         values.user_type === 'Parent'
                       ) {
-                        dispatch(
-                          ChangeModalState.action({
-                            parentPaymentModalVisibility: true,
-                          }),
-                        );
+                        dispatch(LoginStore.action(obj));
                       } else {
                         console.log(obj);
                         dispatch(LoginStore.action(obj));
@@ -293,6 +279,16 @@ const SignInScreen = ({navigation}) => {
                   isValid,
                 }) => (
                   <>
+                    <ParentPaymentModal
+                      loginObj={loginObj}
+                      onPay={() => {
+                        dispatch(LoginStore.action(loginObj));
+                        dispatch(ChangeModalState.action({ loading: false }));
+                      }}
+                      onCancel={()=>{
+                        dispatch(ChangeModalState.action({ loading: false }));
+                      }}
+                    />
                     <Layout style={styles.formContainer}>
                       <CustomDropdown
                         placeholder="Select User"

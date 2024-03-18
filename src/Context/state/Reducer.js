@@ -6,6 +6,7 @@ export const actions = {
   SET_SELECTED_CHILD: "SET_SELECTED_CHILD",
   INSTRUCTOR_DETAIL: "INSTRUCTOR_DETAIL",
   ORG_INSTRUCTORS: "ORG_INSTRUCTORS",
+  SET_TOGGLE: "SET_TOGGLE",
 };
 
 export const reducer = (state, action) => {
@@ -45,6 +46,11 @@ export const reducer = (state, action) => {
         ...state,
         orgInstructors: action.payload,
       };
+    case actions.SET_TOGGLE:
+      return {
+        ...state,
+        toggle: action.payload
+      }
     default:
       return state;
   }

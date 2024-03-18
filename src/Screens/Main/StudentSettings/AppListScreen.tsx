@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
-  View,
-  Text,
   Alert,
-  Image,
   FlatList,
   Linking,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View
 } from "react-native";
-import { useTheme } from "@/Theme";
-// @ts-ignore
 
-import LinearGradient from "react-native-linear-gradient";
+import { AppHeader } from "@/Components";
 import GetApps from "@/Services/Settings/GetApps";
 import FastImage from "react-native-fast-image";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-import { AppHeader } from "@/Components";
 const AppListScreen = () => {
   const [apps, setapps] = useState([]);
   useEffect(() => {

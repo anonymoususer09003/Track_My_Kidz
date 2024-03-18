@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, Switch, View, TouchableOpacity } from "react-native";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { Icon, Input } from "@ui-kitten/components";
 import { useTheme } from "@/Theme";
 import Colors from "@/Theme/Colors";
+import { Icon, Input } from "@ui-kitten/components";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Switch, TouchableOpacity, View } from "react-native";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 export interface SearchBarProps {
   onChangeText?: (nextValue: string) => void;

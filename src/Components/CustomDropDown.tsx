@@ -1,10 +1,19 @@
-import Colors from "@/Theme/Colors";
-import { produceWithPatches } from "immer";
-import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
-import { PersonIcon } from "@/Components/SignUp/icons";
-const CustomDropdown: React.FC = (props) => {
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+
+import Colors from '@/Theme/Colors';
+import { PersonIcon } from '@/Components/SignUp/icons';
+
+interface CustomDropdownProps {
+  value?: any;
+  disable?: boolean;
+  placeholder?: string;
+  dropDownList?: any[];
+  onSelect?: (index: number) => void;
+}
+
+const CustomDropdown: React.FC<CustomDropdownProps> = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
@@ -34,7 +43,7 @@ const CustomDropdown: React.FC = (props) => {
           {selectedValue || props.placeholder}
         </Text>
         <Icon
-          name={isOpen ? "chevron-up" : "chevron-down"}
+          name={isOpen ? 'chevron-up' : 'chevron-down'}
           size={18}
           color={Colors.white}
           style={styles.rightIcon}
@@ -50,7 +59,7 @@ const CustomDropdown: React.FC = (props) => {
                   key={index}
                   style={styles.dropdownOption}
                   onPress={() => {
-                    props.onSelect(index);
+                    props?.onSelect && props.onSelect(index);
                     setIsOpen(false);
                   }}
                 >
@@ -68,17 +77,17 @@ const CustomDropdown: React.FC = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 1000,
   },
   dropdownHeader: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 10,
     borderWidth: 0,
     borderBottomWidth: 2,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 5,
     height: 55,
   },
@@ -92,8 +101,8 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   dropdownContainer: {
-    position: "absolute",
-    top: "100%",
+    position: 'absolute',
+    top: '100%',
     left: 0,
     right: 0,
     zIndex: 2,
@@ -102,14 +111,14 @@ const styles = StyleSheet.create({
   dropdownOptions: {
     marginTop: 10,
     borderWidth: 0,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 5,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     zIndex: 2,
   },
   dropdownOption: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 10,
   },
   optionIcon: {

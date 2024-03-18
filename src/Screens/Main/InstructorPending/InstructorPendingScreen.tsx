@@ -416,9 +416,9 @@ const InstructorGroupPendingScreen = ({ route }) => {
                         <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />
                           <View>
-                          <Text style={styles.text} >
+                          <Text style={[styles.text,{paddingRight:20}]} >
                             {`${item?.venueFromAddress}, ${item?.venueFromCity}, ${item?.venueFromState} ${item?.venueFromZip}, ${item?.venueToCountry}`}
-                          </Text> 
+                          </Text>
                           </View>
                         </View>
 

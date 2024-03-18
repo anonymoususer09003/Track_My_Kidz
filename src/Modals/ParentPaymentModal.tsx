@@ -17,10 +17,11 @@ import Colors from '@/Theme/Colors';
 
 interface ParentPaymentModalProps {
   onPay: any,
-  onCancel: any
+  onCancel: any,
+  loginObj: any
 }
 
-const ParentPaymentModal = ({ onCancel }: ParentPaymentModalProps) => {
+const ParentPaymentModal = ({ onCancel, loginObj }: ParentPaymentModalProps) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);
   console.log(user);
   // const {createToken} = useStripe();
@@ -174,8 +175,10 @@ const ParentPaymentModal = ({ onCancel }: ParentPaymentModalProps) => {
   };
   const updateUser = async () => {
     try {
+      console.log('userrrrr', loginObj);
+
       let res = await UpdateUser(
-        { ...user, id: (user as any)?.parentId, isSubscribed: true },
+        { ...loginObj, isSubscribed: true },
         'parent',
       );
       console.log('res', res);

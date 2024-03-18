@@ -52,6 +52,7 @@ import Colors from '@/Theme/Colors';
 import { LinearGradientButton, ProfileAvatarPicker } from '@/Components';
 import { ImagePickerModal, ParentPaymentModal } from '@/Modals';
 import { Login } from '@/Services/LoginServices';
+import { ModalState } from "@/Store/Modal";
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -110,6 +111,9 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
 
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
     '',
+  );
+  const isVisible = useSelector(
+    (state: { modal: ModalState }) => state.modal.parentPaymentModalVisibility
   );
   const [uploadedImage, setUploadedImage] = React.useState<any>(null);
   const [, setSelectedGrades] = useState<string[]>([]);
@@ -454,18 +458,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
             close={() => setVisibleImagePicker(false)}
           />
         )}
-        <ParentPaymentModal
-          onPay={() => {
-            dispatch(LoginStore.action(loginObj));
-            dispatch(
-              ChangeModalState.action({
-                welcomeMessageModal: true,
-              }),
-            );
-          }}
-          onCancel={() => {
-          }}
-        />
+
         <ScrollView style={styles.container}>
           {_user_type?.id === 1 ? (
             <Formik
@@ -582,6 +575,18 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   isValid,
                 }) => (
                 <>
+                  <ParentPaymentModal
+                    loginObj={loginObj}
+                    onPay={() => {
+                      dispatch(LoginStore.action(loginObj));
+                      dispatch(
+                        ChangeModalState.action({
+                          welcomeMessageModal: true,
+                        })
+                      );
+                    }}
+                    onCancel={()=>{}}
+                  />
                   <Layout style={styles.formContainer} level="1">
                     <Input
                       style={styles.inputSettings}

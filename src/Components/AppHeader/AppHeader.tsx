@@ -39,6 +39,8 @@ const AppHeader = ({ showGlobe, ...props }) => {
     (state: { studentActivity: StudentState }) => state.studentActivity
   );
 
+  const navigation = useNavigation()
+  console.log('navigation',navigation?.getState()?.index)
   // const user_type = 'instructor';
   //@ts-ignore
   const renderSettingIcon = (props) => {
@@ -106,7 +108,7 @@ const AppHeader = ({ showGlobe, ...props }) => {
   );
   //@ts-ignore
   const renderListItem = (props) => (
-    <Icon name="list" size={25} color="white" /> 
+    <Icon name="list" size={25} color="white" />
   );
 
   const isStack = props && props.isStack;
@@ -183,6 +185,7 @@ const AppHeader = ({ showGlobe, ...props }) => {
             } else {
               // nav.navigate("Home");
               if (props?.thumbnail) {
+                nav.navigate("Home");
                 dispatch(
                   ChangeModalState.action({
                     showCalendar: false,

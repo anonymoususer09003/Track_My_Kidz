@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from "react";
-import {
-  ImageBackground,
-  View,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Image,
-} from "react-native";
-import { Icon, Input, Select, SelectItem } from "@ui-kitten/components";
-import { useNavigation } from "@react-navigation/native";
-import MaterialIcon from "react-native-vector-icons/MaterialIcons";
-import Colors from "@/Theme/Colors";
-import { useDispatch, useSelector } from "react-redux";
-import { useIsFocused } from "@react-navigation/native";
 import setHeaderParams from "@/Store/header/setHeaderParams";
-import { ModalState } from "@/Store/Modal";
+import Colors from "@/Theme/Colors";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Icon, Input, Select, SelectItem } from "@ui-kitten/components";
+import React, { useEffect, useState } from "react";
+import {
+  Image,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import { useDispatch, useSelector } from "react-redux";
 
 import { StudentState } from "@/Store/StudentActivity";
 export default function BackgroundLayout({
@@ -69,7 +67,11 @@ export default function BackgroundLayout({
     >
       {!hideHeader && !showFamilyMap && (
         <View style={[styles.main, style && style]}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => {
+
+            navigation.goBack()
+
+          }}>
             {!hideLeftIcon && (
               <MaterialIcon name="arrow-back" size={20} color={Colors.white} />
             )}

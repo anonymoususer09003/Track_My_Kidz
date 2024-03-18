@@ -217,6 +217,7 @@ const HomeScreen = () => {
                   onPress={() =>
                     navigation.navigate("Activity", {
                       dependent: item,
+                      setThumbnail:()=>setThumbnail(true),
                     })
                   }
                 >
