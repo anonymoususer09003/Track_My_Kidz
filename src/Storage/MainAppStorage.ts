@@ -156,10 +156,8 @@ export const loadId = async () => {
 
 export const loadIsSubscribed = async () => {
   const isSubscribed = await AsyncStorage.getItem("isSubscribed");
-  if (isSubscribed == "true") {
-    return true;
-  }
-  return false;
+  return isSubscribed == "true";
+
 };
 
 export const loadUserType = async () => {
