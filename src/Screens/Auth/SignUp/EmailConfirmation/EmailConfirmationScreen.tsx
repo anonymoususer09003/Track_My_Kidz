@@ -1,68 +1,52 @@
 //Activiation code
-import React, {useState, useEffect} from 'react';
-import {Alert, Image, KeyboardAvoidingView, View} from 'react-native';
-import {
-  Button,
-  Input,
-  Layout,
-  StyleService,
-  Text,
-  useStyleSheet,
-  Select,
-  SelectItem,
-} from '@ui-kitten/components';
-import {Formik} from 'formik';
+import React, { useEffect, useState } from 'react';
+import { Image, KeyboardAvoidingView, View } from 'react-native';
+import { Button, Input, Layout, StyleService, Text, useStyleSheet } from '@ui-kitten/components';
+import { Formik } from 'formik';
 import * as yup from 'yup';
-import {
-  CheckToken,
-  ReactivateUser,
-  ResendRegistrationCode,
-} from '@//Services/SignUpServices';
-import {GetActivationCode} from '@/Services/ActivationCode';
-import {Normalize} from '@/Utils/Shared/NormalizeDisplay';
-import LoginStore from '@/Store/Authentication/LoginStore';
-import {useDispatch} from 'react-redux';
-import ChangeModalState from '@/Store/Modal/ChangeModalState';
-import {LinearGradientButton} from '@/Components';
-import FastImage from 'react-native-fast-image';
+import { GetActivationCode } from '@/Services/ActivationCode';
+import { Normalize } from '@/Utils/Shared/NormalizeDisplay';
+import { LinearGradientButton } from '@/Components';
 import Colors from '@/Theme/Colors';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 import CustomDropdown from '@/Components/CustomDropDown';
-import {VerifyCode} from '@/Services/LoginServices';
+import { VerifyCode } from '@/Services/LoginServices';
+
 const user_types = [
-  {id: 1, label: 'Parent', value: 'Parent'},
-  {id: 2, label: 'Instructor', value: 'Instructor'},
-  {id: 3, label: 'Student', value: 'Student'},
+  { id: 1, label: 'Parent', value: 'Parent' },
+  { id: 2, label: 'Instructor', value: 'Instructor' },
+  { id: 3, label: 'Student', value: 'Student' },
 ];
-// @ts-ignore
-const EmailConfirmationScreen = ({route, navigation}) => {
-  const dispatch = useDispatch();
+interface EmailConfirmationScreenProps{
+ route: any
+ navigation: any
+}
+
+const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenProps) => {
   const styles = useStyleSheet(themedStyles);
   const [resendCode, setResendCode] = useState(false);
-  const {emailAddress, user_type, activation_code, student, isDesignatedAdmin} =
+  const { emailAddress, user_type, activation_code, student, isDesignatedAdmin } =
     route.params;
   console.log('email address', emailAddress);
   const [activationCode, setActivationCode] = useState(activation_code);
-  const {reactivate} = route.params;
+  const { reactivate } = route.params;
 
   const codeValidationSchema = yup.object().shape({
     code: yup
       .string()
-      //@ts-ignore
-      .test('code', 'Must be exactly 6 characters', val => val.length === 6)
+      .test('code', 'Must be exactly 6 characters', (val) => val?.length === 6)
       .required('Code is required'),
   });
   const codeValidationSchemaStudents = yup.object().shape({
     code: yup
       .string()
-      //@ts-ignore
-      .test('code', 'Must be exactly 32 characters', val => val.length === 36)
+      .test('code', 'Must be exactly 32 characters', (val) => val?.length === 36)
       .required('Code is required'),
   });
 
   const onResendButtonPress = async () => {
     if (emailAddress) {
-      let res = await GetActivationCode({email: emailAddress}, user_type);
+      let res = await GetActivationCode({ email: emailAddress }, user_type);
       setResendCode(true);
       console.log('res----', res);
       setActivationCode(res.activation_code);
@@ -82,8 +66,8 @@ const EmailConfirmationScreen = ({route, navigation}) => {
         activationCode: code,
         message: emailAddress,
       });
-      return true;
       console.log('res', res.data);
+      return true;
     } catch (err) {
       console.log('err', err);
     }
@@ -124,13 +108,14 @@ const EmailConfirmationScreen = ({route, navigation}) => {
               user_type == 'Student' && activationCode ? activationCode : '',
           }}
           validateOnMount={true}
-          onSubmit={async (values, {resetForm}) => {
+          onSubmit={async (values, { resetForm }) => {
             // console.log("isDesignatedAdmin", isDesignatedAdmin);
 
             let res = await verifyOtpCode(values.code);
 
             if (isDesignatedAdmin) {
               if (res) {
+                console.log('EmailConfirmationScreen.tsx line 118 navigation to FinalOrgRegistrationScreen');
                 navigation.navigate('FinalOrgRegistrationScreen', {
                   emailAddress: emailAddress,
                   registrationId: 'test',
@@ -143,43 +128,43 @@ const EmailConfirmationScreen = ({route, navigation}) => {
               if (!reactivate) {
                 if (res) {
                   navigation &&
-                    navigation.navigate('FinalRegistrationScreen', {
-                      emailAddress: emailAddress,
-                      registrationId: 'test',
-                      user_type: user_type,
-                      activation_code: values.code,
-                      student: student,
-                    });
+                  navigation.navigate('FinalRegistrationScreen', {
+                    emailAddress: emailAddress,
+                    registrationId: 'test',
+                    user_type: user_type,
+                    activation_code: values.code,
+                    student: student,
+                  });
                 }
               } else {
-                let object = {
-                  activationCode: values.code,
-                  email: emailAddress,
-                };
+                // let object = {
+                //   activationCode: values.code,
+                //   email: emailAddress,
+                // };
               }
               resetForm();
             }
           }}>
           {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            setFieldValue,
-            values,
-            errors,
-            touched,
-            isValid,
-          }) => (
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              setFieldValue,
+              values,
+              errors,
+              touched,
+              isValid,
+            }) => (
             <>
               <Layout style={styles.formContainer}>
-                <View style={{marginTop: 80, marginBottom: 30}}>
+                <View style={{ marginTop: 80, marginBottom: 30 }}>
                   <CustomDropdown
                     disable={true}
                     placeholder="Select User"
                     value={user_type}
                     onSelect={(index: any) => {
                       console.log('index', index);
-                      setFieldValue('user_type', user_type[index].value);
+                      setFieldValue('user_type', user_type[index].value).catch(console.error);
                     }}
                     dropDownList={user_types}
                   />
@@ -193,17 +178,17 @@ const EmailConfirmationScreen = ({route, navigation}) => {
                   onChangeText={handleChange('code')}
                   onBlur={handleBlur('code')}
                   keyboardType="numeric"
-                  textStyle={{color: Colors.white}}
+                  textStyle={{ color: Colors.white }}
                   style={styles.selectSettings}
                 />
                 {errors.code && touched.code && (
-                  <Text style={styles.errorText}>{errors.code}</Text>
+                  <Text style={styles.errorText}>{String(errors.code)}</Text>
                 )}
 
                 <Text
                   style={[
                     styles.errorText,
-                    {textAlign: 'center', fontSize: 15, marginBottom: 10},
+                    { textAlign: 'center', fontSize: 15, marginBottom: 10 },
                   ]}>
                   Check email for activation code
                 </Text>
@@ -222,7 +207,7 @@ const EmailConfirmationScreen = ({route, navigation}) => {
 
         {resendCode && (
           <Text
-            style={[styles.buttonMessage, {textAlign: 'center', color: 'red'}]}>
+            style={[styles.buttonMessage, { textAlign: 'center', color: 'red' }]}>
             {' '}
             Check email for activation code*
           </Text>
