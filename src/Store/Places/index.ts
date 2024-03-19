@@ -1,6 +1,6 @@
 import { buildSlice } from "@thecodingmachine/redux-toolkit-wrapper";
-import { CountryDTO } from "@/Models/CountryDTOs";
 import FetchCountries from "@/Store/Places/FetchCountries";
+import { CountryDTO } from '@/Models/CountryDTOs';
 
 const sliceInitialState = {
   countries: null,
