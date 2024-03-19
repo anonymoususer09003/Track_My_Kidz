@@ -88,9 +88,9 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
     (state: { places: PlaceState }) => state.places.countries,
   );
 
-  const [countriesData, setCountriesData] = React.useState(countries);
-  const [states, setStates] = useState<any[]>([]);
-  const [cities, setCities] = useState<any[]>([]);
+  const [countriesData, setCountriesData] = React.useState<CountryDTO[]>(countries);
+  const [states, setStates] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
 
   const [schoolsData, setSchoolsData] = React.useState<any[]>([]);
   const [schools, setSchools] = useState<any[]>([]);
@@ -487,6 +487,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   password: values.password,
                   activationcode: activation_code,
                 };
+
                 const userObject = {
                   email: emailAddress,
                   firstname: values.firstName,
@@ -667,13 +668,10 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         setFieldValue('selectedCountry', selectedCountry.name);
                         setFieldValue('selectedState', '');
                         setFieldValue('state', '');
-                        setStates([]);
                         GetAllStates(
                           selectedCountry.name.replace(/ /g, ''),
                         ).then((res) => {
                           setStates(res.data);
-                          console.log(res.data);
-                          console.log(states);
                         });
                         selectedCountry.phone_code.toString().startsWith('+')
                           ? setPhoneCode(selectedCountry.phone_code.toString())
@@ -915,9 +913,9 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
 
                 Register(registerObject, 'instructor')
                   .then(async (res) => {
-                    console.log('res---', res?.data);
+                    console.log('FinalRegistrationScreen.tsx line 916 Register(registerObject, instructor) res?.data ---', res?.data);
                     await storeToken(res?.data?.token);
-                    console.log('userobject', JSON.stringify(formData));
+                    console.log('FinalRegistrationScreen.tsx line 918  formData', JSON.stringify(formData));
                     CompleteRegistration(formData, 'instructor')
                       .then(async (response: any) => {
                         console.log('responsefromback', response);
@@ -931,7 +929,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                           }),
                         );
                         if (response.status == 201) {
-                          register(emailAddress, values.password);
+                          register(emailAddress, values.password).catch(console.error);
                         }
                       })
                       .catch((error: any) => {
@@ -1057,12 +1055,10 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         setFieldValue('selectedCountry', selectedCountry.name);
                         setFieldValue('selectedState', '');
                         setFieldValue('state', '');
-                        setStates([]);
                         GetAllStates(
                           selectedCountry.name.replace(/ /g, ''),
                         ).then((res) => {
                           setStates(res.data);
-                          setStates(states);
                         });
                         selectedCountry.phone_code.toString().startsWith('+')
                           ? setPhoneCode(selectedCountry.phone_code.toString())
