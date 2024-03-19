@@ -14,35 +14,27 @@ const instance = axios.create({
 
 instance.interceptors.request.use(async (request) => {
   const token = await loadToken();
-  console.log("token", token);
   if (token) {
     switch (request.url) {
       case "/contact-us/create":
-        request.headers = {
-          ...request.headers,
-
-          Authorization: "Bearer " + token,
-        };
-
+        request.headers.Authorization =  "Bearer " + token
         break;
 
       case "/user/student/create":
       case "/user/student/update":
       case "/user/instructor/create":
       case "/user/instructor/update":
-        request.headers = {
-          ...request.headers,
-
-          Authorization: "Bearer " + token,
-          "Content-Type": "multipart/form-data",
-        };
+        request.headers.Authorization =  "Bearer " + token;
+        request.headers["Content-Type"]= "multipart/form-data";
+        request.headers.Accept = '*/*'
+        break;
 
       default:
         request.headers.Authorization = "Bearer " + token;
     }
   }
-  console.log("request----", request);
-  // console.log("request", request);
+  console.log(request.headers);
+  console.log(request.data);
   return request;
 });
 
