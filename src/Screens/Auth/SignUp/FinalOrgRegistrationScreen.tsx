@@ -52,27 +52,17 @@ import Feather from 'react-native-vector-icons/Feather';
 import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 import { ModalState } from '@/Store/Modal';
+import { ORGANISATIONS } from '@/Constants';
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
-const filterStates = (item: string, query: string) => {
-  return item?.toLowerCase().includes(query.toLowerCase());
-};
-const filterCities = (item: string, query: string) => {
+const isItemMatchQuery = (item: string, query: string) => {
+  if (!query) return true;
   return item?.toLowerCase().includes(query.toLowerCase());
 };
 
-// const user_types = [
-//     {id: 1, label: "Parent", value: "Parent"},
-//     {id: 2, label: "Instructor", value: "Instructor"},
-//     {id: 3, label: "Student", value: "Student"},
-// ];
-
-const organisations = [
-  { id: 1, label: 'School', value: 'School' },
-  { id: 2, label: 'Organisation', value: 'Organisation' },
-];
+const organisations = ORGANISATIONS
 
 // const schools = [
 //     {id: 1, label: "School 1", value: "School 1"},
@@ -99,16 +89,17 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
       state.modal.addButInformationModalVisibility,
   );
   const [countriesData, setCountriesData] = React.useState<any[]>(countries);
+  const [states, setStates] = useState<string[]>([]);
+  const [dropdownStates, setDropdownStates] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
+  const [dropdownCities, setDropdownCities] = useState<string[]>([]);
+
   const [schools, setSchools] = useState<any[]>([]);
   const [schoolsData, setSchoolsData] = React.useState<any[]>(schools);
-  const [statesData, setStatesData] = React.useState<any[]>([]);
-  const [citiesData, setCitiesData] = React.useState<any[]>([]);
   const [orgData, setOrgData] = React.useState<any[]>([]);
   const [, setOrg] = useState<any[]>([]);
 
   const [reRender, setRerender] = useState<boolean>(false);
-  const [states, setStates] = useState<any[]>([]);
-  const [cities, setCities] = useState<any[]>([]);
   const [, setPhoneCode] = useState<string>('');
   const [placement] = React.useState('bottom');
   const [instructors, setInstructors] = useState<any[]>(_instructors);
@@ -157,19 +148,11 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
       .required('Password is required'),
     confirmPassword: yup
       .string()
-      .when('password', {
-        // TODO: remove it
-        // @ts-ignore
-        is: (val: any) => (!!(val && val.length > 0)),
-        then: yup
-          .string()
-          .oneOf(
-            [yup.ref('password')],
-            'Password & Confirm Password do not match',
-          ),
-        otherwise: yup.string().notRequired(),
+      .test('password-match', 'Password & Confirm Password do not match', function(value) {
+        const password = this.resolve(yup.ref('password'));
+        return value === password;
       })
-      .required('Re-Password is required'),
+      .when('password', (password, schema) => password && schema.required('Re-Password is required')),
     termsAccepted: yup.boolean().required(),
   });
 
@@ -1062,12 +1045,14 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
                         setFieldValue('selectedState', '');
                         setFieldValue('state', '');
                         setStates([]);
-                        GetAllStates(
-                          selectedCountry.name.replace(/ /g, ''),
-                        ).then((res) => {
+                        setDropdownStates([]);
+                        console.log();
+                        const countryId = selectedCountry.name.replace(/ /g, '');
+                        console.log('FinalOrgRegistrationScreen.tsx line 1058 - countryId', countryId);
+                        GetAllStates(countryId).then((res) => {
                           setStates(res.data);
-                          setStatesData(res.data);
-                        });
+                          setDropdownStates(res.data);
+                        }).catch(console.error);
                         selectedCountry.phone_code.toString().startsWith('+')
                           ? setPhoneCode(selectedCountry.phone_code.toString())
                           : setPhoneCode('+' + selectedCountry.phone_code);
@@ -1090,23 +1075,25 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
                       // label={evaProps => <Text {...evaProps}>State</Text>}
                       onChangeText={(query) => {
                         setFieldValue('state', query);
-                        setStatesData(
-                          states.filter((item) => filterStates(item, query)),
+                        setDropdownStates(
+                          states.filter((item) => isItemMatchQuery(item, query)),
                         );
+                        console.log(states);
                       }}
                       onSelect={(query) => {
-                        const selectedState = statesData[query];
+                        const selectedState = states[query];
                         setFieldValue('state', selectedState);
                         setFieldValue('selectedState', selectedState);
                         setFieldValue('selectedCity', '');
                         setFieldValue('city', '');
                         setCities([]);
+                        setDropdownCities([]);
                         GetAllCities(
                           values.selectedCountry,
                           selectedState,
                         ).then((res) => {
                           setCities(res.data);
-                          setCitiesData(res.data);
+                          console.log(cities);
                         });
                         getSchoolsByFilter(
                           values.selectedCountry,
@@ -1115,7 +1102,8 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
                         getOrgByFilter(values.selectedCountry, selectedState);
                       }}
                     >
-                      {statesData.map((item, index) => {
+                      {dropdownStates.map((item, index) => {
+                        console.log(item);
                         return <AutocompleteItem key={index} title={item} />;
                       })}
                     </Autocomplete>
@@ -1128,19 +1116,20 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
                       // label={evaProps => <Text {...evaProps}>City</Text>}
                       onChangeText={(query) => {
                         setFieldValue('city', query);
-                        setCitiesData(
-                          cities.filter((item) => filterCities(item, query)),
+                        setDropdownCities(
+                          cities.filter((item) => isItemMatchQuery(item, query)),
                         );
+                        console.log(cities);
                       }}
                       onSelect={(query) => {
-                        const selectedCity = citiesData[query];
+                        const selectedCity = cities[query];
                         setFieldValue('city', selectedCity);
                         setFieldValue('selectedCity', selectedCity);
                         // getSchoolsByFilter('', '', selectedCity)
                         // getOrgByFilter('', '', selectedCity)
                       }}
                     >
-                      {citiesData.map((item, index) => {
+                      {dropdownCities.map((item, index) => {
                         return <AutocompleteItem key={index} title={item} />;
                       })}
                     </Autocomplete>

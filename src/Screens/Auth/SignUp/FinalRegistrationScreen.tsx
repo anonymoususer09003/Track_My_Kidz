@@ -52,31 +52,20 @@ import Colors from '@/Theme/Colors';
 import { LinearGradientButton, ProfileAvatarPicker } from '@/Components';
 import { ImagePickerModal, ParentPaymentModal } from '@/Modals';
 import { Login } from '@/Services/LoginServices';
-import { ModalState } from "@/Store/Modal";
+import { ORGANISATIONS, USER_TYPES } from '@/Constants';
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
-const filterStates = (item: string, query: string) => {
-  return item?.toLowerCase().includes(query.toLowerCase());
-};
-const filterCities = (item: string, query: string) => {
-  return item?.toLowerCase().includes(query.toLowerCase());
-};
-const filterSchools = (item: string, query: string) => {
+
+const isItemMatchQuery = (item: string, query: string) => {
+  if (!query) return true;
   return item?.toLowerCase().includes(query.toLowerCase());
 };
 
-const user_types = [
-  { id: 1, label: 'Parent', value: 'Parent' },
-  { id: 2, label: 'Instructor', value: 'Instructor' },
-  { id: 3, label: 'Student', value: 'Student' },
-];
+const user_types = USER_TYPES;
 
-const organisations = [
-  { id: 1, label: 'School', value: 'School' },
-  { id: 2, label: 'Organisation', value: 'Organisation' },
-];
+const organisations = ORGANISATIONS;
 
 const FinalRegistrationScreen = ({ navigation, route }: Props) => {
   const [, setRerender] = useState(false);
@@ -90,7 +79,9 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
 
   const [countriesData, setCountriesData] = React.useState<CountryDTO[]>(countries);
   const [states, setStates] = useState<string[]>([]);
+  const [dropdownStates, setDropdownStates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
+  const [dropdownCities, setDropdownCities] = useState<string[]>([]);
 
   const [schoolsData, setSchoolsData] = React.useState<any[]>([]);
   const [schools, setSchools] = useState<any[]>([]);
@@ -112,9 +103,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
     '',
   );
-  const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.parentPaymentModalVisibility
-  );
+
   const [uploadedImage, setUploadedImage] = React.useState<any>(null);
   const [, setSelectedGrades] = useState<string[]>([]);
   const [, setSelectedSubjects] = useState<any[]>([]);
@@ -583,10 +572,11 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       dispatch(
                         ChangeModalState.action({
                           welcomeMessageModal: true,
-                        })
+                        }),
                       );
                     }}
-                    onCancel={()=>{}}
+                    onCancel={() => {
+                    }}
                   />
                   <Layout style={styles.formContainer} level="1">
                     <Input
@@ -672,6 +662,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                           selectedCountry.name.replace(/ /g, ''),
                         ).then((res) => {
                           setStates(res.data);
+                          setDropdownStates(res.data);
                         });
                         selectedCountry.phone_code.toString().startsWith('+')
                           ? setPhoneCode(selectedCountry.phone_code.toString())
@@ -692,8 +683,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       style={styles.inputSettings}
                       onChangeText={(query) => {
                         setFieldValue('state', query);
-                        setStates(
-                          states.filter((item) => filterStates(item, query)),
+                        setDropdownStates(
+                          states.filter((item) => isItemMatchQuery(item, query)),
                         );
                       }}
                       onSelect={(query) => {
@@ -703,15 +694,17 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         setFieldValue('selectedCity', '');
                         setFieldValue('city', '');
                         setCities([]);
+                        setDropdownCities([]);
                         GetAllCities(
                           values.selectedCountry,
                           selectedState,
                         ).then((res) => {
                           setCities(res.data);
+                          setDropdownCities(res.data);
                         });
                       }}
                     >
-                      {states.map((item, index) => {
+                      {dropdownStates.map((item, index) => {
                         return <AutocompleteItem key={index} title={item} />;
                       })}
                     </Autocomplete>
@@ -726,8 +719,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       style={styles.inputSettings}
                       onChangeText={(query) => {
                         setFieldValue('city', query);
-                        setCities(
-                          cities.filter((item) => filterCities(item, query)),
+                        setDropdownCities(
+                          cities.filter((item) => isItemMatchQuery(item, query)),
                         );
                       }}
                       onSelect={(query) => {
@@ -735,7 +728,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         setFieldValue('selectedCity', cities[query]);
                       }}
                     >
-                      {cities.map((item, index) => {
+                      {dropdownCities.map((item, index) => {
                         return <AutocompleteItem key={index} title={item} />;
                       })}
                     </Autocomplete>
@@ -1059,6 +1052,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                           selectedCountry.name.replace(/ /g, ''),
                         ).then((res) => {
                           setStates(res.data);
+                          setDropdownStates(res.data);
                         });
                         selectedCountry.phone_code.toString().startsWith('+')
                           ? setPhoneCode(selectedCountry.phone_code.toString())
@@ -1081,8 +1075,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       style={styles.inputSettings}
                       onChangeText={(query) => {
                         setFieldValue('state', query);
-                        setStates(
-                          states.filter((item) => filterStates(item, query)),
+                        setDropdownStates(
+                          states.filter((item) => isItemMatchQuery(item, query)),
                         );
                       }}
                       onSelect={(query) => {
@@ -1092,17 +1086,19 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         setFieldValue('selectedCity', '');
                         setFieldValue('city', '');
                         setCities([]);
+                        setDropdownCities([]);
                         GetAllCities(
                           values.selectedCountry,
                           selectedState,
                         ).then((res) => {
                           setCities(res.data);
+                          setDropdownCities(res.data);
                         });
                         getSchoolsByFilter(values.country, selectedState);
                         getOrgByFilter(values.country, selectedState);
                       }}
                     >
-                      {states.map((item, index) => {
+                      {dropdownStates.map((item, index) => {
                         return <AutocompleteItem key={index} title={item} />;
                       })}
                     </Autocomplete>
@@ -1114,8 +1110,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                       style={styles.inputSettings}
                       onChangeText={(query) => {
                         setFieldValue('city', query);
-                        setCities(
-                          cities.filter((item) => filterCities(item, query)),
+                        setDropdownCities(
+                          cities.filter((item) => isItemMatchQuery(item, query)),
                         );
                       }}
                       onSelect={(query) => {
@@ -1134,7 +1130,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         );
                       }}
                     >
-                      {cities.map((item, index) => {
+                      {dropdownCities.map((item, index) => {
                         return <AutocompleteItem key={index} title={item} />;
                       })}
                     </Autocomplete>
@@ -1158,7 +1154,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                           setFieldValue('school', query);
                           setSchoolsData(
                             schools.filter((item) =>
-                              filterSchools(item.name, query),
+                              isItemMatchQuery(item.name, query),
                             ),
                           );
                         }}
@@ -1192,7 +1188,7 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                           setFieldValue('organization', query);
                           setOrgData(
                             org.filter((item) =>
-                              filterSchools(item.label, query),
+                              isItemMatchQuery(item.label, query),
                             ),
                           );
                         }}
