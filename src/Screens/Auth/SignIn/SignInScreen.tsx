@@ -1,74 +1,57 @@
-import {
-  Button,
-  Input,
-  Layout,
-  StyleService,
-  Text,
-  useStyleSheet,
-} from '@ui-kitten/components';
-import {Formik} from 'formik';
-import React, {useContext, useEffect, useState} from 'react';
-import {
-  Dimensions,
-  Image,
-  ImageBackground,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
-import {getDeviceId} from 'react-native-device-info';
+import { Button, Input, Layout, StyleService, Text, useStyleSheet } from '@ui-kitten/components';
+import { Formik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Image, ImageBackground, TouchableWithoutFeedback, View } from 'react-native';
+import { getDeviceId } from 'react-native-device-info';
 import * as yup from 'yup';
 import Toast from 'react-native-toast-message';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {useDispatch, useSelector} from 'react-redux';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useDispatch, useSelector } from 'react-redux';
 // import { useDispatch } from "react-redux";
 // import messaging from "@react-native-firebase/messaging";
-
 import CustomDropdown from '@/Components/CustomDropDown';
-import {Login} from '@/Services/LoginServices';
+import { Login } from '@/Services/LoginServices';
 import LoginStore from '@/Store/Authentication/LoginStore';
-import {useIsFocused} from '@react-navigation/native';
-import {Normalize} from '@/Utils/Shared/NormalizeDisplay';
-import {UpdateDeviceToken} from '@/Services/User';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { Normalize } from '@/Utils/Shared/NormalizeDisplay';
+import { UpdateDeviceToken } from '@/Services/User';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
-import {LinearGradientButton} from '@/Components';
-import {GetAllCountries} from '@/Services/PlaceServices';
+import { LinearGradientButton } from '@/Components';
+import { GetAllCountries } from '@/Services/PlaceServices';
 import ChangeCountryState from '@/Store/Places/FetchCountries';
 import Colors from '@/Theme/Colors';
-import {AuthContext} from '@/Navigators/Auth/AuthProvider';
-import { ParentPaymentModal } from "@/Modals";
+import { ParentPaymentModal } from '@/Modals';
+import { USER_TYPES } from '@/Constants';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackNavigatorParamsList } from '@/Navigators/Auth/AuthNavigator';
 
-const user_type = [
-  {id: 1, label: 'Parent', value: 'Parent'},
-  {id: 2, label: 'Instructor', value: 'Instructor'},
-  {id: 3, label: 'Student', value: 'Student'},
-];
+const user_type = USER_TYPES;
 const screenHeight = Dimensions.get('screen').height;
-// @ts-ignore
-const SignInScreen = ({navigation}) => {
+const SignInScreen = () => {
+  const navigation =
+    useNavigation<StackNavigationProp<AuthStackNavigatorParamsList>>();
+
   const dispatch = useDispatch();
   const isFocuesed = useIsFocused();
-  const [loading, setLoading] = useState(false);
-  const [loginObj, setLoginObj] = useState(null);
-  // const dispatch = useDispatch();
+  const [, setLoading] = useState(false);
+  const [loginObj, setLoginObj] = useState<UserLoginResponse | null>(null);
+
   const countries = useSelector(
-    (state: {places: any}) => state?.places.countries,
+    (state: { places: any }) => state?.places.countries,
   );
-  let values = {email: '', password: '', user_type: '', is_default: false};
+  let values = { email: '', password: '', user_type: '', is_default: false };
   const [intitialValues, setInitialValues] = useState({
     email: '',
     password: '',
     user_type: '',
     is_default: false,
   });
-  // const deviceId = DeviceInfo.getUniqueID();
-  // console.log("------deviceId", deviceId);
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
-  const {login, register} = useContext(AuthContext);
   const fetchCountries = async () => {
     try {
       if (!countries) {
         let res = await GetAllCountries();
-        dispatch(ChangeCountryState.action({countries: res}));
+        dispatch(ChangeCountryState.action({ countries: res }));
       }
     } catch (err) {
       console.log('err fetch coutnries', err);
@@ -112,7 +95,7 @@ const SignInScreen = ({navigation}) => {
   };
   const onResendActivationButtonPress = (value: boolean): void => {
     navigation &&
-      navigation.navigate('ResendConfirmation', {resendCode: value});
+    navigation.navigate('ResendConfirmation', { resendCode: value });
   };
   const onReactivateButtonPress = (): void => {
     navigation && navigation.navigate('ReactivateAccount');
@@ -123,20 +106,19 @@ const SignInScreen = ({navigation}) => {
     setPasswordVisible(!passwordVisible);
   };
 
-  // @ts-ignore
-  const renderPasswordIcon = props => (
+  const renderPasswordIcon = () => (
     <TouchableWithoutFeedback onPress={onPasswordIconPress}>
       <Image
         source={require('@/Assets/Images/lock.png')}
-        style={{height: 20, width: 20}}
+        style={{ height: 20, width: 20 }}
         resizeMode="contain"
       />
     </TouchableWithoutFeedback>
   );
-  const renderPersonIcon = (props: any) => (
+  const renderPersonIcon = () => (
     <Image
       source={require('@/Assets/Images/email.png')}
-      style={{height: 20, width: 20}}
+      style={{ height: 20, width: 20 }}
       resizeMode="contain"
     />
   );
@@ -148,15 +130,17 @@ const SignInScreen = ({navigation}) => {
       .required('Email is required'),
     password: yup
       .string()
-      .min(8, ({min}) => `Password must be at least ${min} characters`)
+      .min(8, ({ min }) => `Password must be at least ${min} characters`)
       .required('Password is required'),
     user_type: yup.string().required('User type is required'),
   });
 
   const saveTokenToDatabase = (token: string) => {
     UpdateDeviceToken(token)
-      .then(data => {})
-      .catch(err => {});
+      .then(data => {
+      })
+      .catch(err => {
+      });
   };
 
   const requestUserPermission = async () => {
@@ -166,13 +150,13 @@ const SignInScreen = ({navigation}) => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: Colors.primary}}>
+    <View style={{ flex: 1, backgroundColor: Colors.primary }}>
       <ImageBackground
-        style={{flex: 1}}
+        style={{ flex: 1 }}
         source={require('../../../Assets/Images/childBackground.png')}
         resizeMode="stretch">
-        <KeyboardAwareScrollView style={{flex: 1}}>
-          <View style={{flex: 1}}>
+        <KeyboardAwareScrollView style={{ flex: 1 }}>
+          <View style={{ flex: 1 }}>
             <View style={styles.headerContainer}>
               <Image
                 style={{
@@ -200,11 +184,12 @@ const SignInScreen = ({navigation}) => {
                   };
                   setLoading(true);
 
-                  dispatch(ChangeModalState.action({loading: true}));
+                  dispatch(ChangeModalState.action({ loading: true }));
                   Login(objectToPass, values.user_type.toLowerCase())
                     .then(res => {
+                      console.log('SignInScreen.tsx line 206 - res', res);
                       // console.log('res',res.data);
-                      const obj = {
+                      const obj: UserLoginResponse = {
                         token: res.data?.token,
                         userType: values.user_type.toLowerCase(),
                         id: res.data.userTypeId,
@@ -224,14 +209,14 @@ const SignInScreen = ({navigation}) => {
                       } else {
                         console.log(obj);
                         dispatch(LoginStore.action(obj));
-                        dispatch(ChangeModalState.action({loading: false}));
+                        dispatch(ChangeModalState.action({ loading: false }));
                       }
                       setLoading(false);
                     })
                     .catch(err => {
                       setLoading(false);
                       console.log('err', err);
-                      dispatch(ChangeModalState.action({loading: false}));
+                      dispatch(ChangeModalState.action({ loading: false }));
                       if (
                         err?.data &&
                         err?.data?.detail === 'Account is not active.'
@@ -246,9 +231,12 @@ const SignInScreen = ({navigation}) => {
                           autoHide: true,
                           topOffset: 30,
                           bottomOffset: 40,
-                          onShow: () => {},
-                          onHide: () => {},
-                          onPress: () => {},
+                          onShow: () => {
+                          },
+                          onHide: () => {
+                          },
+                          onPress: () => {
+                          },
                         });
                       } else {
                         Toast.show({
@@ -261,31 +249,35 @@ const SignInScreen = ({navigation}) => {
                           autoHide: true,
                           topOffset: 30,
                           bottomOffset: 40,
-                          onShow: () => {},
-                          onHide: () => {},
-                          onPress: () => {},
+                          onShow: () => {
+                          },
+                          onHide: () => {
+                          },
+                          onPress: () => {
+                          },
                         });
                       }
                     });
                 }}>
                 {({
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                  setFieldValue,
-                  values,
-                  errors,
-                  touched,
-                  isValid,
-                }) => (
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                    setFieldValue,
+                    values,
+                    errors,
+                    touched,
+                    isValid,
+                  }) => (
                   <>
                     <ParentPaymentModal
                       loginObj={loginObj}
                       onPay={() => {
-                        dispatch(LoginStore.action(loginObj));
+                        if (loginObj)
+                          dispatch(LoginStore.action(loginObj));
                         dispatch(ChangeModalState.action({ loading: false }));
                       }}
-                      onCancel={()=>{
+                      onCancel={() => {
                         dispatch(ChangeModalState.action({ loading: false }));
                       }}
                     />
@@ -311,7 +303,7 @@ const SignInScreen = ({navigation}) => {
                         value={values.email}
                         keyboardType="email-address"
                         autoCapitalize="none"
-                        textStyle={{color: Colors.white}}
+                        textStyle={{ color: Colors.white }}
                         autoCorrect={false}
                       />
                       {errors.email && touched.email && (
@@ -328,13 +320,13 @@ const SignInScreen = ({navigation}) => {
                         onBlur={handleBlur('password')}
                         value={values.password}
                         secureTextEntry={!passwordVisible}
-                        textStyle={{color: Colors.white}}
+                        textStyle={{ color: Colors.white }}
                       />
                       {errors.password && touched.password && (
                         <Text style={styles.errorText}>{errors.password}</Text>
                       )}
                       <Button
-                        style={{alignSelf: 'flex-end', marginTop: 10}}
+                        style={{ alignSelf: 'flex-end', marginTop: 10 }}
                         appearance="ghost"
                         status="basic"
                         size="small"
@@ -343,7 +335,7 @@ const SignInScreen = ({navigation}) => {
                           <Text
                             style={[
                               styles.buttonMessage,
-                              {textAlign: 'right'},
+                              { textAlign: 'right' },
                             ]}>
                             {' '}
                             Forgot Password{' '}
@@ -395,7 +387,7 @@ const SignInScreen = ({navigation}) => {
               <Text style={styles.buttonMessage}>
                 {' '}
                 Don't have an account?{' '}
-                <Text style={{color: Colors.secondary}}>Sign up</Text>
+                <Text style={{ color: Colors.secondary }}>Sign up</Text>
               </Text>
             )}
           </Button>

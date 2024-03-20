@@ -13,11 +13,11 @@ export default async () => {
   if (!userId || userId === 'null') {
     return handleError({ message: 'User ID is required' });
   }
-  if (userType?.toLowerCase() === 'parent' || userId) {
+  if (userType?.toLowerCase() === 'parent') {
     return await GetParent(userId);
-  } else if (userType?.toLowerCase() === 'instructor' || userId) {
+  } else if (userType?.toLowerCase() === 'instructor') {
     return await GetInstructor(userId);
-  } else if (userType?.toLowerCase() === 'student' || userId) {
+  } else if (userType?.toLowerCase() === 'student') {
     return await GetStudent(userId);
   }
 };
