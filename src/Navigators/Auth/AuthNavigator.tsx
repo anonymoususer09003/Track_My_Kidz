@@ -11,7 +11,19 @@ import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
 import { AuthProvider } from "./AuthProvider";
 
-const AuthNavigator = createStackNavigator();
+export type AuthStackNavigatorParamsList = {
+  Login: undefined;
+  SignUp1: undefined;
+  EmailConfirmation: undefined;
+  FinalRegistrationScreen: undefined;
+  FinalOrgRegistrationScreen: undefined;
+  ForgotPassword: undefined;
+  ResendConfirmation: {resendCode: any};
+  ReactivateAccount: undefined;
+  ResetPassword: undefined;
+};
+
+const AuthNavigator = createStackNavigator<AuthStackNavigatorParamsList>();
 const AuthStack = () => (
   <AuthProvider>
     <AuthNavigator.Navigator initialRouteName="Login">
