@@ -1,19 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Image, Alert } from "react-native";
-import { DrawerItem, DrawerContentScrollView } from "@react-navigation/drawer";
-import { Text } from "@ui-kitten/components";
-import Entypo from "react-native-vector-icons/Entypo";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { ProfileAvatar } from "@/Components/SignUp/profile-avatar.component";
-import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
-import FetchMenu from "@/Services/Menus/FetchMenu";
-import { navigateAndSimpleReset } from "@/Navigators/Functions";
-import { useSelector, useDispatch } from "react-redux";
-import { UserState } from "@/Store/User";
-import ChangeSearchString from "@/Store/Blogs/ChangeSearchString";
-import FastImage from "react-native-fast-image";
-import Colors from "@/Theme/Colors";
+import React, { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
+import { Text } from '@ui-kitten/components';
+import Entypo from 'react-native-vector-icons/Entypo';
+import { ProfileAvatar } from '@/Components/SignUp/profile-avatar.component';
+import { Normalize } from '@/Utils/Shared/NormalizeDisplay';
+import { navigateAndSimpleReset } from '@/Navigators/Functions';
+import { useDispatch, useSelector } from 'react-redux';
+import { UserState } from '@/Store/User';
+import ChangeSearchString from '@/Store/Blogs/ChangeSearchString';
+import FastImage from 'react-native-fast-image';
+import Colors from '@/Theme/Colors';
+
 const LeftDrawerContent = (props: any) => {
   const userData = useSelector((state: { user: UserState }) => state.user.item);
   const dispatch = useDispatch();
@@ -93,38 +91,38 @@ const LeftDrawerContent = (props: any) => {
                         setLeftDrawerOptions([...data]);
                       } else {
                         props.navigation.closeDrawer();
-                        if (option?.isMenuItem) {
-                          dispatch(
-                            ChangeSearchString.action({
-                              menuId: option?.id,
-                              screenName: option?.label,
-                            })
-                          );
-                          navigateAndSimpleReset("CustomizedFeature");
-                        } else if (option.value == "MyUploads") {
-                          navigateAndSimpleReset("MyUploads");
-                        } else if (option.value === "Blogs") {
-                          navigateAndSimpleReset("Blogs");
-                        } else if (option.value === "NeedAnswers") {
-                          navigateAndSimpleReset("NeedAnswers");
-                        } else if (option.value === "MyBoosts") {
-                          navigateAndSimpleReset("MyBoosts");
-                        } else if (option.value === "Contributor") {
-                          props.navigation.closeDrawer();
-                          navigateAndSimpleReset("Contributors");
-                        } else if (option.value === "Country") {
-                          navigateAndSimpleReset("Country");
-                        } else if (option.value === "Products") {
-                          navigateAndSimpleReset("Products");
-                        } else if (option.value === "Favourite") {
-                          navigateAndSimpleReset("Favourite");
-                        } else if (option.value === "Shared") {
-                          navigateAndSimpleReset("Shared");
-                        } else if (option.value === "ShoppingList") {
-                          navigateAndSimpleReset("ShoppingList");
-                        } else {
-                          navigateAndSimpleReset("Home");
-                        }
+                        // if (option?.isMenuItem) {
+                        //   dispatch(
+                        //     ChangeSearchString.action({
+                        //       menuId: option?.id,
+                        //       screenName: option?.label,
+                        //     })
+                        //   );
+                        //   navigateAndSimpleReset("CustomizedFeature");
+                        // } else if (option.value == "MyUploads") {
+                        //   navigateAndSimpleReset("MyUploads");
+                        // } else if (option.value === "Blogs") {
+                        //   navigateAndSimpleReset("Blogs");
+                        // } else if (option.value === "NeedAnswers") {
+                        //   navigateAndSimpleReset("NeedAnswers");
+                        // } else if (option.value === "MyBoosts") {
+                        //   navigateAndSimpleReset("MyBoosts");
+                        // } else if (option.value === "Contributor") {
+                        //   props.navigation.closeDrawer();
+                        //   navigateAndSimpleReset("Contributors");
+                        // } else if (option.value === "Country") {
+                        //   navigateAndSimpleReset("Country");
+                        // } else if (option.value === "Products") {
+                        //   navigateAndSimpleReset("Products");
+                        // } else if (option.value === "Favourite") {
+                        //   navigateAndSimpleReset("Favourite");
+                        // } else if (option.value === "Shared") {
+                        //   navigateAndSimpleReset("Shared");
+                        // } else if (option.value === "ShoppingList") {
+                        //   navigateAndSimpleReset("ShoppingList");
+                        // } else {
+                        //   navigateAndSimpleReset("Home");
+                        // }
                       }
                     }}
                   />
@@ -149,14 +147,14 @@ const LeftDrawerContent = (props: any) => {
                 </View>
                 {option &&
                   option.itemsVisible &&
-                  option.items.map((item: any, index) => (
+                  option.items.map((item: any, index: number) => (
                     <DrawerItem
                       key={index}
                       style={[styles.drawerItemChild, { paddingLeft: 25 }]}
                       label={item.label}
                       onPress={() => {
-                        props.navigation.closeDrawer();
-                        navigateAndSimpleReset("CustomizedFeature");
+                        // props.navigation.closeDrawer();
+                        // navigateAndSimpleReset("CustomizedFeature");
                       }}
                     />
                   ))}

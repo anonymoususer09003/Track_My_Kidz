@@ -94,38 +94,22 @@ const ParentPaymentModal = ({ onCancel, loginObj }: ParentPaymentModalProps) => 
     );
   };
 
-  // const setOption = (opt: any) => {
-  //   setIntervalOption(opt);
-  // };
   const getUser = async () => {
     const id = await loadUserId() || '';
     GetParent(parseInt(id, 0)).then(response => {
-      console.log('res-00-20-20--0', response);
+      console.log('ParentPaymentModal.tsx line 104', response);
       setParent(response);
     });
   };
   const fetchPaymentIntentClientSecret = async (data: any) => {
     console.log(data);
-    // let res = await createToken({
-    //   type: "Card",
-    //   name: "David Wallace",
-    //   currency: "usd",
-    // });
-    // console.log("res", res);
+
     return await CreateSinglePaymentIntent(
       selectedIndex == 0 ? 50 : 4.99,
     );
-    // setPayment(paymentIntent);
-    // console.log("paymentIntent", paymentIntent);
   };
-  // const fetchPaymentIntentClientSecret = async (int: string) => {
-  //   // const int = intervals[selectedIndex];
-  //   const paymentIntent = await fetchPaymentIntent(int);
 
-  //   return paymentIntent?.data;
-  // };
   const activateSubscription = async () => {
-    // Alert.alert("kkaa");
     if (!cardData || !cardData?.complete) {
       return;
     }
@@ -140,7 +124,6 @@ const ParentPaymentModal = ({ onCancel, loginObj }: ParentPaymentModalProps) => 
       email: user?.email,
     };
 
-    // Confirm the payment with the card details
     const { paymentIntent, error } = await confirmPayment(clientSecret, {
       paymentMethodType: 'Card',
       paymentMethodData: {
@@ -157,10 +140,7 @@ const ParentPaymentModal = ({ onCancel, loginObj }: ParentPaymentModalProps) => 
     } else if (paymentIntent) {
       setIsLoading(false);
       await updateUser();
-      // const userId = await loadUserId();
-      // if (userId != null) {
-      //   dispatch(FetchOne.action(userId));
-      // }
+
       Toast.show({
         type: 'success',
         position: 'top',

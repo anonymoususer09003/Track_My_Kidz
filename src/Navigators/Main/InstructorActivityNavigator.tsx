@@ -1,46 +1,47 @@
-import { Calendar, LinearGradientButton } from "@/Components";
-import BackgroundLayout from "@/Components/BackgroundLayout";
-import { actions } from "@/Context/state/Reducer";
-import { useStateValue } from "@/Context/state/State";
-import { InstructorActivityScreen, InstructorGroupScreen } from "@/Screens";
+import { Calendar, LinearGradientButton } from '@/Components';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { actions } from '@/Context/state/Reducer';
+import { useStateValue } from '@/Context/state/State';
+// import { InstructorActivityScreen, InstructorGroupScreen } from "@/Screens";
 import {
   FindInstructorBySchoolOrg,
-  GetInstructor
-} from "@/Services/Instructor";
-import ChangeInstructorActivityState from "@/Store/InstructorsActivity/ChangeInstructorActivityState";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Colors from "@/Theme/Colors";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { TabBar } from "@ui-kitten/components";
-import axios from "axios";
-import moment from "moment";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+  GetInstructor,
+} from '@/Services/Instructor';
+import ChangeInstructorActivityState from '@/Store/InstructorsActivity/ChangeInstructorActivityState';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Colors from '@/Theme/Colors';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { TabBar } from '@ui-kitten/components';
+import axios from 'axios';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadUserId } from '@/Storage/MainAppStorage';
 // @refresh reset
 const InstructorActivityNavigator = () => {
   const dispatch = useDispatch();
   const cancelToken = axios.CancelToken;
   const source = cancelToken.source();
-  const [, _dispatch] = useStateValue();
+  // const {state, dispatch} = useStateValue();
   const activeNav = useSelector(
-    (state: { navigation: any }) => state.navigation.activeNav
+    (state: { navigation: any }) => state.navigation.activeNav,
   );
   const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
+    (state: { user: any }) => state.user.item,
   );
   const TabNavigator = createMaterialTopTabNavigator();
-  const tabNames = ["Activity", "Group"];
+  const tabNames = ['Activity', 'Group'];
   const [selectedMonth, setSelectedMonth] = useState(
-    moment(new Date()).month()
+    moment(new Date()).month(),
   );
   const [instructors, setInstructors] = useState([]);
-  const [activeTab, setActiveTab] = useState(1);
-  const [selectedDay, setSelectedDay] = useState(moment().format("D"));
+  const [activeTab, setActiveTab] = useState<number>(1);
+  const [selectedDay, setSelectedDay] = useState(moment().format('D'));
 
   const isCalendarVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.showCalendar
+    (state: { modal: ModalState }) => state.modal.showCalendar,
   );
 
   //@ts-ignore
@@ -48,7 +49,7 @@ const InstructorActivityNavigator = () => {
     <TabBar
       style={styles.toolBar}
       selectedIndex={state.index}
-      indicatorStyle={{ display: "none" }}
+      indicatorStyle={{ display: 'none' }}
       onSelect={(index) => navigation.navigate(state.routeNames[index])}
     >
       {tabNames.map((tabName, index) => {
@@ -72,7 +73,7 @@ const InstructorActivityNavigator = () => {
                     dispatch(
                       ChangeModalState.action({
                         showCalendar: false,
-                      })
+                      }),
                     );
                   }
                   navigation.navigate(state.routeNames[index], { instructors });
@@ -97,11 +98,11 @@ const InstructorActivityNavigator = () => {
         },
         {
           cancelToken: source.token,
-        }
+        },
       );
 
       if (instructorsList) {
-        _dispatch({
+        dispatch({
           type: actions.ORG_INSTRUCTORS,
           payload: instructorsList,
         });
@@ -110,31 +111,35 @@ const InstructorActivityNavigator = () => {
         //   })
       }
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
 
   const getInstructors = async () => {
     try {
-      console.log("logs00000", Object.keys(currentUser).length == 0);
+      console.log('logs00000', Object.keys(currentUser).length == 0);
       if (Object.keys(currentUser).length == 0) {
         const userId = await loadUserId();
-        let res = await GetInstructor(userId);
-        await findInstructorBySchoolId(res);
+        if (userId) {
+
+          let res = await GetInstructor(userId);
+          await findInstructorBySchoolId(res);
+        }
       } else {
         await findInstructorBySchoolId(currentUser);
       }
-    } catch (err) {}
+    } catch (err) {
+    }
   };
 
   useEffect(() => {
     if (!isCalendarVisible) {
-      setSelectedDay(moment().format("D"));
+      setSelectedDay(moment().format('D'));
       dispatch(
         ChangeInstructorActivityState.action({
-          selectedMonthForFilter: moment().subtract(1,"M").format("M"),
-          selectedDayForFilter: moment().format("DD"),
-        })
+          selectedMonthForFilter: moment().subtract(1, 'M').format('M'),
+          selectedDayForFilter: moment().format('DD'),
+        }),
       );
     }
   }, [isCalendarVisible]);
@@ -154,19 +159,20 @@ const InstructorActivityNavigator = () => {
       <BackgroundLayout
         hideLeftIcon={true}
         dropDownList={instructors}
-        showDropDown={currentUser?.isAdmin ? true : false}
+        showDropDown={!!currentUser?.isAdmin}
         title={`Activity & Groups`}
         rightIcon={true}
       >
         {isCalendarVisible && (
           <Calendar
+            style={''}
             selectedMonth={selectedMonth}
             setSelectedMonth={(value) => {
               setSelectedMonth(value);
               dispatch(
                 ChangeInstructorActivityState.action({
-                  selectedMonthForFilter: value,
-                })
+                  selectedMonthForFilter: String(value),
+                }),
               );
             }}
             selectedDay={parseInt(selectedDay)}
@@ -175,7 +181,7 @@ const InstructorActivityNavigator = () => {
               dispatch(
                 ChangeInstructorActivityState.action({
                   selectedDayForFilter: value,
-                })
+                }),
               );
             }}
           />
@@ -185,20 +191,19 @@ const InstructorActivityNavigator = () => {
           tabBar={(props) => (
             <TopTabBar
               {...props}
-              setIsCalendar={() => null}
-              setActiveTab={(value) => setActiveTab(value)}
+              setActiveTab={(value: number) => setActiveTab(value)}
             />
           )}
         >
           <TabNavigator.Screen
             name="InstructorActivity"
-            options={{ title: "Activity", }}
-            component={InstructorActivityScreen}
+            options={{ title: 'Activity' }}
+            component={View}
           />
           <TabNavigator.Screen
             name="InstructorGroup"
-            options={{ title: "Groups" }}
-            component={InstructorGroupScreen}
+            options={{ title: 'Groups' }}
+            component={View}
           />
         </TabNavigator.Navigator>
       </BackgroundLayout>
@@ -216,7 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.newBackgroundColor,
     marginTop: 20,
     paddingHorizontal: 20,
-    width: "100%",
+    width: '100%',
   },
   topNav: {
     color: Colors.white,
@@ -228,20 +233,20 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     borderRadius: 10,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
 
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
   toolBar: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
 
     backgroundColor: Colors.newBackgroundColor,
-    width: "100%",
+    width: '100%',
   },
 });

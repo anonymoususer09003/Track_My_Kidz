@@ -30,7 +30,7 @@ export default function BackgroundLayout({
   const focused = useIsFocused();
   const dispatch = useDispatch();
 
-  const headerState = useSelector((state: { user: UserState }) => state.header);
+  const headerState = useSelector((state: { user: any, header: any }) => state.header);
 
   const { showFamilyMap, showParticipantMap } = useSelector(
     (state: { studentActivity: StudentState }) => state.studentActivity
@@ -68,9 +68,9 @@ export default function BackgroundLayout({
       {!hideHeader && !showFamilyMap && (
         <View style={[styles.main, style && style]}>
           <TouchableOpacity onPress={() => {
-           
+
             navigation.goBack()
-            
+
             }}>
             {!hideLeftIcon && (
               <MaterialIcon name="arrow-back" size={20} color={Colors.white} />
@@ -101,7 +101,7 @@ export default function BackgroundLayout({
         >
           <SelectItem title="All" />
           {dropDownList &&
-            dropDownList?.map((item, index) => (
+            dropDownList?.map((item: any, index: any) => (
               <SelectItem
                 key={index}
                 title={item?.firstname + " " + item?.lastname}

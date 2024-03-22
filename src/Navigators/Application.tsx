@@ -1,61 +1,42 @@
-import React, {useEffect} from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
-import {StartUpScreen} from '@/Screens';
-import {useSelector} from 'react-redux';
-import {NavigationContainer} from '@react-navigation/native';
-import {navigationRef} from '@/Navigators/Functions';
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  View,
-} from 'react-native';
-import {
-  GetAllInstructors,
-  GetInstructor,
-  FindInstructorBySchoolOrg,
-} from '@/Services/Instructor';
-import {loadUserId, loadUserType} from '@/Storage/MainAppStorage';
+import React, { useEffect } from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
+import { StartUpScreen } from '@/Screens';
+import { useDispatch, useSelector } from 'react-redux';
+import { NavigationContainer } from '@react-navigation/native';
+import { navigationRef } from '@/Navigators/Functions';
+import { Platform, SafeAreaView, StatusBar, View } from 'react-native';
+import { getCountryDetail, loadUserId, loadUserType, storeCountryDetail } from '@/Storage/MainAppStorage';
 // import ChangeUserState from '@/Store/User/FetchOne';
 import ChangeCountryState from '../Store/Places/FetchCountries';
-import axios from 'axios';
-import {actions} from '@/Context/state/Reducer';
-import {useDispatch} from 'react-redux';
-import {useTheme} from '@/Theme';
-import {StartupState} from '@/Store/Startup';
-import {getCountryDetail, storeCountryDetail} from '@/Storage/MainAppStorage';
-import {customTheme, customMappings} from '../../trackmykidz-theme';
-import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
+import { useTheme } from '@/Theme';
+import { StartupState } from '@/Store/Startup';
+import { customTheme } from '../../trackmykidz-theme';
+import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
 import * as eva from '@eva-design/eva';
 import AuthStack from './Auth/AuthNavigator';
-import FetchCountries from '@/Store/Places/FetchCountries';
-import {GetAllCountries} from '@/Services/PlaceServices';
-import {AuthenticationState} from '@/Store/Authentication';
+import { GetAllCountries } from '@/Services/PlaceServices';
+import { AuthenticationState } from '@/Store/Authentication';
 import MainNavigator from '@/Navigators/Main/MainNavigator';
 import Toast from 'react-native-toast-message';
 import SafeAreaViewDecider from 'react-native-smart-statusbar';
-import {LoadingModal} from '@/Modals';
-import {EvaIconsPack} from '@ui-kitten/eva-icons';
-import {FeatherIconsPack} from '@/Components/FeatherIconPacks';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { EvaIconsPack } from '@ui-kitten/eva-icons';
+
+import { LoadingModal } from '@/Modals';
+import { FeatherIconsPack } from '@/Components/FeatherIconPacks';
 import TwoFACodeModal from '../Modals/TwoFACodeModal';
-import {default as mapping} from '../../mapping.json'; // <-- Import app mapping
+import { default as mapping } from '../../mapping.json'; // <-- Import app mapping
 import Colors from '@/Theme/Colors';
-import AddBusInformation from '@/Modals/AddBusInformation';
 
 // @refresh reset
 const Application = () => {
   const dispatch = useDispatch();
 
-  const {Layout, NavigationTheme} = useTheme();
-  const {colors} = NavigationTheme;
+  const { Layout, NavigationTheme } = useTheme();
   const applicationIsLoading = useSelector(
-    (state: {startup: StartupState}) => state.startup.loadingInitialData,
+    (state: { startup: StartupState }) => state.startup.loadingInitialData,
   );
   const loggedIn = useSelector(
-    (state: {authentication: AuthenticationState}) =>
+    (state: { authentication: AuthenticationState }) =>
       state.authentication.loggedIn,
   );
 
@@ -83,6 +64,9 @@ const Application = () => {
   };
 
   const MainStackNavigator = createStackNavigator();
+
+  console.log('Application.tsx line 68 applicationIsLoading',applicationIsLoading);
+  console.log('Application.tsx line 68 loggedIn',loggedIn);
   const MainStack = () => (
     <MainStackNavigator.Navigator
       screenOptions={{
@@ -118,11 +102,11 @@ const Application = () => {
       if (!countiresList) {
         let res = await GetAllCountries();
 
-        dispatch(ChangeCountryState.action({countries: res}));
+        dispatch(ChangeCountryState.action({ countries: res }));
         await storeCountryDetail(JSON.stringify(res));
       } else {
         dispatch(
-          ChangeCountryState.action({countries: JSON.parse(countiresList)}),
+          ChangeCountryState.action({ countries: JSON.parse(countiresList) }),
         );
       }
       const userType = await loadUserType();
@@ -154,10 +138,12 @@ const Application = () => {
   return (
     <>
       <IconRegistry icons={[EvaIconsPack, FeatherIconsPack]} />
+      {/*// TODO sole this*/}
+      {/*//@ts-ignore*/}
       <ApplicationProvider {...eva} mapping={mapping} theme={customTheme}>
         <>
           {Platform.OS === 'ios' && (
-            <View style={{zIndex: 1}}>
+            <View style={{ zIndex: 1 }}>
               <SafeAreaViewDecider
                 statusBarHiddenForNotch={false}
                 statusBarHiddenForNonNotch={false}
@@ -173,7 +159,7 @@ const Application = () => {
               barStyle="light-content"
             />
           )}
-          <SafeAreaView style={[{flex: 1}, {backgroundColor: Colors.primary}]}>
+          <SafeAreaView style={[{ flex: 1 }, { backgroundColor: Colors.primary }]}>
             <NavigationContainer
               linking={linking}
               theme={NavigationTheme}
@@ -186,7 +172,7 @@ const Application = () => {
             <Toast />
           </SafeAreaView>
           {Platform.OS === 'ios' && (
-            <View style={{zIndex: 1}}>
+            <View style={{ zIndex: 1 }}>
               <SafeAreaViewDecider
                 statusBarHiddenForNotch={false}
                 statusBarHiddenForNonNotch={false}

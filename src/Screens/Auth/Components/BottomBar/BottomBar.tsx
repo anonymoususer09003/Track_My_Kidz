@@ -20,10 +20,10 @@ const BottomBar = () => {
               appearance="ghost"
               size="giant"
               status="control"
-              onPress={() =>
-                dispatch(
-                  ChangeModalState.action({ createPostModalVisibility: true }),
-                )
+              onPress={() =>{}
+                // dispatch(
+                //   ChangeModalState.action({ createPostModalVisibility: true }),
+                // )
               }
             >
               Upload
@@ -35,12 +35,8 @@ const BottomBar = () => {
               appearance="ghost"
               size="giant"
               status="control"
-              onPress={() =>
-                dispatch(
-                  ChangeModalState.action({
-                    startLivestreamModalVisibility: true,
-                  }),
-                )
+              onPress={() => {}
+
               }
             >
               Livestream

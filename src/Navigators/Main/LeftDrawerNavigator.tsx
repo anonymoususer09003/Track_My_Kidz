@@ -4,8 +4,9 @@ import ChangeNavigationCustomState from '@/Store/Navigation/ChangeNavigationCust
 import RightDrawerNavigator from '@/Navigators/Main/RightDrawerNavigator'
 import { useDispatch } from 'react-redux'
 import LeftDrawerContent from "@/Navigators/Main/DrawerContents/LeftDrawerContent/LeftDrawerContent";
+import { View } from 'react-native';
 
-const LeftDrawerNavigator = (props: any) => {
+const LeftDrawerNavigator = () => {
   const Drawer = createDrawerNavigator()
   const dispatch = useDispatch()
   let leftNavigation: any
@@ -31,7 +32,7 @@ const LeftDrawerNavigator = (props: any) => {
       }}
     >
       <>
-        <Drawer.Screen name="AccountDrawer" component={RightDrawerNavigator} />
+        <Drawer.Screen name="AccountDrawer" component={View} />
       </>
     </Drawer.Navigator>
   )

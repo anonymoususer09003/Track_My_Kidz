@@ -1,14 +1,14 @@
-import { Card, Modal, Text, Button } from "@ui-kitten/components";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
-import React, { useState, useEffect } from "react";
-import { StyleSheet, View, TouchableOpacity } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import { useNavigation } from "@react-navigation/native";
-import moment from "moment";
-import Colors from "@/Theme/Colors";
-import { UserTypeState } from "@/Store/UserType";
+import { Card, Modal, Text } from '@ui-kitten/components';
+import { useDispatch, useSelector } from 'react-redux';
+import { ModalState } from '@/Store/Modal';
+import React, { useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserState } from '@/Store/User';
+import { useNavigation } from '@react-navigation/native';
+import Colors from '@/Theme/Colors';
+import { UserTypeState } from '@/Store/UserType';
+
 interface AvailableBoost {
   freeBoostEligible: boolean;
   freeBoostActive: any;
@@ -59,7 +59,7 @@ const WelcomeMessageModal = () => {
     </View>
   );
 
-  const StudentFooter = (props) => (
+  const StudentFooter = (props: any) => (
     <View {...props} style={[props.style, styles.footerContainer]}>
       <View>
         <TouchableOpacity
@@ -96,9 +96,10 @@ const WelcomeMessageModal = () => {
                     welcomeMessageModal: false,
                   })
                 );
-                navigation.navigate("ImportDependentScreen", {
-                  fromHome: true,
-                });
+                // TODO check if this is existing
+                // navigation.navigate("ImportDependentScreen", {
+                //   fromHome: true,
+                // });
               }}
             >
               <Text style={styles.buttonText}>

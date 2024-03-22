@@ -1,13 +1,13 @@
-import { Button, TopNavigation } from '@ui-kitten/components'
-import React from 'react'
-import ChangeModalState from '@/Store/Modal/ChangeModalState'
-import { useDispatch } from 'react-redux'
-import LinearGradient from 'react-native-linear-gradient'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Button, TopNavigation } from '@ui-kitten/components';
+import React from 'react';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { useDispatch } from 'react-redux';
+import LinearGradient from 'react-native-linear-gradient';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Colors from '@/Theme/Colors';
 
 const BottomBar = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   return (
     <View>
       <View style={styles.bottom}>
@@ -20,10 +20,10 @@ const BottomBar = () => {
               appearance="ghost"
               size="giant"
               status="control"
-              onPress={() =>
-                dispatch(
-                  ChangeModalState.action({ createPostModalVisibility: true }),
-                )
+              onPress={() =>{}
+                // dispatch(
+                //   ChangeModalState.action({ createPostModalVisibility: true }),
+                // )
               }
             >
               Upload
@@ -35,13 +35,8 @@ const BottomBar = () => {
               appearance="ghost"
               size="giant"
               status="control"
-              onPress={() =>
-                dispatch(
-                  ChangeModalState.action({
-                    startLivestreamModalVisibility: true,
-                  }),
-                )
-              }
+              onPress={() => {
+              }}
             >
               Livestream
             </Button>
@@ -49,16 +44,16 @@ const BottomBar = () => {
         </View>
       </View>
     </View>
-  )
-}
-export default BottomBar
+  );
+};
+export default BottomBar;
 const styles = StyleSheet.create({
   background: {
     flex: 1,
     flexDirection: 'row',
     color: Colors.white,
     zIndex: -1,
-    backgroundColor: Colors.primary
+    backgroundColor: Colors.primary,
   },
   topNav: {
     color: Colors.white,
@@ -86,4 +81,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
-})
+});
