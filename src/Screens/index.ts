@@ -17,7 +17,7 @@ export { default as InstructorActivityScreen } from "./Main/InstructorActivity/I
 export { default as InstructorGroupScreen } from "./Main/InstructorGroup/InstructorGroupScreen";
 
 export { default as ActivityDetailsScreen } from "./Main/ActivityDetails/ActivityDetailsScreen";
-// export { default as CreateActivityScreen } from "./Main/CreateActivity/CreateActivityScreen";
+export { default as CreateActivityScreen } from "./Main/CreateActivity/CreateActivityScreen";
 // export { default as CreateGroupScreen } from "./Main/CreateGroup/CreateGroupScreen";
 // export { default as InstructorApprovalScreen } from "./Main/InstructorApproval/InstructorApprovalScreen";
 // export { default as InstructorDeclineScreen } from "./Main/InstructorDecline/InstructorDeclineScreen";

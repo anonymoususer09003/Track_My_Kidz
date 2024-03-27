@@ -7,7 +7,7 @@ import {
   ActivityDetailsScreen,
   AppListScreen,
   ChangePasswordScreen,
-  ContactUsScreen,
+  ContactUsScreen, CreateActivityScreen,
   InstructorPersonalProfileScreen,
   InstructorSettingsScreen,
   OrganizationInfoScreen,
@@ -26,6 +26,7 @@ export type MainStackNavigatorParamsList = {
   ReportProblemScreen: undefined
   InstructorActivityNavigator: undefined
   ActivityDetails: { activity?: any }
+  CreateActivity: { isEdit?: boolean, groupId?: string }
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
@@ -101,6 +102,8 @@ const RightDrawerNavigator = () => {
           name="ActivityDetails"
           component={ActivityDetailsScreen}
         />
+        <Stack.Screen name="CreateActivity" component={CreateActivityScreen} />
+
 
         {/*{user_type === "student" && (*/}
         {/*  <Stack.Screen*/}
@@ -160,7 +163,6 @@ const RightDrawerNavigator = () => {
         {/*  name="StudentLocation"*/}
         {/*  component={StudentLocationScreen}*/}
         {/*/>*/}
-        {/*<Stack.Screen name="CreateActivity" component={CreateActivityScreen} />*/}
         {/*<Stack.Screen name="CreateGroup" component={CreateGroupScreen} />*/}
 
         {/*<Stack.Screen name="AddMembers" component={AddMembersNavigator} />*/}
@@ -190,7 +192,7 @@ const RightDrawerNavigator = () => {
 const Placeholder = () => {
   let useNavigation1: any = useNavigation();
   return <View>
-    <Text onPress={() => useNavigation1.navigate('ActivityDetails')}>
+    <Text onPress={() => useNavigation1.navigate('CreateActivity')}>
       settings
     </Text>
   </View>;

@@ -5,13 +5,18 @@ import Colors from "@/Theme/Colors";
 import { Input, Layout, Modal, Text } from "@ui-kitten/components";
 import { Formik } from "formik";
 import Papa from "papaparse";
-import React from "react";
+import React, { FC } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import DocumentPicker from "react-native-document-picker";
 import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
 
-const AddIndividialMembersModal = ({
+type AddIndividialMembersModalProps = {
+  individuals?: any,
+  setIndividuals?: any,
+  hideImport?: any,
+}
+const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
   individuals,
   setIndividuals,
   hideImport,
@@ -36,7 +41,7 @@ const AddIndividialMembersModal = ({
     DocumentPicker.pickSingle({
       type: DocumentPicker.types.csv,
     })
-      .then((res) => {
+      .then((res: any) => {
         Papa.parse(res[0].fileCopyUri, {
           download: true,
           delimiter: ",",
