@@ -2396,6 +2396,15 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.11.tgz#2596fb352ee96a1379c657734d4b913a613ad563"
   integrity sha512-ga8y9v9uyeiLdpKddhxYQkxNDrfvuPrlFb0N1qnZZByvcElJaXthF1UhvCh9TLWJBEHeNtdnbysW7Y6Uq8CVng==
 
+"@types/react-native-table-component@^1.2.8":
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/@types/react-native-table-component/-/react-native-table-component-1.2.8.tgz#b4deb0d24f55641ac63783cc04a2bd4e40c11d65"
+  integrity sha512-ZhWnoW3LpzXx+fCyosNBVasVCuaWNCMDMcP0mO9FSSK8eRE4ihLTqKiit6zjpph9ot4LQ/mD8hmbhV0YpRLvOQ==
+  dependencies:
+    "@types/react" "*"
+    csstype "^3.0.3"
+    react-native "*"
+
 "@types/react-native-vector-icons@^6.4.18":
   version "6.4.18"
   resolved "https://registry.yarnpkg.com/@types/react-native-vector-icons/-/react-native-vector-icons-6.4.18.tgz#18671c617b9d0958747bc959903470dde91a8c79"
@@ -3445,7 +3454,7 @@ csso@^5.0.5:
   dependencies:
     css-tree "~2.2.0"
 
-csstype@^3.0.2:
+csstype@^3.0.2, csstype@^3.0.3:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.3.tgz#d80ff294d114fb0e6ac500fbf85b60137d7eff81"
   integrity sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==
@@ -7086,6 +7095,11 @@ react-native-screens@^3.29.0:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
 
+react-native-share@^10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-10.1.0.tgz#ce444830a6d9d3f3d5248344a95e124ceef39f82"
+  integrity sha512-fKKvwaZe5s3HW0tcRKyR5AWvAfXvkk0FgTw1nYWYjI4gNqntXbMjRqWZed8Hmd1MvIJS17K/ELPges0tsxbp3g==
+
 react-native-smart-statusbar@^1.0.24:
   version "1.0.24"
   resolved "https://registry.yarnpkg.com/react-native-smart-statusbar/-/react-native-smart-statusbar-1.0.24.tgz#eb26d7ee74c299126116b69fc92e7664a760acfd"
@@ -7141,7 +7155,7 @@ react-native-vector-icons@^10.0.3:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native@0.73.6:
+react-native@*, react-native@0.73.6:
   version "0.73.6"
   resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.73.6.tgz#ed4c675e205a34bd62c4ce8b9bd1ca5c85126d5b"
   integrity sha512-oqmZe8D2/VolIzSPZw+oUd6j/bEmeRHwsLn1xLA5wllEYsZ5zNuMsDus235ONOnCRwexqof/J3aztyQswSmiaA==
