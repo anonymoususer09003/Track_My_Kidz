@@ -13,10 +13,10 @@ export {default as EmailConfirmationScreen} from './Auth/SignUp/EmailConfirmatio
 export {default as StartUpScreen} from './Startup/StartUpScreen';
 
 //INSTRUCTOR
-// export { default as InstructorActivityScreen } from "./Main/InstructorActivity/InstructorActivityScreen";
+export { default as InstructorActivityScreen } from "./Main/InstructorActivity/InstructorActivityScreen";
+export { default as InstructorGroupScreen } from "./Main/InstructorGroup/InstructorGroupScreen";
 
 // export { default as ActivityDetailsScreen } from "./Main/ActivityDetails/ActivityDetailsScreen";
-// export { default as InstructorGroupScreen } from "./Main/InstructorGroup/InstructorGroupScreen";
 // export { default as CreateActivityScreen } from "./Main/CreateActivity/CreateActivityScreen";
 // export { default as CreateGroupScreen } from "./Main/CreateGroup/CreateGroupScreen";
 // export { default as InstructorApprovalScreen } from "./Main/InstructorApproval/InstructorApprovalScreen";

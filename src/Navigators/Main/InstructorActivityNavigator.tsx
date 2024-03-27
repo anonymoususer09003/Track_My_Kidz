@@ -15,8 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUserId } from '@/Storage/MainAppStorage';
-import InstructorActivityScreen from '@/Screens/Main/InstructorActivity/InstructorActivityScreen';
-import InstructorGroupScreen from '@/Screens/Main/InstructorGroup/InstructorGroupScreen';
+import { InstructorActivityScreen, InstructorGroupScreen } from '@/Screens';
 
 export type InstructorActivityNavigatorParamList = {
   InstructorActivity: { instructors?: any };
