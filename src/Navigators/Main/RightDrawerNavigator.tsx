@@ -14,14 +14,16 @@ import {
 } from '@/Screens';
 import { createStackNavigator } from '@react-navigation/stack';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
+import InstructorActivityNavigator from '@/Navigators/Main/InstructorActivityNavigator';
 
-export type RightDrawerNavigatorParamsList = {
+export type MainStackNavigatorParamsList = {
   InstructorPersonalProfileScreen: undefined
   InstructorActivity?: undefined
   ChangePassword: undefined
   OrganizationInfo: undefined
   InstructorSettings: undefined
   ReportProblemScreen: undefined
+  InstructorActivityNavigator: any
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
@@ -43,11 +45,12 @@ const RightDrawerNavigator = () => {
   if (!user_type) {
     return <></>;
   }
-  const Stack = createStackNavigator<RightDrawerNavigatorParamsList>();
+  const Stack = createStackNavigator<MainStackNavigatorParamsList>();
 
 
   return (
     <Stack.Navigator
+      screenOptions={{headerShown: false}}
       // drawerContent={(props) => {
       //   rightNavigation = props.navigation;
       //   return <RightDrawerContent {...props} />;
@@ -71,7 +74,7 @@ const RightDrawerNavigator = () => {
         {user_type === 'instructor' && (
           <Stack.Screen
             name="InstructorActivity"
-            component={Placeholder}
+            component={InstructorActivityNavigator}
           />
         )}
         <Stack.Screen

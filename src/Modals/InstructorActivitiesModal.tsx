@@ -1,102 +1,88 @@
-import {
-  Card,
-  IndexPath,
-  Modal,
-  RadioGroup,
-  Text,
-  Icon,
-} from "@ui-kitten/components";
-import { actions } from "@/Context/state/Reducer";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
-import React, { useEffect, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import { useTheme } from "@/Theme";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { LinearGradientButton } from "@/Components";
-import ChangeSelectedState from "@/Store/Selected/ChangeSelectedState";
-import { DeclineToGift } from "@/Services/GiftService";
-import Colors from "@/Theme/Colors";
-import EvilIcons from "react-native-vector-icons/EvilIcons";
-import Entypo from "react-native-vector-icons/Entypo";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Feather from "react-native-vector-icons/Feather";
-import { useStateValue } from "@/Context/state/State";
-import { useNavigation } from "@react-navigation/native";
-import { DeleteActivity } from "@/Services/Activity";
-import SetChatParam from "@/Store/chat/SetChatParams";
+import { Card, Icon, Modal, Text } from '@ui-kitten/components';
+import { actions } from '@/Context/state/Reducer';
+import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserState } from '@/Store/User';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { LinearGradientButton } from '@/Components';
+import Colors from '@/Theme/Colors';
+import Entypo from 'react-native-vector-icons/Entypo';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useStateValue } from '@/Context/state/State';
+import { useNavigation } from '@react-navigation/native';
+import { DeleteActivity } from '@/Services/Activity';
+import SetChatParam from '@/Store/chat/SetChatParams';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
-const InstructorActivityModal = ({
-  selectedInstructions,
-  setSelectedInstructions,
-  visible,
-  item,
-  hide,
-  prevOpenedRow,
-  buses,
-  showCancelModal,
-  getActivities,
-  row,
-  setSelectedActivity,
-}: {
-  selectedInstructions: any;
-  setSelectedInstructions: any;
-  visible: any;
-  item: any;
-  hide: any;
-  prevOpenedRow: any;
-  row: any;
-  buses: any;
-  showCancelModal: any;
-  getActivities: any;
-  setSelectedActivity: any;
-}) => {
-  const navigation = useNavigation();
-  const user = useSelector((state: { user: UserState }) => state.user.item);
-  const amountValues = [
-    { id: 0, amount: 500, label: "$5" },
-    { id: 1, amount: 1000, label: "$10" },
-    {
-      id: 3,
-      amount: 2000,
-      label: "$20",
-    },
-    { id: 4, amount: 5000, label: "$50" },
-    { id: 5, amount: 10000, label: "$100" },
-  ];
+type InstructorActivityModal = {
+  selectedInstructions?: any;
+  setSelectedInstructions?: any;
+  visible?: any;
+  item?: any;
+  hide?: any;
+  prevOpenedRow?: any;
+  row?: any;
+  buses?: any;
+  showCancelModal?: any;
+  getActivities?: any;
+  setSelectedActivity?: any;
+}
 
-  const { Layout } = useTheme();
-  const [selectedAmountIndex, setSelectedAmountIndex] =
-    useState<IndexPath | null>(null);
-  const [cardData, setCardData] = useState({});
-  const [isValid, setIsValid] = useState(false);
-  const [payment, setPayment] = useState(false);
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const availableAmounts = [
-    {
-      amount: 1,
-      label: "$50 - Annually (Best Deal)",
-    },
-    {
-      amount: 5,
-      label: "$4.99 - Monthly",
-    },
-  ];
-  //   const isVisible = useSelector(
+const InstructorActivityModal = (
+  {
+    selectedInstructions,
+    setSelectedInstructions,
+    visible,
+    item,
+    hide,
+    prevOpenedRow,
+    buses,
+    showCancelModal,
+    getActivities,
+    row,
+    setSelectedActivity,
+  }: InstructorActivityModal) => {
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
+  const user: any = useSelector((state: { user: UserState }) => state.user.item);
+  // todo check if it can be removed
+  // const amountValues = [
+  //   { id: 0, amount: 500, label: "$5" },
+  //   { id: 1, amount: 1000, label: "$10" },
+  //   {
+  //     id: 3,
+  //     amount: 2000,
+  //     label: "$20",
+  //   },
+  //   { id: 4, amount: 5000, label: "$50" },
+  //   { id: 5, amount: 10000, label: "$100" },
+  // ];
+  //
+  // const { Layout } = useTheme();
+  // const [selectedAmountIndex, setSelectedAmountIndex] =
+  //   useState<IndexPath | null>(null);
+  // const [cardData, setCardData] = useState({});
+  // const [isValid, setIsValid] = useState(false);
+  // const [payment, setPayment] = useState(false);
+  // const [selectedIndex, setSelectedIndex] = React.useState(0);
+  // const availableAmounts = [
+  //   {
+  //     amount: 1,
+  //     label: "$50 - Annually (Best Deal)",
+  //   },
+  //   {
+  //     amount: 5,
+  //     label: "$4.99 - Monthly",
+  //   },
+  // ];
+  // //   const isVisible = useSelector(
   //     (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
   //   );
-  console.log("item", item);
+  console.log('item', item);
   const dispatch = useDispatch();
-  const [{ item: activity }, _dispatch] = useStateValue();
+  const [{ item: activity }, _dispatch]: any = useStateValue();
   // @ts-ignore
   return (
     <Modal
@@ -110,11 +96,11 @@ const InstructorActivityModal = ({
       <Card style={styles.modal} disabled={true}>
         <View
           style={{
-            flexDirection: "column",
+            flexDirection: 'column',
             // alignItems: "center",
             // justifyContent: "space-between",
             // backgroundColor: "yellow",
-            height: "100%",
+            height: '100%',
           }}
         >
           <TouchableOpacity
@@ -124,7 +110,7 @@ const InstructorActivityModal = ({
               dispatch(
                 ChangeModalState.action({
                   requestPermissionModalVisibility: true,
-                })
+                }),
               );
               setSelectedActivity(item);
               _dispatch({
@@ -141,9 +127,11 @@ const InstructorActivityModal = ({
             style={styles.buttonStyle}
             onPress={() => {
               console.log(item, buses);
-              const bus = buses.find((b) => b?.activityId === item?.activityId);
+
+              // todo check if it can be removed
+              // const bus = buses.find((b) => b?.activityId === item?.activityId);
               // / // console.log();
-              console.log("item-------", item);
+              console.log('item-------', item);
 
               if (
                 item?.countApprovedInstructors ||
@@ -155,7 +143,7 @@ const InstructorActivityModal = ({
                 });
                 setSelectedActivity(item);
                 dispatch(
-                  ChangeModalState.action({ rollCallModalVisibility: true })
+                  ChangeModalState.action({ rollCallModalVisibility: true }),
                 );
               } else {
                 Alert.alert(`You don't have any approved participant `);
@@ -177,7 +165,7 @@ const InstructorActivityModal = ({
               }
               hide();
               setSelectedActivity(item);
-              navigation.navigate("CreateActivity", {
+              navigation.navigate('CreateActivity', {
                 isEdit: true,
               });
               _dispatch({
@@ -203,7 +191,7 @@ const InstructorActivityModal = ({
                 prevOpenedRow?.close();
               }
               hide();
-              navigation.navigate("ActivityDetails", {
+              navigation.navigate('ActivityDetails', {
                 activity: item,
               });
             }}
@@ -222,7 +210,7 @@ const InstructorActivityModal = ({
               dispatch(
                 ChangeModalState.action({
                   journeyTrackerModalVisibility: true,
-                })
+                }),
               );
 
               hide();
@@ -242,7 +230,7 @@ const InstructorActivityModal = ({
                 prevOpenedRow?.close();
               }
               hide();
-              navigation.navigate("CreateActivity", {
+              navigation.navigate('CreateActivity', {
                 isEdit: false,
               });
               _dispatch({
@@ -271,20 +259,20 @@ const InstructorActivityModal = ({
                 SetChatParam.action({
                   title: item?.activityName,
                   chatId: `activity_${item?.activityId}`,
-                  subcollection: "parent",
+                  subcollection: 'parent',
                   user: {
                     _id: user?.instructorId,
                     avatar: user?.imageurl,
                     name: user?.firstname
                       ? user?.firstname[0].toUpperCase() +
-                        user?.firstname.slice(1) +
-                        " " +
-                        user?.lastname[0]?.toUpperCase()
-                      : user?.firstname + "" + user?.lastname,
+                      user?.firstname.slice(1) +
+                      ' ' +
+                      user?.lastname[0]?.toUpperCase()
+                      : user?.firstname + '' + user?.lastname,
                   },
-                })
+                }),
               );
-              navigation.navigate("InstructorChatNavigator", {
+              navigation.navigate('InstructorChatNavigator', {
                 title: item?.activityName,
               });
             }}
@@ -344,7 +332,7 @@ const InstructorActivityModal = ({
             <Entypo size={30} color={Colors.primary} name="circle-with-cross" />
             <Text style={styles.textStyle}>End Activity</Text>
           </TouchableOpacity>
-          <View style={{ width: "100%" }}>
+          <View style={{ width: '100%' }}>
             <LinearGradientButton
               onPress={() => {
                 if (prevOpenedRow) {
@@ -367,18 +355,18 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
     backgroundColor: Colors.newBackgroundColor,
     borderRadius: 10,
   },
   modal: { borderRadius: 10, backgroundColor: Colors.newBackgroundColor },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     color: Colors.white,
     zIndex: -1,
   },
@@ -387,54 +375,54 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   bottom: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 45,
     marginTop: 10,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   buttonText: {
     flex: 1,
     borderRadius: 25,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     margin: 2,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
     marginTop: 10,
   },
   textStyle: {
-    width: "75%",
+    width: '75%',
     // backgroundColor: "red",
-    textAlign: "center",
+    textAlign: 'center',
     color: Colors.black,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   buttonStyle: {
     padding: 5,
-    alignItems: "center",
+    alignItems: 'center',
     //   justifyContent: "center",
     //   padding: 5,
-    width: "100%",
+    width: '100%',
     height: 50,
     backgroundColor: Colors.white,
     borderRadius: 10,
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingLeft: 20,
     marginBottom: 10,
     elevation: 1.5,
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

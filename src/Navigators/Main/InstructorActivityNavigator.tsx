@@ -1,12 +1,8 @@
 import { Calendar, LinearGradientButton } from '@/Components';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 import { actions } from '@/Context/state/Reducer';
-import { useStateValue } from '@/Context/state/State';
 // import { InstructorActivityScreen, InstructorGroupScreen } from "@/Screens";
-import {
-  FindInstructorBySchoolOrg,
-  GetInstructor,
-} from '@/Services/Instructor';
+import { FindInstructorBySchoolOrg, GetInstructor } from '@/Services/Instructor';
 import ChangeInstructorActivityState from '@/Store/InstructorsActivity/ChangeInstructorActivityState';
 import { ModalState } from '@/Store/Modal';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
@@ -16,9 +12,17 @@ import { TabBar } from '@ui-kitten/components';
 import axios from 'axios';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUserId } from '@/Storage/MainAppStorage';
+import InstructorActivityScreen from '@/Screens/Main/InstructorActivity/InstructorActivityScreen';
+import InstructorGroupScreen from '@/Screens/Main/InstructorGroup/InstructorGroupScreen';
+
+export type InstructorActivityNavigatorParamList = {
+  InstructorActivity: { instructors?: any };
+  InstructorGroup: { instructors?: any };
+};
+
 // @refresh reset
 const InstructorActivityNavigator = () => {
   const dispatch = useDispatch();
@@ -31,7 +35,7 @@ const InstructorActivityNavigator = () => {
   const currentUser = useSelector(
     (state: { user: any }) => state.user.item,
   );
-  const TabNavigator = createMaterialTopTabNavigator();
+  const TabNavigator = createMaterialTopTabNavigator<InstructorActivityNavigatorParamList>();
   const tabNames = ['Activity', 'Group'];
   const [selectedMonth, setSelectedMonth] = useState(
     moment(new Date()).month(),
@@ -160,7 +164,7 @@ const InstructorActivityNavigator = () => {
         hideLeftIcon={true}
         dropDownList={instructors}
         showDropDown={!!currentUser?.isAdmin}
-        title={`Activity & Groups`}
+        title={`Activities & Groups`}
         rightIcon={true}
       >
         {isCalendarVisible && (
@@ -198,17 +202,20 @@ const InstructorActivityNavigator = () => {
           <TabNavigator.Screen
             name="InstructorActivity"
             options={{ title: 'Activity' }}
-            component={View}
+            component={InstructorActivityScreen}
           />
           <TabNavigator.Screen
             name="InstructorGroup"
             options={{ title: 'Groups' }}
-            component={View}
+            component={InstructorGroupScreen}
           />
         </TabNavigator.Navigator>
       </BackgroundLayout>
     </>
   );
+};
+const sfkjdsa = () => {
+  return <View><Text>nello worls</Text></View>;
 };
 
 export default InstructorActivityNavigator;

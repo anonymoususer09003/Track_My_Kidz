@@ -1,59 +1,40 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from 'react';
+import { CheckBox, Icon, Text, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
+import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import Colors from '@/Theme/Colors';
+import Entypo from 'react-native-vector-icons/Entypo';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { LinearGradientButton } from '@/Components';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Modal from 'react-native-modal';
+import Toast from 'react-native-toast-message';
+import { useStateValue } from '@/Context/state/State';
+import { actions } from '@/Context/state/Reducer';
 import {
-  Text,
-  CheckBox,
-  TopNavigation,
-  TopNavigationAction,
-  Icon,
-} from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import Entypo from "react-native-vector-icons/Entypo";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { LinearGradientButton } from "@/Components";
-import moment from "moment";
-import { InstructionsModal, DeclineActivityModal } from "@/Modals";
-import SearchBar from "@/Components/SearchBar/SearchBar";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Modal from "react-native-modal";
-import Toast from "react-native-toast-message";
-import { useStateValue } from "@/Context/state/State";
-import { actions } from "@/Context/state/Reducer";
-import {
-  FindAllStudentsWhichActivity,
   FindAllIstructorActivities,
+  FindAllStudentsWhichActivity,
   SendEmailToPendingStudent,
   SendEmailToPenidngInstructor,
-} from "@/Services/Activity";
+} from '@/Services/Activity';
 
-const RequestPermissionModal = ({}) => {
-  const [{ selectedActivity }, _dispatch] = useStateValue();
+const RequestPermissionModal = () => {
+  const [{ selectedActivity }, _dispatch]: any = useStateValue();
   console.log("selectedActivity", selectedActivity);
-  const navigation = useNavigation();
 
   const dispatch = useDispatch();
-  const [pageStudents, pageNumberStudents] = useState(0);
-  const [pageSizeStudents, setPageSizeStudents] = useState(30);
-  const [totalRecordsStudents, setTotalRecordsStudents] = useState(true);
-  const [pageInstructors, pageNumberInstructors] = useState(true);
-  const [pageSizeInstructors, setPageSizeInstructors] = useState(10);
-  const [totalRecordsInstructors, setTotalRecordsInstructors] = useState(0);
-  const [students, setStudents] = useState([]);
-  const [instructors, setInstructors] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [selectAll, setSelectAll] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("pending");
+  const [pageStudents, pageNumberStudents] = useState<number>(0);
+  const [pageSizeStudents, setPageSizeStudents] = useState<number>(30);
+  const [totalRecordsStudents, setTotalRecordsStudents] = useState<boolean>(true);
+  const [pageInstructors, pageNumberInstructors] = useState<number>(0);
+  const [pageSizeInstructors, setPageSizeInstructors] = useState<number>(10);
+  const [totalRecordsInstructors, setTotalRecordsInstructors] = useState<number>(0);
+  const [students, setStudents] = useState<any[]>([]);
+  const [instructors, setInstructors] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
+  const [selectedStatus, setSelectedStatus] = useState<string>("pending");
 
   const isVisible = useSelector(
     (state: { modal: ModalState }) =>
@@ -64,7 +45,7 @@ const RequestPermissionModal = ({}) => {
     setSelectAll(!selectAll);
     if (!selectAll) {
       const data = [...students];
-      const _data = [];
+      const _data: any[] = [];
       data.forEach((i) =>
         _data.push({
           ...i,
@@ -73,7 +54,7 @@ const RequestPermissionModal = ({}) => {
       );
       setStudents(_data);
       const instructorData = [...instructors];
-      const __data = [];
+      const __data: any[] = [];
       instructorData.forEach((i) =>
         __data.push({
           ...i,
@@ -83,7 +64,7 @@ const RequestPermissionModal = ({}) => {
       setInstructors(__data);
     } else {
       const data = [...students];
-      const _data = [];
+      const _data: any[] = [];
       data.forEach((i) =>
         _data.push({
           ...i,
@@ -92,7 +73,7 @@ const RequestPermissionModal = ({}) => {
       );
       setStudents(_data);
       const instructorData = [...instructors];
-      const __data = [];
+      const __data:any[] = [];
       instructorData.forEach((i) =>
         __data.push({
           ...i,
@@ -103,7 +84,7 @@ const RequestPermissionModal = ({}) => {
     }
   };
 
-  const handleCheckboxChange = (index) => {
+  const handleCheckboxChange = (index: number) => {
     const data = [...students];
     const item = data[index];
     item.selected = !item.selected;
@@ -111,7 +92,7 @@ const RequestPermissionModal = ({}) => {
     setStudents(data);
   };
 
-  const handleCheckboxInstructorChange = (index) => {
+  const handleCheckboxInstructorChange = (index: number) => {
     const data = [...instructors];
     const item = data[index];
     item.selected = !item.selected;
@@ -122,7 +103,7 @@ const RequestPermissionModal = ({}) => {
   const handleSubmit = async () => {
     try {
       console.log("instructors", instructors);
-      let ids = [];
+      let ids :any[]= [];
       let filterStudents =
         students &&
         students?.map((item: any) => {
@@ -139,7 +120,7 @@ const RequestPermissionModal = ({}) => {
         let res = await SendEmailToPendingStudent(body);
       }
 
-      let instructor_ids = [];
+      let instructor_ids :any[]= [];
       let filterInstructors =
         instructors &&
         instructors?.map((item: any) => {
@@ -202,7 +183,7 @@ const RequestPermissionModal = ({}) => {
       }}
     />
   );
-  const getPendingStudents = async (refreshing: any) => {
+  const getPendingStudents = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
@@ -231,8 +212,8 @@ const RequestPermissionModal = ({}) => {
         console.log("err", err);
       });
   };
-  const getPendingInstructors = async (refreshing: any) => {
-    let pageNumberStudentCount = refreshing ? pageInstructors : 0;
+  const getPendingInstructors = async (refreshing?: any) => {
+    let pageNumberStudentCount: number = refreshing ? pageInstructors : 0;
     let body = {
       activityId: selectedActivity?.activityId,
       status: "pending",
@@ -245,7 +226,7 @@ const RequestPermissionModal = ({}) => {
           "res ins==============00000000303399398983983899839839838998393",
           res
         );
-        setTotalRecordsInstructors(res.length == 0 ? false : true);
+        setTotalRecordsInstructors(res.length);
         setRefreshing(false);
         setPageSizeInstructors(10);
 
@@ -576,7 +557,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   topNav: {
-    color: Colors.white,
+    // todo find analog
+    // color: Colors.white,
   },
   layout: {
     flex: 1,

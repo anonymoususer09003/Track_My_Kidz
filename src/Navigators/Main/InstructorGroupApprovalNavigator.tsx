@@ -1,27 +1,25 @@
-import React, { useState } from "react";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { Button, TabBar } from "@ui-kitten/components";
-import { StyleSheet, View } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
-import {
-  InstructorGroupApprovalScreen,
-  InstructorGroupDeclineScreen,
-  InstructorGroupPendingScreen,
-} from "@/Screens";
-import { AppHeader } from "@/Components";
-import Colors from "@/Theme/Colors";
-import SearchBar from "@/Components/SearchBar/SearchBar";
+import React, { useState } from 'react';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { Button, TabBar } from '@ui-kitten/components';
+import { StyleSheet, Text, View } from 'react-native';
+// import {
+//   InstructorGroupApprovalScreen,
+//   InstructorGroupDeclineScreen,
+//   InstructorGroupPendingScreen,
+// } from "@/Screens";
+import Colors from '@/Theme/Colors';
+import SearchBar from '@/Components/SearchBar/SearchBar';
 
 // @refresh reset
 const InstructorGroupApprovalNavigator = () => {
   const TabNavigator = createMaterialTopTabNavigator();
-  const tabNames = ["Approved", "Declined", "Pending"];
-  const [searchParam, setSearchParam] = useState("");
+  const tabNames = ['Approved', 'Declined', 'Pending'];
+  const [searchParam, setSearchParam] = useState('');
   //@ts-ignore
   const TopTabBar = ({ navigation, state }) => (
     <TabBar
       selectedIndex={state.index}
-      indicatorStyle={{ display: "none" }}
+      indicatorStyle={{ display: 'none' }}
       onSelect={(index) => navigation.navigate(state.routeNames[index])}
     >
       {tabNames.map((tabName, index) => {
@@ -61,7 +59,7 @@ const InstructorGroupApprovalNavigator = () => {
   );
   return (
     <>
-      <AppHeader title="Trip: Liam High School" />
+      {/*<AppHeader title="Trip: Liam High School" />*/}
       <SearchBar
         searchText={searchParam}
         onChangeText={(value) => setSearchParam(value)}
@@ -72,24 +70,32 @@ const InstructorGroupApprovalNavigator = () => {
       >
         <TabNavigator.Screen
           name="InstructorGroupApproval"
-          options={{ title: "Approved" }}
-          component={InstructorGroupApprovalScreen}
+          options={{ title: 'Approved' }}
+          component={fsjl}
         />
         <TabNavigator.Screen
           name="InstructorGroupDecline"
-          options={{ title: "Declined" }}
-          component={InstructorGroupDeclineScreen}
+          options={{ title: 'Declined' }}
+          component={fsjl}
         />
         <TabNavigator.Screen
           name="InstructorGroupPending"
-          options={{ title: "Pending" }}
-          component={InstructorGroupPendingScreen}
+          options={{ title: 'Pending' }}
+          component={fsjl}
         />
       </TabNavigator.Navigator>
     </>
   );
 };
 
+const fsjl = () => {
+  return <View>
+
+    <Text>
+      hello world
+    </Text>
+  </View>;
+};
 export default InstructorGroupApprovalNavigator;
 const styles = StyleSheet.create({
   background: {
@@ -105,17 +111,17 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   buttonText: {
     borderRadius: 10,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     color: Colors.white,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

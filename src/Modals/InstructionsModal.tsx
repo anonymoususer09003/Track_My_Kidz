@@ -21,10 +21,10 @@ const InstructionsModal = ({
   activity,
   group,
 }: {
-  selectedInstructions: any;
-  setSelectedInstructions: any;
-  activity: any;
-  group: any;
+  selectedInstructions?: any;
+  setSelectedInstructions?: any;
+  activity?: any;
+  group?: any;
 }) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);
   const amountValues = [
@@ -42,11 +42,10 @@ const InstructionsModal = ({
   const { Layout } = useTheme();
   const [selectedAmountIndex, setSelectedAmountIndex] =
     useState<IndexPath | null>(null);
-  const [cardData, setCardData] = useState({});
-  const [isValid, setIsValid] = useState(false);
-  const [payment, setPayment] = useState(false);
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const [infomation, setInformation] = useState({});
+  // const [cardData, setCardData] = useState<any>({});
+  const [isValid, setIsValid] = useState<boolean>(false);
+  const [payment, setPayment] = useState<boolean>(false);
+  const [infomation, setInformation] = useState<any>({});
   const availableAmounts = [
     {
       amount: 1,
@@ -94,8 +93,6 @@ console.log('resssss',res)
     }
   };
 
-  console.log('infomation',infomation?.instructions)
-  // @ts-ignore
   return (
     <Modal
       style={styles.container}

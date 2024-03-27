@@ -23,7 +23,7 @@ import Icon from 'react-native-vector-icons/Entypo';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RightDrawerNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 import { CountryDTO } from '@/Models/CountryDTOs';
 
 const filterCountries = (item: CountryDTO, query: string) => {
@@ -47,7 +47,7 @@ const Divider = () => (
 
 const grades = ["ECP", "Transition", "Kindergander", "1st Grade", "2nd Grade"];
 type OrganizationInfoScreenProps = {
-  navigation: StackNavigationProp<RightDrawerNavigatorParamsList, 'OrganizationInfo'>;
+  navigation: StackNavigationProp<MainStackNavigatorParamsList, 'OrganizationInfo'>;
 };
 
 const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation }) => {

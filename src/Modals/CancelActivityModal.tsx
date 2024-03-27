@@ -1,22 +1,18 @@
-import React from "react";
-import {
-  Card,
-  IndexPath,
-  Modal,
-  RadioGroup,
-  Text,
-  Icon,
-} from "@ui-kitten/components";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { actions } from "@/Context/state/Reducer";
-import { useDispatch, useSelector } from "react-redux";
-import { GetInstructor } from "@/Services/Instructor";
-import { ScrollView, StyleSheet, View, TouchableOpacity } from "react-native";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import Colors from "@/Theme/Colors";
-import { DeleteActivity, CancelOngoingActivity } from "@/Services/Activity";
-import { useStateValue } from "@/Context/state/State";
-import { useNavigation } from "@react-navigation/native";
+import React from 'react';
+import { Card, Modal, Text } from '@ui-kitten/components';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import { actions } from '@/Context/state/Reducer';
+import { useDispatch } from 'react-redux';
+import { GetInstructor } from '@/Services/Instructor';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import Colors from '@/Theme/Colors';
+import { CancelOngoingActivity, DeleteActivity } from '@/Services/Activity';
+import { useStateValue } from '@/Context/state/State';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+
 const CancelActivityModal = ({
   selectedInstructions,
   setSelectedInstructions,
@@ -29,23 +25,23 @@ const CancelActivityModal = ({
 
   row,
 }: {
-  selectedInstructions: any;
-  setSelectedInstructions: any;
-  visible: any;
-  item: any;
-  hide: any;
-  prevOpenedRow: any;
-  row: any;
-  buses: any;
-  getActivities: any;
+  selectedInstructions?: any;
+  setSelectedInstructions?: any;
+  visible?: any;
+  item?: any;
+  hide?: any;
+  prevOpenedRow?: any;
+  row?: any;
+  buses?: any;
+  getActivities?: any;
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
 
   //   const isVisible = useSelector(
   //     (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
   //   );
   const dispatch = useDispatch();
-  const [{ item: activity }, _dispatch] = useStateValue();
+  const [{ item: activity }, _dispatch] : any= useStateValue();
   // @ts-ignore
   return (
     <Modal
@@ -76,6 +72,7 @@ const CancelActivityModal = ({
             ]}
             onPress={async () => {
               const userId = await loadUserId();
+              if (!userId) return
               GetInstructor(userId)
                 .then((res) => {
                   console.log("res", res);

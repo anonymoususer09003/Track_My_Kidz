@@ -13,7 +13,7 @@ import { loadUserId } from '@/Storage/MainAppStorage';
 import CreateReport from '@/Services/Settings/CreateReport';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RightDrawerNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
 const Divider = () => (
   <View
@@ -82,7 +82,7 @@ const RadioOptions = ({
 };
 
 type ReportProblemScreenProps = {
-  navigation: StackNavigationProp<RightDrawerNavigatorParamsList, 'ReportProblem'>;
+  navigation: StackNavigationProp<MainStackNavigatorParamsList, 'ReportProblem'>;
 };
 
 const ReportProblemScreen: FC<ReportProblemScreenProps> = ({ navigation }) => {

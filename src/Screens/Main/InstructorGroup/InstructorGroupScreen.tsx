@@ -1,116 +1,96 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Text, Icon, Input, Select, SelectItem } from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  Image,
-} from "react-native";
-import setHeaderParams from "@/Store/header/setHeaderParams";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import { useStateValue } from "@/Context/state/State";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import Entypo from "react-native-vector-icons/Entypo";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import fetchOneUserService from "@/Services/User/FetchOne";
-import ChangeUserState from "@/Store/User/FetchOne";
-import { actions } from "@/Context/state/Reducer";
-import {
-  InstructionsModal,
-  RequestPermissionModalGroups,
-  ShowStudentsInstructorsGroupModal,
-} from "@/Modals";
-import { AppHeader } from "@/Components";
-import SetChatParam from "@/Store/chat/SetChatParams";
-import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import {
-  DeleteGroup,
-  GetAllGroup,
-  GetgroupByUserId,
-  FindGroupsByName,
-  GetGroupCount,
-} from "@/Services/Group";
-import {
-  loadId,
-  loadUserId,
-  storeHomeScreenCacheInfo,
-  getHomeScreenCacheInfo,
-} from "@/Storage/MainAppStorage";
-import GetGroupByInstructor from "@/Services/Group/GetGroupByInstructor";
-import { useDebouncedEffect } from "@/Utils/Hooks";
-import usePrevious from "@/Utils/Hooks/usePrevious";
-import {
-  GetAllInstructors,
-  GetInstructor,
-  FindInstructorBySchoolOrg,
-} from "@/Services/Instructor";
-import axios from "axios";
-import MaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
-const instructorImage = require("@/Assets/Images/approval_icon2.png");
-const InstructorGroupScreen = ({ route }) => {
-  const navigation = useNavigation();
-  const dependent = route && route.params && route.params.dependent;
+import React, { FC, useEffect, useRef, useState } from 'react';
+import { RouteProp, useIsFocused, useNavigation } from '@react-navigation/native';
+import { Icon, Text } from '@ui-kitten/components';
+import { ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import setHeaderParams from '@/Store/header/setHeaderParams';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useStateValue } from '@/Context/state/State';
+import { useDispatch, useSelector } from 'react-redux';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Colors from '@/Theme/Colors';
+import Entypo from 'react-native-vector-icons/Entypo';
+import ChangeUserState from '@/Store/User/FetchOne';
+import { actions } from '@/Context/state/Reducer';
+import { InstructionsModal, RequestPermissionModalGroups, ShowStudentsInstructorsGroupModal } from '@/Modals';
+import { AppHeader } from '@/Components';
+import SetChatParam from '@/Store/chat/SetChatParams';
+import ChangeNavigationCustomState from '@/Store/Navigation/ChangeNavigationCustomState';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { DeleteGroup, FindGroupsByName, GetAllGroup, GetgroupByUserId, GetGroupCount } from '@/Services/Group';
+import { getHomeScreenCacheInfo, loadId, loadUserId, storeHomeScreenCacheInfo } from '@/Storage/MainAppStorage';
+import GetGroupByInstructor from '@/Services/Group/GetGroupByInstructor';
+import { useDebouncedEffect } from '@/Utils/Hooks';
+import { FindInstructorBySchoolOrg, GetInstructor } from '@/Services/Instructor';
+import axios from 'axios';
+import MaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
+import { InstructorActivityNavigatorParamList } from '@/Navigators/Main/InstructorActivityNavigator';
+import { UserState } from '@/Store/User';
+import { ModalState } from '@/Store/Modal';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+const instructorImage = require('@/Assets/Images/approval_icon2.png');
+
+type InstructorGroupScreenProps = {
+  route: RouteProp<InstructorActivityNavigatorParamList, 'InstructorGroup'>;
+};
+
+const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const isFocused = useIsFocused();
-  const swipeableRef = useRef(null);
-  const [user, setUser] = useState(null);
-  const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
+  // const swipeableRef = useRef(null);
+  const [user, setUser] = useState<any>(null);
+  const currentUser: any = useSelector(
+    (state: { user: UserState }) => state.user.item,
   );
   const abortControllerRef = useRef(new AbortController());
 
-  let signal = {
-    signal: abortControllerRef.current.signal,
-  };
+  // let signal = {
+  //   signal: abortControllerRef.current.signal,
+  // };
   const cancelToken = axios.CancelToken;
   const source = cancelToken.source();
-  const [, _dispatch] = useStateValue();
+  const [, _dispatch]: any = useStateValue();
   const dispatch = useDispatch();
   const searchBarValue = useSelector(
-    (state: any) => state.header.searchBarValue
+    (state: any) => state.header.searchBarValue,
   );
   const dropDownValue = useSelector((state: any) => state.header.dropDownValue);
-  const [initialize, setInitialize] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
-  const [loading, setLoading] = useState(true);
-  const [thumbnail, setThumbnail] = useState(false);
-  const [searchParam, setSearchParam] = useState("");
-  const [selectedDependent, setSelectedDependent] = useState(null);
-  const [selectedActivity, setSelectedActivity] = useState(null);
-  const [groups, setGroups] = useState([]);
-  const [selectedGroup, setSelectedGroup] = useState(null);
-  const [selectedInstructions, setSelectedInstructions] = useState(null);
+  const [initialize, setInitialize] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  // const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
+  // const [loading, setLoading] = useState(true);
+  // const [thumbnail, setThumbnail] = useState(false);
+  const [searchParam, setSearchParam] = useState<string>('');
+  // const [selectedDependent, setSelectedDependent] = useState(null);
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [groups, setGroups] = useState<any[]>([]);
+  // const [selectedGroup, setSelectedGroup] = useState(null);
+  const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
   const instructors = route.params.instructors;
-  const [selectedInstructor, setSelectedInstructor] = useState(null);
-  const [selectedInstructorGroup, setSelectedInstructorGroup] = useState(null);
-  const [page, pageNumber] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const previousSearchParam = usePrevious(searchParam);
-  const [groupCount, setGroupCount] = useState({});
+  const [selectedInstructor, setSelectedInstructor] = useState<any>(null);
+  const [selectedInstructorGroup, setSelectedInstructorGroup] = useState<any>(null);
+  const [page, pageNumber] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [totalRecords, setTotalRecords] = useState<number>(0);
+  // todo find out about usePrevious hook
+  // const previousSearchParam = usePrevious(searchParam);
+  const [groupCount, setGroupCount] = useState<any>({});
   const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
-    useState(false);
-  const [selectionData, setSelectionData] = useState({
-    type: "student",
-    status: "pending",
+    useState<boolean>(false);
+  const [selectionData, setSelectionData] = useState<any>({
+    type: 'student',
+    status: 'pending',
     group: null,
   });
   const isVisible = useSelector(
     (state: { modal: ModalState }) =>
-      state.modal.requestPermissionModalGroupVisibility
+      state.modal.requestPermissionModalGroupVisibility,
   );
   let prevOpenedRow: any;
   let row: Array<any> = [];
-  const getGroups = async (refreshing: any) => {
+  const getGroups = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
@@ -121,7 +101,7 @@ const InstructorGroupScreen = ({ route }) => {
       cancelToken: source.token,
     })
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
 
         setRefreshing(false);
         setPageSize(10);
@@ -130,8 +110,8 @@ const InstructorGroupScreen = ({ route }) => {
         setTotalRecords(res.totalRecords);
         if (page == 0) {
           storeHomeScreenCacheInfo(
-            "instructor_groups",
-            JSON.stringify(res?.result)
+            'instructor_groups',
+            JSON.stringify(res?.result),
           );
         }
         if (refreshing) {
@@ -145,16 +125,17 @@ const InstructorGroupScreen = ({ route }) => {
         setPageSize(10);
 
         pageNumber(page);
-        console.log("Error:", err);
+        console.log('Error:', err);
       });
   };
-  const getGroupsByUserId = async (refreshing: any) => {
+  const getGroupsByUserId = async (refreshing?: any) => {
     // const user_id = await loadUserId();
     if (refreshing) {
       setRefreshing(true);
     }
     const id = await loadId();
-    console.log("id", id);
+    console.log('id', id);
+    if (!id) return;
     GetgroupByUserId(id, refreshing ? page : 0, pageSize, {
       cancelToken: source.token,
     })
@@ -164,8 +145,8 @@ const InstructorGroupScreen = ({ route }) => {
         setPageSize(10);
         if (page == 0) {
           storeHomeScreenCacheInfo(
-            "instructor_groups",
-            JSON.stringify(res?.result)
+            'instructor_groups',
+            JSON.stringify(res?.result),
           );
         }
         pageNumber(refreshing ? page + 1 : 1);
@@ -175,30 +156,31 @@ const InstructorGroupScreen = ({ route }) => {
           setGroups(res?.result);
         }
       })
-      .catch((err) => console.log("Error:", err));
+      .catch((err) => console.log('Error:', err));
   };
 
   const getGroupByInstructor = async (id: number) => {
-    console.log("id----", id);
+    console.log('id----', id);
     GetGroupByInstructor(id, 0, 15, {
       cancelToken: source.token,
     })
       .then((res) => {
-        console.log("getGroupByInstructor", res);
+        console.log('getGroupByInstructor', res);
         setSelectedInstructorGroup(res);
       })
-      .catch((err) => console.log("getGroupByInstructor"));
+      .catch((err) => console.log('getGroupByInstructor'));
   };
 
-  const getInstructors = async () => {
-    GetAllInstructors(0, 20)
-      .then((res) => {
-        setInstructors(res);
-      })
-      .catch((err) => {
-        console.log("getInstructors Error:", err);
-      });
-  };
+  // todo check if redundant
+  // const getInstructors = async () => {
+  //   GetAllInstructors(0, 20)
+  //     .then((res) => {
+  //       setInstructors(res);
+  //     })
+  //     .catch((err) => {
+  //       console.log("getInstructors Error:", err);
+  //     });
+  // };
 
   const findInstructorBySchoolId = async (res: any) => {
     try {
@@ -211,7 +193,7 @@ const InstructorGroupScreen = ({ route }) => {
         },
         {
           cancelToken: source.token,
-        }
+        },
         // {
         //   signal: abortControllerRef.current.signal,
         // }
@@ -222,35 +204,35 @@ const InstructorGroupScreen = ({ route }) => {
           payload: { result: instructorsList },
         });
 
-        setInstructors({ result: instructorsList });
+        // todo check if redundant
+        // setInstructors({ result: instructorsList });
         // setOrgInfo(org);
         //   })
       }
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
 
   const getInstructor = async () => {
     const userId = await loadUserId();
-    console.log("instructor------------------", userId);
+    console.log('instructor------------------', userId);
+    if (!userId) return;
     try {
       if (Object.keys(currentUser).length == 0) {
-        let res = await GetInstructor(userId, {
-          cancelToken: source.token,
-        });
+        let res = await GetInstructor(userId);
         dispatch(
           ChangeUserState.action({
             item: res,
             fetchOne: { loading: false, error: null },
-          })
+          }),
         );
         _dispatch({
           type: actions.INSTRUCTOR_DETAIL,
           payload: res,
         });
         setUser(res);
-        console.log("res", res.isAdmin);
+        console.log('res', res.isAdmin);
         if (res?.isAdmin) {
           await getGroups();
           findInstructorBySchoolId(res);
@@ -264,7 +246,7 @@ const InstructorGroupScreen = ({ route }) => {
         });
         setUser(currentUser);
         setUser(currentUser);
-        console.log("currentUser", currentUser.isAdmin);
+        console.log('currentUser', currentUser.isAdmin);
         if (currentUser?.isAdmin) {
           getGroups();
           findInstructorBySchoolId(currentUser);
@@ -273,7 +255,7 @@ const InstructorGroupScreen = ({ route }) => {
         }
       }
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
 
@@ -304,40 +286,40 @@ const InstructorGroupScreen = ({ route }) => {
   //       console.log("Error:", err);
   //     });
   // };
-  const RightActions = (dragX: any, item) => {
+  const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
-      extrapolate: "clamp",
+      extrapolate: 'clamp',
     });
 
     return (
       <View
         style={{
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <View
           style={{
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <TouchableOpacity
             style={{
               padding: 5,
-              alignItems: "center",
-              justifyContent: "center",
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             onPress={() => {
               prevOpenedRow?.close();
               dispatch(
                 ChangeModalState.action({
                   requestPermissionModalGroupVisibility: true,
-                })
+                }),
               );
               setSelectedActivity(item);
             }}
@@ -347,12 +329,12 @@ const InstructorGroupScreen = ({ route }) => {
           <TouchableOpacity
             style={{
               padding: 5,
-              alignItems: "center",
-              justifyContent: "center",
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             onPress={() => {
               prevOpenedRow?.close();
-              navigation.navigate("CreateActivity", {
+              navigation.navigate('CreateActivity', {
                 groupId: item?.groupId,
               });
             }}
@@ -366,14 +348,14 @@ const InstructorGroupScreen = ({ route }) => {
           <TouchableOpacity
             onPress={() => {
               prevOpenedRow?.close();
-              navigation.navigate("CreateGroup", {
+              navigation.navigate('CreateGroup', {
                 data: item,
               });
             }}
             style={{
               padding: 5,
-              alignItems: "center",
-              justifyContent: "center",
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <Icon
@@ -405,27 +387,27 @@ const InstructorGroupScreen = ({ route }) => {
               SetChatParam.action({
                 title: item?.groupName,
                 chatId: `activity_${item?.groupId}`,
-                subcollection: "parent",
+                subcollection: 'parent',
                 user: {
                   _id: user?.instructorId,
                   avatar: user?.imageurl,
                   name: user?.firstname
                     ? user?.firstname[0].toUpperCase() +
-                      user?.firstname.slice(1) +
-                      " " +
-                      user?.lastname[0]?.toUpperCase()
-                    : user?.firstname + " " + user?.lastname,
+                    user?.firstname.slice(1) +
+                    ' ' +
+                    user?.lastname[0]?.toUpperCase()
+                    : user?.firstname + ' ' + user?.lastname,
                 },
-              })
+              }),
             );
-            navigation.navigate("InstructorChatNavigator", {
+            navigation.navigate('InstructorChatNavigator', {
               title: item?.groupName,
             });
           }}
           style={{
             padding: 5,
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
@@ -434,16 +416,16 @@ const InstructorGroupScreen = ({ route }) => {
         {!item.status && (
           <View
             style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <TouchableOpacity
               style={{
                 padding: 10,
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
               onPress={() =>
                 DeleteGroup(item.groupId)
@@ -451,7 +433,7 @@ const InstructorGroupScreen = ({ route }) => {
                     getGroups();
                   })
                   .catch((err) => {
-                    console.log("Error:", err);
+                    console.log('Error:', err);
                   })
               }
             >
@@ -468,7 +450,7 @@ const InstructorGroupScreen = ({ route }) => {
   };
 
   const getCacheGroups = async () => {
-    let groups = await getHomeScreenCacheInfo("instructor_groups");
+    let groups = await getHomeScreenCacheInfo('instructor_groups');
     if (groups) {
       setGroups(JSON.parse(groups));
     }
@@ -477,7 +459,7 @@ const InstructorGroupScreen = ({ route }) => {
     dispatch(
       ChangeNavigationCustomState.action({
         navigationLeftDrawer: null,
-      })
+      }),
     );
     setInitialize(true);
     getCacheGroups();
@@ -503,11 +485,12 @@ const InstructorGroupScreen = ({ route }) => {
     () => {
       if (
         searchParam &&
-        searchParam !== previousSearchParam &&
+        // todo check previous hook
+        // searchParam !== previousSearchParam &&
         (searchParam.length === 0 || searchParam.length > 3)
       ) {
         search();
-      } else if (searchParam == "" && initialize) {
+      } else if (searchParam == '' && initialize) {
         if (user?.isAdmin) {
           getGroups();
         } else {
@@ -516,11 +499,11 @@ const InstructorGroupScreen = ({ route }) => {
       }
     },
     [searchParam],
-    50
+    50,
   );
 
-  const search = (text: String) => {
-    if (text == "") {
+  const search = (text: string = '') => {
+    if (text == '') {
       if (user?.isAdmin) {
         getGroups();
       } else {
@@ -545,13 +528,13 @@ const InstructorGroupScreen = ({ route }) => {
           setPageSize(10);
 
           pageNumber(page);
-          console.log("Error:", err);
+          console.log('Error:', err);
         });
     }
   };
 
-  const renderIcon = (props: any) => <Icon {...props} name={"search"} />;
-  const closeRow = (index) => {
+  const renderIcon = (props: any) => <Icon {...props} name={'search'} />;
+  const closeRow = (index: number) => {
     console.log(index);
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow?.close();
@@ -561,20 +544,20 @@ const InstructorGroupScreen = ({ route }) => {
 
   const getGroupCountApi = async (body: any) => {
     try {
-      let temp = {};
+      let temp: any = {};
       let res = await GetGroupCount(body);
-      res.map((item) => {
+      res.map((item: any) => {
         temp[item.groupId] = item;
       });
       setGroupCount({ ...groupCount, ...temp });
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
 
   useEffect(() => {
     if (isFocused) {
-      let temp = [];
+      let temp: any = [];
       if (groups?.length > 0) {
         groups?.forEach(async (element) => {
           temp.push(element.groupId);
@@ -585,7 +568,7 @@ const InstructorGroupScreen = ({ route }) => {
         selectedInstructorGroup &&
         selectedInstructorGroup?.length > 0
       ) {
-        selectedInstructorGroup?.forEach(async (element) => {
+        selectedInstructorGroup?.forEach(async (element: any) => {
           temp.push(element.groupId);
         });
         getGroupCountApi(temp);
@@ -599,12 +582,12 @@ const InstructorGroupScreen = ({ route }) => {
     } else {
       dispatch(
         setHeaderParams.action({
-          selectedDropDownOption: "",
-          searchBarValue: "",
-        })
+          selectedDropDownOption: '',
+          searchBarValue: '',
+        }),
       );
     }
-    return () => source.cancel("axios request cancelled");
+    return () => source.cancel('axios request cancelled');
     //  abortControllerRef.current.abort();
   }, [isFocused]);
 
@@ -616,12 +599,12 @@ const InstructorGroupScreen = ({ route }) => {
       } else {
         setSelectedInstructor(
           instructors?.result[dropDownValue.row - 1]?.firstname +
-            " " +
-            instructors?.result[dropDownValue.row - 1]?.lastname
+          ' ' +
+          instructors?.result[dropDownValue.row - 1]?.lastname,
         );
 
         getGroupByInstructor(
-          instructors?.result[dropDownValue.row]?.instructorId
+          instructors?.result[dropDownValue.row]?.instructorId,
         );
       }
     }
@@ -660,7 +643,7 @@ const InstructorGroupScreen = ({ route }) => {
       )}
       <View style={styles.layout}>
         {groups.length == 0 && (
-          <Text style={{ textAlign: "center", marginTop: 5 }}>
+          <Text style={{ textAlign: 'center', marginTop: 5 }}>
             You currently do not have any groups
           </Text>
         )}
@@ -670,14 +653,14 @@ const InstructorGroupScreen = ({ route }) => {
           }
           style={{
             padding: 10,
-            width: "100%",
+            width: '100%',
             marginTop: 10,
             marginBottom: 20,
           }}
           renderItem={({ item, index }) => {
-            let temp = [];
-            let instructor = item?.instructors?.map((item) =>
-              temp.push(item?.firstName)
+            let temp: any[] = [];
+            let instructor = item?.instructors?.map((item: any) =>
+              temp.push(item?.firstName),
             );
             return (
               <Swipeable
@@ -689,7 +672,7 @@ const InstructorGroupScreen = ({ route }) => {
                   style={[
                     styles.item,
                     {
-                      backgroundColor: "#fff",
+                      backgroundColor: '#fff',
                       marginBottom: index + 1 == groups.length ? 50 : 0,
                     },
                   ]}
@@ -699,7 +682,7 @@ const InstructorGroupScreen = ({ route }) => {
                       styles.text,
                       {
                         fontSize: 20,
-                        fontWeight: "800",
+                        fontWeight: '800',
                         paddingLeft: 25,
                       },
                     ]}
@@ -713,21 +696,21 @@ const InstructorGroupScreen = ({ route }) => {
                       styles.text,
                       {
                         fontSize: 12,
-                        fontWeight: "700",
+                        fontWeight: '700',
                         paddingLeft: 25,
                       },
                     ]}
                   >{`Instructors: ${temp.toString()}`}</Text>
                   <View style={styles.divider}>
-                    <View style={{ alignItems: "center" }}>
+                    <View style={{ alignItems: 'center' }}>
                       <Text style={styles.text}>{`Approval`}</Text>
-                      <View style={{ flexDirection: "row" }}>
+                      <View style={{ flexDirection: 'row' }}>
                         <TouchableOpacity
                           style={styles.horizontal}
                           onPress={() => {
                             setSelectionData({
-                              status: "approved",
-                              type: "student",
+                              status: 'approved',
+                              type: 'student',
                               group: item,
                             });
                             setShowStudentsInstructorsModal(true);
@@ -735,7 +718,7 @@ const InstructorGroupScreen = ({ route }) => {
                         >
                           <Text style={styles.footerText}>{`${
                             groupCount[item.groupId]?.countApprovedStudents ||
-                            "0"
+                            '0'
                           }`}</Text>
                           <Entypo
                             name="book"
@@ -748,8 +731,8 @@ const InstructorGroupScreen = ({ route }) => {
                           style={styles.horizontal}
                           onPress={() => {
                             setSelectionData({
-                              status: "approved",
-                              type: "instructor",
+                              status: 'approved',
+                              type: 'instructor',
                               group: item,
                             });
                             setShowStudentsInstructorsModal(true);
@@ -757,7 +740,7 @@ const InstructorGroupScreen = ({ route }) => {
                         >
                           <Text style={styles.text}>
                             {groupCount[item.groupId]
-                              ?.countApprovedInstructors || "0"}
+                              ?.countApprovedInstructors || '0'}
                           </Text>
                           <Image
                             source={instructorImage}
@@ -767,15 +750,15 @@ const InstructorGroupScreen = ({ route }) => {
                       </View>
                     </View>
 
-                    <View style={{ alignItems: "center" }}>
+                    <View style={{ alignItems: 'center' }}>
                       <Text style={styles.footerText}>{`Declined`}</Text>
-                      <View style={{ flexDirection: "row" }}>
+                      <View style={{ flexDirection: 'row' }}>
                         <TouchableOpacity
                           style={styles.horizontal}
                           onPress={() => {
                             setSelectionData({
-                              status: "declined",
-                              type: "student",
+                              status: 'declined',
+                              type: 'student',
                               group: item,
                             });
                             setShowStudentsInstructorsModal(true);
@@ -783,7 +766,7 @@ const InstructorGroupScreen = ({ route }) => {
                         >
                           <Text style={styles.text}>{`${
                             groupCount[item.groupId]?.countDeclinedStudents ||
-                            "0"
+                            '0'
                           }`}</Text>
                           <Entypo
                             name="book"
@@ -796,8 +779,8 @@ const InstructorGroupScreen = ({ route }) => {
                           style={styles.horizontal}
                           onPress={() => {
                             setSelectionData({
-                              status: "declined",
-                              type: "instructor",
+                              status: 'declined',
+                              type: 'instructor',
                               group: item,
                             });
                             setShowStudentsInstructorsModal(true);
@@ -805,7 +788,7 @@ const InstructorGroupScreen = ({ route }) => {
                         >
                           <Text style={styles.text}>
                             {groupCount[item.groupId]
-                              ?.countDeclinedInstructors || "0"}
+                              ?.countDeclinedInstructors || '0'}
                           </Text>
                           <Image
                             source={instructorImage}
@@ -815,14 +798,14 @@ const InstructorGroupScreen = ({ route }) => {
                       </View>
                     </View>
 
-                    <View style={{ alignItems: "center" }}>
+                    <View style={{ alignItems: 'center' }}>
                       <Text style={styles.footerText}>{`Pending`}</Text>
-                      <View style={{ flexDirection: "row" }}>
+                      <View style={{ flexDirection: 'row' }}>
                         <TouchableOpacity
                           onPress={() => {
                             setSelectionData({
-                              status: "pending",
-                              type: "student",
+                              status: 'pending',
+                              type: 'student',
                               group: item,
                             });
                             setShowStudentsInstructorsModal(true);
@@ -832,7 +815,7 @@ const InstructorGroupScreen = ({ route }) => {
                           <Text style={styles.text}>
                             {`${
                               groupCount[item.groupId]?.countPendingStudents ||
-                              "0"
+                              '0'
                             }`}
                           </Text>
                           <Entypo
@@ -846,8 +829,8 @@ const InstructorGroupScreen = ({ route }) => {
                           style={styles.horizontal}
                           onPress={() => {
                             setSelectionData({
-                              status: "pending",
-                              type: "instructor",
+                              status: 'pending',
+                              type: 'instructor',
                               group: item,
                             });
                             setShowStudentsInstructorsModal(true);
@@ -855,7 +838,7 @@ const InstructorGroupScreen = ({ route }) => {
                         >
                           <Text style={styles.text}>
                             {groupCount[item.groupId]
-                              ?.countPendingInstructors || "0"}
+                              ?.countPendingInstructors || '0'}
                             {/* {item.countPendingInstructors || `0`} */}
                           </Text>
                           <Image
@@ -874,10 +857,10 @@ const InstructorGroupScreen = ({ route }) => {
                       dispatch(
                         ChangeModalState.action({
                           instructionsModalVisibility: true,
-                        })
+                        }),
                       );
                     }}
-                    style={{ width: "100%", alignItems: "center" }}
+                    style={{ width: '100%', alignItems: 'center' }}
                   >
                     <Text
                       style={[
@@ -897,9 +880,9 @@ const InstructorGroupScreen = ({ route }) => {
           onEndReached={async () => {
             // console.log("logs", originalActivities.result.length);
 
-            console.log("logs", totalRecords);
+            console.log('logs', totalRecords);
             if (totalRecords > groups.length) {
-              console.log("logs");
+              console.log('logs');
               const userId = await loadUserId();
               user?.isAdmin ? getGroups(true) : getGroupsByUserId(userId);
             }
@@ -914,7 +897,7 @@ const InstructorGroupScreen = ({ route }) => {
 
       <AppHeader
         onAddPress={() => {
-          navigation.navigate("CreateGroup");
+          navigation.navigate('CreateGroup');
         }}
       />
     </>
@@ -926,23 +909,23 @@ export default InstructorGroupScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     backgroundColor: Colors.newBackgroundColor,
   },
   item: {
     borderRadius: 15,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     // paddingHorizontal: 10,
     paddingTop: 10,
     minHeight: 205,
   },
 
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 13,
@@ -952,7 +935,7 @@ const styles = StyleSheet.create({
   iconImages: {
     height: 15,
     width: 15,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     marginLeft: 5,
     marginRight: 5,
   },
@@ -963,20 +946,20 @@ const styles = StyleSheet.create({
   footer: {
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
   horizontal: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   divider: {
-    flexDirection: "row",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
     borderColor: Colors.lightgray,

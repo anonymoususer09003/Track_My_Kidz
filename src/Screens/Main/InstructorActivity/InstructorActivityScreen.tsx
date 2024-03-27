@@ -1,67 +1,93 @@
-import { AppHeader } from "@/Components";
-import { actions } from "@/Context/state/Reducer";
-import { useStateValue } from "@/Context/state/State";
-import { CancelActivityModal, InstructionsModal, InstructorActivitiesModal, JourneyTrackerModal, RequestPermissionModal, RollCallModal, SetupVehicleModal, ShowInstructorsStudentsModal } from "@/Modals";
-import { Activity, Optin } from "@/Models/DTOs";
+import { AppHeader } from '@/Components';
+import { actions } from '@/Context/state/Reducer';
+import { useStateValue } from '@/Context/state/State';
 import {
-  FindActivitiesByUserId,
-  GetActivitesCount, GetActivityByName,
-  GetAllActivity
-} from "@/Services/Activity";
-import GetActivityByInstructor from "@/Services/Activity/GetActivityByInstructor";
+  CancelActivityModal,
+  InstructionsModal,
+  InstructorActivitiesModal,
+  JourneyTrackerModal,
+  RequestPermissionModal,
+  RollCallModal,
+  SetupVehicleModal,
+  ShowInstructorsStudentsModal,
+} from '@/Modals';
+import { Activity, Optin } from '@/Models/DTOs';
+import { FindActivitiesByUserId, GetActivitesCount, GetActivityByName, GetAllActivity } from '@/Services/Activity';
+import GetActivityByInstructor from '@/Services/Activity/GetActivityByInstructor';
+import { GetInstructor } from '@/Services/Instructor';
+import CreateMultipleInstructor from '@/Services/Instructor/CreateMultipleInstructor';
+import { GetAllCountries } from '@/Services/PlaceServices';
 import {
-  GetInstructor
-} from "@/Services/Instructor";
-import CreateMultipleInstructor from "@/Services/Instructor/CreateMultipleInstructor";
-import { GetAllCountries } from "@/Services/PlaceServices";
-import { getHomeScreenCacheInfo, getOrgInstructors, loadToken, loadUserId, removeInstructors, storeHomeScreenCacheInfo } from "@/Storage/MainAppStorage";
-import { InstructorState } from "@/Store/InstructorsActivity";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
-import { PlaceState } from "@/Store/Places";
-import { UserState } from "@/Store/User";
-import ChangeUserState from "@/Store/User/FetchOne";
-import Colors from "@/Theme/Colors";
-import { abortController } from "@/Utils/Hooks";
-import usePrevious from "@/Utils/Hooks/usePrevious";
-import Geolocation from "@react-native-community/geolocation";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Icon, Text } from "@ui-kitten/components";
-import axios from "axios";
-import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
+  getHomeScreenCacheInfo,
+  getOrgInstructors,
+  loadId,
+  loadToken,
+  loadUserId,
+  removeInstructors,
+  storeHomeScreenCacheInfo,
+} from '@/Storage/MainAppStorage';
+import { InstructorState } from '@/Store/InstructorsActivity';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import ChangeNavigationCustomState from '@/Store/Navigation/ChangeNavigationCustomState';
+import { PlaceState } from '@/Store/Places';
+import { UserState } from '@/Store/User';
+import ChangeUserState from '@/Store/User/FetchOne';
+import Colors from '@/Theme/Colors';
+import Geolocation from '@react-native-community/geolocation';
+import { RouteProp, useIsFocused, useNavigation } from '@react-navigation/native';
+import { Icon, Text } from '@ui-kitten/components';
+import axios from 'axios';
+import moment from 'moment';
+import React, { FC, useEffect, useState } from 'react';
 import {
-  ActivityIndicator, FlatList, Image, PermissionsAndroid,
-  Platform, StyleSheet, TouchableOpacity, View
-} from "react-native";
-import BackgroundService from "react-native-background-actions";
-import GeolocationAndroid from "react-native-geolocation-service";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Entypo from "react-native-vector-icons/Entypo";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { useDispatch, useSelector } from "react-redux";
-import SockJS from "sockjs-client";
-import * as Stomp from "stompjs";
+  ActivityIndicator,
+  FlatList,
+  Image,
+  PermissionsAndroid,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import BackgroundService from 'react-native-background-actions';
+import GeolocationAndroid from 'react-native-geolocation-service';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Entypo from 'react-native-vector-icons/Entypo';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { useDispatch, useSelector } from 'react-redux';
+import { UserTypeState } from '@/Store/UserType';
+import { InstructorActivityNavigatorParamList } from '@/Navigators/Main/InstructorActivityNavigator';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+// todo solve problem with Stomp
+// import SockJS from "sockjs-client";
+// import * as Stomp from "stompjs";
 const studentImage = require("@/Assets/Images/approval_icon1.png");
 const instructorImage = require("@/Assets/Images/approval_icon2.png");
-const InstructorActivityScreen = ({ route }: any) => {
-  const [, _dispatch] = useStateValue();
+
+
+type InstructorActivityScreenProps = {
+  route: RouteProp<InstructorActivityNavigatorParamList, 'InstructorActivity'>;
+};
+
+const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) => {
+  const [, _dispatch]: any = useStateValue();
   // const countries = useSelector(
   //   (state: { state: any }) => state.places.countries
   // );
   const instructors = route?.params?.instructors;
   const cancelToken = axios.CancelToken;
   const source = cancelToken.source();
-  const { abortControllerRef } = abortController();
+  // const { abortControllerRef } = abortController();
   const countries = useSelector(
     (state: { places: PlaceState }) => state.places.countries
   );
   // let abortControllerRef = useRef<AbortController>(new AbortController());
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const isFocused = useIsFocused();
-  const swipeableRef = useRef(null);
-  const [activitiesCount, setActivitiesCount] = useState({});
+  // const swipeableRef = useRef(null);
+  const [activitiesCount, setActivitiesCount] = useState<any>({});
   const dispatch = useDispatch();
   const user_type = useSelector(
     (state: { userType: UserTypeState }) => state.userType.userType
@@ -81,25 +107,23 @@ const InstructorActivityScreen = ({ route }: any) => {
   );
   const dropDownValue = useSelector((state: any) => state.header.dropDownValue);
 
-  const [cancelModal, setCancelModal] = useState(false);
-  const [searchParam, setSearchParam] = useState("");
-  const previousSearchParam = usePrevious(searchParam);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [originalActivities, setOriginalActivities] = useState<Activity[]>([]);
+  const [cancelModal, setCancelModal] = useState<boolean>(false);
+  const [searchParam, setSearchParam] = useState<string>("");
+  const [activities, setActivities] = useState<Activity[]|  any>([]);
+  const [originalActivities, setOriginalActivities] = useState<Activity[]| any>([]);
 
-  const [selectedActivity, setSelectedActivity] = useState(null);
-  const [selectedInstructions, setSelectedInstructions] = useState<Optin>(null);
-  const [selectedInstructor, setSelectedInstructor] = useState("");
-  const [visible, setVisible] = useState(false);
-  const [selectedItem, setSelectedItem] = useState();
-  const [page, pageNumber] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [userId, setUserId] = useState(null);
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [selectedInstructions, setSelectedInstructions] = useState<Optin| null>(null);
+  const [selectedInstructor, setSelectedInstructor] = useState<string| null>("");
+  const [visible, setVisible] = useState<boolean>(false);
+  const [page, pageNumber] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [totalRecords, setTotalRecords] = useState<number>(0);
+  const [userId, setUserId] = useState<string| null>(null);
   const [selectedInstructorActivities, setSelectedInstructorActivities] =
-    useState(null);
+    useState<any>(null);
     const [originalInstructorActivities, setOriginalInstructorActivities] =
-    useState(null);
+    useState<any>(null);
   const isCalendarVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.showCalendar
   );
@@ -119,9 +143,9 @@ const InstructorActivityScreen = ({ route }: any) => {
     type: "student",
     status: "pending",
   });
-  const [refreshing, setRefreshing] = useState(false);
-  const [user, setUser] = useState(null);
-  const [buses, setBuses] = useState([]);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [user, setUser] = useState<any>(null);
+  const [buses, setBuses] = useState<any[]>([]);
   let prevOpenedRow: any;
   let row: Array<any> = [];
   const currentUser = useSelector(
@@ -154,7 +178,7 @@ const InstructorActivityScreen = ({ route }: any) => {
     }
   }, [selectedInstructions]);
 
-  const getActivities = async (refreshing: any) => {
+  const getActivities = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
@@ -214,7 +238,7 @@ const InstructorActivityScreen = ({ route }: any) => {
       });
   };
 
-  const getActivitiesByUser = async (id: any, refreshing: any) => {
+  const getActivitiesByUser = async (id: any, refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
@@ -283,6 +307,7 @@ const InstructorActivityScreen = ({ route }: any) => {
     }
     try {
       if (Object.keys(currentUser).length == 0) {
+        if (!userId) return
         let res = await GetInstructor(userId);
         dispatch(
           ChangeUserState.action({
@@ -309,7 +334,7 @@ const InstructorActivityScreen = ({ route }: any) => {
           payload: currentUser,
         });
         setUser(currentUser);
-        if (currentUser?.isAdmin) {
+        if ((currentUser as any)?.isAdmin) {
           console.log("if------------------");
           await getActivities(false);
         } else {
@@ -375,7 +400,7 @@ const InstructorActivityScreen = ({ route }: any) => {
     }
   };
 
-  const getActivitiesByInstructor = async (id: number) => {
+  const getActivitiesByInstructor = async (id: any) => {
     GetActivityByInstructor(id, 0, pageSize, {
       cancelToken: source.token,
     })
@@ -398,9 +423,7 @@ const InstructorActivityScreen = ({ route }: any) => {
 
   const fetchCountries = async () => {
     try {
-      let res = await GetAllCountries({
-        cancelToken: source.token,
-      });
+      let res = await GetAllCountries();
       //   dispatch(ChangeCountryState.action({ countries: res }));
       // }
     } catch (err) {
@@ -433,16 +456,17 @@ const InstructorActivityScreen = ({ route }: any) => {
   //   [searchParam, user],
   //   300
   // );
-  let stompClient: any = React.createRef<Stomp.Client>();
-  const connectSockets = async () => {
-    const token = await loadToken();
-    const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
-    stompClient = Stomp.over(socket);
-    stompClient.connect({ token }, () => {
-      console.log("Connected");
-      locationPermission(true);
-    });
-  };
+  // todo solve problem witn Stomp
+  // let stompClient: any = React.createRef<Stomp.Client>();
+  // const connectSockets = async () => {
+  //   const token = await loadToken();
+  //   const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+  //   stompClient = Stomp.over(socket);
+  //   stompClient.connect({ token }, () => {
+  //     console.log("Connected");
+  //     locationPermission(true);
+  //   });
+  // };
   const locationPermission = async () => {
     if (Platform.OS === "android") {
       const granted = await PermissionsAndroid.request(
@@ -473,18 +497,19 @@ const InstructorActivityScreen = ({ route }: any) => {
 
   const sendCoordinates = async (lat: any, lang: any) => {
     const token = await loadToken();
-    stompClient.send(
-      "/socket/ws-location",
-      { token },
-      JSON.stringify({
-        latitude: lat,
-        longitude: lang,
-        deviceId: currentUser?.deviceId,
-      })
-    );
+    // todo solve problem with Stomp
+    // stompClient.send(
+    //   "/socket/ws-location",
+    //   { token },
+    //   JSON.stringify({
+    //     latitude: lat,
+    //     longitude: lang,
+    //     deviceId: currentUser?.deviceId,
+    //   })
+    // );
   };
 
-  const handleHistorySchedule = async (tracking) => {
+  const handleHistorySchedule = async () => {
     // if (currentUser?.childTrackHistory) {
     try {
       if (Platform.OS == "android") {
@@ -495,11 +520,11 @@ const InstructorActivityScreen = ({ route }: any) => {
           sendCoordinates(crd.latitude, crd.longitude);
         });
       } else {
-        Geolocation.getCurrentPosition(async (pos) => {
+        Geolocation.getCurrentPosition(async (pos: { coords: any }) => {
           const crd = pos.coords;
 
           sendCoordinates(crd.latitude, crd.longitude);
-        });
+        }, ()=>{},()=>{});
       }
     } catch (err) {
       console.log("er99999999999999", err);
@@ -507,15 +532,15 @@ const InstructorActivityScreen = ({ route }: any) => {
 
     // }
   };
-  const backgroundCall = async (tracking) => {
-    const sleep = (time) =>
-      new Promise((resolve) => setTimeout(() => resolve(), time));
+  const backgroundCall = async () => {
+    const sleep = (time: any) =>
+      new Promise((resolve: any) => setTimeout(() => resolve(), time));
 
     // You can do anything in your task such as network requests, timers and so on,
     // as long as it doesn't touch UI. Once your task completes (i.e. the promise is resolved),
     // React Native will go into "paused" mode (unless there are other tasks running,
     // or there is a foreground app).
-    const veryIntensiveTask = async (taskDataArguments) => {
+    const veryIntensiveTask = async (taskDataArguments: any) => {
       // Example of an infinite loop task
       const { delay } = taskDataArguments;
 
@@ -523,7 +548,7 @@ const InstructorActivityScreen = ({ route }: any) => {
         for (let i = 1; BackgroundService.isRunning(); i++) {
           try {
             // depends on which lib you are using
-            await handleHistorySchedule(tracking);
+            await handleHistorySchedule();
           } catch (error) {
             // console.log(error);
           }
@@ -594,7 +619,7 @@ const InstructorActivityScreen = ({ route }: any) => {
   //     dispatch(ChangeModalState.action({ setupVehicleModal: true }));
   //   }
   // }, [selectedActivity]);
-  const RightActions = (dragX: any, item) => {
+  const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
@@ -631,11 +656,11 @@ const InstructorActivityScreen = ({ route }: any) => {
   const renderIcon = (props: any) => <Icon {...props} name={"search"} />;
   const filterActivities = (month: any, day: any) => {
       let allActivities = { ...activities }
-     
+
     let date = new Date().getFullYear() + "-" + month + "-" + day;
-    let temp = [];
+    let temp: any[] = [];
     if(originalInstructorActivities?.length){
-      originalInstructorActivities.map((item)=>{
+      originalInstructorActivities.map((item: any)=>{
 
         const date1 = moment(item?.fromDate, ["YYYY-MM-DDTHH:mm:ss.SSSZ", "MMM DD, YYYYTHH:mm:ss.SSSZ"],true);
         const date2 = moment(date, ["YYYY-M-D"],true).add(1,'month').add(1,'day');
@@ -650,7 +675,7 @@ const InstructorActivityScreen = ({ route }: any) => {
       })
       setSelectedInstructorActivities(temp)
     }else{
- originalActivities?.result?.map((item, index) => {
+ originalActivities?.result?.map((item: any, index: number) => {
       // let itemDate = item?.date.split("T");
 
       if (
@@ -661,11 +686,11 @@ const InstructorActivityScreen = ({ route }: any) => {
       }
     });
     }
-   
+
     allActivities.result = temp;
-    
+
     setActivities(allActivities);
- 
+
 
   };
   const filterInstructorActivities = (
@@ -680,10 +705,10 @@ const InstructorActivityScreen = ({ route }: any) => {
       setOriginalInstructorActivities(activities);
     } else{
       let date = new Date().getFullYear() + "-" + month + "-" + day;
-      let temp = [];
+      let temp: any[] = [];
       allActivities.map((item, index) => {
         let itemDate = item?.date?.split(" ");
-  
+
         if (itemDate[0] == date) {
           temp.push(item);
         }
@@ -692,7 +717,7 @@ const InstructorActivityScreen = ({ route }: any) => {
     }
 
   };
-  
+
   useEffect(() => {
     if (isCalendarVisible) {
       filterActivities(selectedMonthForFilter, selectedDayForFilter);
@@ -703,14 +728,13 @@ const InstructorActivityScreen = ({ route }: any) => {
   const search = (text: String) => {
     let allActivities = { ...activities };
 
-    let temp = originalActivities?.result?.filter((item, index) =>
+    allActivities.result = originalActivities?.result?.filter((item: any, index: number) =>
       item.activityName.toLowerCase().includes(text.toLowerCase())
     );
-    allActivities.result = temp;
     setActivities(allActivities);
   };
   // console.log("user--------", user);
-  const closeRow = (index) => {
+  const closeRow = (index: number) => {
     console.log(index);
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
@@ -723,8 +747,8 @@ const InstructorActivityScreen = ({ route }: any) => {
       let res = await GetActivitesCount(body, {
         cancelToken: source.token,
       });
-      let temp = {};
-      res.map((item) => {
+      let temp: any = {};
+      res.map((item: any) => {
         temp[item.activityId] = item;
       });
       console.log("res", res);
@@ -740,12 +764,12 @@ if(!isCalendarVisible){
   setSelectedInstructorActivities(originalInstructorActivities)
 }
   },[isCalendarVisible])
-  
+
   useEffect(() => {
     if (countries && isFocused) {
-      let temp = [];
+      let temp: any = [];
       if (activities?.result?.length > 0) {
-        activities?.result?.forEach(async (element) => {
+        activities?.result?.forEach(async (element:any) => {
           temp.push(element.activityId);
           // await getActivityesCountApi(element?.activityId);
         });
@@ -755,7 +779,7 @@ if(!isCalendarVisible){
         selectedInstructorActivities &&
         selectedInstructorActivities?.length > 0
       ) {
-        selectedInstructorActivities?.forEach(async (element) => {
+        selectedInstructorActivities?.forEach(async (element: any) => {
           temp.push(element.activityId);
           await getActivityesCountApi(element?.activityId);
         });
@@ -808,8 +832,6 @@ if(!isCalendarVisible){
           item={selectedActivity}
           visible={cancelModal}
           hide={() => setCancelModal(false)}
-          prevOpenedRow={prevOpenedRow}
-          row={row}
           buses={buses}
           getActivities={getActivities}
         />
@@ -861,8 +883,9 @@ if(!isCalendarVisible){
       )}
       {isVisible && (
         <RequestPermissionModal
-          activity={selectedActivity}
-          setSelectedActivity={setSelectedActivity}
+          // todo check if it works
+          // activity={selectedActivity}
+          // setSelectedActivity={setSelectedActivity}
         />
       )}
       {showInstructorModal && (
@@ -896,10 +919,10 @@ if(!isCalendarVisible){
           }}
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item, index }) => {
-            let temp = [];
-            let instructor = item?.instructors?.map((item) =>
-              temp.push(item?.firstName)
-            );
+            // let temp = [];
+            // let instructor = item?.instructors?.map((item) =>
+            //   temp.push(item?.firstName)
+            // );
             // console.log("activity", item);
             return (
               <Swipeable
@@ -907,7 +930,7 @@ if(!isCalendarVisible){
                 // ref={swipeableRef}
 
                 onSwipeableOpen={() => closeRow(index)}
-                renderRightActions={(e) => RightActions(e, item, index)}
+                renderRightActions={(e) => RightActions(e, item)}
               >
                 <View
                   style={[

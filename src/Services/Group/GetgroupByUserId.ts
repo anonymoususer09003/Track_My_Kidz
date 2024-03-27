@@ -1,7 +1,7 @@
 import api from "@/Services";
 
 export default async (
-  id: number,
+  id: number| string,
   page: number,
   pageSize: number,
   config: any

@@ -1,44 +1,42 @@
-import { loadToken } from "@/Storage/MainAppStorage";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Icon, Select, SelectItem, Text } from "@ui-kitten/components";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Dimensions, FlatList,
-  Image, StyleSheet, TouchableOpacity, View
-} from "react-native";
-import SockJS from "sockjs-client";
-import * as Stomp from "stompjs";
+import { loadIsSubscribed, loadUserId } from '@/Storage/MainAppStorage';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { Icon, Text } from '@ui-kitten/components';
+import React, { useEffect, useRef, useState } from 'react';
+import { Dimensions, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+// import SockJS from "sockjs-client";
+// import * as Stomp from "stompjs";
 // import { LinearGradientButton } from "@/Components/LinearGradientButton/LinearGradientButton";
-import { AppHeader, Calendar, LinearGradientButton } from "@/Components";
-import SearchBar from "@/Components/SearchBar/SearchBar";
-import { actions } from "@/Context/state/Reducer";
-import { useStateValue } from "@/Context/state/State";
-import {
-  AddStudentModal, EditDependentModal, ParentPaymentModal
-} from "@/Modals";
-import { GetParent } from "@/Services/Parent";
-import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
-import FetchOne from "@/Services/User/FetchOne";
-import { loadIsSubscribed, loadUserId } from "@/Storage/MainAppStorage";
-import LogoutStore from "@/Store/Authentication/LogoutStore";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import Colors from "@/Theme/Colors";
-import Geolocation from "@react-native-community/geolocation";
-import moment from "moment";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import MapView, { Circle, Marker } from "react-native-maps";
-import MaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
-import { useDispatch, useSelector } from "react-redux";
+import { AppHeader, Calendar, LinearGradientButton } from '@/Components';
+import SearchBar from '@/Components/SearchBar/SearchBar';
+import { actions } from '@/Context/state/Reducer';
+import { useStateValue } from '@/Context/state/State';
+import { AddStudentModal, EditDependentModal } from '@/Modals';
+import { GetParent } from '@/Services/Parent';
+import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
+import FetchOne from '@/Services/User/FetchOne';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserState } from '@/Store/User';
+import Colors from '@/Theme/Colors';
+import Geolocation from '@react-native-community/geolocation';
+import moment from 'moment';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import MapView, { Circle, Marker } from 'react-native-maps';
+import MaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useDispatch, useSelector } from 'react-redux';
+
 const window = Dimensions.get("window");
 const { width, height } = window;
+
+interface Corditnations {latitude: any, longitude: any   }
+
 const HomeScreen = () => {
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
   const focused = useIsFocused();
   const swipeableRef = useRef(null);
   const ref = useRef();
-  const [_, _dispatch] = useStateValue();
+  // todo remove any
+  const [_, _dispatch] : any= useStateValue();
   let row: Array<any> = [];
   let prevOpenedRow: any;
   const dispatch = useDispatch();
@@ -51,7 +49,7 @@ const HomeScreen = () => {
   });
 
   useEffect(() => {
-    Geolocation.getCurrentPosition((pos) => {
+    Geolocation.getCurrentPosition((pos: {coords: Corditnations, }) => {
       const crd = pos.coords;
       setPosition({
         latitude: crd.latitude,
@@ -59,21 +57,21 @@ const HomeScreen = () => {
         latitudeDelta: 0.0421,
         longitudeDelta: 0.0421,
       });
-    });
+    }, ()=>{}, ()=>{});
   }, []);
   useEffect(() => {
-    
+
     // setThumbnail(false);
   }, [focused]);
-  const [children, setChildren] = useState([]);
-  const [trackingList, setTrackingList] = useState({});
-  const [getChildrendeviceIds, setChildrensDeviceIds] = useState([]);
-  const [originalChildren, setOriginalChildren] = useState([]);
-  const [thumbnail, setThumbnail] = useState(false);
-  const [searchParam, setSearchParam] = useState("");
-  const [selectedDependent, setSelectedDependent] = useState(null);
-  const [parentLatLong, setparentLatLong] = useState();
-  const [selectedMonth, setSelectedMonth] = useState(
+  const [children, setChildren] = useState<any[]>([]);
+  const [trackingList, setTrackingList] = useState<any>({});
+  const [getChildrendeviceIds, setChildrensDeviceIds] = useState<any[]>([]);
+  const [originalChildren, setOriginalChildren] = useState<any[]>([]);
+  const [thumbnail, setThumbnail] = useState<boolean>(false);
+  const [searchParam, setSearchParam] = useState<string>("");
+  const [selectedDependent, setSelectedDependent] = useState<any>(null);
+  const [parentLatLong, setparentLatLong] = useState<any>();
+  const [selectedMonth, setSelectedMonth] = useState<any>(
     moment(new Date()).month()
   );
   const [region, setRegion] = useState({
@@ -82,16 +80,16 @@ const HomeScreen = () => {
     latitudeDelta: 60,
     longitudeDelta: 0.0421,
   });
-  const [studentsEmails, setStudentsEmail] = useState([]);
-  const [originalStudentsEmails, setOriginalStudentsEmail] = useState([]);
-  const [selectedDay, setSelectedDay] = useState(moment().format("D"));
+  const [studentsEmails, setStudentsEmail] = useState<any[]>([]);
+  const [originalStudentsEmails, setOriginalStudentsEmail] = useState<any[]>([]);
+  const [selectedDay, setSelectedDay] = useState<any>(moment().format("D"));
   const [showChildFilter, setShowChildFilter] = useState(false);
   const [selectedChild, setSelectedChild] = useState("All");
   const [activities, setActivities] = useState([]);
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
-  const socketRef = useRef();
+  const socketRef = useRef<any>();
 
   // console.log("currentUser", currentUser);
   const [isSubscribed, setIsSubscribed] = useState<boolean>();
@@ -111,6 +109,8 @@ const HomeScreen = () => {
   const getParentInfo = async () => {
     const userId = await loadUserId();
 
+    if (!userId) return
+
     GetParent(userId)
       .then((res) => {
         setparentLatLong(res.data);
@@ -126,7 +126,7 @@ const HomeScreen = () => {
   const isCalendarVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.showCalendar
   );
-  const closeRow = (index) => {
+  const closeRow = (index: number) => {
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
     }
@@ -136,9 +136,9 @@ const HomeScreen = () => {
   const getChildrens = async (referCode: string) => {
     try {
       let res = await GetParentChildrens(referCode);
-      let temp = [];
-      let deviceIds = [];
-      res.map((item, index) => {
+      let temp: any[] = [];
+      let deviceIds: string[] = [];
+      res.map((item: any, index: number) => {
         temp.push({
           latitude: item?.latitude ? parseFloat(item?.latitude) : null,
 
@@ -150,7 +150,8 @@ const HomeScreen = () => {
       });
       setChildrensDeviceIds(deviceIds);
 
-      turnOnTracker(currentUser?.id, deviceIds, "activity");
+      // todo: find analog or fix this one
+      // turnOnTracker(currentUser?.id, deviceIds, "activity");
 
       setOriginalChildren(res);
 
@@ -187,22 +188,23 @@ const HomeScreen = () => {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
   }, [selectedDependent]);
-  let stompClient: any = React.createRef<Stomp.Client>();
-  const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
-    try {
-      const token = await loadToken();
-
-      const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
-      stompClient = Stomp.over(socket);
-      stompClient.connect({ token }, () => {
-        deviceIds.map((item) => {
-          stompClient.subscribe(`/device/${item}`, subscriptionCallback);
-        });
-      });
-    } catch (err) {
-      console.log("Error:", err);
-    }
-  };
+  // todo: find analog or fix this one
+  // let stompClient: any = React.createRef<Stomp.Client>();
+  // const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
+  //   try {
+  //     const token = await loadToken();
+  //
+  //     const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+  //     stompClient = Stomp.over(socket);
+  //     stompClient.connect({ token }, () => {
+  //       deviceIds.map((item) => {
+  //         stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+  //       });
+  //     });
+  //   } catch (err) {
+  //     console.log("Error:", err);
+  //   }
+  // };
   const subscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
     console.log("Update Received", messageBody);
@@ -298,27 +300,28 @@ const HomeScreen = () => {
   }, [selectedDependent]);
   const mapFitToCoordinates = () => {
     if (thumbnail && children.length > 0) {
-      let temp = [];
+      let temp: any[] = [];
       let arr = children.map((item, index) => {
         temp.push({
           latitude: item?.latitude
             ? parseFloat(item?.latitude)
-            : parseFloat(10),
+            : 10,
           longitude: item?.longititude
             ? parseFloat(item?.longititude)
-            : parseFloat(10),
+            : 10,
         });
       });
       // ref.current.fitToSuppliedMarkers(temp.map(({ studentId }) => studentId));
-      ref.current.fitToCoordinates(temp, {
-        edgePadding: {
-          top: 2,
-          right: 2,
-          bottom: 2,
-          left: 2,
-        },
-        animated: true,
-      });
+      // todo solve this
+      // ref?.current?.fitToCoordinates(temp, {
+      //   edgePadding: {
+      //     top: 2,
+      //     right: 2,
+      //     bottom: 2,
+      //     left: 2,
+      //   },
+      //   animated: true,
+      // });
     }
   };
   // useEffect(() => {
@@ -423,17 +426,19 @@ useEffect(()=>{
         />
       )}
       {!isSubscribed && (
-        <ParentPaymentModal
-          onPay={() => {}}
-          onCancel={() => dispatch(LogoutStore.action())}
-        />
+        <View></View>
+        // todo uncomment this
+        // <ParentPaymentModal
+        //   onPay={() => {}}
+        //   onCancel={() => dispatch(LogoutStore.action())}
+        // />
       )}
       <AppHeader
         // title="Home"
         onAddPress={() => navigation.navigate("CreateParentActivity")}
         thumbnail={thumbnail}
-        setThumbnail={(value) => setThumbnail(value)}
-        hideCalendar={thumbnail ? false : true}
+        setThumbnail={(value) => setThumbnail(!!(value))}
+        hideCalendar={!thumbnail}
       />
       {isCalendarVisible && (
         <Calendar
@@ -470,47 +475,47 @@ useEffect(()=>{
       />
 
       <View style={[styles.layout]}>
-        {showChildFilter && (
-          <Select
-            style={{ width: "90%", marginHorizontal: "5%" }}
-            value={selectedChild}
-            placeholder="Select Child"
-            onSelect={(index: any) => {
-              let children = [...originalChildren];
+        {/*{showChildFilter && (*/}
+        {/*  <Select*/}
+        {/*    style={{ width: "90%", marginHorizontal: "5%" }}*/}
+        {/*    value={selectedChild}*/}
+        {/*    placeholder="Select Child"*/}
+        {/*    onSelect={(index: any) => {*/}
+        {/*      let children = [...originalChildren];*/}
 
-              const child =
-                index.row === 0
-                  ? "All"
-                  : children[index.row - 1]?.firstname +
-                    " " +
-                    children[index.row - 1]?.lastname;
+        {/*      const child =*/}
+        {/*        index.row === 0*/}
+        {/*          ? "All"*/}
+        {/*          : children[index.row - 1]?.firstname +*/}
+        {/*            " " +*/}
+        {/*            children[index.row - 1]?.lastname;*/}
 
-              if (index.row == 0) {
-                setChildren([...originalChildren]);
-                setOriginalStudentsEmail([...originalStudentsEmails]);
-              } else {
-                let res = children.filter(
-                  (item) => children[index.row - 1].studentId == item.studentId
-                );
-                setChildren(res);
-                let studentsMarker = [...originalStudentsEmails];
-                let markers = studentsMarker[index.row - 1];
-                setStudentsEmail(markers);
-              }
-              setSelectedChild(child);
-            }}
-            label={(evaProps: any) => <Text {...evaProps}></Text>}
-          >
-            <SelectItem title="All" />
-            {originalChildren &&
-              originalChildren.map((item) => (
-                <SelectItem
-                  key={item?.studentId}
-                  title={item?.firstname + " " + item?.lastname}
-                />
-              ))}
-          </Select>
-        )}
+        {/*      if (index.row == 0) {*/}
+        {/*        setChildren([...originalChildren]);*/}
+        {/*        setOriginalStudentsEmail([...originalStudentsEmails]);*/}
+        {/*      } else {*/}
+        {/*        let res = children.filter(*/}
+        {/*          (item) => children[index.row - 1].studentId == item.studentId*/}
+        {/*        );*/}
+        {/*        setChildren(res);*/}
+        {/*        let studentsMarker = [...originalStudentsEmails];*/}
+        {/*        let markers = studentsMarker[index.row - 1];*/}
+        {/*        setStudentsEmail(markers);*/}
+        {/*      }*/}
+        {/*      setSelectedChild(child);*/}
+        {/*    }}*/}
+        {/*    label={(evaProps: any) => <Text {...evaProps}></Text>}*/}
+        {/*  >*/}
+        {/*    <SelectItem title="All" />*/}
+        {/*    {originalChildren &&*/}
+        {/*      originalChildren.map((item) => (*/}
+        {/*        <SelectItem*/}
+        {/*          key={item?.studentId}*/}
+        {/*          title={item?.firstname + " " + item?.lastname}*/}
+        {/*        />*/}
+        {/*      ))}*/}
+        {/*  </Select>*/}
+        {/*)}*/}
         {thumbnail ? (
           <View style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}>
             {children.length == 0 && (
@@ -604,19 +609,21 @@ useEffect(()=>{
           </View>
         ) : (
           <MapView
-            ref={ref}
+            // todo: uncomment this
+            // ref={ref}
             onLayout={() => {
               let temp = studentsEmails.filter((item) => item.latitude != null);
 
-              ref?.current?.fitToCoordinates(temp, {
-                edgePadding: {
-                  top: 10,
-                  right: 10,
-                  bottom: 10,
-                  left: 10,
-                },
-                animated: true,
-              });
+              // todo: uncomment this
+              // ref?.current?.fitToCoordinates(temp, {
+              //   edgePadding: {
+              //     top: 10,
+              //     right: 10,
+              //     bottom: 10,
+              //     left: 10,
+              //   },
+              //   animated: true,
+              // });
             }}
             style={{ flex: 1 }}
           >
@@ -638,10 +645,10 @@ useEffect(()=>{
                         center={{
                           latitude: latitude
                             ? parseFloat(latitude)
-                            : parseFloat(10),
+                            : 10,
                           longitude: longititude
                             ? parseFloat(longititude)
-                            : parseFloat(10),
+                            : 10,
                         }}
                         radius={item?.allowedDistance || 50}
                         strokeWidth={10}
@@ -653,29 +660,30 @@ useEffect(()=>{
                     <Marker
                       onSelect={() => console.log("pressed")}
                       onPress={() => {
-                        ref.current.fitToSuppliedMarkers(
-                          [
-                            {
-                              latitude: latitude
-                                ? parseFloat(latitude)
-                                : parseFloat(10),
-                              longitude: longititude
-                                ? parseFloat(longititude)
-                                : parseFloat(10),
-                            },
-                          ]
+                        // todo: uncomment this
+                        // ref.current.fitToSuppliedMarkers(
+                        //   [
+                        //     {
+                        //       latitude: latitude
+                        //         ? parseFloat(latitude)
+                        //         : 10,
+                        //       longitude: longititude
+                        //         ? parseFloat(longititude)
+                        //         : 10,
+                        //     },
+                        //   ]
                           // false, // not animated
-                        );
+                        // );
                       }}
                       identifier={item?.email}
                       key={index}
                       coordinate={{
                         latitude: latitude
                           ? parseFloat(latitude)
-                          : parseFloat(10),
+                          : 10,
                         longitude: longititude
                           ? parseFloat(longititude)
-                          : parseFloat(10),
+                          : 10,
                       }}
                     >
                       <View style={{}}>

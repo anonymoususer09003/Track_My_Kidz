@@ -27,7 +27,7 @@ export const storeInstructors = async (instructors: any) => {
     return false;
   }
 };
-export const getOrgInstructors = async (instructors: any) => {
+export const getOrgInstructors = async () => {
   try {
     return await AsyncStorage.getItem("instructors");
   } catch (e) {
