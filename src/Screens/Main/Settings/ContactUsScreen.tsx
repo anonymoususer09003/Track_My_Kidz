@@ -1,29 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import {
-  View,
-  KeyboardAvoidingView,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
-import {AppHeader, LinearGradientButton} from '@/Components';
-import {
-  Button,
-  Input,
-  StyleService,
-  useStyleSheet,
-  Layout,
-  Text,
-  Spinner,
-} from '@ui-kitten/components';
-// @ts-ignore
-import {ContactUs} from '../../../Services/ContactUsServices';
+import React, { useEffect, useState } from 'react';
+import { Alert, KeyboardAvoidingView, View } from 'react-native';
+import { AppHeader, LinearGradientButton } from '@/Components';
+import { Input, StyleService, Text, useStyleSheet } from '@ui-kitten/components';
+import { ContactUs } from '../../../Services/ContactUsServices';
 import * as yup from 'yup';
-import {Formik} from 'formik';
+import { Formik } from 'formik';
 import Colors from '@/Theme/Colors';
-import {useIsFocused} from '@react-navigation/native';
-import {loadId} from '@/Storage/MainAppStorage';
+import { useIsFocused } from '@react-navigation/native';
+import { loadId } from '@/Storage/MainAppStorage';
 import BackgroundLayout from '@/Components/BackgroundLayout';
-import LinearGradient from 'react-native-linear-gradient';
 
 const ContactUsScreen = () => {
   const isFocuesed = useIsFocused();
@@ -125,7 +110,6 @@ const ContactUsScreen = () => {
                         {errors.message && isTouched && showErrors ? (
                           <Text style={styles.errorText}>{errors.message}</Text>
                         ) : null}
-                        {console.log('valid', isValid)}
                         <LinearGradientButton
                           onPress={() => (!isValid ? null : handleSubmit())}
                           gradient={

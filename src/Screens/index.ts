@@ -27,12 +27,12 @@ export {default as StartUpScreen} from './Startup/StartUpScreen';
 // export { default as InstructorGroupApprovalScreen } from "./Main/InstructorGroupApproval/InstructorGroupApprovalScreen";
 // export { default as InstructorGroupDeclineScreen } from "./Main/InstructorGroupDecline/InstructorGroupDeclineScreen";
 // export { default as InstructorGroupPendingScreen } from "./Main/InstructorGroupPending/InstructorGroupPendingScreen";
-// export { default as InstructorSettingsScreen } from "./Main/InstructorSettings/InstructorSettingsScreen";
-// export { default as OrganizationInfoScreen } from "./Main/InstructorSettings/OrganizationInfoScreen";
+export { default as InstructorSettingsScreen } from "./Main/InstructorSettings/InstructorSettingsScreen";
+export { default as OrganizationInfoScreen } from "./Main/InstructorSettings/OrganizationInfoScreen";
 // export { default as InstructorsListScreen } from "./Main/InstructorSettings/InstructorOrganizationScreen";
 // export { default as OrganizationBusinformation } from "./Main/InstructorSettings/OrganizationBusinformation";
 // export { default as InstructorHome } from "./Main/InstructorHome/HomeScreen";
-// export { default as InstructorPersonalProfileScreen } from "./Main/InstructorSettings/PersonalProfileScreen";
+export { default as InstructorPersonalProfileScreen } from "./Main/InstructorSettings/PersonalProfileScreen";
 // export { default as DragDropStudentScreen } from "./Main/DragDropStudent/DragDropStudentScreen";
 
 // //PARENT
@@ -59,10 +59,10 @@ export {default as StartUpScreen} from './Startup/StartUpScreen';
 // export { default as StudentPersonalProfileScreen } from "./Main/StudentSettings/PersonalProfileScreen";
 
 // //SETTINGS
-// export { default as AppListScreen } from "./Main/Settings/AppListScreen";
-// export { default as ChangePasswordScreen } from "./Main/Settings/ChangePasswordScreen";
+export { default as AppListScreen } from "./Main/Settings/AppListScreen";
+export { default as ChangePasswordScreen } from "./Main/Settings/ChangePasswordScreen";
 // export { default as NotificationsScreen } from "./Main/Settings/NotificationsScreen";
 // export { default as PaymentInfoScreen } from "./PaymentInfo/PaymentInfoScreen";
-// export { default as ReportProblemScreen } from "./Main/Settings/ReportProblemScreen";
-// export { default as ContactUsScreen } from "./Main/Settings/ContactUsScreen";
+export { default as ReportProblemScreen } from "./Main/Settings/ReportProblemScreen";
+export { default as ContactUsScreen } from "./Main/Settings/ContactUsScreen";
 // export { default as InstructorActivityDetailScreen } from "./Main/InstructorActivity/InstructorActivityDetailScreen";

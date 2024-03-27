@@ -1,21 +1,20 @@
-import {useTheme} from '@/Theme';
-import {Card, Icon, Modal, Spinner} from '@ui-kitten/components';
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { useTheme } from '@/Theme';
+import { Card, Icon, Modal } from '@ui-kitten/components';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Share from 'react-native-share';
-// @ts-ignore
-import {AppHeader, LinearGradientButton} from '@/Components';
+import { AppHeader, LinearGradientButton } from '@/Components';
 import BackgroundLayout from '@/Components/BackgroundLayout';
-import {TwoFactorAuthenticationModal, VerifyYourselfModal} from '@/Modals';
-import {DeleteUser} from '@/Services/SettingsServies';
-import {loadId} from '@/Storage/MainAppStorage';
+import { TwoFactorAuthenticationModal, VerifyYourselfModal } from '@/Modals';
+import { DeleteUser } from '@/Services/SettingsServies';
+import { loadId } from '@/Storage/MainAppStorage';
 import LogoutStore from '@/Store/Authentication/LogoutStore';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
-import {UserState} from '@/Store/User';
+import { UserState } from '@/Store/User';
 import ChangeUserState from '@/Store/UserType/ChangeUserTypeState';
 import Colors from '@/Theme/Colors';
 import Toast from 'react-native-toast-message';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const InstructorSettingsScreen = ({navigation}: {navigation: any}) => {
   const dispatch = useDispatch();
@@ -36,7 +35,7 @@ const InstructorSettingsScreen = ({navigation}: {navigation: any}) => {
 
   const onShare = async () => {
     Share.open({
-      message: `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`,
+      message: `${(user as any)?.firstname} ${(user as any)?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`,
       url: 'https://trackmykidz.com/apps/',
 
       activityItemSources: [
@@ -53,7 +52,8 @@ const InstructorSettingsScreen = ({navigation}: {navigation: any}) => {
           },
           linkMetadata: {
             title: 'TrackMykidz',
-            subject: 'trackmykidz.com',
+            // todo solve this
+            // subject: 'trackmykidz.com',
             icon: require('@/Assets/AppIcons/appstore.png'),
           },
         },
@@ -131,7 +131,7 @@ const InstructorSettingsScreen = ({navigation}: {navigation: any}) => {
                 <TouchableOpacity
                   onPress={async () => {
                     const userId = await loadId();
-                    DeleteUser(parseInt(userId, 0))
+                    DeleteUser(parseInt(String(userId), 0))
                       .then(res => {})
                       .catch(err => {
                         console.log(err);
@@ -281,6 +281,7 @@ const InstructorSettingsScreen = ({navigation}: {navigation: any}) => {
                     }),
                   );
 
+                  // @ts-ignore
                   dispatch(LogoutStore.action());
                 }}>
                 Log Out

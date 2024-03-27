@@ -1,47 +1,36 @@
-import React, {useEffect, useState} from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Keyboard,
-  Alert,
-  Image,
-} from 'react-native';
-import {useTheme} from '@/Theme';
-import {ProfileAvatarPicker} from '@/Components';
+import React, { useEffect, useState } from 'react';
+import { Image, Keyboard, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '@/Theme';
+import { AppHeader, LinearGradientButton, ProfileAvatarPicker } from '@/Components';
 import ImagePicker from 'react-native-image-crop-picker';
-import {ImagePickerModal} from '@/Modals';
-import {useIsFocused} from '@react-navigation/native';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { ImagePickerModal } from '@/Modals';
+import { useIsFocused } from '@react-navigation/native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import ChangeUserState from '@/Store/User/FetchOne';
+import FetchOne from '@/Store/User/FetchOne';
 import fetchOneUserService from '@/Services/User/FetchOne';
 import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Text,
   Autocomplete,
   AutocompleteItem,
+  Button,
+  ButtonElement,
+  ButtonProps,
   Icon,
+  Input,
+  Text,
 } from '@ui-kitten/components';
-import {AppHeader} from '@/Components';
-import {loadUserId} from '@/Storage/MainAppStorage';
-import {UpdateUser} from '../../../Services/SettingsServies';
-import {Formik} from 'formik';
-// @ts-ignore
-import {useSelector, useDispatch} from 'react-redux';
-import {UserState} from '@/Store/User';
-import {PlaceState} from '@/Store/Places';
-import {GetAllCities, GetAllStates} from '@/Services/PlaceServices';
-import FetchOne from '@/Store/User/FetchOne';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import { UpdateUser } from '../../../Services/SettingsServies';
+import { Formik } from 'formik';
+import { useDispatch, useSelector } from 'react-redux';
+import { UserState } from '@/Store/User';
+import { PlaceState } from '@/Store/Places';
+import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
 import Colors from '@/Theme/Colors';
-import {CountryDTO} from '@/Models/CountryDTOs';
+import { CountryDTO } from '@/Models/CountryDTOs';
 import BackgroundLayout from '@/Components/BackgroundLayout';
-import {LinearGradientButton} from '@/Components';
 import FA5 from 'react-native-vector-icons/FontAwesome5';
+
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -62,29 +51,29 @@ const PersonalProfileScreen = () => {
   const countries = useSelector(
     (state: {places: PlaceState}) => state.places.countries,
   );
-  const [isEditMode, setisEditMode] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const [isSending, setisSending] = useState(false);
-  const user = useSelector((state: {user: UserState}) => state.user.item);
-  const [userId, setuserId] = useState(null);
+  const [isEditMode, setisEditMode] = useState<boolean>(false);
+  const [visible, setVisible] = useState<boolean>(false);
+  const [isSending, setisSending] = useState<boolean>(false);
+  const user: any = useSelector((state: {user: UserState}) => state.user.item);
+  const [userId, setuserId] = useState<any>(null);
   const isLoading = useSelector(
     (state: {user: UserState}) => state.user.fetchOne.loading,
   );
   const dispatch = useDispatch();
 
-  const [placement, setPlacement] = React.useState('bottom');
+  const [placement, setPlacement] = React.useState<string>('bottom');
   const [countriesData, setCountriesData] = React.useState(countries);
-  const [states, setStates] = useState<Array<any>>([]);
-  const [cities, setCities] = useState<Array<any>>([]);
-  const [statesData, setStatesData] = React.useState<Array<any>>([]);
-  const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
-  const currentUser = useSelector(
+  const [states, setStates] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+  const [statesData, setStatesData] = React.useState<any[]>([]);
+  const [citiesData, setCitiesData] = React.useState<any[]>([]);
+  const currentUser: any = useSelector(
     (state: {user: UserState}) => state.user.item,
   );
-  const [selectedImage, setSelectedImage] = React.useState('');
+  const [selectedImage, setSelectedImage] = React.useState<string>('');
 
-  const [uploadedImage, setUploadedImage] = React.useState();
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [uploadedImage, setUploadedImage] = React.useState<any>();
+  const [isKeyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const getUserId = async () => {
     const id: any = await loadUserId();
     setuserId(id);
@@ -140,41 +129,42 @@ const PersonalProfileScreen = () => {
     });
   };
 
-  const renderPersonIcon = (props: any) => (
+  const renderPersonIcon = () => (
     <Image
       source={userIcon}
       style={{height: 18, width: 18, marginRight: 10}}
       resizeMode="contain"
     />
   );
-  const renderLocationIcon = (props: any) => (
+  const renderLocationIcon = () => (
     <Image
       source={marker}
       style={{height: 20, width: 20}}
       resizeMode="contain"
     />
   );
-  const renderEmailIcon = (props: any) => (
+  const renderEmailIcon = () => (
     <Image
       source={email}
       style={{height: 18, width: 18, marginRight: 12}}
       resizeMode="contain"
     />
   );
-  const renderPhoneIcon = (props: any) => (
+  const renderPhoneIcon = () => (
     <Image
       source={phone}
       style={{height: 20, width: 20, marginRight: 10}}
       resizeMode="contain"
     />
   );
-  const renderSchoolIcon = (props: any) => (
+  const renderSchoolIcon = () => (
     <FA5
       name="school"
       size={20}
       style={{height: 20, width: 20, marginRight: 10}}
       color={Colors.secondaryDark}
-      resizeMode="contain"
+      // todo solve this
+      // resizeMode="contain"
     />
   );
 
@@ -288,22 +278,23 @@ const PersonalProfileScreen = () => {
                   }}
                   onSubmit={(values, {resetForm}) => {
                     setisSending(true);
-                    let objectToPass = {
-                      firstname: values.firstName,
-                      lastname: values.lastName,
-                      id: currentUser?.instructorId,
-                      address: values.address,
-                      state: values.state,
-                      country: values.country,
-                      city: values.city,
-                      zipcode: values.zipcode,
-                      phone: values.phone,
-                      schoolName: values?.schoolName || '',
-                      schoolId: values.schoolId,
-                      term: true,
-                      grades: [],
-                      isAdmin: currentUser?.isAdmin,
-                    };
+                    // todo check if can be removed
+                    // let objectToPass = {
+                    //   firstname: values.firstName,
+                    //   lastname: values.lastName,
+                    //   id: currentUser?.instructorId,
+                    //   address: values.address,
+                    //   state: values.state,
+                    //   country: values.country,
+                    //   city: values.city,
+                    //   zipcode: values.zipcode,
+                    //   phone: values.phone,
+                    //   schoolName: values?.schoolName || '',
+                    //   schoolId: values.schoolId,
+                    //   term: true,
+                    //   grades: [],
+                    //   isAdmin: currentUser?.isAdmin,
+                    // };
 
                     let formData = new FormData();
                     formData.append(
@@ -519,7 +510,7 @@ const PersonalProfileScreen = () => {
                                     City
                                   </Text>
                                 )}
-                                disabled={isEditMode ? false : true}
+                                disabled={!isEditMode}
                                 placeholder="Enter City"
                                 value={values.city}
                                 placement={placement}
@@ -570,7 +561,7 @@ const PersonalProfileScreen = () => {
                                     State
                                   </Text>
                                 )}
-                                disabled={isEditMode ? false : true}
+                                disabled={!isEditMode}
                                 placeholder="Enter State*"
                                 value={values.state}
                                 placement={placement}
@@ -640,7 +631,7 @@ const PersonalProfileScreen = () => {
                                     Country
                                   </Text>
                                 )}
-                                disabled={isEditMode ? false : true}
+                                disabled={!isEditMode}
                                 placeholder="Enter Country*"
                                 value={values.country}
                                 placement={placement}
@@ -696,7 +687,7 @@ const PersonalProfileScreen = () => {
                           {isEditMode && (
                             <>
                               <Input
-                                disabled={currentUser?.isAdmin ? false : true}
+                                disabled={!currentUser?.isAdmin}
                                 style={[
                                   styles.inputSettings,
                                   {marginBottom: 5},
@@ -711,7 +702,7 @@ const PersonalProfileScreen = () => {
                               />
 
                               <Input
-                                disabled={currentUser?.isAdmin ? false : true}
+                                disabled={!currentUser?.isAdmin}
                                 accessoryLeft={renderSchoolIcon()}
                                 style={styles.inputSettings}
                                 autoCapitalize="none"
@@ -727,7 +718,7 @@ const PersonalProfileScreen = () => {
                           {isEditMode && (
                             <>
                               <Autocomplete
-                                disabled={currentUser?.isAdmin ? false : true}
+                                disabled={!currentUser?.isAdmin}
                                 label={evaProps => (
                                   <Text {...evaProps}>Country</Text>
                                 )}
@@ -781,7 +772,7 @@ const PersonalProfileScreen = () => {
                                 })}
                               </Autocomplete>
                               <Autocomplete
-                                disabled={currentUser?.isAdmin ? false : true}
+                                disabled={!currentUser?.isAdmin}
                                 label={evaProps => (
                                   <Text {...evaProps}>State</Text>
                                 )}
@@ -828,7 +819,7 @@ const PersonalProfileScreen = () => {
                                 })}
                               </Autocomplete>
                               <Autocomplete
-                                disabled={currentUser?.isAdmin ? false : true}
+                                disabled={!currentUser?.isAdmin}
                                 label={evaProps => (
                                   <Text {...evaProps}>City</Text>
                                 )}
@@ -869,7 +860,7 @@ const PersonalProfileScreen = () => {
                               </Autocomplete>
 
                               <Input
-                                disabled={currentUser?.isAdmin ? false : true}
+                                disabled={!currentUser?.isAdmin}
                                 accessoryLeft={renderLocationIcon}
                                 style={styles.inputSettings}
                                 autoCapitalize="none"
@@ -972,25 +963,26 @@ const styles = StyleSheet.create({
     flex: 9,
     marginTop: 40,
   },
-  profileAvatar: {
-    width: 116,
-    height: 116,
-    borderRadius: 58,
-    alignSelf: 'center',
-    backgroundColor: '#3AA5A2',
-    tintColor: '#ECF1F7',
-  },
-  profileImage: {
-    width: 126,
-    height: 126,
-    borderRadius: 63,
-    alignSelf: 'center',
-  },
-  editAvatarButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
+  // todo check which styles are right one
+  // profileAvatar: {
+  //   width: 116,
+  //   height: 116,
+  //   borderRadius: 58,
+  //   alignSelf: 'center',
+  //   backgroundColor: '#3AA5A2',
+  //   tintColor: '#ECF1F7',
+  // },
+  // profileImage: {
+  //   width: 126,
+  //   height: 126,
+  //   borderRadius: 63,
+  //   alignSelf: 'center',
+  // },
+  // editAvatarButton: {
+  //   width: 40,
+  //   height: 40,
+  //   borderRadius: 20,
+  // },
   selectSettings: {
     marginTop: 18,
   },
@@ -1085,4 +1077,8 @@ const styles = StyleSheet.create({
     top: 70,
     left: 80,
   },
+  editButton: {
+
+  },
+
 });

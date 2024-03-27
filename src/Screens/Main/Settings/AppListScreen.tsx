@@ -125,8 +125,9 @@ const styles = StyleSheet.create({
     marginVertical: 30,
   },
   button: {
-    textAlign: "center",
-    color: Colors.white,
+    // todo find another solution
+    // textAlign: "center",
+    // color: Colors.white,
   },
   topContainer: {
     flexDirection: "row",

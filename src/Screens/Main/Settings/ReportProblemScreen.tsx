@@ -1,39 +1,20 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  Switch,
-  TouchableOpacity,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  TouchableWithoutFeedback,
-  Keyboard,
-} from "react-native";
-import { useTheme } from "@/Theme";
-import {
-  Card,
-  Text,
-  Radio,
-  RadioGroup,
-  Spinner,
-  Input,
-} from "@ui-kitten/components";
-import { useIsFocused } from "@react-navigation/native";
-// @ts-ignore
-import { ReportAProblem } from "../../../Services/SettingsServies";
-import LinearGradient from "react-native-linear-gradient";
-import * as yup from "yup";
-import { Formik } from "formik";
-import { AppHeader, LinearGradientButton } from "@/Components";
-import { useHeaderHeight } from "react-native-screens/native-stack";
-import { ScrollView } from "react-native-gesture-handler";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Colors from "@/Theme/Colors";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import CreateReport from "@/Services/Settings/CreateReport";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import React, { FC, useEffect, useState } from 'react';
+import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '@/Theme';
+import { Input, Radio, RadioGroup, Text } from '@ui-kitten/components';
+import { useIsFocused } from '@react-navigation/native';
+import * as yup from 'yup';
+import { Formik } from 'formik';
+import { AppHeader, LinearGradientButton } from '@/Components';
+import { ScrollView } from 'react-native-gesture-handler';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import Colors from '@/Theme/Colors';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import CreateReport from '@/Services/Settings/CreateReport';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RightDrawerNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+
 const Divider = () => (
   <View
     style={{
@@ -100,7 +81,11 @@ const RadioOptions = ({
   );
 };
 
-const ReportProblemScreen = ({ navigation }) => {
+type ReportProblemScreenProps = {
+  navigation: StackNavigationProp<RightDrawerNavigatorParamsList, 'ReportProblem'>;
+};
+
+const ReportProblemScreen: FC<ReportProblemScreenProps> = ({ navigation }) => {
   const { Layout } = useTheme();
   const reportAProblemValidationSchema = yup.object().shape({
     message: yup
@@ -110,11 +95,12 @@ const ReportProblemScreen = ({ navigation }) => {
       .required("Message is required"),
   });
   const isFocused = useIsFocused();
-  const [userId, setUserId] = useState();
+  const [userId, setUserId] = useState<string>();
   const [message, setMessage] = useState("");
   const getUserId = async () => {
     const _id = await loadUserId();
-    setUserId(_id);
+    if (_id)
+      setUserId(_id);
   };
 
   useEffect(() => {

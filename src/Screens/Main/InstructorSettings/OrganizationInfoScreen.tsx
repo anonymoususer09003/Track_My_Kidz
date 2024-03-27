@@ -1,70 +1,31 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  Switch,
-  TouchableOpacity,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ActivityIndicator,
-  FlatList,
-  Dimensions,
-} from "react-native";
+import React, { FC, useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { useTheme } from "@/Theme";
-import {
-  Table,
-  TableWrapper,
-  Row,
-  Rows,
-  Col,
-  Cols,
-  Cell,
-} from "react-native-table-component";
-import {
-  Autocomplete,
-  Text,
-  AutocompleteItem,
-  IndexPath,
-  Select,
-  SelectItem,
-  Input,
-  CheckBox,
-} from "@ui-kitten/components";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-// @ts-ignore
-import { ReportAProblem } from "../../../Services/SettingsServies";
-import { useDispatch, useSelector } from "react-redux";
-import { PlaceState } from "@/Store/Places";
-import * as yup from "yup";
-import { Formik } from "formik";
-import { useHeaderHeight } from "react-native-screens/native-stack";
-import { ScrollView } from "react-native-gesture-handler";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Colors from "@/Theme/Colors";
-import {
-  GetAllInstructors,
-  FindInstructorBySchoolOrg,
-} from "@/Services/Instructor";
+import { useTheme } from '@/Theme';
+import { Autocomplete, AutocompleteItem, Input, Text } from '@ui-kitten/components';
+import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
+import { useDispatch, useSelector } from 'react-redux';
+import { PlaceState } from '@/Store/Places';
+import * as yup from 'yup';
+import { Formik } from 'formik';
+import { ScrollView } from 'react-native-gesture-handler';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import Colors from '@/Theme/Colors';
+import { GetAllInstructors, GetInstructor } from '@/Services/Instructor';
 
-import { AppHeader, LinearGradientButton } from "@/Components";
-import { UserState } from "@/Store/User";
-import { GetSchool, UpdateSchool } from "@/Services/School";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { useIsFocused } from "@react-navigation/native";
-import { GetInstructor } from "@/Services/Instructor";
-import EditOrgInstructorsModal from "@/Modals/EditOrganizationInstructorModal";
-import OrgInstructorsListModal from "@/Modals/OrgInstructorList";
-import AddInstructorOrgModal from "@/Modals/AddInstructorOrgModal";
-import Icon from "react-native-vector-icons/Entypo";
-import { navigationRef } from "@/Navigators/Functions";
+import { AppHeader, LinearGradientButton } from '@/Components';
+import { UserState } from '@/Store/User';
+import { GetSchool, UpdateSchool } from '@/Services/School';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import { useIsFocused } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Entypo';
 
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RightDrawerNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+import { CountryDTO } from '@/Models/CountryDTOs';
+
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -85,12 +46,15 @@ const Divider = () => (
 );
 
 const grades = ["ECP", "Transition", "Kindergander", "1st Grade", "2nd Grade"];
+type OrganizationInfoScreenProps = {
+  navigation: StackNavigationProp<RightDrawerNavigatorParamsList, 'OrganizationInfo'>;
+};
 
-const OrganizationInfoScreen = ({ navigation }) => {
+const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation }) => {
   const { Layout } = useTheme();
   const windowWidth = Dimensions.get("window").width;
   const height = Dimensions.get("screen").height;
-  const [instructors, setInstructors] = useState([]);
+  const [instructors, setInstructors] = useState<any>([]);
   const dispatch = useDispatch();
   const reportAProblemValidationSchema = yup.object().shape({
     message: yup
@@ -112,10 +76,10 @@ const OrganizationInfoScreen = ({ navigation }) => {
       .catch((err) => {});
   };
   const formatTableData = (data: any) => {
-    let temp = { ...tableData };
-    let row = [];
-    let rowItem = [];
-    data.result.map((item, index) => {
+    let temp: any = { ...tableData };
+    let row: any[] = [];
+    let rowItem: any[]  = [];
+    data.result.map((item: any, index: number) => {
       let { firstname, lastname, email, phone, isAdmin, state } = item;
       row.push([
         firstname,
@@ -149,19 +113,22 @@ const OrganizationInfoScreen = ({ navigation }) => {
   );
   console.log("current user", currentUser);
   const [countriesData, setCountriesData] = React.useState(countries);
-  const [statesData, setStatesData] = React.useState<Array<any>>([]);
-  const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
-  const [placement, setPlacement] = React.useState("bottom");
-  const [isEditMode, setisEditMode] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const [addEditVisible, setaddEditVisible] = useState(false);
-  const [selectedInstructor, setSelectedInstructor] = useState({});
-  const [states, setStates] = useState<Array<any>>([]);
-  const [cities, setCities] = useState<Array<any>>([]);
-  const [orgInfo, setOrgInfo] = useState(null);
+  const [statesData, setStatesData] = React.useState<any[]>([]);
+  const [citiesData, setCitiesData] = React.useState<any[]>([]);
+  const [placement, setPlacement] = React.useState<string>("bottom");
+  const [isEditMode, setisEditMode] = useState<boolean>(false);
+  const [visible, setVisible] = useState<boolean>(false);
+  const [addEditVisible, setaddEditVisible] = useState<boolean>(false);
+  const [selectedInstructor, setSelectedInstructor] = useState<any>({});
+  const [states, setStates] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+  const [orgInfo, setOrgInfo] = useState<any>(null);
 
   const handleGetOrganizationInfo = async () => {
     const userId = await loadUserId();
+
+    if (!userId) return
+
     let res = await GetInstructor(userId);
     if (res.schoolId || res.orgId) {
       GetSchool(res.schoolId)
@@ -384,8 +351,8 @@ const OrganizationInfoScreen = ({ navigation }) => {
                                   )
                                 );
                               }}
-                              onSelect={(query: IndexPath) => {
-                                const selectedState = states[query.row];
+                              onSelect={(query) => {
+                                const selectedState = states[(query as any).row];
                                 setFieldValue("state", selectedState);
                                 setFieldValue("selectedState", selectedState);
                                 setFieldValue("selectedCity", "");
@@ -442,7 +409,7 @@ const OrganizationInfoScreen = ({ navigation }) => {
                                   })
                                 : []}
                             </Autocomplete>
-                            {currentUser?.isAdmin ? (
+                            {(currentUser as any)?.isAdmin ? (
                               <>
                                 <TouchableOpacity
                                   onPress={() =>

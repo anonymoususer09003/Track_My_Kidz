@@ -1,39 +1,27 @@
-import React, {useState, ReactElement, useEffect} from 'react';
-import {
-  StyleSheet,
-  View,
-  TouchableWithoutFeedback,
-  ScrollView,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
-import {useTheme} from '@/Theme';
-import {Text, Icon, Input, Spinner} from '@ui-kitten/components';
-import {loadToken, loadUserId} from '@/Storage/MainAppStorage';
+import React, { ReactElement, useState } from 'react';
+import { ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { useTheme } from '@/Theme';
+import { Icon, Input, Text } from '@ui-kitten/components';
+import { loadUserType } from '@/Storage/MainAppStorage';
 
-import {ResetPasswordVerify} from '@/Services/LoginServices';
-import {ResetPassword} from '@/Services/Settings';
-import {Formik} from 'formik';
-// @ts-ignore
+import { ChangePassword, ResetPasswordVerify } from '@/Services/LoginServices';
+import { ResetPassword } from '@/Services/Settings';
+import { Formik } from 'formik';
 import * as yup from 'yup';
-import {loadUserType} from '@/Storage/MainAppStorage';
 import Toast from 'react-native-toast-message';
-import LinearGradient from 'react-native-linear-gradient';
-import {useDispatch, useSelector} from 'react-redux';
-import {UserState} from '@/Store/User';
+import { useDispatch, useSelector } from 'react-redux';
+import { UserState } from '@/Store/User';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
-import {ChangePassword} from '@/Services/LoginServices';
 import LogoutStore from '@/Store/Authentication/LogoutStore';
-import {AppHeader, LinearGradientButton} from '@/Components';
+import { AppHeader, LinearGradientButton } from '@/Components';
 import Colors from '@/Theme/Colors';
-import {navigationRef} from '@/Navigators/Functions';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 
 const ChangePasswordScreen = () => {
-  const {Layout} = useTheme();
+  const { Layout } = useTheme();
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const [showCodeField, setShowField] = useState(false);
-  const user = useSelector((state: {user: UserState}) => state.user.item);
+  const user = useSelector((state: { user: UserState }) => state.user.item);
   console.log('user', user);
   const [oldPasswordVisible, setOldPasswordVisible] =
     React.useState<boolean>(false);
@@ -44,7 +32,7 @@ const ChangePasswordScreen = () => {
   const [isSending, setisSending] = useState(false);
 
   const isLoading = useSelector(
-    (state: {user: UserState}) => state.user.fetchOne.loading,
+    (state: { user: UserState }) => state.user.fetchOne.loading,
   );
   const dispatch = useDispatch();
   const getActivationCode = async () => {
@@ -72,19 +60,19 @@ const ChangePasswordScreen = () => {
         });
       })
       .finally(() => {
-        dispatch(ChangeModalState.action({loading: false}));
+        dispatch(ChangeModalState.action({ loading: false }));
       });
   };
   const loginValidationSchema = yup.object().shape({
     oldPassword: yup.string().required('Old Password is required'),
     password: yup
       .string()
-      .min(8, ({min}) => `Password must be at least ${min} characters`)
+      .min(8, ({ min }) => `Password must be at least ${min} characters`)
       .required('Password is required'),
     newPassword: yup
       .string()
-      .min(8, ({min}) => `Password must be at least ${min} characters`)
-      .oneOf([yup.ref('password'), null], "Passwords don't match")
+      .min(8, ({ min }) => `Password must be at least ${min} characters`)
+      .oneOf([yup.ref('password')], 'Passwords don\'t match')
       .required('Password is required'),
     verificationCode: yup.string(),
   });
@@ -92,17 +80,18 @@ const ChangePasswordScreen = () => {
     oldPassword: yup.string().required('Old Password is required'),
     password: yup
       .string()
-      .min(8, ({min}) => `Password must be at least ${min} characters`)
+      .min(8, ({ min }) => `Password must be at least ${min} characters`)
       .required('Password is required'),
     newPassword: yup
       .string()
-      .min(8, ({min}) => `Password must be at least ${min} characters`)
-      .oneOf([yup.ref('password'), null], "Passwords don't match")
+      .min(8, ({ min }) => `Password must be at least ${min} characters`)
+      // todo there were null [yup.ref('password'), null
+      .oneOf([yup.ref('password')], 'Passwords don\'t match')
       .required('Password is required'),
     verificationCode: yup
       .string()
-      .min(6, ({min}) => `Verification must be at least ${min} characters`)
-      .max(6, ({max}) => `Verification code must be at least ${max} characters`)
+      .min(6, ({ min }) => `Verification must be at least ${min} characters`)
+      .max(6, ({ max }) => `Verification code must be at least ${max} characters`)
       .required('Verification Code is required'),
   });
 
@@ -142,6 +131,8 @@ const ChangePasswordScreen = () => {
           position: 'top',
           text1: 'Password reset successfully',
         });
+        // todo solve this problem
+        // @ts-ignore
         dispatch(LogoutStore.action());
       })
       .catch(err => {
@@ -156,7 +147,7 @@ const ChangePasswordScreen = () => {
         console.log('err', err);
       })
       .finally(() => {
-        dispatch(ChangeModalState.action({loading: false}));
+        dispatch(ChangeModalState.action({ loading: false }));
       });
   };
 
@@ -183,8 +174,8 @@ const ChangePasswordScreen = () => {
                 newPassword: '',
                 verificationCode: '',
               }}
-              onSubmit={async (values, {resetForm}) => {
-                dispatch(ChangeModalState.action({loading: true}));
+              onSubmit={async (values, { resetForm }) => {
+                dispatch(ChangeModalState.action({ loading: true }));
                 if (!showCodeField) {
                   ResetPassword(values.oldPassword)
                     .then(async res => {
@@ -201,7 +192,7 @@ const ChangePasswordScreen = () => {
                       });
                     })
                     .finally(() => {
-                      dispatch(ChangeModalState.action({loading: false}));
+                      dispatch(ChangeModalState.action({ loading: false }));
                     });
                 } else {
                   let resetPasswordObject = {
@@ -242,15 +233,15 @@ const ChangePasswordScreen = () => {
                 // }
               }}>
               {({
-                handleChange,
-                handleSubmit,
-                handleBlur,
-                setFieldValue,
-                values,
-                errors,
-                touched,
-                isValid,
-              }) => (
+                  handleChange,
+                  handleSubmit,
+                  handleBlur,
+                  setFieldValue,
+                  values,
+                  errors,
+                  touched,
+                  isValid,
+                }) => (
                 <>
                   {console.log('errors', errors)}
                   {isSending ? (
@@ -328,7 +319,7 @@ const ChangePasswordScreen = () => {
                       {showCodeField && (
                         <View style={styles.inputSettings}>
                           <Input
-                            textStyle={{fontSize: 16}}
+                            textStyle={{ fontSize: 16 }}
                             autoCapitalize="none"
                             label={evaProps => (
                               <Text style={styles.inputLabels}>
@@ -351,7 +342,7 @@ const ChangePasswordScreen = () => {
                       )}
                       {console.log('err', isValid)}
                       {!showCodeField && (
-                        <View style={{marginBottom: 10}}>
+                        <View style={{ marginBottom: 10 }}>
                           <LinearGradientButton
                             disabled={isValid ? false : true}
                             onPress={handleSubmit}>
