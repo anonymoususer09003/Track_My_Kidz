@@ -9,7 +9,7 @@ import {
   Text, TopNavigation,
   TopNavigationAction
 } from "@ui-kitten/components";
-import React from "react";
+import React, { FC } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -25,21 +25,38 @@ const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
 const activitiesIcon = require("@/Assets/Images/navigation_icon3.png");
 const settings = require("@/Assets/Images/navigation_icon4.png");
 const addIcon = require("@/Assets/Images/add.png");
-const AppHeader = ({ showGlobe, ...props }) => {
+
+type AppHeaderProps = {
+  showGlobe?: boolean;
+  hideCalendar?: boolean;
+  hideApproval?: boolean
+  goBack?: ()=>void
+  onAddPress?: ()=>void
+  hideCenterIcon?: boolean
+  setThumbnail?: (thumbnail:(boolean| undefined))=> void
+  thumbnail?: any
+  isStack?: boolean
+  isBack?: boolean
+  isCalendar?: boolean
+  simple?: boolean
+  title?: string
+};
+
+const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
   const user_type = useSelector(
     (state: { userType: UserTypeState }) => state.userType.userType
   );
   const isCalendarVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.showCalendar
   );
-  const hideCalendar = props?.hideCalendar || false;
+  // const hideCalendar = props?.hideCalendar || false;
   const hideApproval = props?.hideApproval || false;
-  const goBack = props.goBack;
+  // const goBack = props.goBack;
   const { showFamilyMap } = useSelector(
     (state: { studentActivity: StudentState }) => state.studentActivity
   );
 
-  const navigation = useNavigation()
+  // const navigation = useNavigation()
   const route = useRoute();
   // const user_type = 'instructor';
   //@ts-ignore
@@ -60,8 +77,8 @@ const AppHeader = ({ showGlobe, ...props }) => {
               onPress={() => {
                 dispatch(
                   ChangeStudentActivityState.action({
-                    showFamilyMap: showFamilyMap ? false : true,
-                    hideCalendar: !showFamilyMap ? true : false,
+                    showFamilyMap: !showFamilyMap,
+                    hideCalendar: !showFamilyMap,
                     showParticipantMap: false,
                   })
                 );
@@ -104,14 +121,14 @@ const AppHeader = ({ showGlobe, ...props }) => {
   };
 
   //@ts-ignore
-  const renderHomeIcon = (props) => (
+  const renderHomeIcon = () => (
     <Image style={{ height: 27, width: 27 }} source={homeIcon} />
   );
 
   //@ts-ignore
   console.log('routeName',route.name)
   console.log('user_type',user_type)
-  
+
   const renderListItem = () => {
      if (user_type === 'instructor'){
        if(route.name === 'InstructorActivity'){
@@ -122,10 +139,10 @@ const AppHeader = ({ showGlobe, ...props }) => {
         return <></>
       }
       switch(route.name){
-        case "Activity": 
+        case "Activity":
         return  <Image style={{ height: 27, width: 27 }} source={calendarIcon} />
         case "HomeScreen":
-        return  <Icon name="list" size={25} color="white" />  
+        return  <Icon name="list" size={25} color="white" />
       }
     }else if (user_type === 'student'){
       if(route.name !== 'StudentSettings')
@@ -137,28 +154,28 @@ const AppHeader = ({ showGlobe, ...props }) => {
   const isStack = props && props.isStack;
   const isBack = props && props.isBack;
 
-  const navigationLeftDrawer = useSelector(
-    (state: { navigation: NavigationCustomState }) =>
-      state.navigation.navigationLeftDrawer
-  );
+  // const navigationLeftDrawer = useSelector(
+  //   (state: { navigation: NavigationCustomState }) =>
+  //     state.navigation.navigationLeftDrawer
+  // );
   const dispatch = useDispatch();
-  const nav = useNavigation();
+  const nav = useNavigation<any>();
 
   const navigationRightDrawer = useSelector(
     (state: { navigation: NavigationCustomState }) =>
       state.navigation.navigationRightDrawer
   );
   // @ts-ignore
-  const LeftDrawerMenu = () => {
-    navigationRightDrawer.closeDrawer();
-    navigationLeftDrawer.toggleDrawer();
-  };
+  // const LeftDrawerMenu = () => {
+  //   navigationRightDrawer.closeDrawer();
+  //   navigationLeftDrawer.toggleDrawer();
+  // };
 
   // @ts-ignore
-  const LeftGoBack = () => {
-    navigationRightDrawer.closeDrawer();
-    navigateAndSimpleReset("Home");
-  };
+  // const LeftGoBack = () => {
+  //   navigationRightDrawer.closeDrawer();
+  //   navigateAndSimpleReset("Home");
+  // };
 
   // @ts-ignore
   const GoBackToChats = () => {
@@ -311,7 +328,7 @@ const AppHeader = ({ showGlobe, ...props }) => {
         {!props.hideCenterIcon && (
           <TouchableOpacity
             style={{ zIndex: 5 }}
-            onPress={() => props.onAddPress()}
+            onPress={() => props?.onAddPress && props.onAddPress()}
           >
             <Image
               style={{
@@ -338,29 +355,31 @@ const AppHeader = ({ showGlobe, ...props }) => {
             appearance="control"
             {...props}
             alignment="center"
-            accessoryLeft={
-              isBack ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    if (goBack) {
-                      nav.goBack();
-                    } else if (user_type === "instructor") {
-                      nav.navigate("InstructorSettings");
-                    } else if (user_type === "student") {
-                      nav.navigate("StudentSettings");
-                    } else {
-                      nav.goBack();
-                      // nav.navigate("Settings");
-                    }
-                  }}
-                >
-                  <Feather name="arrow-left" color={Colors.white} size={25} />
-                </TouchableOpacity>
-              ) : (
-                LeftDrawerAction
-              )
-            }
-            accessoryRight={RightDrawerAction}
+            // todo uncomment this
+            // accessoryLeft={
+            //   isBack ? (
+            //     <TouchableOpacity
+            //       onPress={() => {
+            //         if (goBack) {
+            //           nav.goBack();
+            //         } else
+            //           if (user_type === "instructor") {
+            //           nav.navigate("InstructorSettings");
+            //         } else if (user_type === "student") {
+            //           nav.navigate("StudentSettings");
+            //         } else {
+            //           nav.goBack();
+            //           // nav.navigate("Settings");
+            //         }
+            //       }}
+            //     >
+            //       <Feather name="arrow-left" color={Colors.white} size={25} />
+            //     </TouchableOpacity>
+            //   ) : (
+            //     LeftDrawerAction
+            //   )
+            // }
+            // accessoryRight={RightDrawerAction}
             title={() => (
               <Text
                 style={{
@@ -396,7 +415,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
   },
   topNav: {
-    color: Colors.white,
+    // TODO find solution
+    // color: Colors.white
   },
   icon: {
     width: 32,
