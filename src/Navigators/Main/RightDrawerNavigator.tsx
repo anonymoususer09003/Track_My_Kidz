@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { UserTypeState } from '@/Store/UserType';
 import { Text, View } from 'react-native';
 import {
+  ActivityDetailsScreen,
   AppListScreen,
   ChangePasswordScreen,
   ContactUsScreen,
@@ -24,6 +25,7 @@ export type MainStackNavigatorParamsList = {
   InstructorSettings: undefined
   ReportProblemScreen: undefined
   InstructorActivityNavigator: undefined
+  ActivityDetails: { activity?: any }
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
@@ -50,7 +52,7 @@ const RightDrawerNavigator = () => {
 
   return (
     <Stack.Navigator
-      screenOptions={{headerShown: false}}
+      screenOptions={{ headerShown: false }}
       // drawerContent={(props) => {
       //   rightNavigation = props.navigation;
       //   return <RightDrawerContent {...props} />;
@@ -71,6 +73,7 @@ const RightDrawerNavigator = () => {
         {/*{user_type === "parent" && (*/}
         {/*  <Stack.Screen name="Home" component={HomeNavigator} />*/}
         {/*)}*/}
+
         {user_type === 'instructor' && (
           <Stack.Screen
             name="InstructorActivity"
@@ -94,6 +97,10 @@ const RightDrawerNavigator = () => {
         <Stack.Screen name="ContactUs" component={ContactUsScreen} />
         <Stack.Screen name="AppList" component={AppListScreen} />
 
+        <Stack.Screen
+          name="ActivityDetails"
+          component={ActivityDetailsScreen}
+        />
 
         {/*{user_type === "student" && (*/}
         {/*  <Stack.Screen*/}
@@ -155,10 +162,7 @@ const RightDrawerNavigator = () => {
         {/*/>*/}
         {/*<Stack.Screen name="CreateActivity" component={CreateActivityScreen} />*/}
         {/*<Stack.Screen name="CreateGroup" component={CreateGroupScreen} />*/}
-        {/*<Stack.Screen*/}
-        {/*  name="ActivityDetails"*/}
-        {/*  component={ActivityDetailsScreen}*/}
-        {/*/>*/}
+
         {/*<Stack.Screen name="AddMembers" component={AddMembersNavigator} />*/}
 
         {/*<Stack.Screen*/}
@@ -186,7 +190,7 @@ const RightDrawerNavigator = () => {
 const Placeholder = () => {
   let useNavigation1: any = useNavigation();
   return <View>
-    <Text onPress={() => useNavigation1.navigate('InstructorSettings')}>
+    <Text onPress={() => useNavigation1.navigate('ActivityDetails')}>
       settings
     </Text>
   </View>;

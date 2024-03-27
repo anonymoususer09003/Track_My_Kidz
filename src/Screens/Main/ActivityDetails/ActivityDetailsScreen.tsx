@@ -1,44 +1,43 @@
-import { AppHeader } from "@/Components";
-import BackgroundLayout from "@/Components/BackgroundLayout";
-import { GroupParticipantsModal } from "@/Modals";
-import { ParticipantLocation } from "@/Services/Activity";
-import { loadToken } from "@/Storage/MainAppStorage";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Colors from "@/Theme/Colors";
-import {
-  useIsFocused,
-  useNavigation,
-  useRoute,
-} from "@react-navigation/native";
-import { Text } from "@ui-kitten/components";
-import React, { useEffect, useRef, useState } from "react";
-import { FlatList, Image, StyleSheet, Switch, View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import MapView, { Marker } from "react-native-maps";
-import Fontisto from "react-native-vector-icons/Fontisto";
-import { useDispatch } from "react-redux";
-import SockJS from "sockjs-client";
-import * as Stomp from "stompjs";
-import { calculateDistance } from "../../../Utils/DistanceCalculator";
+import { AppHeader } from '@/Components';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { GroupParticipantsModal } from '@/Modals';
+import { ParticipantLocation } from '@/Services/Activity';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Colors from '@/Theme/Colors';
+import { RouteProp, useIsFocused, useRoute } from '@react-navigation/native';
+import { Text } from '@ui-kitten/components';
+import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, Image, StyleSheet, Switch, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import MapView, { Marker } from 'react-native-maps';
+import Fontisto from 'react-native-vector-icons/Fontisto';
+import { useDispatch } from 'react-redux';
+// todo resolve
+// import SockJS from "sockjs-client";
+// import * as Stomp from "stompjs";
+import { calculateDistance } from '@/Utils/DistanceCalculator';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+
 const ActivityDetailsScreen = () => {
-  const ref = useRef();
-  const navigation = useNavigation();
-  const route = useRoute();
+  const ref = useRef<any>();
+  // const navigation = useNavigation();
+  const route = useRoute<RouteProp<MainStackNavigatorParamsList, 'ActivityDetails'>>();
   const activity = route?.params?.activity || null;
-  const swipeableRef = useRef(null);
+  // const swipeableRef = useRef(null);
   const dispatch = useDispatch();
-  const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
-  const [loading, setLoading] = useState(true);
-  const [thumbnail, setThumbnail] = useState(false);
-  const [searchParam, setSearchParam] = useState("");
-  const [selectedDependent, setSelectedDependent] = useState(null);
-  const [participantsEmail, setParticipantsEmail] = useState([]);
-  const [partcipants, setParticipants] = useState([]);
-  const [newParticipnatsArr, setnewParticipnatsArr] = useState([]);
-  const [getParticipantsIds, setParticipantsIds] = useState([]);
-  const [showModal, setModal] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState(null);
-  const [trackingList, setTrackingList] = useState({
+  // const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
+  // const [loading, setLoading] = useState(true);
+  const [thumbnail, setThumbnail] = useState<boolean>(false);
+  // const [searchParam, setSearchParam] = useState("");
+  const [selectedDependent, setSelectedDependent] = useState<any>(null);
+  // const [participantsEmail, setParticipantsEmail] = useState([]);
+  const [studentsEmails, setStudentsEmails] = useState<any>([]);
+  const [partcipants, setParticipants] = useState<any[]>([]);
+  const [newParticipnatsArr, setnewParticipnatsArr] = useState<any[]>([]);
+  const [getParticipantsIds, setParticipantsIds] = useState<any[]>([]);
+  const [showModal, setModal] = useState<boolean>(false);
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+  const [trackingList, setTrackingList] = useState<any>({
     // 1: {
     //   lat: 40.7128,
     //   lang: -74.006,
@@ -50,42 +49,44 @@ const ActivityDetailsScreen = () => {
     //   childDeviceId: 2,
     // },
   });
-  const [groups, setGroups] = useState({});
+  const [groups, setGroups] = useState<any>({});
   const isFocused = useIsFocused();
 
   const getParticipantLocation = async () => {
     try {
-      let res = await ParticipantLocation(activity?.activityId);
-      let deviceIds = [];
+      let res: any[]= await ParticipantLocation(activity?.activityId);
+      let deviceIds: any[] = [];
       res.map((item) => {
         item?.childDeviceId && deviceIds.push(item?.childDeviceId);
       });
 
       setParticipantsIds(deviceIds);
-      deviceIds.length > 0 &&
-        turnOnTracker(activity?.activityId, deviceIds, "activity");
+      deviceIds.length > 0
+      // todo solve stomp
+      // && turnOnTracker(activity?.activityId, deviceIds, "activity");
       // , { childDeviceId: 1 }, { childDeviceId: 2 }
       setParticipants([...res]);
     } catch (err) {
       console.log("err", err);
     }
   };
-  let stompClient: any = React.createRef<Stomp.Client>();
-  const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
-    try {
-      const token = await loadToken();
-
-      const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
-      stompClient = Stomp.over(socket);
-      stompClient.connect({ token }, () => {
-        deviceIds.map((item) => {
-          stompClient.subscribe(`/device/${item}`, subscriptionCallback);
-        });
-      });
-    } catch (err) {
-      console.log("Error:", err);
-    }
-  };
+  // todo solve stomp
+  // let stompClient: any = React.createRef<Stomp.Client>();
+  // const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
+  //   try {
+  //     const token = await loadToken();
+  //
+  //     const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+  //     stompClient = Stomp.over(socket);
+  //     stompClient.connect({ token }, () => {
+  //       deviceIds.map((item) => {
+  //         stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+  //       });
+  //     });
+  //   } catch (err) {
+  //     console.log("Error:", err);
+  //   }
+  // };
   const subscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
 
@@ -130,8 +131,8 @@ const ActivityDetailsScreen = () => {
   // ]
 
   useEffect(() => {
-    let temp = [];
-    let groups = {};
+    let temp:any[] = [];
+    let groups: any = {};
     let trackingListKeys = Object.keys(trackingList);
     trackingListKeys.map((item, index) => {
       let latitude1 = trackingList[item]?.lat;
@@ -201,8 +202,8 @@ const ActivityDetailsScreen = () => {
     });
 
     setGroups(groups);
-    let groupedArray = [];
-    let groupNames = [];
+    let groupedArray:any[] = [];
+    let groupNames:any[] = [];
 
     temp.forEach((item) => {
       if (!item?.groupName || !groupNames.includes(item?.groupName)) {
@@ -309,10 +310,10 @@ const ActivityDetailsScreen = () => {
                               {
                                 latitude: latitude
                                   ? parseFloat(latitude)
-                                  : parseFloat(10),
+                                  : 10,
                                 longitude: longititude
                                   ? parseFloat(longititude)
-                                  : parseFloat(10),
+                                  : 10,
                               },
                             ]
                             // false, // not animated
@@ -327,10 +328,10 @@ const ActivityDetailsScreen = () => {
                       coordinate={{
                         latitude: latitude
                           ? parseFloat(latitude)
-                          : parseFloat(10),
+                          : 10,
                         longitude: longititude
                           ? parseFloat(longititude)
-                          : parseFloat(10),
+                          : 10,
                       }}
                     >
                       {!item?.group && (
