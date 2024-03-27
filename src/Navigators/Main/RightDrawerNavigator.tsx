@@ -1,58 +1,33 @@
-// import {
-//   ActivationCodeScreen,
-//   ActivityDetailsScreen,
-//   AppListScreen,
-//   ChangePasswordScreen,
-//   ContactUsScreen,
-//   CreateActivityScreen,
-//   CreateGroupScreen,
-//   CreateParentActivityScreen,
-//   DependentInfoScreen,
-//   DragDropStudentScreen,
-//   ImportDependentScreen,
-//   InstructorActivityDetailScreen,
-//   InstructorHome,
-//   InstructorPersonalProfileScreen,
-//   InstructorSettingsScreen,
-//   InstructorsListScreen,
-//   NotificationsScreen,
-//   OrganizationBusinformation,
-//   OrganizationInfoScreen,
-//   PaymentInfoScreen,
-//   PersonalProfileScreen,
-//   ReportProblemScreen,
-//   SettingsScreen,
-//   StudentActivityDetailsScreen,
-//   StudentLocationScreen,
-//   StudentPersonalProfileScreen,
-//   StudentSettingsScreen,
-// } from "@/Screens";
-import ChangeNavigationCustomState from "@/Store/Navigation/ChangeNavigationCustomState";
-import { createDrawerNavigator } from "@react-navigation/drawer";
-import React, { useEffect } from "react";
-import RNDeviceInfo from "react-native-device-info";
-import { useDispatch, useSelector } from "react-redux";
+import ChangeNavigationCustomState from '@/Store/Navigation/ChangeNavigationCustomState';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { UserTypeState } from '@/Store/UserType';
+import { Text, View } from 'react-native';
+import {
+  AppListScreen,
+  ChangePasswordScreen,
+  ContactUsScreen,
+  InstructorPersonalProfileScreen,
+  InstructorSettingsScreen,
+  OrganizationInfoScreen,
+  ReportProblemScreen,
+} from '@/Screens';
+import { createStackNavigator } from '@react-navigation/stack';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
 
-import ActivityNavigator from "@/Navigators/Main/ActivityNavigator";
-import ApprovalNavigator from "@/Navigators/Main/ApprovalNavigator";
-import RightDrawerContent from "@/Navigators/Main/DrawerContents/RightDrawerContent/RightDrawerContent";
-import HomeNavigator from "@/Navigators/Main/HomeNavigator";
-import InstructorActivityNavigator from "@/Navigators/Main/InstructorActivityNavigator";
-import InstructorApprovalNavigator from "@/Navigators/Main/InstructorApprovalNavigator";
-import InstructorChatNavigator from "@/Navigators/Main/InstructorChatNavigator";
-import StudentActivityNavigator from "@/Navigators/Main/StudentActivityNavigator";
-import { ParentChatScreen } from "@/Screens/Chats";
-
-import AddMembersNavigator from "@/Navigators/Main/AddMembersNavigator";
-import InstructorGroupApprovalNavigator from "@/Navigators/Main/InstructorGroupApprovalNavigator";
-import ParentDeletePermissionScreen from "@/Screens/Main/ParentDeletePermission/ParentDeletePermissionScreen";
-import { UserTypeState } from "@/Store/UserType";
+export type RightDrawerNavigatorParamsList = {
+  InstructorPersonalProfileScreen: undefined
+  InstructorActivity?: undefined
+  ChangePassword: undefined
+  OrganizationInfo: undefined
+  InstructorSettings: undefined
+  ReportProblemScreen: undefined
+} & ParamListBase;
 
 const RightDrawerNavigator = () => {
-  const Drawer = createDrawerNavigator();
   const dispatch = useDispatch();
   const user_type = useSelector(
-    (state: { userType: UserTypeState }) => state.userType.userType
+    (state: { userType: UserTypeState }) => state.userType.userType,
   );
   let rightNavigation: any;
   useEffect(() => {
@@ -60,7 +35,7 @@ const RightDrawerNavigator = () => {
       dispatch(
         ChangeNavigationCustomState.action({
           navigationRightDrawer: rightNavigation,
-        })
+        }),
       );
     }
   }, [dispatch, rightNavigation]);
@@ -68,137 +43,149 @@ const RightDrawerNavigator = () => {
   if (!user_type) {
     return <></>;
   }
+  const Stack = createStackNavigator<RightDrawerNavigatorParamsList>();
+
 
   return (
-    <Drawer.Navigator
-      backBehavior={"history"}
-      drawerContent={(props) => {
-        rightNavigation = props.navigation;
-        return <RightDrawerContent {...props} />;
-      }}
-      screenOptions={({ navigation }) => {
-        rightNavigation = navigation;
-        return {
-          drawerPosition: "right",
-          drawerStyle: {
-            marginLeft:
-              RNDeviceInfo.getDeviceType() === "Tablet" ? "70%" : "35%",
-          },
-          headerShown: false,
-        };
-      }}
+    <Stack.Navigator
+      // drawerContent={(props) => {
+      //   rightNavigation = props.navigation;
+      //   return <RightDrawerContent {...props} />;
+      // }}
+      // screenOptions={({ navigation }) => {
+      //   rightNavigation = navigation;
+      //   return {
+      //     drawerPosition: "right",
+      //     drawerStyle: {
+      //       marginLeft:
+      //         RNDeviceInfo.getDeviceType() === "Tablet" ? "70%" : "35%",
+      //     },
+      //     headerShown: false,
+      //   };
+      // }}
     >
       <>
-        {user_type === "parent" && (
-          <Drawer.Screen name="Home" component={HomeNavigator} />
-        )}
-        {user_type === "instructor" && (
-          <Drawer.Screen
+        {/*{user_type === "parent" && (*/}
+        {/*  <Stack.Screen name="Home" component={HomeNavigator} />*/}
+        {/*)}*/}
+        {user_type === 'instructor' && (
+          <Stack.Screen
             name="InstructorActivity"
-            component={InstructorActivityNavigator}
+            component={Placeholder}
           />
         )}
-        {user_type === "student" && (
-          <Drawer.Screen
-            name="StudentActivity"
-            component={StudentActivityNavigator}
-          />
-        )}
+        <Stack.Screen
+          name="InstructorSettings"
+          component={InstructorSettingsScreen}
+        />
+        <Stack.Screen
+          name="InstructorPersonalProfileScreen"
+          component={InstructorPersonalProfileScreen}
+        />
+        <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+        <Stack.Screen
+          name="OrganizationInfo"
+          component={OrganizationInfoScreen}
+        />
+        <Stack.Screen name="ReportProblem" component={ReportProblemScreen} />
+        <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+        <Stack.Screen name="AppList" component={AppListScreen} />
 
-        {/*<Drawer.Screen*/}
+
+        {/*{user_type === "student" && (*/}
+        {/*  <Stack.Screen*/}
+        {/*    name="StudentActivity"*/}
+        {/*    component={StudentActivityNavigator}*/}
+        {/*  />*/}
+        {/*)}*/}
+
+        {/*<Stack.Screen*/}
         {/*  name="InstructorActivityDetail"*/}
         {/*  component={InstructorActivityDetailScreen}*/}
         {/*/>*/}
 
-        {/*<Drawer.Screen*/}
+        {/*<Stack.Screen*/}
         {/*  name="StudentActivityDetails"*/}
         {/*  component={StudentActivityDetailsScreen}*/}
         {/*/>*/}
-        {/*<Drawer.Screen name="InstructorHome" component={InstructorHome} />*/}
-        {/*<Drawer.Screen*/}
+        {/*<Stack.Screen name="InstructorHome" component={InstructorHome} />*/}
+        {/*<Stack.Screen*/}
         {/*  name="InstructorChatNavigator"*/}
         {/*  component={InstructorChatNavigator}*/}
         {/*/>*/}
-        {/*<Drawer.Screen*/}
+        {/*<Stack.Screen*/}
         {/*  name="CreateParentActivity"*/}
         {/*  component={CreateParentActivityScreen}*/}
         {/*/>*/}
-        <Drawer.Screen name="ChatScreen" component={ParentChatScreen} />
-        <Drawer.Screen name="Activity" component={ActivityNavigator} />
-        <Drawer.Screen name="Approval" component={ApprovalNavigator} />
-        <Drawer.Screen
-          name="InstructorApproval"
-          component={InstructorApprovalNavigator}
-        />
-        {/*<Drawer.Screen name="Settings" component={SettingsScreen} />*/}
-        {/*<Drawer.Screen*/}
+        {/*<Stack.Screen name="ChatScreen" component={ParentChatScreen} />*/}
+        {/*<Stack.Screen name="Activity" component={ActivityNavigator} />*/}
+        {/*<Stack.Screen name="Approval" component={ApprovalNavigator} />*/}
+        {/*<Stack.Screen*/}
+        {/*  name="InstructorApproval"*/}
+        {/*  component={InstructorApprovalNavigator}*/}
+        {/*/>*/}
+        {/*<Stack.Screen name="Settings" component={SettingsScreen} />*/}
+        {/*<Stack.Screen*/}
         {/*  name="StudentSettings"*/}
         {/*  component={StudentSettingsScreen}*/}
         {/*/>*/}
-        {/*<Drawer.Screen*/}
+        {/*<Stack.Screen*/}
         {/*  name="PersonalProfile"*/}
         {/*  component={PersonalProfileScreen}*/}
         {/*/>*/}
-        {/*<Drawer.Screen*/}
-        {/*  name="InstructorPersonalProfileScreen"*/}
-        {/*  component={InstructorPersonalProfileScreen}*/}
-        {/*/>*/}
-        {/*<Drawer.Screen*/}
+        {/*<Stack.Screen*/}
         {/*  name="StudentPersonalProfile"*/}
         {/*  component={StudentPersonalProfileScreen}*/}
         {/*/>*/}
-        {/*<Drawer.Screen name="ChangePassword" component={ChangePasswordScreen} />*/}
-        {/*<Drawer.Screen name="Notifications" component={NotificationsScreen} />*/}
-        {/*<Drawer.Screen name="PaymentInfo" component={PaymentInfoScreen} />*/}
+        {/*<Stack.Screen name="Notifications" component={NotificationsScreen} />*/}
+        {/*<Stack.Screen name="PaymentInfo" component={PaymentInfoScreen} />*/}
 
-        {/*<Drawer.Screen name="ReportProblem" component={ReportProblemScreen} />*/}
-        {/*<Drawer.Screen name="ContactUs" component={ContactUsScreen} />*/}
-        {/*<Drawer.Screen name="AppList" component={AppListScreen} />*/}
-        {/*<Drawer.Screen name="ActivationCode" component={ActivationCodeScreen} />*/}
-        {/*<Drawer.Screen name="DependentInfo" component={DependentInfoScreen} />*/}
-        {/*<Drawer.Screen*/}
+        {/*<Stack.Screen name="ActivationCode" component={ActivationCodeScreen} />*/}
+        {/*<Stack.Screen name="DependentInfo" component={DependentInfoScreen} />*/}
+        {/*<Stack.Screen*/}
         {/*  name="ImportParentDependentScreen"*/}
         {/*  component={ImportDependentScreen}*/}
         {/*/>*/}
-        {/*<Drawer.Screen*/}
+        {/*<Stack.Screen*/}
         {/*  name="StudentLocation"*/}
         {/*  component={StudentLocationScreen}*/}
         {/*/>*/}
-        {/*<Drawer.Screen name="CreateActivity" component={CreateActivityScreen} />*/}
-        {/*<Drawer.Screen name="CreateGroup" component={CreateGroupScreen} />*/}
-        {/*<Drawer.Screen*/}
+        {/*<Stack.Screen name="CreateActivity" component={CreateActivityScreen} />*/}
+        {/*<Stack.Screen name="CreateGroup" component={CreateGroupScreen} />*/}
+        {/*<Stack.Screen*/}
         {/*  name="ActivityDetails"*/}
         {/*  component={ActivityDetailsScreen}*/}
         {/*/>*/}
-        <Drawer.Screen name="AddMembers" component={AddMembersNavigator} />
-        <Drawer.Screen
-          name="InstructorGroupApproval"
-          component={InstructorGroupApprovalNavigator}
-        />
-        {/*<Drawer.Screen*/}
-        {/*  name="InstructorSettings"*/}
-        {/*  component={InstructorSettingsScreen}*/}
+        {/*<Stack.Screen name="AddMembers" component={AddMembersNavigator} />*/}
+
+        {/*<Stack.Screen*/}
+        {/*  name="InstructorGroupApproval"*/}
+        {/*  component={InstructorGroupApprovalNavigator}*/}
         {/*/>*/}
-        {/*<Drawer.Screen*/}
-        {/*  name="OrganizationInfo"*/}
-        {/*  component={OrganizationInfoScreen}*/}
-        {/*/>*/}
-        {/*<Drawer.Screen*/}
+
+        {/*<Stack.Screen*/}
         {/*  name="InstructorList"*/}
         {/*  component={InstructorsListScreen}*/}
         {/*/>*/}
-        {/*<Drawer.Screen name="BusInfo" component={OrganizationBusinformation} />*/}
-        <Drawer.Screen
-          name="ParentDeletePermission"
-          component={ParentDeletePermissionScreen}
-        />
-        {/*<Drawer.Screen*/}
+        {/*<Stack.Screen name="BusInfo" component={OrganizationBusinformation} />*/}
+        {/*<Stack.Screen*/}
+        {/*  name="ParentDeletePermission"*/}
+        {/*  component={ParentDeletePermissionScreen}*/}
+        {/*/>*/}
+        {/*<Stack.Screen*/}
         {/*  name="DragDropStudent"*/}
         {/*  component={DragDropStudentScreen}*/}
         {/*/>*/}
       </>
-    </Drawer.Navigator>
+    </Stack.Navigator>
   );
 };
-
+const Placeholder = () => {
+  let useNavigation1: any = useNavigation();
+  return <View>
+    <Text onPress={() => useNavigation1.navigate('InstructorSettings')}>
+      settings
+    </Text>
+  </View>;
+};
 export default RightDrawerNavigator;
