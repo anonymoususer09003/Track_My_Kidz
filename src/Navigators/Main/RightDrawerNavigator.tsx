@@ -23,7 +23,7 @@ export type MainStackNavigatorParamsList = {
   OrganizationInfo: undefined
   InstructorSettings: undefined
   ReportProblemScreen: undefined
-  InstructorActivityNavigator: any
+  InstructorActivityNavigator: undefined
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
