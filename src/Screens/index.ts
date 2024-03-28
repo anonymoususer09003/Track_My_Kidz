@@ -22,17 +22,17 @@ export { default as CreateGroupScreen } from "./Main/CreateGroup/CreateGroupScre
 export { default as InstructorApprovalScreen } from "./Main/InstructorApproval/InstructorApprovalScreen";
 export { default as InstructorDeclineScreen } from "./Main/InstructorDecline/InstructorDeclineScreen";
 export { default as InstructorPendingScreen } from "./Main/InstructorPending/InstructorPendingScreen";
+export { default as InstructorSettingsScreen } from "./Main/InstructorSettings/InstructorSettingsScreen";
+export { default as OrganizationInfoScreen } from "./Main/InstructorSettings/OrganizationInfoScreen";
+export { default as InstructorPersonalProfileScreen } from "./Main/InstructorSettings/PersonalProfileScreen";
 export { default as AddMembersInstructorScreen } from "./Main/AddMembersInstructor/AddMembersInstructorScreen";
-// export { default as AddMembersStudentScreen } from "./Main/AddMembersStudent/AddMembersStudentScreen";
+export { default as AddMembersStudentScreen } from "./Main/AddMembersStudent/AddMembersStudentScreen";
 // export { default as InstructorGroupApprovalScreen } from "./Main/InstructorGroupApproval/InstructorGroupApprovalScreen";
 // export { default as InstructorGroupDeclineScreen } from "./Main/InstructorGroupDecline/InstructorGroupDeclineScreen";
 // export { default as InstructorGroupPendingScreen } from "./Main/InstructorGroupPending/InstructorGroupPendingScreen";
-export { default as InstructorSettingsScreen } from "./Main/InstructorSettings/InstructorSettingsScreen";
-export { default as OrganizationInfoScreen } from "./Main/InstructorSettings/OrganizationInfoScreen";
 // export { default as InstructorsListScreen } from "./Main/InstructorSettings/InstructorOrganizationScreen";
 // export { default as OrganizationBusinformation } from "./Main/InstructorSettings/OrganizationBusinformation";
 // export { default as InstructorHome } from "./Main/InstructorHome/HomeScreen";
-export { default as InstructorPersonalProfileScreen } from "./Main/InstructorSettings/PersonalProfileScreen";
 // export { default as DragDropStudentScreen } from "./Main/DragDropStudent/DragDropStudentScreen";
 
 // //PARENT

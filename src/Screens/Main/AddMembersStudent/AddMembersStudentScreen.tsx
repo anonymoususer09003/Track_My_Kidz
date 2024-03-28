@@ -1,45 +1,44 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { Text } from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  Linking,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Image,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { LinearGradientButton } from "@/Components";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { useIsFocused } from "@react-navigation/native";
+import React, { FC, useEffect, useState } from 'react';
+import { RouteProp, useIsFocused, useNavigation } from '@react-navigation/native';
+import { Text } from '@ui-kitten/components';
+import { FlatList, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { LinearGradientButton } from '@/Components';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
 
-import Colors from "@/Theme/Colors";
-import AntDesign from "react-native-vector-icons/AntDesign";
+import Colors from '@/Theme/Colors';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
-import ChangeAddMembersStudentsState from "@/Store/AddMembersStudents/ChangeAddMembersStudentsState";
-import { useStateValue } from "@/Context/state/State";
-import { actions } from "@/Context/state/Reducer";
-import { AddIndividialMembersModal } from "@/Modals";
+import ChangeAddMembersStudentsState from '@/Store/AddMembersStudents/ChangeAddMembersStudentsState';
+import { useStateValue } from '@/Context/state/State';
+import { actions } from '@/Context/state/Reducer';
+import { AddIndividialMembersModal } from '@/Modals';
+import { AddMembersNavigatorParamList } from '@/Navigators/Main/AddMembersNavigator';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
-const AddMembersStudentScreen = ({ route }) => {
+
+type AddMembersStudentScreenProps = {
+  route: RouteProp<AddMembersNavigatorParamList, 'AddMembersStudent'>
+}
+const AddMembersStudentScreen: FC<AddMembersStudentScreenProps> = ({ route }) => {
   const isFocused = useIsFocused();
-  const [{ group }, _dispatch] = useStateValue();
-  const navigation = useNavigation();
-  const studentss = useSelector(
-    (state: { students: AddMembersStudentsState }) => state.students?.students
-  );
+  const [{ group }, _dispatch]: any = useStateValue();
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
+
+  // const studentss = useSelector(
+  //   (state: { students: AddMembersStudentsState }) => state.students?.students,
+  // );
   const dispatch = useDispatch();
 
-  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [selectedStudents, setSelectedStudents] = useState<any[]>([]);
 
-  const [askPermission, setAskPermission] = useState(false);
-  const [students, setStudents] = useState([]);
-  const [deletedStudents, setDeletedStudents] = useState([]);
+  const [askPermission, setAskPermission] = useState<boolean>(false);
+  const [students, setStudents] = useState<any[]>([]);
+  const [deletedStudents, setDeletedStudents] = useState<any[]>([]);
+  const [deletedInstructors, setDeletedInstructors] = useState<any[]>([]);
 
-  const handleSelectStudent = (index, status) => {
+  const handleSelectStudent = (index: number, status: any) => {
     const data = [...students];
     if (status) {
       const item = data[index];
@@ -50,7 +49,7 @@ const AddMembersStudentScreen = ({ route }) => {
       dispatch(
         ChangeAddMembersStudentsState.action({
           students: _selectedStudents,
-        })
+        }),
       );
     } else {
       const item = selectedStudents[index];
@@ -59,20 +58,20 @@ const AddMembersStudentScreen = ({ route }) => {
       _selectedStudents = _selectedStudents.filter((i) => i !== item);
       setSelectedStudents(_selectedStudents);
       const filterDeletedInstrutors = deletedInstructors.filter(
-        (instructor) => instructor?.email != item?.email
+        (instructor) => instructor?.email != item?.email,
       );
       setDeletedInstructors(filterDeletedInstrutors);
       dispatch(
         ChangeAddMembersStudentsState.action({
           students: _selectedStudents,
-        })
+        }),
       );
     }
   };
 
   const handleSubmit = () => {
     let addStudents = [...students];
-    let temp = [];
+    let temp: any[] = [];
     if (group?.isEdit) {
       addStudents.map((item) => {
         if (!item?.studentId) {
@@ -81,23 +80,23 @@ const AddMembersStudentScreen = ({ route }) => {
       });
     }
     addStudents = group?.isEdit ? temp : [...students];
-    let filter = addStudents.filter((s) => s?.firstName !== "");
+    let filter = addStudents.filter((s) => s?.firstName !== '');
 
     _dispatch({
       type: actions.SET_GROUP,
       payload: {
         ...group,
         deletedStudent: group?.isEdit ? deletedStudents : false,
-        students: addStudents.filter((s) => s?.firstName !== ""),
+        students: addStudents.filter((s) => s?.firstName !== ''),
       },
     });
-    navigation.navigate("AddMembers", {
-      screen: "AddMembersInstructor",
-      data: group?.isEdit ? true : false,
+    navigation.navigate('AddMembers', {
+      screen: 'AddMembersInstructor',
+      data: !!group?.isEdit,
     });
   };
 
-  const handleRemoveStudent = (item) => {
+  const handleRemoveStudent = (item: any) => {
     let data = [...students];
 
     if (!item?.studentId) {
@@ -112,7 +111,7 @@ const AddMembersStudentScreen = ({ route }) => {
     dispatch(
       ChangeAddMembersStudentsState.action({
         students: [],
-      })
+      }),
     );
     setSelectedStudents([]);
     setAskPermission(false);
@@ -146,16 +145,16 @@ const AddMembersStudentScreen = ({ route }) => {
           <View
             style={{
               marginVertical: 10,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}
           >
             <Text
               style={{
                 color: Colors.primary,
                 fontSize: 18,
-                fontWeight: "700",
+                fontWeight: '700',
               }}
             >
               Add Students
@@ -166,16 +165,16 @@ const AddMembersStudentScreen = ({ route }) => {
                 dispatch(
                   ChangeModalState.action({
                     addIndividualMemberModalVisibility: true,
-                  })
+                  }),
                 )
               }
             >
               <Image
-                source={require("@/Assets/Images/add.png")}
+                source={require('@/Assets/Images/add.png')}
                 style={{
                   height: 24,
                   width: 24,
-                  resizeMode: "contain",
+                  resizeMode: 'contain',
                 }}
               />
             </TouchableOpacity>
@@ -188,16 +187,16 @@ const AddMembersStudentScreen = ({ route }) => {
               renderItem={({ item, index }) => (
                 <View
                   style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                     paddingVertical: 2.5,
                   }}
                 >
                   <View
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
+                      flexDirection: 'row',
+                      alignItems: 'center',
                     }}
                   >
                     <Text>{item.name}</Text>
@@ -229,8 +228,8 @@ const AddMembersStudentScreen = ({ route }) => {
                 >
                   <View
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
+                      flexDirection: 'row',
+                      alignItems: 'center',
                     }}
                   >
                     <View>
@@ -252,21 +251,21 @@ const AddMembersStudentScreen = ({ route }) => {
 
           <View style={[styles.buttonSettings, { paddingBottom: 20 }]}>
             <LinearGradientButton
-              disabled={students.filter((s) => s.firstName !== "").length === 0}
+              disabled={students.filter((s) => s.firstName !== '').length === 0}
               onPress={handleSubmit}
             >
-              {route?.params ? "Edit Members" : "Add Members"}
+              {route?.params ? 'Edit Members' : 'Add Members'}
             </LinearGradientButton>
             <View style={{ marginTop: 20 }} />
             <LinearGradientButton
-              gradient={["#EC5ADD", Colors.primary]}
+              gradient={['#EC5ADD', Colors.primary]}
               onPress={() => {
                 resetFields();
                 navigation.reset({
                   index: 0,
                   routes: [
                     {
-                      name: "InstructorActivity",
+                      name: 'InstructorActivity',
                     },
                   ],
                 });
@@ -286,7 +285,7 @@ export default AddMembersStudentScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     paddingTop: 20,
     backgroundColor: Colors.newBackgroundColor,
   },
@@ -296,32 +295,32 @@ const styles = StyleSheet.create({
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "left",
+    fontWeight: 'bold',
+    textAlign: 'left',
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
   bottomButton: {
-    width: "60%",
+    width: '60%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -335,26 +334,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonSettings: {
-    marginTop: "25%",
-    flexDirection: "column",
+    marginTop: '25%',
+    flexDirection: 'column',
 
-    alignItems: "center",
-    width: "80%",
-    marginLeft: "10%",
+    alignItems: 'center',
+    width: '80%',
+    marginLeft: '10%',
 
     // alignItems: "center",
     // justifyContent: "flex-start",
   },
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
     marginLeft: 10,
     marginTop: 10,
   },
   participantContainer: {
-    width: "80%",
+    width: '80%',
     marginVertical: 5,
-    marginLeft: "5%",
+    marginLeft: '5%',
   },
   participantListView: {
     borderRadius: 10,
@@ -363,9 +362,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   participantsListCards: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 2.5,
     borderColor: Colors.newBackgroundColor,
     paddingBottom: 10,

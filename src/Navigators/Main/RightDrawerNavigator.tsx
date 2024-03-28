@@ -7,7 +7,9 @@ import {
   ActivityDetailsScreen,
   AppListScreen,
   ChangePasswordScreen,
-  ContactUsScreen, CreateActivityScreen, CreateGroupScreen, InstructorApprovalScreen,
+  ContactUsScreen,
+  CreateActivityScreen,
+  CreateGroupScreen,
   InstructorPersonalProfileScreen,
   InstructorSettingsScreen,
   OrganizationInfoScreen,
@@ -17,6 +19,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import InstructorApprovalNavigator from '@/Navigators/Main/InstructorApprovalNavigator';
 import InstructorActivityNavigator from '@/Navigators/Main/InstructorActivityNavigator';
+import AddMembersNavigator from '@/Navigators/Main/AddMembersNavigator';
 
 export type MainStackNavigatorParamsList = {
   InstructorPersonalProfileScreen: undefined
@@ -30,6 +33,10 @@ export type MainStackNavigatorParamsList = {
   CreateActivity: { isEdit?: boolean, groupId?: string }
   CreateGroup: { data: { groupId: number, groupName: string } }
   InstructorApproval: undefined
+  AddMembers: {
+    screen: string,
+    data: boolean,
+  }
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
@@ -111,6 +118,7 @@ const RightDrawerNavigator = () => {
           name="InstructorApproval"
           component={InstructorApprovalNavigator}
         />
+        <Stack.Screen name="AddMembers" component={AddMembersNavigator} />
 
 
         {/*{user_type === "student" && (*/}
@@ -169,7 +177,6 @@ const RightDrawerNavigator = () => {
         {/*  component={StudentLocationScreen}*/}
         {/*/>*/}
 
-        {/*<Stack.Screen name="AddMembers" component={AddMembersNavigator} />*/}
 
         {/*<Stack.Screen*/}
         {/*  name="InstructorGroupApproval"*/}
@@ -196,7 +203,7 @@ const RightDrawerNavigator = () => {
 const Placeholder = () => {
   let useNavigation1: any = useNavigation();
   return <View>
-    <Text onPress={() => useNavigation1.navigate('InstructorApproval')}>
+    <Text onPress={() => useNavigation1.navigate('AddMembers')}>
       settings
     </Text>
   </View>;

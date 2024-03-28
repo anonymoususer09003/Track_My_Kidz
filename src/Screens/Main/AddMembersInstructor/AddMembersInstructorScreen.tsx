@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState, useRef, FC } from 'react';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import {
   Text,
   Icon,
@@ -47,25 +47,31 @@ import {
   GetInstructor,
   FindInstructorBySchoolOrg,
 } from "@/Services/Instructor";
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+import { AddMembersNavigatorParamList } from '@/Navigators/Main/AddMembersNavigator';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-const AddMembersInstructorScreen = ({ route }) => {
-  const navigation = useNavigation();
-  const [{ group, orgInstructors }, _dispatch] = useStateValue();
+const AddMembersInstructorScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
+
+  const [{ group, orgInstructors }, _dispatch]: any = useStateValue();
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
-  const [selectedInstructors, setSelectedInstructors] = useState([]);
-  const [instructors, setInstructors] = useState([]);
-  const [deletedInstructors, setDeletedInstructors] = useState([]);
-  const students = useSelector(
-    (state: { students: AddMembersStudentsState }) => state.students?.students
-  );
+  const [selectedInstructors, setSelectedInstructors] = useState<any[]>([]);
+  const [instructors, setInstructors] = useState<any[]>([]);
+  const [deletedInstructors, setDeletedInstructors] = useState<any[]>([]);
+  // const students = useSelector(
+  //   (state: { students: AddMembersStudentsState }) => state.students?.students
+  // );
   console.log("group", group);
 
-  const [askPermission, setAskPermission] = useState(false);
-  const [user, setUser] = useState(null);
+  const [askPermission, setAskPermission] = useState<boolean>(false);
+  const [user, setUser] = useState<any>(null);
 
   const getInstructor = async () => {
     const userId = await loadUserId();
+
+    if (!userId) return
 
     GetInstructor(userId)
       .then((res) => {
@@ -102,7 +108,7 @@ const AddMembersInstructorScreen = ({ route }) => {
     // getAllInstructors();
   }, [isFocused]);
 
-  const handleSelectInstructor = (index, status) => {
+  const handleSelectInstructor = (index: number, status: any) => {
     const data = [...instructors];
     if (status) {
       const item = data[index];
@@ -179,7 +185,7 @@ const AddMembersInstructorScreen = ({ route }) => {
             });
 
             // console.log("group", group);
-            const _students = group?.students?.map((item) => ({
+            const _students = group?.students?.map((item: any) => ({
               firstName: item?.name?.split(" ")[0],
               lastName: item?.name?.split(" ")[1],
               parentEmail1: item?.parent1_email,
@@ -192,7 +198,7 @@ const AddMembersInstructorScreen = ({ route }) => {
                 _students
               );
 
-              const _instructors = [];
+              const _instructors: any[] = [];
               let notifyToInstructor;
               if (!group?.isEdit && selectedInstructors) {
                 selectedInstructors.map((item) => {
@@ -259,7 +265,7 @@ const AddMembersInstructorScreen = ({ route }) => {
             });
 
             // console.log("group", group);
-            const _students = group?.students?.map((item) => ({
+            const _students = group?.students?.map((item: any) => ({
               firstName: item?.name?.split(" ")[0],
               lastName: item?.item?.name?.split(" ")[1] || "",
               parentEmail1: item?.parent1_email,
@@ -316,13 +322,13 @@ const AddMembersInstructorScreen = ({ route }) => {
                 );
                 setSelectedInstructors([]);
               }
-              let deletedInstructor = [];
-              let deletedStudents = [];
+              let deletedInstructor: any[] = [];
+              let deletedStudents: any[] = [];
               deletedInstructors.map((item) => {
                 deletedInstructor.push(item?.instructorId);
               });
               if (group?.deletedStudent) {
-                group?.deletedStudent.map((item) => {
+                group?.deletedStudent.map((item: any) => {
                   deletedStudents.push(item?.studentId);
                 });
               }

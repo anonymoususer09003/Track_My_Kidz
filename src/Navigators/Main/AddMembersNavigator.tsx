@@ -1,21 +1,31 @@
-import React, { useState, useEffect } from "react";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import React, { FC, useState } from 'react';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
-import { Button, TabBar } from "@ui-kitten/components";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { TabBar } from '@ui-kitten/components';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { AddMembersInstructorScreen, AddMembersStudentScreen } from "@/Screens";
-import { AppHeader, LinearGradientButton } from "@/Components";
-import Colors from "@/Theme/Colors";
-import { AuthStackHeader } from "@/Components";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import { AddMembersInstructorScreen, AddMembersStudentScreen } from '@/Screens';
+import { LinearGradientButton } from '@/Components';
+import Colors from '@/Theme/Colors';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { RouteProp } from '@react-navigation/native';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
+
+type AddMembersNavigatorProps = {
+  route: RouteProp<MainStackNavigatorParamsList, 'AddMembers'>
+}
+
+export type AddMembersNavigatorParamList = {
+  AddMembersInstructor: undefined
+  AddMembersStudent: undefined
+};
 // @refresh reset
-const AddMembersNavigator = ({ route }) => {
-  const TabNavigator = createMaterialTopTabNavigator();
+const AddMembersNavigator: FC<AddMembersNavigatorProps> = ({ route }) => {
+  const TabNavigator = createMaterialTopTabNavigator<AddMembersNavigatorParamList>();
   const tabNames = ["Students", "Instructors"];
-  const [activeTab, setActiveTab] = useState(1);
-  const [groupDetail, setGroupDetail] = useState();
+  const [activeTab, setActiveTab] = useState<number>(1);
+  // const [groupDetail, setGroupDetail] = useState();
   //@ts-ignore
 
   const TopTabBar = ({ navigation, state, route }) => {
