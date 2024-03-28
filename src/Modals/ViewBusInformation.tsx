@@ -1,65 +1,42 @@
-import React, { useEffect, useState } from "react";
-import {
-  Text,
-  Input,
-  TopNavigationAction,
-  Icon,
-  CheckBox,
-} from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  Dimensions,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import Colors from "@/Theme/Colors";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Modal from "react-native-modal";
-import { CreateBus, PutBus } from "@/Services/BusConfiguration";
-import { UserState } from "@/Store/User";
-import FetchOne from "@/Services/User/FetchOne";
-import { useNavigation } from "@react-navigation/native";
-const ViewBusInformation = ({
-  isLongSeat,
-  numberOfKidsLongSeat,
-  numberOfRows,
-  numberOfKidsInRow,
-  numberOfSeatsPerRow,
-  busName,
-}: {
+import React, { FC, useEffect, useState } from 'react';
+import { CheckBox, Text } from '@ui-kitten/components';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import Colors from '@/Theme/Colors';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Modal from 'react-native-modal';
+
+type ViewBusInformationProps = {
   isLongSeat: boolean;
   numberOfKidsLongSeat: number;
   numberOfRows: number;
   numberOfKidsInRow: number;
-  buses?: Array<object>;
-  setBuses?: Function;
   busName: string;
   numberOfSeatsPerRow: number;
-  setBusName: Function;
-  setNumberOfRows: Function;
-  setNumberOfSeatsPerRow: Function;
-  setNumberOfKidsPerSeat: Function;
-  setIsLongSeat: Function;
-  setNumberOfKidsLongSeat: Function;
-  activity?: any;
-  selectedItem: any;
-}) => {
-  const deviceWidth = Dimensions.get("screen").width;
+}
+const ViewBusInformation: FC<ViewBusInformationProps> = (
+  {
+    isLongSeat,
+    numberOfKidsLongSeat,
+    numberOfRows,
+    numberOfKidsInRow,
+    numberOfSeatsPerRow,
+    busName,
+  }) => {
+  // const deviceWidth = Dimensions.get('screen').width;
   const dispatch = useDispatch();
-  const navigation = useNavigation();
-  const [rearSeats, setRearSeats] = useState([]);
-  const [seats, setSeats] = useState([]);
-  const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
-  );
-  console.log("currentUser00000000000000000000000", numberOfKidsLongSeat);
+  // const navigation = useNavigation();
+  const [rearSeats, setRearSeats] = useState<any>([]);
+  const [seats, setSeats] = useState<any>([]);
+  // const currentUser = useSelector(
+  //   (state: { user: UserState }) => state.user.item,
+  // );
+  console.log('currentUser00000000000000000000000', numberOfKidsLongSeat);
   const getRearSeats = () => {
     const data = [];
     for (let i = 0; i < numberOfKidsLongSeat; i++) {
-      data.push("");
+      data.push('');
     }
     setRearSeats(data);
   };
@@ -71,7 +48,7 @@ const ViewBusInformation = ({
     for (let i = 0; i < numberOfRows; i++) {
       const innerData = [];
       for (let j = 0; j < rowsInSeat; j++) {
-        innerData.push("");
+        innerData.push('');
       }
       data.push(innerData);
     }
@@ -80,7 +57,7 @@ const ViewBusInformation = ({
   };
 
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.viewBusInformationModal
+    (state: { modal: ModalState }) => state.modal.viewBusInformationModal,
   );
 
   useEffect(() => {
@@ -100,21 +77,21 @@ const ViewBusInformation = ({
         dispatch(
           ChangeModalState.action({
             viewBusInformationModal: false,
-          })
+          }),
         );
       }}
       onBackdropPress={() => {
         dispatch(
           ChangeModalState.action({
             viewBusInformationModal: false,
-          })
+          }),
         );
       }}
       onBackButtonPress={() => {
         dispatch(
           ChangeModalState.action({
             viewBusInformationModal: false,
-          })
+          }),
         );
       }}
     >
@@ -129,20 +106,20 @@ const ViewBusInformation = ({
         >
           <View style={styles.layout}>
             <ScrollView style={{ flex: 1 }}>
-              <View horizontal style={{ flex: 1, paddingBottom: 5 }}>
+              <View style={{ flex: 1, paddingBottom: 5, flexDirection: 'row' }}>
                 <View
                   style={{
-                    width: "100%",
-                    alignSelf: "center",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
+                    width: '100%',
+                    alignSelf: 'center',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
                   }}
                 >
                   {isLongSeat &&
-                    rearSeats.map((item) => (
+                    rearSeats.map((item: any) => (
                       <View
                         style={{
-                          flexDirection: "row",
+                          flexDirection: 'row',
                           // alignItems: "center",
                           // justifyContent: "space-between",
                           // marginRight: 10,
@@ -152,10 +129,10 @@ const ViewBusInformation = ({
                           style={{
                             margin: 5,
                             height: 40,
-                            width: "12%",
+                            width: '12%',
                             borderWidth: 1,
                             borderRadius: 10,
-                            borderColor: "#000",
+                            borderColor: '#000',
                             padding: 20,
                             backgroundColor: Colors.textInputBackgroundColor,
                           }}
@@ -165,30 +142,29 @@ const ViewBusInformation = ({
                 </View>
               </View>
 
-              <View horizontal style={{ flex: 1, paddingBottom: 5 }}>
-                <View style={{ width: "100%" }}>
-                  {seats.map((item, index) => {
-                    let width = "10%";
+              <View style={{ flex: 1, paddingBottom: 5, flexDirection: 'row' }}>
+                <View style={{ width: '100%' }}>
+                  {seats.map((item: any) => {
                     return (
                       <View
                         style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                         }}
                       >
                         {item &&
                           item?.length > 0 &&
-                          item.map((innerItem, index) => (
+                          item.map(() => (
                             <View
                               style={{
                                 borderWidth: 1,
                                 margin: 3,
-                                width: width,
+                                width: 10,
                                 height: 40,
                                 borderRadius: 10,
                                 backgroundColor:
-                                  Colors.textInputBackgroundColor,
+                                Colors.textInputBackgroundColor,
                               }}
                             ></View>
                           ))}
@@ -201,19 +177,19 @@ const ViewBusInformation = ({
               <Text
                 style={{
                   marginVertical: 10,
-                  fontWeight: "bold",
+                  fontWeight: 'bold',
                   fontSize: 24,
-                  alignSelf: "center",
+                  alignSelf: 'center',
                 }}
               >
                 Front
               </Text>
               <View
                 style={{
-                  flexDirection: "column",
-                  width: "100%",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  flexDirection: 'column',
+                  width: '100%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <View style={styles.horizonatal}>
@@ -233,7 +209,7 @@ const ViewBusInformation = ({
                   <Text style={styles.textLabel}>{numberOfKidsInRow}</Text>
                 </View>
                 <View style={styles.horizonatal}>
-                  <Text style={{ marginRight: 10, fontWeight: "bold" }}>
+                  <Text style={{ marginRight: 10, fontWeight: 'bold' }}>
                     Do you have a rear long seats?
                   </Text>
                   <CheckBox
@@ -241,7 +217,7 @@ const ViewBusInformation = ({
                     checked={isLongSeat}
                     onChange={() => null}
                   >
-                    {""}
+                    {''}
                   </CheckBox>
                 </View>
                 <View style={styles.horizonatal}>
@@ -254,12 +230,12 @@ const ViewBusInformation = ({
 
             <View
               style={{
-                position: "absolute",
+                position: 'absolute',
                 bottom: 30,
                 left: 0,
                 right: 0,
-                alignItems: "center",
-                width: "100%",
+                alignItems: 'center',
+                width: '100%',
               }}
             >
               <View style={styles.bottomButton}>
@@ -269,7 +245,7 @@ const ViewBusInformation = ({
                     dispatch(
                       ChangeModalState.action({
                         viewBusInformationModal: false,
-                      })
+                      }),
                     );
                   }}
                 >
@@ -289,12 +265,12 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   modal: { borderRadius: 10 },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 0,
@@ -309,33 +285,33 @@ const styles = StyleSheet.create({
   },
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     paddingTop: 20,
   },
   item: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     paddingHorizontal: 10,
     paddingTop: 10,
   },
   footer: {
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginVertical: 5,
   },
   text: {
@@ -343,12 +319,12 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   bottomButton: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -359,15 +335,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   horizonatal: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   textLabel: {
     marginLeft: 5,
   },
   label: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

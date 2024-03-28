@@ -11,11 +11,13 @@ import {
   CreateActivityScreen,
   CreateGroupScreen,
   InstructorPersonalProfileScreen,
-  InstructorSettingsScreen, InstructorsListScreen,
+  InstructorSettingsScreen,
+  InstructorsListScreen,
+  OrganizationBusinformation,
   OrganizationInfoScreen,
   ReportProblemScreen,
 } from '@/Screens';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import InstructorApprovalNavigator from '@/Navigators/Main/InstructorApprovalNavigator';
 import AddMembersNavigator from '@/Navigators/Main/AddMembersNavigator';
@@ -39,6 +41,7 @@ export type MainStackNavigatorParamsList = {
   }
   InstructorGroupApprovalNavigator: undefined
   InstructorList: { data: any }
+  BusInfo: { data: { buses: any, schoolId: number } }
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
@@ -129,7 +132,7 @@ const RightDrawerNavigator = () => {
           name="InstructorList"
           component={InstructorsListScreen}
         />
-
+        <Stack.Screen name="BusInfo" component={OrganizationBusinformation} />
 
 
         {/*{user_type === "student" && (*/}
@@ -189,9 +192,6 @@ const RightDrawerNavigator = () => {
         {/*/>*/}
 
 
-
-
-        {/*<Stack.Screen name="BusInfo" component={OrganizationBusinformation} />*/}
         {/*<Stack.Screen*/}
         {/*  name="ParentDeletePermission"*/}
         {/*  component={ParentDeletePermissionScreen}*/}
@@ -205,9 +205,10 @@ const RightDrawerNavigator = () => {
   );
 };
 const Placeholder = () => {
-  let useNavigation1: any = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
+
   return <View>
-    <Text onPress={() => useNavigation1.navigate('InstructorList')}>
+    <Text onPress={() => navigation.navigate('BusInfo', { data: { buses: [], schoolId: 1 } })}>
       Open test page
     </Text>
   </View>;
