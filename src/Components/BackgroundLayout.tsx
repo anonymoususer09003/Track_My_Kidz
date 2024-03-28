@@ -1,48 +1,53 @@
-import setHeaderParams from "@/Store/header/setHeaderParams";
-import Colors from "@/Theme/Colors";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Icon, Input, Select, SelectItem } from "@ui-kitten/components";
-import React, { useEffect, useState } from "react";
-import {
-  Image,
-  ImageBackground,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import MaterialIcon from "react-native-vector-icons/MaterialIcons";
-import { useDispatch, useSelector } from "react-redux";
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { Icon, Input, Select, SelectItem } from '@ui-kitten/components';
+import React, { FC, useEffect, useState } from 'react';
+import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { StudentState } from "@/Store/StudentActivity";
-export default function BackgroundLayout({
-  title,
-  children,
-  hideHeader,
-  style,
-  rightIcon,
-  dropDownList,
-  showDropDown,
-  hideLeftIcon,
-}: any) {
-  const searchIcon = require("@/Assets/Images/search_icon.png");
+import setHeaderParams from '@/Store/header/setHeaderParams';
+import Colors from '@/Theme/Colors';
+import { StudentState } from '@/Store/StudentActivity';
+
+type BackgroundLayoutProps = {
+  title?: string,
+  children?: any,
+  hideHeader?: boolean,
+  style?: any,
+  rightIcon?: any,
+  dropDownList?: any,
+  showDropDown?: any,
+  hideLeftIcon?: any,
+}
+const BackgroundLayout: FC<BackgroundLayoutProps> = (
+  {
+    title,
+    children,
+    hideHeader,
+    style,
+    rightIcon,
+    dropDownList,
+    showDropDown,
+    hideLeftIcon,
+  }) => {
+  const searchIcon = require('@/Assets/Images/search_icon.png');
+  const arrowBackIcon = require('@/Assets/Images/arrow_back.png');
   const navigation = useNavigation();
   const focused = useIsFocused();
   const dispatch = useDispatch();
 
   const headerState = useSelector((state: { user: any, header: any }) => state.header);
 
-  const { showFamilyMap, showParticipantMap } = useSelector(
-    (state: { studentActivity: StudentState }) => state.studentActivity
+  const { showFamilyMap } = useSelector(
+    (state: { studentActivity: StudentState }) => state.studentActivity,
   );
   const [showSearchBar, setShowSearchBar] = useState(false);
   useEffect(() => {
     if (!focused) {
       dispatch(
         setHeaderParams.action({
-          selectedDropDownOption: "",
-          searchBarValue: "",
-        })
+          selectedDropDownOption: '',
+          searchBarValue: '',
+        }),
       );
     }
   }, [focused]);
@@ -51,33 +56,36 @@ export default function BackgroundLayout({
       <TouchableOpacity onPress={() => setShowSearchBar(!showSearchBar)}>
         <Image
           source={searchIcon}
-          style={{ height: 15, width: 15, resizeMode: "contain" }}
+          style={{ height: 15, width: 15, resizeMode: 'contain' }}
         />
       </TouchableOpacity>
     );
   };
 
-  const renderIcon = (props: any) => <Icon {...props} name={"search"} />;
+  const renderIcon = (props: any) => <Icon {...props} name={'search'} />;
 
   return (
     <ImageBackground
       style={{ flex: 1 }}
-      source={require("@/Assets/Images/App_Background.png")}
+      source={require('@/Assets/Images/App_Background.png')}
       resizeMode="stretch"
     >
       {!hideHeader && !showFamilyMap && (
         <View style={[styles.main, style && style]}>
           <TouchableOpacity onPress={() => {
 
-            navigation.goBack()
+            navigation.goBack();
 
-            }}>
+          }}>
             {!hideLeftIcon && (
-              <MaterialIcon name="arrow-back" size={20} color={Colors.white} />
+              <Image
+                source={arrowBackIcon}
+                style={{ height: 20, width: 20 }}
+              />
             )}
           </TouchableOpacity>
 
-          <Text style={{ color: Colors.white, fontWeight: "bold" }}>
+          <Text style={{ color: Colors.white, fontWeight: 'bold' }}>
             {title}
           </Text>
           <View style={{ height: 10, width: 10, paddingRight: 20 }}>
@@ -87,14 +95,14 @@ export default function BackgroundLayout({
       )}
       {showDropDown && (
         <Select
-          style={{ width: "90%", marginBottom: 10, alignSelf: "center" }}
+          style={{ width: '90%', marginBottom: 10, alignSelf: 'center' }}
           value={headerState?.dropDownValue}
           placeholder="Select Name"
           onSelect={(index: any) => {
             dispatch(
               setHeaderParams.action({
                 selectedDropDownOption: index,
-              })
+              }),
             );
           }}
           label={(evaProps: any) => <Text {...evaProps}></Text>}
@@ -104,7 +112,7 @@ export default function BackgroundLayout({
             dropDownList?.map((item: any, index: any) => (
               <SelectItem
                 key={index}
-                title={item?.firstname + " " + item?.lastname}
+                title={item?.firstname + ' ' + item?.lastname}
               />
             ))}
         </Select>
@@ -120,7 +128,7 @@ export default function BackgroundLayout({
             dispatch(
               setHeaderParams.action({
                 searchBarValue: nextValue,
-              })
+              }),
             );
 
             //@ts-ignore
@@ -132,22 +140,25 @@ export default function BackgroundLayout({
       {children}
     </ImageBackground>
   );
-}
+};
+
+export default BackgroundLayout;
+
 const styles = StyleSheet.create({
   main: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingHorizontal: 10,
     paddingTop: 10,
     paddingBottom: 40,
     marginTop: 30,
   },
   searchBar: {
-    width: "90%",
+    width: '90%',
     marginTop: 10,
     borderRadius: 10,
-    alignSelf: "center",
+    alignSelf: 'center',
     marginBottom: 20,
   },
 });
