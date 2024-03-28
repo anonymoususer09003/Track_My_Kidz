@@ -1,61 +1,55 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Switch,
-  Alert,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { DraxProvider, DraxView, DraxList } from "react-native-drax";
-import { AppHeader, LinearGradientButton } from "@/Components";
-import Colors from "@/Theme/Colors";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
-import { useStateValue } from "@/Context/state/State";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { FindAllBus } from "@/Services/BusConfiguration";
-import { UserState } from "@/Store/User";
-import { useIsFocused } from "@react-navigation/native";
-import { FindAllStudentsWhichActivity } from "@/Services/Activity";
-import { SaveStudentSeats, GetBusByID } from "@/Services/BusConfiguration";
-import { AnyMessageParams } from "yup/lib/types";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import React, { FC, useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { DraxList, DraxProvider, DraxView } from 'react-native-drax';
+import { AppHeader, LinearGradientButton } from '@/Components';
+import Colors from '@/Theme/Colors';
+import { useDispatch, useSelector } from 'react-redux';
+import { RouteProp, useIsFocused, useNavigation } from '@react-navigation/native';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { FindAllBus, GetBusByID, SaveStudentSeats } from '@/Services/BusConfiguration';
+import { UserState } from '@/Store/User';
+import { FindAllStudentsWhichActivity } from '@/Services/Activity';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+
 const gestureRootViewStyle = { flex: 1 };
 
-export default function App({ route }: any) {
-  const FirstReceivingItemList = [
-    {
-      id: 13,
-      name: "M",
-      background_color: "#ffaaff",
-    },
-    {
-      id: 14,
-      name: "N",
-      background_color: "#ffaaff",
-    },
-    {
-      id: 15,
-      name: "O",
-      background_color: "#ffaaff",
-    },
-    {
-      id: 16,
-      name: "P",
-      background_color: "#ffaaff",
-    },
-  ];
-  console.log("route", route.params);
-  const navigation = useNavigation();
+type DragDropStudentScreenProps = {
+  route: RouteProp<MainStackNavigatorParamsList, 'DragDropStudent'>
+}
+
+const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
+  // const FirstReceivingItemList = [
+  //   {
+  //     id: 13,
+  //     name: 'M',
+  //     background_color: '#ffaaff',
+  //   },
+  //   {
+  //     id: 14,
+  //     name: 'N',
+  //     background_color: '#ffaaff',
+  //   },
+  //   {
+  //     id: 15,
+  //     name: 'O',
+  //     background_color: '#ffaaff',
+  //   },
+  //   {
+  //     id: 16,
+  //     name: 'P',
+  //     background_color: '#ffaaff',
+  //   },
+  // ];
+  console.log('route', route.params);
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const [loading, setLoading] = useState(false);
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
-  const [{ selectedActivity }] = useStateValue();
-  const [students, setStudents] = useState([{ name: "jj" }]);
+  // const [{ selectedActivity }] = useStateValue();
+  // const [students, setStudents] = useState([{ name: 'jj' }]);
   //   const [students, setStudents] = React.useState(
   //     selectedActivity?.studentsActivity?.map((item) => ({
   //       id: item?.studentActivityId,
@@ -63,11 +57,11 @@ export default function App({ route }: any) {
   //       background_color: "#fff",
   //     })) || []
   //   );
-  const [seatsAllocate, setSeatsAllocate] = useState([]);
-  const [allocated, setAllocated] = useState([]);
-  const [bus, setBus] = useState({
+  // const [seatsAllocate, setSeatsAllocate] = useState([]);
+  // const [allocated, setAllocated] = useState([]);
+  const [bus, setBus] = useState<any>({
     busId: 3128,
-    busName: "strings",
+    busName: 'strings',
     numberOfRows: 6,
     numberOfSeatsPerRow: 2,
     numberOfKidsPerSeat: 2,
@@ -77,36 +71,36 @@ export default function App({ route }: any) {
     instructorId: 1268,
     busSeatsReserved: [],
   });
-  const [thumbnail, setThumbnail] = useState(true);
-  const [receivingItemList, setReceivedItemList] = useState([]);
-  const [dragItemMiddleList, setDragItemListMiddle] = useState([
+  const [thumbnail, setThumbnail] = useState<boolean>(true);
+  const [receivingItemList, setReceivedItemList] = useState<any[]>([]);
+  const [dragItemMiddleList, setDragItemListMiddle] = useState<any[]>([
     // { name: "mm", background_color: "#fff", id: 1 },
     // { name: "nm", background_color: "#fff", id: 2 },
   ]);
-  const [originaldragItemMiddleList, setOriginalDragItemListMiddle] = useState(
-    []
+  const [originaldragItemMiddleList, setOriginalDragItemListMiddle] = useState<any[]>(
+    [],
   );
   const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
+    (state: { user: UserState }) => state.user.item,
   );
 
-  const [rearSeats, setRearSeats] = useState([]);
-  const [seats, setSeats] = useState([]);
-  console.log("rearsetas", dragItemMiddleList);
-  console.log("rearsetas", receivingItemList);
+  const [rearSeats, setRearSeats] = useState<any[]>([]);
+  const [seats, setSeats] = useState<any[]>([]);
+  console.log('rearsetas', dragItemMiddleList);
+  console.log('rearsetas', receivingItemList);
 
   const getBusbyId = async (bus: any, busDetail: any) => {
     try {
       let res = await GetBusByID(
-        route?.params?.bus?.busId || route?.params?.bus
+        route?.params?.bus?.busId || route?.params?.bus,
       );
-      console.log("res0999", res);
+      console.log('res0999', res);
       if (res.data.length > 0) {
         getSeatsList(res.data, busDetail);
       }
       return res;
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
   const getBuses = async () => {
@@ -114,7 +108,7 @@ export default function App({ route }: any) {
     setLoading(true);
     FindAllBus(currentUser?.instructorId, 0, 100)
       .then(async (res) => {
-        console.log("00000000000000res", res);
+        console.log('00000000000000res', res);
 
         // console.log("88989389398938", res?.data);
         // setBus(
@@ -131,21 +125,21 @@ export default function App({ route }: any) {
         //     busSeatsReserved: [],
         //   }
         // res?.data?.result[0];
-        console.log("result", res?.data?.result);
-        console.log("route", route?.params?.bus);
+        console.log('result', res?.data?.result);
+        console.log('route', route?.params?.bus);
         const bus = res?.data?.result?.find(
-          (b) => b?.busId === route?.params.bus?.busId
+          (b: any) => b?.busId === route?.params.bus?.busId,
         );
         setBus(bus);
-        let response = await getBusbyId(res, bus);
+        // let response = await getBusbyId(res, bus);
         setLoading(false);
-        console.log("bus---", bus);
+        console.log('bus---', bus);
       })
       .catch((err) => {
-        console.log("getBuses Error:", err);
+        console.log('getBuses Error:', err);
       });
   };
-  const getSeatsList = (seats: AnyMessageParams, busInfo: any) => {
+  const getSeatsList = (seats: any[], busInfo: any) => {
     try {
       const rearSeats = [];
       // let seats = [
@@ -157,13 +151,13 @@ export default function App({ route }: any) {
       //   [null, null, null, null],
       //   [null, null, null, null],
       // ];
-      let obj = {};
+      let obj: any = {};
       seats.map((item) => {
-        obj[item[1] + "_" + item[2]] = item;
+        obj[`${item[1]}_${item[2]}`] = item;
       });
 
-      console.log("seats", seats);
-      console.log("obj00", obj);
+      console.log('seats', seats);
+      console.log('obj00', obj);
       let data = [];
       const temp = [];
       let users = [...dragItemMiddleList];
@@ -174,17 +168,17 @@ export default function App({ route }: any) {
         for (let j = 0; j < busInfo?.numberOfKidsOnLongSeat; j++) {
           let lgValue =
             JSON.stringify(busInfo?.numberOfRows + 1) +
-            "_" +
+            '_' +
             JSON.stringify(j + 1);
           if (obj[lgValue]) {
             let personObj = dragItemMiddleList.find(
-              (person) => person.id == obj[lgValue][0]
+              (person) => person.id == obj[lgValue][0],
             );
-            console.log("0000", dragItemMiddleList);
-            console.log("000082828", obj[lgValue]);
-            console.log("personob99j", personObj);
+            console.log('0000', dragItemMiddleList);
+            console.log('000082828', obj[lgValue]);
+            console.log('personob99j', personObj);
             users = users.filter((per) => per.id != obj[lgValue][0]);
-            console.log("user", users);
+            console.log('user', users);
 
             rearSeats.push({
               id: personObj?.id,
@@ -194,89 +188,62 @@ export default function App({ route }: any) {
           } else {
             rearSeats.push({
               id: parseInt(`${j}` + 1, 0),
-              name: "-",
-              background_color: "#fff",
+              name: '-',
+              background_color: '#fff',
             });
           }
         }
       }
 
       for (let i = 0; i < busInfo?.numberOfRows; i++) {
-        let item = seats[i];
+        // let item = seats[i];
         let comparisonValue = longSeat
           ? busInfo?.numberOfKidsOnLongSeat
           : busInfo?.numberOfSeatsPerRow;
         for (let j = 0; j < comparisonValue; j++) {
-          let k = JSON.stringify(i + 1) + "_" + JSON.stringify(j + 1);
-          console.log("00000---k", k);
-          console.log("los-000-0--0-0", obj[k]);
-          if (false) {
-            let lgValue =
-              JSON.stringify(busInfo?.numberOfRows.length) +
-              "_" +
-              JSON.stringify(j);
-            if (obj[lgValue]) {
-              let personObj = dragItemMiddleList.find(
-                (person) => person.id == obj[lgValue][0]
-              );
-              console.log("draglist", dragItemMiddleList);
-              console.log("personobj", item[j]);
-              users = users.filter((per) => per.id != obj[lgValue][0]);
-              console.log("users", users);
-              rearSeats.push({
-                id: personObj?.id,
-                name: personObj?.name,
-                background_color: personObj?.background_color,
-              });
-            } else {
-              rearSeats.push({
-                id: parseInt(`${i}` + 1, 0),
-                name: "-",
-                background_color: "#fff",
-              });
-            }
-          } else {
-            console.log("909090909090", obj[k]);
-            if (obj[k]) {
-              let personObj = dragItemMiddleList.find(
-                (person) => person.id == obj[k][0]
-              );
-              console.log("0000", dragItemMiddleList);
-              console.log("000082828", obj[k]);
-              console.log("personob99j", personObj);
-              users = users.filter((per) => per.id != obj[k][0]);
-              console.log("user", users);
+          let k = JSON.stringify(i + 1) + '_' + JSON.stringify(j + 1);
+          console.log('00000---k', k);
+          console.log('los-000-0--0-0', obj[k]);
+          console.log('909090909090', obj[k]);
+          if (obj[k]) {
+            let personObj = dragItemMiddleList.find(
+              (person) => person.id == obj[k][0],
+            );
+            console.log('0000', dragItemMiddleList);
+            console.log('000082828', obj[k]);
+            console.log('personob99j', personObj);
+            users = users.filter((per) => per.id != obj[k][0]);
+            console.log('user', users);
 
-              data.push({
-                id: personObj?.id,
-                name: personObj?.name,
-                background_color: personObj?.background_color,
-              });
-            } else {
-              data.push({
-                id: parseInt(`${i}` + 1, 0),
-                name: "-",
-                background_color: "#fff",
-              });
-            }
+            data.push({
+              id: personObj?.id,
+              name: personObj?.name,
+              background_color: personObj?.background_color,
+            });
+          } else {
+            data.push({
+              id: parseInt(`${i}` + 1, 0),
+              name: '-',
+              background_color: '#fff',
+            });
           }
         }
         if (!longSeat) {
           temp.push(data);
           data = [];
         }
-        console.log("longseat", longSeat);
+        console.log('longseat', longSeat);
         longSeat = false;
 
-        console.log("longseat-----", longSeat);
+        console.log('longseat-----', longSeat);
       }
-      console.log("middle", users);
-      console.log("rear seats", rearSeats);
-      console.log("data", temp);
+      console.log('middle', users);
+      console.log('rear seats', rearSeats);
+      console.log('data', temp);
 
       let temp1 = seats.map((item, index) => ({
-        name: "-",
-        background_color: "#fff",
+        name: '-',
+        background_color: '#fff',
         id: index,
       }));
       setDragItemListMiddle([...users, ...temp1]);
@@ -293,36 +260,36 @@ export default function App({ route }: any) {
       //   setRearSeats(data);
       // }
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
   useEffect(() => {
     if (isFocused) {
       if (route?.params?.students) {
         if (route.params?.attendanceMark) {
-          const temp = route?.params?.students.map((item) => ({
+          const temp = route?.params?.students.map((item: any) => ({
             name: item?.firstName || item?.firstname,
-            background_color: "#fff",
+            background_color: '#fff',
             id: item?.id || item?.studentId,
           }));
 
           setDragItemListMiddle(temp);
           setOriginalDragItemListMiddle(temp);
         } else {
-          const temp = route?.params?.students.map((item) => ({
+          const temp = route?.params?.students.map((item: any) => ({
             name:
               item?.firstName ||
               item?.firstname + item?.lastName ||
               item?.lastname,
-            background_color: "#fff",
+            background_color: '#fff',
             id: item?.studentId || item?.id,
           }));
-          console.log("if88888888888", temp);
+          console.log('if88888888888', temp);
           setDragItemListMiddle(temp);
           setOriginalDragItemListMiddle(temp);
         }
       } else {
-        console.log("else000000000000000000");
+        console.log('else000000000000000000');
 
         getApprovedStudents();
       }
@@ -334,7 +301,7 @@ export default function App({ route }: any) {
     }
   }, [originaldragItemMiddleList]);
 
-  const DragUIComponent = ({ item, index }) => {
+  const DragUIComponent = ({ item, index }: { item: any, index: number }) => {
     return (
       <DraxView
         style={[
@@ -356,18 +323,18 @@ export default function App({ route }: any) {
   const getApprovedStudents = async () => {
     let body = {
       activityId: route?.params?.activity?.activityId,
-      status: "approved",
+      status: 'approved',
       page: 0,
       page_size: 1000,
     };
-    console.log("body", body);
+    console.log('body', body);
     // console.log("body", body);
     FindAllStudentsWhichActivity(body)
       .then((res) => {
-        console.log("res--------------------------", res);
-        const temp = res.map((item) => ({
+        console.log('res--------------------------', res);
+        const temp = res.map((item: any) => ({
           name: item?.firstName + item?.lastName,
-          background_color: "#fff",
+          background_color: '#fff',
           id: item.studentId,
         }));
         setDragItemListMiddle(temp);
@@ -375,20 +342,21 @@ export default function App({ route }: any) {
         // setStudents(res);
       })
       .catch((err) => {
-        console.log("err99099009990", err);
+        console.log('err99099009990', err);
       });
   };
-  const ReceivingZoneUIComponent = ({
-    item,
-    index,
-    parentIndex,
-    isRear = false,
-  }: {
-    item: any;
-    index: number;
-    parentIndex: number;
-    isRear: boolean;
-  }) => {
+  const ReceivingZoneUIComponent = (
+    {
+      item,
+      index,
+      parentIndex,
+      isRear = false,
+    }: {
+      item: any;
+      index: number;
+      parentIndex: number;
+      isRear?: boolean;
+    }) => {
     // console.log("item", item);
     return (
       <DraxView
@@ -409,14 +377,14 @@ export default function App({ route }: any) {
         }}
         key={index}
         onReceiveDragDrop={(event) => {
-          console.log("event", event);
+          console.log('event', event);
           let selected_item = dragItemMiddleList[event.dragged.payload];
 
           let newReceivingItemList = [...receivingItemList];
           if (isRear) {
             let newRearSeats = [...rearSeats];
-            console.log("onReceiveDragDrop :: newRearSeats", newRearSeats);
-            console.log("parentIndex", parentIndex);
+            console.log('onReceiveDragDrop :: newRearSeats', newRearSeats);
+            console.log('parentIndex', parentIndex);
             newRearSeats[index] = selected_item;
             setRearSeats(newRearSeats);
           } else {
@@ -431,16 +399,16 @@ export default function App({ route }: any) {
 
           if (parentIndex >= 0) {
             // Alert.alert("akk");
-            console.log("sleceteditem", selected_item);
-            console.log("recieving list", receivingItemList);
+            console.log('sleceteditem', selected_item);
+            console.log('recieving list', receivingItemList);
 
             newDragItemMiddleList[event.dragged.payload] =
-              selected_item.name != "-"
+              selected_item.name != '-'
                 ? {
-                    id: 0,
-                    name: "-",
-                    background_color: "#fff",
-                  }
+                  id: 0,
+                  name: '-',
+                  background_color: '#fff',
+                }
                 : originaldragItemMiddleList[event.dragged.payload];
             // receivingItemList[parentIndex][index];
             // console.log("prnet", receivingItemList[parentIndex][index]);
@@ -472,7 +440,7 @@ export default function App({ route }: any) {
     const data = [];
     for (let i = 0; i < bus?.numberOfRows; i++) {
       const innerData = [];
-      console.log("here", bus?.numberOfKidsPerSeat * bus?.numberOfSeatsPerRow);
+      console.log('here', bus?.numberOfKidsPerSeat * bus?.numberOfSeatsPerRow);
       for (
         let j = 0;
         j < bus?.numberOfKidsPerSeat * bus?.numberOfSeatsPerRow;
@@ -480,13 +448,13 @@ export default function App({ route }: any) {
       ) {
         innerData.push({
           id: parseInt(`${i}${j}` + 1, 0),
-          name: "-",
-          background_color: "#fff",
+          name: '-',
+          background_color: '#fff',
         });
       }
       data.push(innerData);
     }
-    console.log("data", data);
+    console.log('data', data);
     setSeats(data);
     setReceivedItemList(data);
   };
@@ -496,8 +464,8 @@ export default function App({ route }: any) {
     for (let i = 0; i < bus?.numberOfKidsOnLongSeat; i++) {
       data.push({
         id: parseInt(`${i}` + 1, 0),
-        name: "-",
-        background_color: "#fff",
+        name: '-',
+        background_color: '#fff',
       });
     }
     setRearSeats(data);
@@ -510,11 +478,11 @@ export default function App({ route }: any) {
   //     getRearSeats();
   //   }
   // }, [bus]);
-  console.log("rearseats", rearSeats);
+  console.log('rearseats', rearSeats);
   // console.log("acitivtyId", route.params.activity);
   const allocateSeats = async () => {
     try {
-      console.log("recicved list", receivingItemList);
+      console.log('recicved list', receivingItemList);
       let temp = [];
       let innerArr = [];
       let rearSeatsArr = [];
@@ -522,63 +490,63 @@ export default function App({ route }: any) {
         let item = receivingItemList[i];
         innerArr = [];
         for (let j = 0; j < item.length; j++) {
-          item[j]?.name != "-" ? temp.push([item[j]?.id, i + 1, j + 1]) : null;
+          item[j]?.name != '-' ? temp.push([item[j]?.id, i + 1, j + 1]) : null;
           // console.log("77887877", item[j]);
         }
         // temp.push(innerArr);
       }
       if (rearSeats.length > 0) {
         let rearArr = rearSeats.map((item, index) => {
-          item?.name != "-"
+          item?.name != '-'
             ? temp.push([item?.id, receivingItemList?.length + 1, index + 1])
             : null;
           // rearSeatsArr.push(item?.name == "-" ? null : item.id);
         });
         // temp=[...temp,...rearSeatsArr]
       }
-      console.log("busId", route?.params.bus);
-      console.log("temp", temp);
+      console.log('busId', route?.params.bus);
+      console.log('temp', temp);
       let res = await SaveStudentSeats(
         route?.params?.bus?.busId || route?.params?.bus,
-        temp
+        temp,
       );
-      console.log("res--------------8", res);
+      console.log('res--------------8', res);
       // getSeats();
-      console.log("temp", temp);
+      console.log('temp', temp);
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
 
   return (
     <BackgroundLayout>
       <GestureHandlerRootView style={gestureRootViewStyle}>
-         <AppHeader hideCenterIcon={true} hideCalendar={true} />
+        <AppHeader hideCenterIcon={true} hideCalendar={true} />
         {loading ? (
           <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
           >
-            <ActivityIndicator size={"large"} color={Colors.primary} />
+            <ActivityIndicator size={'large'} color={Colors.primary} />
           </View>
         ) : (
           <ScrollView>
             <View
               style={{
-                justifyContent: "flex-end",
-                alignItems: "flex-end",
+                justifyContent: 'flex-end',
+                alignItems: 'flex-end',
                 marginTop: 10,
               }}
             >
               <Switch
                 style={{ marginLeft: 20 }}
-                trackColor={{ false: "#767577", true: "#50CBC7" }}
+                trackColor={{ false: '#767577', true: '#50CBC7' }}
                 thumbColor={Colors.white}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={() => {
                   setThumbnail(!thumbnail);
                   navigation.goBack();
                   dispatch(
-                    ChangeModalState.action({ rollCallModalVisibility: true })
+                    ChangeModalState.action({ rollCallModalVisibility: true }),
                   );
                 }}
                 value={thumbnail}
@@ -586,7 +554,7 @@ export default function App({ route }: any) {
             </View>
             <View>
               <Text style={styles.headerStyle}>
-                {"Drag drop students on seats"}
+                {'Drag drop students on seats'}
               </Text>
             </View>
             <DraxProvider>
@@ -610,7 +578,7 @@ export default function App({ route }: any) {
                         index,
                         isRear: true,
                         parentIndex: -1,
-                      })
+                      }),
                     )}
                 </View>
                 <View style={styles.receivingContainer}>
@@ -625,28 +593,28 @@ export default function App({ route }: any) {
                   {/* {console.log("receivingItemList", receivingItemList?.length)} */}
                   <View
                     style={{
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   >
                     {receivingItemList &&
                       receivingItemList?.map((i, parentIndex: number) => (
                         <View
                           style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "space-evenly",
-                            width: "100%",
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-evenly',
+                            width: '100%',
                           }}
                         >
                           {i &&
-                            i?.map((item, index: number) =>
+                            i?.map((item: any, index: number) =>
                               ReceivingZoneUIComponent({
                                 item,
                                 index,
                                 parentIndex,
-                              })
+                              }),
                             )}
                         </View>
                       ))}
@@ -654,17 +622,17 @@ export default function App({ route }: any) {
                 </View>
                 <Text
                   style={{
-                    fontWeight: "bold",
+                    fontWeight: 'bold',
                     fontSize: 16,
                     marginTop: 20,
-                    textAlign: "center",
+                    textAlign: 'center',
                   }}
                 >
                   Bus Front
                 </Text>
               </View>
             </DraxProvider>
-            <View style={{ width: "80%", alignSelf: "center" }}>
+            <View style={{ width: '80%', alignSelf: 'center' }}>
               <LinearGradientButton
                 onPress={() => {
                   allocateSeats();
@@ -682,6 +650,8 @@ export default function App({ route }: any) {
   );
 }
 
+export default DragDropStudentScreen
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -693,17 +663,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     margin: 3,
     marginVertical: 5,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bottomButton: {
-    width: "80%",
-    alignSelf: "center",
+    width: '80%',
+    alignSelf: 'center',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
     marginBottom: 5,
@@ -718,12 +688,12 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 10,
     width: 40,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 3,
   },
   receiving: {
-    borderColor: "red",
+    borderColor: 'red',
     borderWidth: 2,
   },
   draggableBox: {
@@ -731,8 +701,8 @@ const styles = StyleSheet.create({
     padding: 5,
     // height: 40,
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 3,
     marginVertical: 2,
   },
@@ -740,15 +710,15 @@ const styles = StyleSheet.create({
     opacity: 0.2,
   },
   hoverDragging: {
-    borderColor: "magenta",
+    borderColor: 'magenta',
     borderWidth: 2,
   },
   receivingContainer: {
-    flexDirection: "row",
-    width: "100%",
+    flexDirection: 'row',
+    width: '100%',
     marginTop: 20,
-    alignItems: "center",
-    justifyContent: "space-evenly",
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
   },
   itemSeparator: {
     height: 15,
@@ -756,9 +726,9 @@ const styles = StyleSheet.create({
   draxListContainer: {
     padding: 5,
     // height: "100%",
-    width: "100%",
-    flexDirection: "row",
-    flexWrap: "wrap",
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   receivingZoneContainer: {
     padding: 5,
@@ -770,7 +740,7 @@ const styles = StyleSheet.create({
   headerStyle: {
     marginTop: 20,
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginLeft: 20,
   },
 });
