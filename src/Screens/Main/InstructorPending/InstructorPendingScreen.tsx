@@ -1,108 +1,85 @@
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Icon, Text } from "@ui-kitten/components";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { Icon, Text } from '@ui-kitten/components';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 // import axios from "axios";
-import { useStateValue } from "@/Context/state/State";
-import { ApproveActivityModal, DeclineActivityModal, InstructionsModal } from "@/Modals";
-import {
-  GetActivitiesByInsructorId
-} from "@/Services/Activity";
-import {
-  GetGroupByInstructorId
-} from "@/Services/Group";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Colors from "@/Theme/Colors";
-import moment from "moment";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import AntDesign from "react-native-vector-icons/AntDesign";
-const _students = [
-  {
-    name: "Dylan B.",
-    selected: false,
-  },
-  {
-    name: "Peter C.",
-    selected: false,
-  },
-  {
-    name: "James B.",
-    selected: false,
-  },
-  {
-    name: "Mark K.",
-    selected: false,
-  },
-  {
-    name: "John B.",
-    selected: false,
-  },
-];
+import { useStateValue } from '@/Context/state/State';
+import { ApproveActivityModal, DeclineActivityModal, InstructionsModal } from '@/Modals';
+import { GetActivitiesByInsructorId } from '@/Services/Activity';
+import { GetGroupByInstructorId } from '@/Services/Group';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Colors from '@/Theme/Colors';
+import moment from 'moment';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { ModalState } from '@/Store/Modal';
+import { TEST_STUDENTS } from '@/Constants';
 
-const InstructorGroupPendingScreen = ({ route }) => {
-  const navigation = useNavigation();
+const _students = TEST_STUDENTS;
+
+const InstructorGroupPendingScreen = () => {
   const isFocused = useIsFocused();
   const swipeableRef = useRef(null);
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
+    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility,
   );
   let prevOpenedRow: any;
   let row: Array<any> = [];
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const dispatch = useDispatch();
-  const [students, setStudents] = useState(_students);
-  const approveActivityModalVisibility = useSelector(
-    (state: { modal: any }) => state.modal.approveActivityModalVisibility
-  );
-  const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
-  const marker = require("@/Assets/Images/marker.png");
+  const [students, setStudents] = useState<any>(_students);
+  // const approveActivityModalVisibility = useSelector(
+  //   (state: { modal: any }) => state.modal.approveActivityModalVisibility,
+  // );
+  // const calendarIcon = require('@/Assets/Images/navigation_icon2.png');
+  const marker = require('@/Assets/Images/marker.png');
 
-  const email = require("@/Assets/Images/email.png");
-  const clockIcon = require("@/Assets/Images/clock1.png");
-  const instructorImage = require("@/Assets/Images/approval_icon2.png");
-  const [showAcceptModal, setShowAcceptModal] = useState(false);
-  const [pageActivity, pageNumberActivity] = useState(0);
-  const [pageSizeActivity, setPageSizeActivity] = useState(20);
-  const [totalRecordsActivity, setTotalRecordsActivity] = useState(0);
-  const [pageGroup, pageNumberGroup] = useState(0);
-  const [pageSizeGroup, setPageSizeGroup] = useState(20);
-  const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
-  const [selectAll, setSelectAll] = useState(false);
-  const [activities, setActivities] = useState([]);
-  const [groups, setGroups] = useState([]);
-  const [activity, setActivity] = useState(null);
-  const [declineActivity, setDeclineActivity] = useState(null);
-  const [selectedInstructions, setSelectedInstructions] = useState(null);
-  const [{ instructorDetail: instructorDetail }, _dispatch] = useStateValue();
-  const handleSelectAll = () => {
-    setSelectAll(!selectAll);
-    if (!selectAll) {
-      const data = [...students];
-      const _data = [];
-      data.forEach((i) =>
-        _data.push({
-          name: i.name,
-          selected: true,
-        })
-      );
-      setStudents(_data);
-    } else {
-      const data = [...students];
-      const _data = [];
-      data.forEach((i) =>
-        _data.push({
-          name: i.name,
-          selected: false,
-        })
-      );
-      setStudents(_data);
-    }
-  };
-  const closeRow = (index) => {
+  // const email = require('@/Assets/Images/email.png');
+  // const clockIcon = require('@/Assets/Images/clock1.png');
+  const instructorImage = require('@/Assets/Images/approval_icon2.png');
+  const [showAcceptModal, setShowAcceptModal] = useState<boolean>(false);
+  const [pageActivity, pageNumberActivity] = useState<number>(0);
+  const [pageSizeActivity, setPageSizeActivity] = useState<number>(20);
+  const [totalRecordsActivity, setTotalRecordsActivity] = useState<number>(0);
+  const [pageGroup, pageNumberGroup] = useState<number>(0);
+  const [pageSizeGroup, setPageSizeGroup] = useState<number>(20);
+  const [totalRecordsGroup, setTotalRecordsGroup] = useState<number>(0);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [groups, setGroups] = useState<any[]>([]);
+  const [activity, setActivity] = useState<any>(null);
+  const [declineActivity, setDeclineActivity] = useState<any>(null);
+  const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
+  const [{ instructorDetail: instructorDetail }, _dispatch]: any = useStateValue();
+  // todo delete if redundant
+  // const handleSelectAll = () => {
+  //   setSelectAll(!selectAll);
+  //   if (!selectAll) {
+  //     const data = [...students];
+  //     const _data = [];
+  //     data.forEach((i) =>
+  //       _data.push({
+  //         name: i.name,
+  //         selected: true,
+  //       }),
+  //     );
+  //     setStudents(_data);
+  //   } else {
+  //     const data = [...students];
+  //     const _data = [];
+  //     data.forEach((i) =>
+  //       _data.push({
+  //         name: i.name,
+  //         selected: false,
+  //       }),
+  //     );
+  //     setStudents(_data);
+  //   }
+  // };
+  const closeRow = (index?: number) => {
+    if (!index) return;
     console.log(index);
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
@@ -110,22 +87,23 @@ const InstructorGroupPendingScreen = ({ route }) => {
     prevOpenedRow = row[index];
   };
   // console.log("instructorDetail", instructorDetail);
-  const getActivities = async (refreshing: any) => {
+  const getActivities = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
     const userId = await loadUserId();
-    console.log("userId", userId);
+    console.log('userId', userId);
     let pageNumberActivityCount = refreshing ? pageActivity : 0;
+    if (!userId) return;
 
     GetActivitiesByInsructorId(
       userId,
-      "pending",
+      'pending',
       pageNumberActivityCount,
-      pageSizeActivity
+      pageSizeActivity,
     )
       .then((res) => {
-        console.log("res", res.data);
+        console.log('res', res.data);
         setTotalRecordsActivity(res.data.totalRecords);
         setRefreshing(false);
         setPageSizeActivity(20);
@@ -151,19 +129,19 @@ const InstructorGroupPendingScreen = ({ route }) => {
         setPageSizeActivity(20);
 
         pageNumberActivity(pageActivity);
-        console.log("getActivities Error:", err);
+        console.log('getActivities Error:', err);
       });
   };
-  const getGroup = async (refreshing: any) => {
+  const getGroup = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
     let pageNumberGroupCount = refreshing ? pageGroup : 0;
     GetGroupByInstructorId(
       instructorDetail?.instructorId,
-      "pending",
+      'pending',
       pageNumberGroupCount,
-      pageSizeGroup
+      pageSizeGroup,
     )
       .then((res) => {
         setTotalRecordsGroup(res.totalRecords);
@@ -187,10 +165,10 @@ const InstructorGroupPendingScreen = ({ route }) => {
         }
       })
       .catch((err) => {
-        console.log("getActivities Error:", err);
+        console.log('getActivities Error:', err);
       });
   };
-  console.log("groups", groups);
+  console.log('groups', groups);
 
   useEffect(() => {
     // Alert.alert("kk");
@@ -203,35 +181,35 @@ const InstructorGroupPendingScreen = ({ route }) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
-      extrapolate: "clamp",
+      extrapolate: 'clamp',
     });
     return (
       <View
         style={{
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         {item.status && (
           <View
             style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <TouchableOpacity
               style={{
                 padding: 10,
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
               onPress={() => {
                 dispatch(
                   ChangeModalState.action({
                     approveActivityModalVisibility: true,
-                  })
+                  }),
                 );
                 setActivity(item);
                 setShowAcceptModal(true);
@@ -242,14 +220,14 @@ const InstructorGroupPendingScreen = ({ route }) => {
             <TouchableOpacity
               style={{
                 padding: 10,
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
               onPress={() => {
                 dispatch(
                   ChangeModalState.action({
                     declineActivityModalVisibility: true,
-                  })
+                  }),
                 );
                 setDeclineActivity(item);
               }}
@@ -287,13 +265,13 @@ const InstructorGroupPendingScreen = ({ route }) => {
             activity={activity}
             visible={showAcceptModal}
             onClose={() => setShowAcceptModal(false)}
-            setActivity={(id) => {
+            setActivity={(id: any) => {
               if (activity?.activityId) {
-                console.log("declinedactivity", activity);
+                console.log('declinedactivity', activity);
 
-                console.log("activites", activities);
+                console.log('activites', activities);
                 let filter = activities?.filter(
-                  (item) => item?.activityId != id
+                  (item) => item?.activityId != id,
                 );
 
                 setActivities(filter);
@@ -307,15 +285,14 @@ const InstructorGroupPendingScreen = ({ route }) => {
         {declineActivity && (
           <DeclineActivityModal
             fromParent={false}
-            onClose={() => null}
             activity={declineActivity}
-            setActivity={(id) => {
+            setActivity={(id: any) => {
               if (declineActivity?.activityId) {
-                console.log("declinedactivity", declineActivity);
+                console.log('declinedactivity', declineActivity);
 
-                console.log("activites", activities);
+                console.log('activites', activities);
                 let filter = activities?.filter(
-                  (item) => item?.activityId != id
+                  (item) => item?.activityId != id,
                 );
                 setDeclineActivity(false);
                 setActivities(filter);
@@ -329,7 +306,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
 
         {activities.length === 0 && groups.length == 0 && (
           <View style={{ backgroundColor: Colors.newBackgroundColor }}>
-            <Text style={[styles.text, { textAlign: "center", marginTop: 20 }]}>
+            <Text style={[styles.text, { textAlign: 'center', marginTop: 20 }]}>
               You do not have any pending activities or groups
             </Text>
           </View>
@@ -338,12 +315,13 @@ const InstructorGroupPendingScreen = ({ route }) => {
           {isFocused && (
             <FlatList
               data={[...activities, ...groups] || []}
-              keyExtractor={(item, index) => index}
-              style={{ padding: 10, width: "100%", marginTop: 10 }}
+              // todo check what it is
+              // keyExtractor={(item, index) => index}
+              style={{ padding: 10, width: '100%', marginTop: 10 }}
               contentContainerStyle={{ paddingBottom: 15 }}
               renderItem={({ item, index }) => {
                 if (item?.activityId) {
-                  let date = moment(item.fromDate).format("YYYY-MM-DD");
+                  let date = moment(item.fromDate).format('YYYY-MM-DD');
 
                   return (
                     <Swipeable
@@ -368,34 +346,34 @@ const InstructorGroupPendingScreen = ({ route }) => {
                             style={styles.iconStyle}
                           /> */}
                           <Image
-                        source={require("@/Assets/Images/circle-dashed.png")}
-                        style={{
-                          height: 40,
-                          width: 15,
-                          marginRight:10,
-                          resizeMode: "contain",
-                          // marginRight: 10,
-                        }}
-                      />
+                            source={require('@/Assets/Images/circle-dashed.png')}
+                            style={{
+                              height: 40,
+                              width: 15,
+                              marginRight: 10,
+                              resizeMode: 'contain',
+                              // marginRight: 10,
+                            }}
+                          />
 
-                        <View>
-                        <Text style={styles.text}>{`${moment(
-                          item?.fromDate == "string"
-                            ? new Date()
-                            : item?.fromDate
-                        ).format('MMM DD, YYYY')} at ${moment.utc(
-                          item?.fromDate == "string"
-                            ? new Date()
-                            : item?.fromDate
-                        )
-                          .format("hh:mm a")} `}</Text>
-                        <Text style={styles.text}>{`${moment(
-                          item?.toDate == "string" ? new Date() : item?.toDate
-                        ).format('MMM DD, YYYY')} at ${moment.utc(
-                          item?.toDate == "string" ? new Date() : item?.toDate
-                        )
-                          .format("hh:mm a")} `}</Text>
-                         </View>
+                          <View>
+                            <Text style={styles.text}>{`${moment(
+                              item?.fromDate == 'string'
+                                ? new Date()
+                                : item?.fromDate,
+                            ).format('MMM DD, YYYY')} at ${moment.utc(
+                              item?.fromDate == 'string'
+                                ? new Date()
+                                : item?.fromDate,
+                            )
+                              .format('hh:mm a')} `}</Text>
+                            <Text style={styles.text}>{`${moment(
+                              item?.toDate == 'string' ? new Date() : item?.toDate,
+                            ).format('MMM DD, YYYY')} at ${moment.utc(
+                              item?.toDate == 'string' ? new Date() : item?.toDate,
+                            )
+                              .format('hh:mm a')} `}</Text>
+                          </View>
                           {/* <Text style={styles.text}>{`Date: ${date} `}</Text> */}
                         </View>
 
@@ -414,9 +392,9 @@ const InstructorGroupPendingScreen = ({ route }) => {
                         <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />
                           <View>
-                          <Text style={[styles.text,{paddingRight:20}]} >
-                            {`${item?.venueFromAddress}, ${item?.venueFromCity}, ${item?.venueFromState} ${item?.venueFromZip}, ${item?.venueToCountry}`}
-                          </Text>
+                            <Text style={[styles.text, { paddingRight: 20 }]}>
+                              {`${item?.venueFromAddress}, ${item?.venueFromCity}, ${item?.venueFromState} ${item?.venueFromZip}, ${item?.venueToCountry}`}
+                            </Text>
                           </View>
                         </View>
 
@@ -437,14 +415,14 @@ const InstructorGroupPendingScreen = ({ route }) => {
                           dispatch(
                             ChangeModalState.action({
                               instructionsModalVisibility: true,
-                            })
+                            }),
                           );
                           setSelectedInstructions(item);
                         }}
                         style={[styles.footer]}
                       >
                         <Text
-                          style={[styles.text, { textAlign: "center" }]}
+                          style={[styles.text, { textAlign: 'center' }]}
                         >{`Instructions / Disclaimer / Agreement`}</Text>
                       </TouchableOpacity>
                     </Swipeable>
@@ -468,16 +446,16 @@ const InstructorGroupPendingScreen = ({ route }) => {
                             style={styles.iconStyle}
                           />
                           <Text style={styles.text}>
-                            {item?.status ? "Active" : "Inactive"}
+                            {item?.status ? 'Active' : 'Inactive'}
                           </Text>
                         </View>
                       </View>
                       <TouchableOpacity
                         onPress={() => setSelectedInstructions(item?.optin)}
-                        style={[styles.footer, { backgroundColor: "#fff" }]}
+                        style={[styles.footer, { backgroundColor: '#fff' }]}
                       >
                         <Text
-                          style={[styles.text, { textAlign: "center" }]}
+                          style={[styles.text, { textAlign: 'center' }]}
                         >{`Instructions / Disclaimer / Agreement`}</Text>
                       </TouchableOpacity>
                     </Swipeable>
@@ -517,15 +495,15 @@ export default InstructorGroupPendingScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   item: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
@@ -534,29 +512,30 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.lightgray,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 16,
     marginVertical: 4,
-    whiteSpace: "nowrap",
+    // todo solve this
+    // whiteSpace: 'nowrap',
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -568,20 +547,20 @@ const styles = StyleSheet.create({
   },
   buttonSettings: {
     marginTop: 10,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     marginBottom: 10,
   },
   iconStyle: {
     height: 25,
     width: 15,
     marginRight: 10,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     tintColor: Colors.secondary,
   },
   horizontal: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

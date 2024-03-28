@@ -1,27 +1,28 @@
-import React from "react";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { Button, TabBar } from "@ui-kitten/components";
-import { StyleSheet, View } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
-import {
-  InstructorApprovalScreen,
-  InstructorDeclineScreen,
-  InstructorPendingScreen,
-} from "@/Screens";
-import { AppHeader, LinearGradientButton } from "@/Components";
-import Colors from "@/Theme/Colors";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import React from 'react';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { TabBar } from '@ui-kitten/components';
+import { StyleSheet, View } from 'react-native';
+import { InstructorApprovalScreen, InstructorDeclineScreen, InstructorPendingScreen } from '@/Screens';
+import { LinearGradientButton } from '@/Components';
+import Colors from '@/Theme/Colors';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+
+type InstructorApprovalNavigatorParamList = {
+  InstructorApproval: undefined
+  InstructorDecline: undefined
+  InstructorPending: undefined
+};
 
 // @refresh reset
 const InstructorApprovalNavigator = () => {
-  const TabNavigator = createMaterialTopTabNavigator();
-  const tabNames = ["Approved", "Declined", "Pending"];
+  const TabNavigator = createMaterialTopTabNavigator<InstructorApprovalNavigatorParamList>();
+  const tabNames = ['Approved', 'Declined', 'Pending'];
   //@ts-ignore
   const TopTabBar = ({ navigation, state }) => (
     <TabBar
       style={styles.toolBar}
       selectedIndex={state.index}
-      indicatorStyle={{ display: "none" }}
+      indicatorStyle={{ display: 'none' }}
       onSelect={(index) => navigation.navigate(state.routeNames[index])}
     >
       {tabNames.map((tabName, index) => {
@@ -60,17 +61,17 @@ const InstructorApprovalNavigator = () => {
       >
         <TabNavigator.Screen
           name="InstructorApproval"
-          options={{ title: "Approved" }}
+          options={{ title: 'Approved' }}
           component={InstructorApprovalScreen}
         />
         <TabNavigator.Screen
           name="InstructorDecline"
-          options={{ title: "Declined" }}
+          options={{ title: 'Declined' }}
           component={InstructorDeclineScreen}
         />
         <TabNavigator.Screen
           name="InstructorPending"
-          options={{ title: "Pending" }}
+          options={{ title: 'Pending' }}
           component={InstructorPendingScreen}
         />
       </TabNavigator.Navigator>
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.newBackgroundColor,
     marginTop: 20,
     paddingHorizontal: 20,
-    width: "100%",
+    width: '100%',
   },
   topNav: {
     color: Colors.white,
@@ -100,19 +101,19 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     borderRadius: 10,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     color: Colors.white,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   toolBar: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
 
     backgroundColor: Colors.newBackgroundColor,
-    width: "100%",
+    width: '100%',
   },
 });

@@ -1,44 +1,48 @@
-import { LinearGradientButton } from "@/Components";
-import { useStateValue } from "@/Context/state/State";
-import { GetOptIn, InstructorUpdateStatus, UpdateActivityByStatus } from "@/Services/Activity";
-import { GetOptInGroup, UpdateGroupByStatus, UpdateInstructorGroupStatus } from "@/Services/Group";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Colors from "@/Theme/Colors";
-import { useIsFocused } from "@react-navigation/native";
-import { Card, CheckBox, Modal, Text } from "@ui-kitten/components";
-import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-const ApproveActivityModal = ({
-  selectedChild,
-  setSelectedChild,
-  activity,
-  setActivity,
-  fromParent,
-  visible,
-  onClose,
-}: {
+import { LinearGradientButton } from '@/Components';
+import { useStateValue } from '@/Context/state/State';
+import { GetOptIn, InstructorUpdateStatus, UpdateActivityByStatus } from '@/Services/Activity';
+import { GetOptInGroup, UpdateGroupByStatus, UpdateInstructorGroupStatus } from '@/Services/Group';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Colors from '@/Theme/Colors';
+import { useIsFocused } from '@react-navigation/native';
+import { Card, CheckBox, Modal, Text } from '@ui-kitten/components';
+import React, { FC, useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+
+type ApproveActivityModal = {
   selectedChild: any;
   setSelectedChild: (item: any) => void;
   activity: any;
   setActivity: Function;
   fromParent: any;
   visible: any;
-  oClose: any;
-}) => {
-  const [{ instructorDetail: instructorDetail }, _dispatch] = useStateValue();
-  const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.approveActivityModalVisibility
-  );
-  const [infomation, setInformation] = useState({});
+  onClose: any;
+}
+
+const ApproveActivityModal: FC<ApproveActivityModal> = (
+  {
+    selectedChild,
+    setSelectedChild,
+    activity,
+    setActivity,
+    fromParent,
+    visible,
+    onClose,
+  }) => {
+  const [{ instructorDetail: instructorDetail }, _dispatch]: any = useStateValue();
+  // const isVisible = useSelector(
+  //   (state: { modal: ModalState }) => state.modal.approveActivityModalVisibility,
+  // );
+  const [infomation, setInformation] = useState<any>({});
   const getActivityOptInDetail = async (id: any) => {
     try {
       let res = await GetOptIn(id);
 
       setInformation({ ...infomation, ...res });
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
   const getGroupOptInDetail = async (id: any) => {
@@ -47,31 +51,30 @@ const ApproveActivityModal = ({
 
       setInformation({ ...infomation, ...res });
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
-  const [terms, setTerms] = useState(false);
+  const [terms, setTerms] = useState<boolean>(false);
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const parentApproval = () => {
     if (activity && activity?.activity) {
       const data = {
         activityId: activity?.activity?.activityId,
-        status: "approved",
+        status: 'approved',
         studentId: activity?.selectedStudentId,
         studentActivityId: activity?.studentId,
       };
-      console.log("data", data);
+      console.log('data', data);
       UpdateActivityByStatus(data)
         .then((res) => {
-          console.log("accepted", res);
+          console.log('accepted', res);
           dispatch(
             ChangeModalState.action({
               approveActivityModalVisibility: false,
-            })
+            }),
           );
           onClose();
-          setSelectedChild();
           setActivity(activity?.activity?.activityId);
           setSelectedChild(null);
         })
@@ -79,17 +82,16 @@ const ApproveActivityModal = ({
           dispatch(
             ChangeModalState.action({
               approveActivityModalVisibility: false,
-            })
+            }),
           );
           onClose();
-          setSelectedChild();
           setActivity(activity?.activity?.activityId);
           setSelectedChild(null);
         });
     } else {
       const data = {
         groupId: activity?.group?.groupId,
-        status: "approved",
+        status: 'approved',
         studentId: activity?.selectedStudentId,
         studentGroupId: activity?.studentId,
       };
@@ -99,10 +101,10 @@ const ApproveActivityModal = ({
           dispatch(
             ChangeModalState.action({
               approveActivityModalVisibility: false,
-            })
+            }),
           );
           onClose();
-          setSelectedChild();
+          // setSelectedChild();
           setActivity(activity?.group?.groupId);
           setSelectedChild(null);
         })
@@ -111,23 +113,23 @@ const ApproveActivityModal = ({
   };
 
   const instructorApproval = () => {
-    console.log("activity0000888", activity);
+    console.log('activity0000888', activity);
     if (activity?.activityId) {
       const data = {
         activityId: activity?.activityId,
-        status: "approved",
+        status: 'approved',
         instructorEmail: instructorDetail.email,
       };
       InstructorUpdateStatus(data)
         .then((res) => {
-          console.log("approved", res);
+          console.log('approved', res);
           dispatch(
             ChangeModalState.action({
               approveActivityModalVisibility: false,
-            })
+            }),
           );
           onClose();
-          setSelectedChild();
+          // setSelectedChild();
           setActivity(activity?.activityId);
           setSelectedChild(null);
 
@@ -137,7 +139,7 @@ const ApproveActivityModal = ({
     } else if (activity?.groupId) {
       const data = {
         groupyId: activity?.groupId,
-        status: "approved",
+        status: 'approved',
         instructorEmail: instructorDetail.email,
       };
       UpdateInstructorGroupStatus(data)
@@ -146,10 +148,10 @@ const ApproveActivityModal = ({
           dispatch(
             ChangeModalState.action({
               approveActivityModalVisibility: false,
-            })
+            }),
           );
           onClose();
-          setSelectedChild();
+          // setSelectedChild();
           setActivity(activity?.groupId);
           setSelectedChild(null);
           // setActivities(filter);
@@ -183,24 +185,24 @@ const ApproveActivityModal = ({
       visible={visible}
       backdropStyle={styles.backdrop}
       onBackdropPress={() => {
-        setSelectedChild();
+        // setSelectedChild();
         dispatch(
-          ChangeModalState.action({ approveActivityModalVisibility: false })
+          ChangeModalState.action({ approveActivityModalVisibility: false }),
         );
         onClose();
         // setActivity(null);
       }}
     >
-      {true && (
+      {(
         <Card style={styles.modal} disabled={true}>
           <View style={{ flex: 1 }}>
             <View style={styles.body}>
               <View style={{ paddingBottom: 10, paddingTop: 10 }}>
                 <Text
-                  textBreakStrategy={"highQuality"}
+                  textBreakStrategy={'highQuality'}
                   style={{
-                    textAlign: "center",
-                    color: "#606060",
+                    textAlign: 'center',
+                    color: '#606060',
                     fontSize: 18,
                   }}
                 >
@@ -210,7 +212,7 @@ const ApproveActivityModal = ({
             </View>
             {
               <View style={{ marginTop: 20, paddingHorizontal: 10 }}>
-                <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                <Text style={{ fontWeight: '600', fontSize: 16 }}>
                   Instructions
                 </Text>
                 <View style={{ maxHeight: 100 }}>
@@ -221,7 +223,7 @@ const ApproveActivityModal = ({
                   </ScrollView>
                 </View>
                 <Text
-                  style={{ fontWeight: "600", fontSize: 16, marginTop: 20 }}
+                  style={{ fontWeight: '600', fontSize: 16, marginTop: 20 }}
                 >
                   Disclaimer
                 </Text>
@@ -233,7 +235,7 @@ const ApproveActivityModal = ({
                   </ScrollView>
                 </View>
                 <Text
-                  style={{ fontWeight: "600", fontSize: 16, marginTop: 20 }}
+                  style={{ fontWeight: '600', fontSize: 16, marginTop: 20 }}
                 >
                   Agreement
                 </Text>
@@ -246,13 +248,13 @@ const ApproveActivityModal = ({
                 </View>
               </View>
             }
-            <View style={{ flexDirection: "row" }}>
+            <View style={{ flexDirection: 'row' }}>
               <CheckBox
                 style={[styles.termsCheckBox, { flex: 1, marginRight: 18 }]}
                 checked={terms}
                 onChange={() => setTerms(!terms)}
               >
-                {""}
+                {''}
               </CheckBox>
               <View style={[styles.termsCheckBox, { flex: 15 }]}>
                 <Text>By checking the box, you agree to all of the above</Text>
@@ -293,10 +295,10 @@ const ApproveActivityModal = ({
                   dispatch(
                     ChangeModalState.action({
                       approveActivityModalVisibility: false,
-                    })
+                    }),
                   );
                   onClose();
-                  setSelectedChild();
+                  // setSelectedChild();
                   // setActivity(null);
                 }}
               >
@@ -313,18 +315,18 @@ export default ApproveActivityModal;
 
 const styles = StyleSheet.create({
   container: {
-    maxHeight: "80%",
+    maxHeight: '80%',
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   modal: { borderRadius: 10 },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     color: Colors.white,
     zIndex: -1,
   },
@@ -333,39 +335,39 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   bottom: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 45,
     marginTop: 10,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   buttonText: {
     flex: 1,
     borderRadius: 25,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     margin: 2,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   termsCheckBox: {
     marginTop: 24,
   },
   termsCheckBoxText: {
-    color: "text-hint-color",
+    color: 'text-hint-color',
     marginLeft: 10,
   },
 });

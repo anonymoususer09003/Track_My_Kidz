@@ -1,70 +1,69 @@
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Icon, Text } from "@ui-kitten/components";
-import React, { useEffect, useState } from "react";
+import { useIsFocused } from '@react-navigation/native';
+import { Icon, Text } from '@ui-kitten/components';
+import React, { useEffect, useState } from 'react';
 
-import {
-  ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View
-} from "react-native";
+import { ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { ApproveActivityModal, InstructionsModal } from "@/Modals";
-import {
-  GetActivitiesByInsructorId
-} from "@/Services/Activity";
-import { GetGroupByInstructorId } from "@/Services/Group";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Colors from "@/Theme/Colors";
-import moment from "moment";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { useDispatch, useSelector } from "react-redux";
-const InstructorGroupPendingScreen = ({ route }) => {
-  const [refreshing, setRefreshing] = useState(false);
+import { ApproveActivityModal, InstructionsModal } from '@/Modals';
+import { GetActivitiesByInsructorId } from '@/Services/Activity';
+import { GetGroupByInstructorId } from '@/Services/Group';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Colors from '@/Theme/Colors';
+import moment from 'moment';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { useDispatch, useSelector } from 'react-redux';
+import { ModalState } from '@/Store/Modal';
+
+const InstructorGroupPendingScreen = () => {
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const isFocused = useIsFocused();
-  const [activity, setActivity] = useState(null);
-  const navigation = useNavigation();
+  const [activity, setActivity] = useState<any>(null);
   const dispatch = useDispatch();
-  const [activities, setActivities] = useState([]);
-  const [declineActivity, setDeclineActivity] = useState(null);
-  const [selectedInstructions, setSelectedInstructions] = useState(null);
-  const [groups, setGroups] = useState([]);
-  const [pageActivity, pageNumberActivity] = useState(0);
-  const [pageSizeActivity, setPageSizeActivity] = useState(10);
-  const [totalRecordsActivity, setTotalRecordsActivity] = useState(0);
-  const [pageGroup, pageNumberGroup] = useState(0);
-  const [pageSizeGroup, setPageSizeGroup] = useState(10);
-  const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
+  const [activities, setActivities] = useState<any[]>([]);
+  // const [declineActivity, setDeclineActivity] = useState(null);
+  const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
+  const [groups, setGroups] = useState<any[]>([]);
+  const [pageActivity, pageNumberActivity] = useState<number>(0);
+  const [pageSizeActivity, setPageSizeActivity] = useState<number>(10);
+  const [totalRecordsActivity, setTotalRecordsActivity] = useState<number>(0);
+  const [pageGroup, pageNumberGroup] = useState<number>(0);
+  const [pageSizeGroup, setPageSizeGroup] = useState<number>(10);
+  const [totalRecordsGroup, setTotalRecordsGroup] = useState<number>(0);
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
+    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility,
   );
-  const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
-  const marker = require("@/Assets/Images/marker.png");
+  const calendarIcon = require('@/Assets/Images/navigation_icon2.png');
+  const marker = require('@/Assets/Images/marker.png');
 
-  const email = require("@/Assets/Images/email.png");
-  const clockIcon = require("@/Assets/Images/clock1.png");
-  const instructorImage = require("@/Assets/Images/approval_icon2.png");
-  const [showAcceptModal, setShowAcceptModal] = useState(false);
-  const approveActivityModalVisibility = useSelector(
-    (state: { modal: any }) => state.modal.approveActivityModalVisibility
-  );
+  const email = require('@/Assets/Images/email.png');
+  const clockIcon = require('@/Assets/Images/clock1.png');
+  const instructorImage = require('@/Assets/Images/approval_icon2.png');
+  const [showAcceptModal, setShowAcceptModal] = useState<boolean>(false);
+  // const approveActivityModalVisibility = useSelector(
+  //   (state: { modal: any }) => state.modal.approveActivityModalVisibility,
+  // );
   let prevOpenedRow: any;
   let row: Array<any> = [];
-  const getActivities = async (refreshing: any) => {
+  const getActivities = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
     const userId = await loadUserId();
-    console.log("userId", userId);
+    console.log('userId', userId);
     let pageNumberActivityCount = refreshing ? pageActivity : 0;
+
+    if (!userId) return;
 
     GetActivitiesByInsructorId(
       userId,
-      "declined",
+      'declined',
       pageNumberActivityCount,
-      pageSizeActivity
+      pageSizeActivity,
     )
       .then((res) => {
-        console.log("res", res.data);
+        console.log('res', res.data);
         setTotalRecordsActivity(res?.data?.totalRecords);
         setRefreshing(false);
         setPageSizeActivity(10);
@@ -90,20 +89,22 @@ const InstructorGroupPendingScreen = ({ route }) => {
         setPageSizeActivity(10);
 
         pageNumberActivity(pageActivity);
-        console.log("getActivities Error:", err);
+        console.log('getActivities Error:', err);
       });
   };
-  const getGroup = async (refreshing: any) => {
+  const getGroup = async (refreshing?: any) => {
     const userId = await loadUserId();
+    if (!userId) return;
+
     if (refreshing) {
       setRefreshing(true);
     }
     let pageNumberGroupCount = refreshing ? pageGroup : 0;
     GetGroupByInstructorId(
       userId,
-      "declined",
+      'declined',
       pageNumberGroupCount,
-      pageSizeGroup
+      pageSizeGroup,
     )
       .then((res) => {
         setTotalRecordsGroup(res.totalRecords);
@@ -127,10 +128,11 @@ const InstructorGroupPendingScreen = ({ route }) => {
         }
       })
       .catch((err) => {
-        console.log("getActivities Error:", err);
+        console.log('getActivities Error:', err);
       });
   };
-  const closeRow = (index) => {
+  const closeRow = (index?: number) => {
+    if (!index) return;
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
     }
@@ -140,29 +142,29 @@ const InstructorGroupPendingScreen = ({ route }) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
-      extrapolate: "clamp",
+      extrapolate: 'clamp',
     });
     return (
       <View
         style={{
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         {item.status && (
           <View
             style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <TouchableOpacity
               style={{
                 padding: 10,
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
               onPress={() => {
                 setActivity(item);
@@ -201,7 +203,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
   //     );
   //   }
   // }, [activity]);
-  console.log("activity000", activity);
+  console.log('activity000', activity);
   return (
     <>
       <View style={styles.layout}>
@@ -220,13 +222,13 @@ const InstructorGroupPendingScreen = ({ route }) => {
             setSelectedChild={() => setActivity(null)}
             onClose={() => setShowAcceptModal(false)}
             activity={activity}
-            setActivity={(id) => {
+            setActivity={(id: any) => {
               if (activity?.activityId) {
-                console.log("declinedactivity", activity);
+                console.log('declinedactivity', activity);
                 closeRow();
-                console.log("activites", activities);
+                console.log('activites', activities);
                 let filter = activities?.filter(
-                  (item) => item?.activityId != id
+                  (item) => item?.activityId != id,
                 );
 
                 setActivities(filter);
@@ -263,7 +265,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
         )} */}
         {activities.length === 0 && groups.length == 0 && (
           <View style={{ backgroundColor: Colors.newBackgroundColor }}>
-            <Text style={[styles.text, { textAlign: "center", marginTop: 20 }]}>
+            <Text style={[styles.text, { textAlign: 'center', marginTop: 20 }]}>
               You do not have any declined activities or groups
             </Text>
           </View>
@@ -272,11 +274,12 @@ const InstructorGroupPendingScreen = ({ route }) => {
           {isFocused && (
             <FlatList
               data={[...activities, ...groups]}
-              style={{ padding: 10, width: "100%", marginTop: 10 }}
-              keyExtractor={(item, index) => index}
+              style={{ padding: 10, width: '100%', marginTop: 10 }}
+              // todo check what it is
+              // keyExtractor={(item, index) => index}
               renderItem={({ item, index }) => {
                 if (item?.activityId) {
-                  let date = moment(item.fromDate).format("YYYY-MM-DD");
+                  let date = moment(item.fromDate).format('YYYY-MM-DD');
 
                   return (
                     <Swipeable
@@ -315,34 +318,34 @@ const InstructorGroupPendingScreen = ({ route }) => {
                             style={styles.iconStyle}
                           /> */}
                           <Image
-                        source={require("@/Assets/Images/circle-dashed.png")}
-                        style={{
-                          height: 40,
-                          width: 15,
-                          marginRight:10,
-                          resizeMode: "contain",
-                          // marginRight: 10,
-                        }}
-                      />
-                       <View>
-                        <Text style={styles.text}>{`${moment(
-                          item?.fromDate == "string"
-                            ? new Date()
-                            : item?.fromDate
-                        ).format("MMM DD, YYYY")} at ${moment.utc(
-                          item?.fromDate == "string"
-                            ? new Date()
-                            : item?.fromDate
-                        )
-                          .format("hh:mm a")} `}</Text>
-                        <Text style={styles.text}>{`${moment(
-                          item?.toDate == "string" ? new Date() : item?.toDate
-                        ).format('MMM DD, YYYY')} at ${moment.utc(
-                          item?.toDate == "string" ? new Date() : item?.toDate
-                        )
-                          .format("hh:mm a")} `}</Text>
-                      </View>
-                            {/* <Text style={styles.text}>{date}</Text> */}
+                            source={require('@/Assets/Images/circle-dashed.png')}
+                            style={{
+                              height: 40,
+                              width: 15,
+                              marginRight: 10,
+                              resizeMode: 'contain',
+                              // marginRight: 10,
+                            }}
+                          />
+                          <View>
+                            <Text style={styles.text}>{`${moment(
+                              item?.fromDate == 'string'
+                                ? new Date()
+                                : item?.fromDate,
+                            ).format('MMM DD, YYYY')} at ${moment.utc(
+                              item?.fromDate == 'string'
+                                ? new Date()
+                                : item?.fromDate,
+                            )
+                              .format('hh:mm a')} `}</Text>
+                            <Text style={styles.text}>{`${moment(
+                              item?.toDate == 'string' ? new Date() : item?.toDate,
+                            ).format('MMM DD, YYYY')} at ${moment.utc(
+                              item?.toDate == 'string' ? new Date() : item?.toDate,
+                            )
+                              .format('hh:mm a')} `}</Text>
+                          </View>
+                          {/* <Text style={styles.text}>{date}</Text> */}
                         </View>
                         <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />
@@ -352,9 +355,9 @@ const InstructorGroupPendingScreen = ({ route }) => {
                         <View style={styles.horizontal}>
                           <Image source={marker} style={styles.iconStyle} />
                           <View>
-                          <Text style={styles.text} >
-                            {`${item?.venueFromAddress}, ${item?.venueFromCity}, ${item?.venueFromState} ${item?.venueFromZip}, ${item?.venueToCountry}`}
-                          </Text> 
+                            <Text style={styles.text}>
+                              {`${item?.venueFromAddress}, ${item?.venueFromCity}, ${item?.venueFromState} ${item?.venueFromZip}, ${item?.venueToCountry}`}
+                            </Text>
                           </View>
                         </View>
                       </TouchableOpacity>
@@ -363,14 +366,14 @@ const InstructorGroupPendingScreen = ({ route }) => {
                           dispatch(
                             ChangeModalState.action({
                               instructionsModalVisibility: true,
-                            })
+                            }),
                           );
                           setSelectedInstructions(item);
                         }}
                         style={[styles.footer]}
                       >
                         <Text
-                          style={[styles.text, { textAlign: "center" }]}
+                          style={[styles.text, { textAlign: 'center' }]}
                         >{`Instructions / Disclaimer / Agreement`}</Text>
                       </TouchableOpacity>
                     </Swipeable>
@@ -394,16 +397,16 @@ const InstructorGroupPendingScreen = ({ route }) => {
                             style={styles.iconStyle}
                           />
                           <Text style={styles.text}>
-                            {item?.status ? "Active" : "Inactive"}
+                            {item?.status ? 'Active' : 'Inactive'}
                           </Text>
                         </View>
                       </View>
                       <TouchableOpacity
                         onPress={() => setSelectedInstructions(item?.optin)}
-                        style={[styles.footer, { backgroundColor: "#fff" }]}
+                        style={[styles.footer, { backgroundColor: '#fff' }]}
                       >
                         <Text
-                          style={[styles.text, { textAlign: "center" }]}
+                          style={[styles.text, { textAlign: 'center' }]}
                         >{`Instructions / Disclaimer / Agreement`}</Text>
                       </TouchableOpacity>
                     </Swipeable>
@@ -412,7 +415,7 @@ const InstructorGroupPendingScreen = ({ route }) => {
               }}
               onEndReached={async () => {
                 if (totalRecordsActivity > activities.length) {
-                  console.log("logs");
+                  console.log('logs');
 
                   getActivities(true);
                 }
@@ -439,15 +442,15 @@ export default InstructorGroupPendingScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   item: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
@@ -456,28 +459,28 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.lightgray,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 16,
     marginVertical: 4,
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -489,20 +492,20 @@ const styles = StyleSheet.create({
   },
   buttonSettings: {
     marginTop: 10,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     marginBottom: 10,
   },
   iconStyle: {
     height: 25,
     width: 15,
     marginRight: 10,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     tintColor: Colors.secondary,
   },
   horizontal: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

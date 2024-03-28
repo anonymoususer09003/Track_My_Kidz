@@ -7,7 +7,7 @@ import {
   ActivityDetailsScreen,
   AppListScreen,
   ChangePasswordScreen,
-  ContactUsScreen, CreateActivityScreen, CreateGroupScreen,
+  ContactUsScreen, CreateActivityScreen, CreateGroupScreen, InstructorApprovalScreen,
   InstructorPersonalProfileScreen,
   InstructorSettingsScreen,
   OrganizationInfoScreen,
@@ -15,6 +15,7 @@ import {
 } from '@/Screens';
 import { createStackNavigator } from '@react-navigation/stack';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
+import InstructorApprovalNavigator from '@/Navigators/Main/InstructorApprovalNavigator';
 import InstructorActivityNavigator from '@/Navigators/Main/InstructorActivityNavigator';
 
 export type MainStackNavigatorParamsList = {
@@ -28,6 +29,7 @@ export type MainStackNavigatorParamsList = {
   ActivityDetails: { activity?: any }
   CreateActivity: { isEdit?: boolean, groupId?: string }
   CreateGroup: { data: { groupId: number, groupName: string } }
+  InstructorApproval: undefined
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
@@ -105,6 +107,10 @@ const RightDrawerNavigator = () => {
         />
         <Stack.Screen name="CreateActivity" component={CreateActivityScreen} />
         <Stack.Screen name="CreateGroup" component={CreateGroupScreen} />
+        <Stack.Screen
+          name="InstructorApproval"
+          component={InstructorApprovalNavigator}
+        />
 
 
         {/*{user_type === "student" && (*/}
@@ -135,10 +141,7 @@ const RightDrawerNavigator = () => {
         {/*<Stack.Screen name="ChatScreen" component={ParentChatScreen} />*/}
         {/*<Stack.Screen name="Activity" component={ActivityNavigator} />*/}
         {/*<Stack.Screen name="Approval" component={ApprovalNavigator} />*/}
-        {/*<Stack.Screen*/}
-        {/*  name="InstructorApproval"*/}
-        {/*  component={InstructorApprovalNavigator}*/}
-        {/*/>*/}
+
         {/*<Stack.Screen name="Settings" component={SettingsScreen} />*/}
         {/*<Stack.Screen*/}
         {/*  name="StudentSettings"*/}
@@ -193,7 +196,7 @@ const RightDrawerNavigator = () => {
 const Placeholder = () => {
   let useNavigation1: any = useNavigation();
   return <View>
-    <Text onPress={() => useNavigation1.navigate('CreateActivity')}>
+    <Text onPress={() => useNavigation1.navigate('InstructorApproval')}>
       settings
     </Text>
   </View>;

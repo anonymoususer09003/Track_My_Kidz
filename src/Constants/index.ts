@@ -84,3 +84,26 @@ export const TIME_STAMP = [
   "12:00 AM",
   "12:30 AM",
 ];
+
+export const TEST_STUDENTS =[
+  {
+    name: 'Dylan B.',
+    selected: false,
+  },
+  {
+    name: 'Peter C.',
+    selected: false,
+  },
+  {
+    name: 'James B.',
+    selected: false,
+  },
+  {
+    name: 'Mark K.',
+    selected: false,
+  },
+  {
+    name: 'John B.',
+    selected: false,
+  },
+];
