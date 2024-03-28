@@ -9,7 +9,7 @@ import {
   ChangePasswordScreen,
   ContactUsScreen,
   CreateActivityScreen,
-  CreateGroupScreen, DragDropStudentScreen, InstructorHome,
+  CreateGroupScreen, DragDropStudentScreen, InstructorActivityDetailScreen, InstructorHome,
   InstructorPersonalProfileScreen,
   InstructorSettingsScreen,
   InstructorsListScreen,
@@ -22,6 +22,7 @@ import { ParamListBase, useNavigation } from '@react-navigation/native';
 import InstructorApprovalNavigator from '@/Navigators/Main/InstructorApprovalNavigator';
 import AddMembersNavigator from '@/Navigators/Main/AddMembersNavigator';
 import InstructorGroupApprovalNavigator from '@/Navigators/Main/InstructorGroupApprovalNavigator';
+import InstructorActivityNavigator from '@/Navigators/Main/InstructorActivityNavigator';
 
 export type MainStackNavigatorParamsList = {
   InstructorPersonalProfileScreen: undefined
@@ -44,6 +45,7 @@ export type MainStackNavigatorParamsList = {
   BusInfo: { data: { buses: any, schoolId: number } }
   InstructorHome: undefined
   DragDropStudent: { students: any[], attendanceMark: any, activity: { activityId: any }, bus: { busId: any } }
+  InstructorActivityDetail: { data?: any, activitiesCount?: any } | undefined
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
@@ -95,7 +97,7 @@ const RightDrawerNavigator = () => {
         {user_type === 'instructor' && (
           <Stack.Screen
             name="InstructorActivity"
-            component={Placeholder}
+            component={InstructorActivityNavigator}
           />
         )}
         <Stack.Screen
@@ -140,6 +142,10 @@ const RightDrawerNavigator = () => {
           name="DragDropStudent"
           component={DragDropStudentScreen}
         />
+        <Stack.Screen
+          name="InstructorActivityDetail"
+          component={InstructorActivityDetailScreen}
+        />
 
         {/*{user_type === "student" && (*/}
         {/*  <Stack.Screen*/}
@@ -148,10 +154,6 @@ const RightDrawerNavigator = () => {
         {/*  />*/}
         {/*)}*/}
 
-        {/*<Stack.Screen*/}
-        {/*  name="InstructorActivityDetail"*/}
-        {/*  component={InstructorActivityDetailScreen}*/}
-        {/*/>*/}
 
         {/*<Stack.Screen*/}
         {/*  name="StudentActivityDetails"*/}
@@ -210,12 +212,7 @@ const Placeholder = () => {
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
 
   return <View>
-    <Text onPress={() => navigation.navigate('DragDropStudent', {
-      students: [],
-      attendanceMark: '',
-      activity: { activityId: 10 },
-      bus: { busId: 10 },
-    })}>
+    <Text onPress={() => navigation.navigate('InstructorActivityDetail')}>
       Open test page
     </Text>
   </View>;

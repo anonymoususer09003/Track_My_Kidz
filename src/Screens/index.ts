@@ -38,7 +38,7 @@ export { default as InstructorsListScreen } from "./Main/InstructorSettings/Inst
 export { default as OrganizationBusinformation } from "./Main/InstructorSettings/OrganizationBusinformation";
 export { default as InstructorHome } from "./Main/InstructorHome/HomeScreen";
 export { default as DragDropStudentScreen } from "./Main/DragDropStudent/DragDropStudentScreen";
-// export { default as InstructorActivityDetailScreen } from "./Main/InstructorActivity/InstructorActivityDetailScreen";
+export { default as InstructorActivityDetailScreen } from "./Main/InstructorActivity/InstructorActivityDetailScreen";
 
 // //PARENT
 // export { default as HomeScreen } from "./Main/Home/HomeScreen";
