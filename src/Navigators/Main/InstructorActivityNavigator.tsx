@@ -1,19 +1,19 @@
-import { Calendar, LinearGradientButton } from '@/Components';
-import BackgroundLayout from '@/Components/BackgroundLayout';
-import { actions } from '@/Context/state/Reducer';
-// import { InstructorActivityScreen, InstructorGroupScreen } from "@/Screens";
-import { FindInstructorBySchoolOrg, GetInstructor } from '@/Services/Instructor';
-import ChangeInstructorActivityState from '@/Store/InstructorsActivity/ChangeInstructorActivityState';
-import { ModalState } from '@/Store/Modal';
-import ChangeModalState from '@/Store/Modal/ChangeModalState';
-import Colors from '@/Theme/Colors';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { TabBar } from '@ui-kitten/components';
 import axios from 'axios';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+
+import { Calendar, LinearGradientButton } from '@/Components';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { actions } from '@/Context/state/Reducer';
+import { FindInstructorBySchoolOrg, GetInstructor } from '@/Services/Instructor';
+import ChangeInstructorActivityState from '@/Store/InstructorsActivity/ChangeInstructorActivityState';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Colors from '@/Theme/Colors';
 import { loadUserId } from '@/Storage/MainAppStorage';
 import { InstructorActivityScreen, InstructorGroupScreen } from '@/Screens';
 
@@ -40,7 +40,7 @@ const InstructorActivityNavigator = () => {
     moment(new Date()).month(),
   );
   const [instructors, setInstructors] = useState([]);
-  const [activeTab, setActiveTab] = useState<number>(1);
+  const [_, setActiveTab] = useState<number>(1);
   const [selectedDay, setSelectedDay] = useState(moment().format('D'));
 
   const isCalendarVisible = useSelector(
@@ -155,10 +155,6 @@ const InstructorActivityNavigator = () => {
 
   return (
     <>
-      {/* <AppHeader
-        hideCalendar={activeTab != 1 ? true : false}
-        title={`Activity & Groups`}
-      /> */}
       <BackgroundLayout
         hideLeftIcon={true}
         dropDownList={instructors}
@@ -212,9 +208,6 @@ const InstructorActivityNavigator = () => {
       </BackgroundLayout>
     </>
   );
-};
-const sfkjdsa = () => {
-  return <View><Text>nello worls</Text></View>;
 };
 
 export default InstructorActivityNavigator;

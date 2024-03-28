@@ -24,7 +24,7 @@ import AddMembersNavigator from '@/Navigators/Main/AddMembersNavigator';
 import InstructorGroupApprovalNavigator from '@/Navigators/Main/InstructorGroupApprovalNavigator';
 import InstructorActivityNavigator from '@/Navigators/Main/InstructorActivityNavigator';
 
-export type MainStackNavigatorParamsList = {
+type InstructorStack = {
   InstructorPersonalProfileScreen: undefined
   InstructorActivity?: undefined
   ChangePassword: undefined
@@ -34,8 +34,8 @@ export type MainStackNavigatorParamsList = {
   InstructorActivityNavigator: undefined
   ActivityDetails: { activity?: any }
   CreateActivity: { isEdit?: boolean, groupId?: string }
-  CreateGroup: { data: { groupId: number, groupName: string } }
-  InstructorApproval: undefined
+  CreateGroup: { data: { groupId: number, groupName: string } }| undefined
+  InstructorApproval: { screen: string } | undefined
   AddMembers: {
     screen: string,
     data: boolean,
@@ -46,7 +46,9 @@ export type MainStackNavigatorParamsList = {
   InstructorHome: undefined
   DragDropStudent: { students: any[], attendanceMark: any, activity: { activityId: any }, bus: { busId: any } }
   InstructorActivityDetail: { data?: any, activitiesCount?: any } | undefined
-} & ParamListBase;
+}
+
+export type MainStackNavigatorParamsList = InstructorStack & ParamListBase;
 
 const RightDrawerNavigator = () => {
   const dispatch = useDispatch();
@@ -90,10 +92,7 @@ const RightDrawerNavigator = () => {
       // }}
     >
       <>
-        {/*{user_type === "parent" && (*/}
-        {/*  <Stack.Screen name="Home" component={HomeNavigator} />*/}
-        {/*)}*/}
-
+        {/*Instructor screens*/}
         {user_type === 'instructor' && (
           <Stack.Screen
             name="InstructorActivity"
@@ -146,6 +145,12 @@ const RightDrawerNavigator = () => {
           name="InstructorActivityDetail"
           component={InstructorActivityDetailScreen}
         />
+        {/*////////////////////////////////////////////*/}
+
+
+        {/*{user_type === "parent" && (*/}
+        {/*  <Stack.Screen name="Home" component={HomeNavigator} />*/}
+        {/*)}*/}
 
         {/*{user_type === "student" && (*/}
         {/*  <Stack.Screen*/}
