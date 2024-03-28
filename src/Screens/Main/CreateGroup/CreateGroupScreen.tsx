@@ -1,19 +1,20 @@
 import React, { FC, useEffect, useState } from 'react';
 import { RouteProp, useIsFocused, useNavigation } from '@react-navigation/native';
-import BackgroundLayout from '@/Components/BackgroundLayout';
 import { Input, Text } from '@ui-kitten/components';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { Formik } from 'formik';
+import * as yup from 'yup';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+import BackgroundLayout from '@/Components/BackgroundLayout';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import Colors from '@/Theme/Colors';
-import { Formik } from 'formik';
 import { LinearGradientButton } from '@/Components';
 import { useStateValue } from '@/Context/state/State';
 import { actions } from '@/Context/state/Reducer';
 import { GetGroup, GetOptInGroup } from '@/Services/Group';
-import * as yup from 'yup';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
-import { StackNavigationProp } from '@react-navigation/stack';
 
 type CreateGroupScreenProps = {
   route: RouteProp<MainStackNavigatorParamsList, 'CreateGroup'>
@@ -24,7 +25,7 @@ const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
 
   const [, _dispatch] : any= useStateValue();
   const dispatch = useDispatch();
-  const [selectedDependent, setSelectedDependent] = useState<any>(null);
+  const [selectedDependent] = useState<any>(null);
   const [groupDetail, setGroupDetail] = useState<any>({});
   const ValidationSchema = yup.object().shape({
     name: yup.string().min(3).max(20).required('Name is required'),
@@ -40,7 +41,8 @@ const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
   };
 
   const getGroupDetail = async () => {
-    GetGroup(route?.params?.data?.groupId)
+    if (!route?.params?.data?.groupId) return
+    GetGroup(route.params.data.groupId)
       .then((res) => {
         console.log('groupinfo', res);
 
@@ -51,7 +53,7 @@ const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
           parent2_email: item.parentEmail2,
           studentId: item?.studentsGroupId,
         }));
-        let instructors = res?.instructorsGroupList?.map((item: any, index: number) => ({
+        let instructors = res?.instructorsGroupList?.map((item: any) => ({
           firstname: item?.firstName,
           lastname: item?.lastName,
           email: item?.email,
@@ -124,7 +126,7 @@ const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
               });
 
               navigation.navigate('AddMembers', {
-                isEdit: !!route?.params,
+                isEdit: !!(route?.params),
                 data: { ...route?.params?.data, ...groupDetail },
               });
               resetForm();

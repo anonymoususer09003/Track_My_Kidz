@@ -37,7 +37,8 @@ type InstructorStack = {
   CreateGroup: { data: { groupId: number, groupName: string } }| undefined
   InstructorApproval: { screen: string } | undefined
   AddMembers: {
-    screen: string,
+    screen?: string,
+    isEdit: boolean
     data: boolean,
   }
   InstructorGroupApprovalNavigator: undefined
