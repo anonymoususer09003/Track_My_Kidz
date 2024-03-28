@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { Button, TabBar } from '@ui-kitten/components';
-import { StyleSheet, Text, View } from 'react-native';
-// import {
-//   InstructorGroupApprovalScreen,
-//   InstructorGroupDeclineScreen,
-//   InstructorGroupPendingScreen,
-// } from "@/Screens";
+import { StyleSheet, View } from 'react-native';
+import { InstructorGroupApprovalScreen, InstructorGroupDeclineScreen, InstructorGroupPendingScreen } from '@/Screens';
 import Colors from '@/Theme/Colors';
 import SearchBar from '@/Components/SearchBar/SearchBar';
 
+type InstructorGroupApprovalNavigatorParamList = {
+  InstructorGroupApproval: undefined
+  InstructorGroupDecline: undefined
+  InstructorGroupPending: undefined
+};
+
 // @refresh reset
 const InstructorGroupApprovalNavigator = () => {
-  const TabNavigator = createMaterialTopTabNavigator();
+  const TabNavigator = createMaterialTopTabNavigator<InstructorGroupApprovalNavigatorParamList>();
   const tabNames = ['Approved', 'Declined', 'Pending'];
   const [searchParam, setSearchParam] = useState('');
   //@ts-ignore
@@ -59,43 +61,34 @@ const InstructorGroupApprovalNavigator = () => {
   );
   return (
     <>
-      {/*<AppHeader title="Trip: Liam High School" />*/}
       <SearchBar
         searchText={searchParam}
         onChangeText={(value) => setSearchParam(value)}
       />
       <TabNavigator.Navigator
         screenOptions={{ lazy: true, swipeEnabled: false }}
-        tabBar={(props) => <></>}
+        tabBar={(props) => <TopTabBar {...props} />}
       >
         <TabNavigator.Screen
           name="InstructorGroupApproval"
           options={{ title: 'Approved' }}
-          component={fsjl}
+          component={InstructorGroupApprovalScreen}
         />
         <TabNavigator.Screen
           name="InstructorGroupDecline"
           options={{ title: 'Declined' }}
-          component={fsjl}
+          component={InstructorGroupDeclineScreen}
         />
         <TabNavigator.Screen
           name="InstructorGroupPending"
           options={{ title: 'Pending' }}
-          component={fsjl}
+          component={InstructorGroupPendingScreen}
         />
       </TabNavigator.Navigator>
     </>
   );
 };
 
-const fsjl = () => {
-  return <View>
-
-    <Text>
-      hello world
-    </Text>
-  </View>;
-};
 export default InstructorGroupApprovalNavigator;
 const styles = StyleSheet.create({
   background: {

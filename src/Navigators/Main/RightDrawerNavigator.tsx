@@ -18,8 +18,8 @@ import {
 import { createStackNavigator } from '@react-navigation/stack';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import InstructorApprovalNavigator from '@/Navigators/Main/InstructorApprovalNavigator';
-import InstructorActivityNavigator from '@/Navigators/Main/InstructorActivityNavigator';
 import AddMembersNavigator from '@/Navigators/Main/AddMembersNavigator';
+import InstructorGroupApprovalNavigator from '@/Navigators/Main/InstructorGroupApprovalNavigator';
 
 export type MainStackNavigatorParamsList = {
   InstructorPersonalProfileScreen: undefined
@@ -37,6 +37,7 @@ export type MainStackNavigatorParamsList = {
     screen: string,
     data: boolean,
   }
+  InstructorGroupApprovalNavigator: undefined
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
@@ -88,7 +89,7 @@ const RightDrawerNavigator = () => {
         {user_type === 'instructor' && (
           <Stack.Screen
             name="InstructorActivity"
-            component={InstructorActivityNavigator}
+            component={Placeholder}
           />
         )}
         <Stack.Screen
@@ -178,10 +179,10 @@ const RightDrawerNavigator = () => {
         {/*/>*/}
 
 
-        {/*<Stack.Screen*/}
-        {/*  name="InstructorGroupApproval"*/}
-        {/*  component={InstructorGroupApprovalNavigator}*/}
-        {/*/>*/}
+        <Stack.Screen
+          name="InstructorGroupApproval"
+          component={InstructorGroupApprovalNavigator}
+        />
 
         {/*<Stack.Screen*/}
         {/*  name="InstructorList"*/}
@@ -203,8 +204,8 @@ const RightDrawerNavigator = () => {
 const Placeholder = () => {
   let useNavigation1: any = useNavigation();
   return <View>
-    <Text onPress={() => useNavigation1.navigate('AddMembers')}>
-      settings
+    <Text onPress={() => useNavigation1.navigate('InstructorGroupApproval')}>
+      Open test page
     </Text>
   </View>;
 };

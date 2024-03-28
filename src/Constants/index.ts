@@ -107,3 +107,36 @@ export const TEST_STUDENTS =[
     selected: false,
   },
 ];
+
+export const TEST_APPROVALS = [
+  {
+    name: 'Dylan B.',
+    type: 'Student',
+    to: false,
+    from: false,
+  },
+  {
+    name: 'Peter C.',
+    type: 'Student',
+    to: false,
+    from: false,
+  },
+  {
+    name: 'James B.',
+    type: 'Student',
+    to: false,
+    from: false,
+  },
+  {
+    name: 'Mark K.',
+    type: 'Instructor',
+    to: false,
+    from: false,
+  },
+  {
+    name: 'John B.',
+    type: 'Instructor',
+    to: false,
+    from: false,
+  },
+]

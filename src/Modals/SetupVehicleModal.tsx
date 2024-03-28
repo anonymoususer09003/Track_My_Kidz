@@ -1,61 +1,49 @@
-import {
-  Card,
-  IndexPath,
-  Modal,
-  Input,
-  Text,
-  Select,
-  SelectItem,
-} from "@ui-kitten/components";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
-import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import { useTheme } from "@/Theme";
-import { LinearGradientButton } from "@/Components";
-import ChangeSelectedState from "@/Store/Selected/ChangeSelectedState";
-import Colors from "@/Theme/Colors";
-import EvilIcons from "react-native-vector-icons/EvilIcons";
-import AddBusInformation from "./AddBusInformation";
-import Entypo from "react-native-vector-icons/Entypo";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Feather from "react-native-vector-icons/Feather";
-import { FindAllBus, GetBusByID, PutBus } from "@/Services/BusConfiguration";
-import { loadId, loadUserId } from "@/Storage/MainAppStorage";
-import FetchOne from "@/Services/User/FetchOne";
+import { Card, Modal, Text } from '@ui-kitten/components';
+import { useDispatch, useSelector } from 'react-redux';
+import { ModalState } from '@/Store/Modal';
+import { useNavigation } from '@react-navigation/native';
+import React, { FC, useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { LinearGradientButton } from '@/Components';
+import Colors from '@/Theme/Colors';
+import AddBusInformation from './AddBusInformation';
+import { FindAllBus, PutBus } from '@/Services/BusConfiguration';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import FetchOne from '@/Services/User/FetchOne';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
-const SetupVehicleModal = ({
-  activity,
-  setActivity,
-  buses,
-  setBuses,
-  fromActivity,
-}: {
-  activity: any;
-  setActivity: Function;
+type SetupVehicleModalProps = {
+  activity?: any;
+  setActivity?: Function;
   buses?: any[];
-  setBuses: Function;
-  fromActivity: any;
-}) => {
+  setBuses?: Function;
+  fromActivity?: any;
+}
+const SetupVehicleModal: FC<SetupVehicleModalProps> = ({
+                                                         activity,
+                                                         setActivity,
+                                                         buses,
+                                                         setBuses,
+                                                         fromActivity,
+                                                       }) => {
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.setupVehicleModal
+    (state: { modal: ModalState }) => state.modal.setupVehicleModal,
   );
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const isBusVisible = useSelector(
     (state: { modal: ModalState }) =>
-      state.modal.addButInformationModalVisibility
+      state.modal.addButInformationModalVisibility,
   );
   // console.log("activity", activity);
-  const [password, setPassword] = useState("");
+  // const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const [showBuses, setShowBuses] = useState(false);
-  const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
-  );
-  const [instructor, setInstructor] = useState(null);
+  const [showBuses, setShowBuses] = useState<boolean>(false);
+  // const currentUser = useSelector(
+  //   (state: { user: UserState }) => state.user.item
+  // );
+  const [instructor, setInstructor] = useState<any>(null);
 
   const getBuses = async () => {
     const id = await loadUserId();
@@ -63,10 +51,10 @@ const SetupVehicleModal = ({
     FindAllBus(id ? parseInt(id) : instructor?.instructorId, 0, 30)
       .then((res) => {
         console.log(res.data);
-        setBuses(res?.data?.result);
+        setBuses && setBuses(res?.data?.result);
       })
       .catch((err) => {
-        console.log("getBuses Error:", err);
+        console.log('getBuses Error:', err);
       });
   };
 
@@ -88,7 +76,7 @@ const SetupVehicleModal = ({
       instructorId: instructor?.instructorId || 0,
     });
     if (fromActivity) {
-      navigation.navigate("DragDropStudent", {
+      navigation.navigate('DragDropStudent', {
         bus: bus?.busId,
         activity: activity,
       });
@@ -127,7 +115,7 @@ const SetupVehicleModal = ({
         backdropStyle={styles.backdrop}
         onBackdropPress={() => {
           dispatch(ChangeModalState.action({ setupVehicleModal: false }));
-          setActivity(null);
+          setActivity && setActivity(null);
         }}
       >
         <Card style={styles.modal} disabled={true}>
@@ -145,7 +133,7 @@ const SetupVehicleModal = ({
                   ChangeModalState.action({
                     // setupVehicleModal: false,
                     addButInformationModalVisibility: true,
-                  })
+                  }),
                 );
               }}
             >
@@ -187,19 +175,19 @@ const SetupVehicleModal = ({
                       updateBus(bus);
                     }}
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
                       padding: 5,
                     }}
                   >
                     <Text>{`${bus && bus?.busName}`}</Text>
                     <View
                       style={{
-                        width: "15%",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-evenly",
+                        width: '15%',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-evenly',
                       }}
                     ></View>
                   </TouchableOpacity>
@@ -216,19 +204,19 @@ export default SetupVehicleModal;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   inputSettings: {
     marginTop: 7,
   },
-  modal: { borderRadius: 10, minHeight: 200, justifyContent: "center" },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  modal: { borderRadius: 10, minHeight: 200, justifyContent: 'center' },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     color: Colors.white,
     zIndex: -1,
   },
@@ -237,32 +225,32 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   bottom: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 45,
     marginTop: 10,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   buttonText: {
     flex: 1,
     borderRadius: 25,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     margin: 2,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });
