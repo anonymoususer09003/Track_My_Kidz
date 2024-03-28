@@ -9,10 +9,14 @@ import {
   ChangePasswordScreen,
   ContactUsScreen,
   CreateActivityScreen,
-  CreateGroupScreen, DragDropStudentScreen, InstructorActivityDetailScreen, InstructorHome,
+  CreateGroupScreen,
+  DragDropStudentScreen,
+  InstructorActivityDetailScreen,
+  InstructorHome,
   InstructorPersonalProfileScreen,
   InstructorSettingsScreen,
   InstructorsListScreen,
+  NotificationsScreen,
   OrganizationBusinformation,
   OrganizationInfoScreen,
   ReportProblemScreen,
@@ -27,14 +31,12 @@ import InstructorActivityNavigator from '@/Navigators/Main/InstructorActivityNav
 type InstructorStack = {
   InstructorPersonalProfileScreen: undefined
   InstructorActivity?: undefined
-  ChangePassword: undefined
   OrganizationInfo: undefined
   InstructorSettings: undefined
-  ReportProblemScreen: undefined
   InstructorActivityNavigator: undefined
   ActivityDetails: { activity?: any }
   CreateActivity: { isEdit?: boolean, groupId?: string }
-  CreateGroup: { data: { groupId: number, groupName: string } }| undefined
+  CreateGroup: { data: { groupId: number, groupName: string } } | undefined
   InstructorApproval: { screen: string } | undefined
   AddMembers: {
     screen?: string,
@@ -49,7 +51,15 @@ type InstructorStack = {
   InstructorActivityDetail: { data?: any, activitiesCount?: any } | undefined
 }
 
-export type MainStackNavigatorParamsList = InstructorStack & ParamListBase;
+type SettingsStack = {
+  Notifications: undefined
+  AppList: undefined
+  ChangePassword: undefined
+  ReportProblem: undefined
+  ContactUs: undefined
+}
+
+export type MainStackNavigatorParamsList = InstructorStack & SettingsStack & ParamListBase;
 
 const RightDrawerNavigator = () => {
   const dispatch = useDispatch();
@@ -108,14 +118,10 @@ const RightDrawerNavigator = () => {
           name="InstructorPersonalProfileScreen"
           component={InstructorPersonalProfileScreen}
         />
-        <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
         <Stack.Screen
           name="OrganizationInfo"
           component={OrganizationInfoScreen}
         />
-        <Stack.Screen name="ReportProblem" component={ReportProblemScreen} />
-        <Stack.Screen name="ContactUs" component={ContactUsScreen} />
-        <Stack.Screen name="AppList" component={AppListScreen} />
 
         <Stack.Screen
           name="ActivityDetails"
@@ -146,6 +152,14 @@ const RightDrawerNavigator = () => {
           name="InstructorActivityDetail"
           component={InstructorActivityDetailScreen}
         />
+        {/*////////////////////////////////////////////*/}
+
+        {/*Settings*/}
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />
+        <Stack.Screen name="ReportProblem" component={ReportProblemScreen} />
+        <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+        <Stack.Screen name="AppList" component={AppListScreen} />
+        <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
         {/*////////////////////////////////////////////*/}
 
 
@@ -190,8 +204,6 @@ const RightDrawerNavigator = () => {
         {/*  name="StudentPersonalProfile"*/}
         {/*  component={StudentPersonalProfileScreen}*/}
         {/*/>*/}
-        {/*<Stack.Screen name="Notifications" component={NotificationsScreen} />*/}
-        {/*<Stack.Screen name="PaymentInfo" component={PaymentInfoScreen} />*/}
 
         {/*<Stack.Screen name="ActivationCode" component={ActivationCodeScreen} />*/}
         {/*<Stack.Screen name="DependentInfo" component={DependentInfoScreen} />*/}

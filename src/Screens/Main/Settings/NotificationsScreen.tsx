@@ -1,61 +1,49 @@
-import { StyleSheet, View } from "react-native";
-import { AppHeader } from "@/Components";
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { NotificationsState } from "@/Store/Notifications";
-import {
-  Divider,
-  Icon,
-  List,
-  ListItem,
-  Spinner,
-  Text,
-} from "@ui-kitten/components";
-import { FlatList, TouchableOpacity } from "react-native";
-import { UserDeleteNotifications, UserGetNotifications } from "@/Services/User";
-import FetchUnreadCount from "@/Store/Notifications/FetchUnreadCount";
-import { format, getDate } from "date-fns";
-import Colors from "@/Theme/Colors";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import { useIsFocused } from "@react-navigation/native";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { AppHeader } from '@/Components';
+import React, { useEffect, useState } from 'react';
+import { Text } from '@ui-kitten/components';
+import { UserDeleteNotifications, UserGetNotifications } from '@/Services/User';
+import Colors from '@/Theme/Colors';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { useIsFocused } from '@react-navigation/native';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+
 const NotificationsScreen = () => {
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const isFocused = useIsFocused();
   let prevOpenedRow: any;
   let row: Array<any> = [];
 
-  const closeRow = (index) => {
+  const closeRow = (index: number) => {
     console.log(index);
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
     }
     prevOpenedRow = row[index];
   };
-  const RightActions = (dragX: any, item) => {
+  const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
-      extrapolate: "clamp",
+      extrapolate: 'clamp',
     });
 
     return (
       <View
         style={{
-          flexDirection: "column",
-          alignItems: "center",
+          flexDirection: 'column',
+          alignItems: 'center',
           // backgroundColor: "red",
-          justifyContent: "center",
+          justifyContent: 'center',
           paddingVertical: 3,
         }}
       >
         <TouchableOpacity
           style={{
             padding: 5,
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
           onPress={() => {
             deleteNotification(item?.notificationId);
@@ -72,7 +60,7 @@ const NotificationsScreen = () => {
 
       setNotifications(res);
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
   const deleteNotification = async (id: any) => {
@@ -85,7 +73,7 @@ const NotificationsScreen = () => {
 
       // getNotifications();
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
   useEffect(() => {
@@ -104,7 +92,7 @@ const NotificationsScreen = () => {
               data={notifications}
               style={{
                 padding: 10,
-                width: "100%",
+                width: '100%',
                 marginTop: 10,
                 marginBottom: 20,
               }}
@@ -115,11 +103,11 @@ const NotificationsScreen = () => {
                     ref={(ref) => (row[index] = ref)}
                     // ref={swipeableRef}
                     onSwipeableOpen={() => closeRow(index)}
-                    renderRightActions={(e) => RightActions(e, item, index)}
+                    renderRightActions={(e) => RightActions(e, item)}
                   >
                     <View style={styles.card}>
                       <Text style={styles.text}>
-                        {item?.dateTime?.split(" ")[0]}
+                        {item?.dateTime?.split(' ')[0]}
                       </Text>
                       <Text style={styles.text}>{item?.title}</Text>
                       <Text style={styles.text}>{item?.message}</Text>
@@ -134,7 +122,7 @@ const NotificationsScreen = () => {
           <Text
             style={{
               marginTop: 30,
-              alignSelf: "center",
+              alignSelf: 'center',
               color: Colors.textInputPlaceholderColor,
             }}
           >
@@ -151,7 +139,7 @@ export default NotificationsScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     backgroundColor: Colors.newBackgroundColor,
     borderRadius: 25,
   },
@@ -161,7 +149,7 @@ const styles = StyleSheet.create({
   },
   card: {
     minHeight: 100,
-    width: "100%",
+    width: '100%',
     marginBottom: 5,
     // borderWidth: 2,
     backgroundColor: Colors.white,

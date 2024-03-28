@@ -66,7 +66,6 @@ export { default as InstructorActivityDetailScreen } from "./Main/InstructorActi
 // //SETTINGS
 export { default as AppListScreen } from "./Main/Settings/AppListScreen";
 export { default as ChangePasswordScreen } from "./Main/Settings/ChangePasswordScreen";
-// export { default as NotificationsScreen } from "./Main/Settings/NotificationsScreen";
-// export { default as PaymentInfoScreen } from "./PaymentInfo/PaymentInfoScreen";
+export { default as NotificationsScreen } from "./Main/Settings/NotificationsScreen";
 export { default as ReportProblemScreen } from "./Main/Settings/ReportProblemScreen";
 export { default as ContactUsScreen } from "./Main/Settings/ContactUsScreen";
