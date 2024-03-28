@@ -1,65 +1,53 @@
-import { Input, Text, Layout, Button } from "@ui-kitten/components";
-import Modal from "react-native-modal";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, ScrollView } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { Formik } from "formik";
-import * as yup from "yup";
-import Colors from "@/Theme/Colors";
-import { Dimensions, TouchableOpacity, FlatList } from "react-native";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Icon from "react-native-vector-icons/Entypo";
-import { useIsFocused } from "@react-navigation/native";
+import { Text } from '@ui-kitten/components';
+import React, { FC, useEffect, useState } from 'react';
+import { Dimensions, FlatList, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import * as yup from 'yup';
+import Colors from '@/Theme/Colors';
+import Icon from 'react-native-vector-icons/Entypo';
+import { RouteProp, useIsFocused } from '@react-navigation/native';
 
 // import { useTheme } from "@/Theme";
-import {
-  Table,
-  TableWrapper,
-  Row,
-  Rows,
-  Col,
-  Cols,
-  Cell,
-} from "react-native-table-component";
-import {
-  GetInstructor,
-  FindInstructorBySchoolOrg,
-} from "@/Services/Instructor";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { GetSchool, UpdateSchool } from "@/Services/School";
-import { AppHeader } from "@/Components";
-import EditOrgInstructorsModal from "@/Modals/EditOrganizationInstructorModal";
-import BackgroundLayout from "@/Components/BackgroundLayout";
-const height = Dimensions.get("screen").height;
+import { Cell, Table, TableWrapper } from 'react-native-table-component';
+import { FindInstructorBySchoolOrg, GetInstructor } from '@/Services/Instructor';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import { AppHeader } from '@/Components';
+import EditOrgInstructorsModal from '@/Modals/EditOrganizationInstructorModal';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
-const OrgInstructorListFormModal = ({ route }: any) => {
-  const dispatch = useDispatch();
+const height = Dimensions.get('screen').height;
+
+type OrgInstructorListFormModalProps = {
+  route: RouteProp<MainStackNavigatorParamsList, 'InstructorList'>
+}
+
+const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route }) => {
+  // const dispatch = useDispatch();
   const isFocused = useIsFocused();
 
-  const [visible, setVisible] = useState(false);
-  const [selectedInstructor, setSelectedInstructor] = useState({});
-  const [rerender, setRerender] = useState(0);
-  const [userId, setUserId] = useState(0);
-  const [tableData, setTableData] = useState({
-    tableHead: ["First Name", "Last Name", "Email", "Phone", "Admin", " "],
+  const [visible, setVisible] = useState<boolean>(false);
+  const [selectedInstructor, setSelectedInstructor] = useState<any>({});
+  const [rerender, setRerender] = useState<number>(0);
+  const [userId, setUserId] = useState<number | string>(0);
+  const [tableData, setTableData] = useState<any>({
+    tableHead: ['First Name', 'Last Name', 'Email', 'Phone', 'Admin', ' '],
     tableData: [],
     item: [],
   });
-  const [addEditVisible, setaddEditVisible] = useState(false);
-  const [instructors, setInstructors] = useState([]);
+  const [addEditVisible, setaddEditVisible] = useState<boolean>(false);
+  const [instructors, setInstructors] = useState<any[]>([]);
   const shoppingListValidationSchema = yup.object().shape({
-    firstName: yup.string().required("First name is required"),
-    lastName: yup.string().required("Last name is required"),
-    email: yup.string().required("Email is required"),
+    firstName: yup.string().required('First name is required'),
+    lastName: yup.string().required('Last name is required'),
+    email: yup.string().required('Email is required'),
   });
-  console.log("instructor", selectedInstructor);
-  const handleGetOrganizationInfo = async () => {
-    const userId = await loadUserId();
-  };
+  console.log('instructor', selectedInstructor);
+  // const handleGetOrganizationInfo = async () => {
+  //   const userId = await loadUserId();
+  // };
   const getInstructor = async () => {
     const userId = await loadUserId();
+    if (!userId) return;
     setUserId(userId);
     GetInstructor(userId)
       .then((res) => {
@@ -70,21 +58,21 @@ const OrgInstructorListFormModal = ({ route }: any) => {
         })
           .then((instructors) => {
             let temp = { ...tableData };
-            let row = [];
-            let rowItem = [];
-            instructors?.map((item, index) => {
+            let row: any[] = [];
+            let rowItem: any[] = [];
+            instructors?.map((item: any, index: number) => {
               let { firstname, lastname, email, phone, isAdmin, state } = item;
               row.push([
                 firstname,
                 lastname,
                 email,
-                phone ? phone : "",
+                phone ? phone : '',
                 isAdmin,
                 state,
               ]);
               rowItem.push(item);
             });
-            console.log("row", row);
+            console.log('row', row);
             temp.tableData = row;
             temp.item = rowItem;
             setTableData(temp);
@@ -95,27 +83,27 @@ const OrgInstructorListFormModal = ({ route }: any) => {
       })
 
       .catch((err) => {
-        console.log("Error:", err);
+        console.log('Error:', err);
       });
   };
   const formatTableData = (data: any) => {
     let temp = { ...tableData };
-    let row = [];
-    let rowItem = [];
-    data.map((item, index) => {
+    let row: any[] = [];
+    let rowItem: any[] = [];
+    data.map((item: any, index: number) => {
       let { firstname, lastname, email, phone, phoneNumber, isAdmin, state } =
         item;
       row.push([
         firstname,
         lastname,
         email,
-        phone ? phone : phoneNumber ? phoneNumber : "",
+        phone ? phone : phoneNumber ? phoneNumber : '',
         isAdmin,
         state,
       ]);
       rowItem.push(item);
     });
-    console.log("row", row);
+    console.log('row', row);
     temp.tableData = row;
     temp.item = rowItem;
     setTableData(temp);
@@ -128,12 +116,12 @@ const OrgInstructorListFormModal = ({ route }: any) => {
       getInstructor();
     }
   }, [isFocused, rerender]);
-  const elements = (index, data, item) => {
+  const elements = (index: number, data: any, item: any) => {
     switch (index) {
       case 4:
         return (
           <Text style={{ fontSize: 13, marginLeft: 5 }}>
-            {data ? "Admin" : " "}
+            {data ? 'Admin' : ' '}
           </Text>
         );
         break;
@@ -150,7 +138,6 @@ const OrgInstructorListFormModal = ({ route }: any) => {
         );
     }
   };
-  const updateInstructor = () => {};
   return (
     <BackgroundLayout title="Instructors List">
       <AppHeader
@@ -164,7 +151,7 @@ const OrgInstructorListFormModal = ({ route }: any) => {
         <EditOrgInstructorsModal
           userId={userId}
           isAdd={true}
-          orgInfo={route.params.data}
+          orgInfo={route?.params?.data}
           visible={addEditVisible}
           setRerender={() => {
             setRerender(rerender + 1);
@@ -179,13 +166,10 @@ const OrgInstructorListFormModal = ({ route }: any) => {
             let temp = [...instructors];
             temp.push(schema);
             formatTableData(temp);
+          }}
+          setVisible={(value: any) => {
             setaddEditVisible(value);
           }}
-          setVisible={(value, id) => {
-            setaddEditVisible(value);
-            // console.log("length=-------------", temp.result.length);
-          }}
-          updateInstructor={(value) => updateInstructor(value)}
           getInstructor={() => null}
         />
       )}
@@ -193,10 +177,10 @@ const OrgInstructorListFormModal = ({ route }: any) => {
         userId={userId}
         isEdit={true}
         // setRerender={() => setRerender(rerender + 1)}
-        orgInfo={route.params.data}
+        orgInfo={route?.params?.data}
         visible={visible}
         instructors={selectedInstructor}
-        onEdit={(item) => {
+        onEdit={(item: any) => {
           let { firstName, lastName, ...others } = item;
           let schema = {
             firstname: firstName,
@@ -207,7 +191,7 @@ const OrgInstructorListFormModal = ({ route }: any) => {
 
           // console.log("length=-------------", temp.result.length);
           let index = temp.findIndex(
-            (item) => item?.instructorId == selectedInstructor.instructorId
+            (item) => item?.instructorId == selectedInstructor.instructorId,
           );
           let temValue = { ...temp[index] };
           temValue = schema;
@@ -218,7 +202,7 @@ const OrgInstructorListFormModal = ({ route }: any) => {
           formatTableData(temp);
           setVisible(false);
         }}
-        setVisible={(value, id) => {
+        setVisible={(value: any, id: number) => {
           let temp = [...instructors];
           setVisible(value);
           // console.log("length=-------------", temp.result.length);
@@ -244,7 +228,7 @@ const OrgInstructorListFormModal = ({ route }: any) => {
         <ScrollView
           contentContainerStyle={{
             height: height * 0.55,
-            overflow: "hidden",
+            overflow: 'hidden',
             marginTop: 50,
             marginLeft: 15,
           }}
@@ -257,18 +241,18 @@ const OrgInstructorListFormModal = ({ route }: any) => {
               }}
             >
               <TableWrapper style={styles.row}>
-                {tableData.tableHead.map((cellData, cellIndex) => (
+                {tableData.tableHead.map((cellData: any, cellIndex: number) => (
                   <Cell
                     width={
                       cellIndex == 0 || cellIndex == 1
                         ? 60
                         : cellIndex == 2
-                        ? 190
-                        : cellIndex == 3
-                        ? 80
-                        : cellIndex == 4
-                        ? 65
-                        : 45
+                          ? 190
+                          : cellIndex == 3
+                            ? 80
+                            : cellIndex == 4
+                              ? 65
+                              : 45
                     }
                     // widthArr={[
                     //   windowWidth / 4.0,
@@ -295,7 +279,6 @@ const OrgInstructorListFormModal = ({ route }: any) => {
                     ]}
                     textStyle={[
                       styles.tableHeadertext,
-                      false ? { ...styles.textDecoration } : {},
                     ]}
                   />
                 ))}
@@ -307,40 +290,42 @@ const OrgInstructorListFormModal = ({ route }: any) => {
                   nestedScrollEnabled
                   keyboardShouldPersistTaps="handled"
                   data={tableData.tableData}
-                  keyExtractor={(item, index) => index}
+                  // todo ??????
+                  // keyExtractor={(item, index) => index}
                   renderItem={({ item, index }) => {
                     return (
                       <View key={index}>
                         <TableWrapper
                           key={index}
-                          style={{ flexDirection: "row" }}
+                          style={{ flexDirection: 'row' }}
                         >
-                          {item.map((cellData, cellIndex) => {
+                          {item.map((cellData: any, cellIndex: any) => {
                             return (
                               <Cell
                                 style={{
                                   marginLeft: cellIndex < 2 ? 5 : 0,
-                                  textAlign: "center",
+                                  // todo: solve this
+                                  // textAlign: "center",
                                 }}
                                 width={
                                   cellIndex == 0 || cellIndex == 1
                                     ? 60
                                     : cellIndex == 2
-                                    ? 190
-                                    : cellIndex == 3
-                                    ? 80
-                                    : cellIndex == 4
-                                    ? 65
-                                    : 45
+                                      ? 190
+                                      : cellIndex == 3
+                                        ? 80
+                                        : cellIndex == 4
+                                          ? 65
+                                          : 45
                                 }
                                 key={cellIndex}
                                 data={
                                   cellIndex > 3
                                     ? elements(
-                                        cellIndex,
-                                        cellData,
-                                        tableData.item[index]
-                                      )
+                                      cellIndex,
+                                      cellData,
+                                      tableData.item[index],
+                                    )
                                     : cellData
                                 }
                                 textStyle={styles.text}
@@ -357,8 +342,8 @@ const OrgInstructorListFormModal = ({ route }: any) => {
           </View>
         </ScrollView>
 
-        <Text style={[styles.errorText, { textAlign: "center", fontSize: 18 }]}>
-          {"Scroll to the right"}
+        <Text style={[styles.errorText, { textAlign: 'center', fontSize: 18 }]}>
+          {'Scroll to the right'}
         </Text>
       </View>
     </BackgroundLayout>
@@ -368,9 +353,9 @@ export default OrgInstructorListFormModal;
 
 const styles = StyleSheet.create({
   modal: {
-    height: "100%",
-    width: "100%",
-    backgroundColor: "red",
+    height: '100%',
+    width: '100%',
+    backgroundColor: 'red',
     // elevation: 5,
     shadowColor: Colors.primaryGray,
     shadowOffset: {
@@ -396,31 +381,31 @@ const styles = StyleSheet.create({
   },
 
   heading: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginTop: 10,
   },
   item: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "30%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '30%',
   },
   modalButton: {
-    width: "95%",
+    width: '95%',
     marginTop: 10,
   },
   selectInput: {
     marginTop: 10,
   },
   mainAsset: {
-    alignItems: "center",
+    alignItems: 'center',
     height: 300,
-    width: "100%",
+    width: '100%',
     flex: 3,
   },
   mainContent: {
@@ -429,46 +414,46 @@ const styles = StyleSheet.create({
   textContent: {
     fontSize: 16,
     padding: 10,
-    width: "100%",
+    width: '100%',
     borderBottomColor: Colors.lightgray,
     borderBottomWidth: 1,
   },
   extraImages: {
     flex: 1,
-    flexDirection: "row",
-    width: "100%",
+    flexDirection: 'row',
+    width: '100%',
     height: 100,
   },
   centerItems: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
     marginBottom: 80,
   },
   formView: {
     flex: 9,
   },
   bottomView: {
-    width: "100%",
-    flexDirection: "row",
-    position: "absolute",
-    justifyContent: "center",
+    width: '100%',
+    flexDirection: 'row',
+    position: 'absolute',
+    justifyContent: 'center',
     backgroundColor: Colors.transparent,
     bottom: 0,
     height: 50,
   },
   linearBottom: {
-    width: "100%",
+    width: '100%',
 
     height: 50,
   },
   createPostButton: {
     margin: 3,
-    width: "50%",
+    width: '50%',
 
     height: 50,
     right: 0,
@@ -478,14 +463,14 @@ const styles = StyleSheet.create({
   },
   ghostButton: {
     margin: 8,
-    width: "100%",
-    alignSelf: "center",
+    width: '100%',
+    alignSelf: 'center',
   },
   buttonSettings: {
     marginTop: 20,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
 
   formContainer: {
@@ -499,39 +484,39 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   backgroundButton: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 16,
     marginLeft: 10,
     marginTop: 10,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.gray,
-    textAlign: "center",
+    textAlign: 'center',
   },
   selectSettings: {
     marginTop: 18,
   },
   tableHeadertext: {
-    textAlign: "center",
+    textAlign: 'center',
     margin: 6,
     color: Colors.white,
   },
   tableHeadertext0: {
-    textAlign: "center",
+    textAlign: 'center',
     margin: 6,
     color: Colors.black,
   },
@@ -542,7 +527,7 @@ const styles = StyleSheet.create({
     borderTopEndRadius: 5,
     borderBottomEndRadius: 5,
 
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 1,
     shadowRadius: 5,
@@ -551,19 +536,19 @@ const styles = StyleSheet.create({
   tableView: {
     marginTop: 70,
     marginBottom: 50,
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
   },
   row: {
-    display: "flex",
-    flexDirection: "row",
+    display: 'flex',
+    flexDirection: 'row',
     // justifyContent: 'space-between',
     flex: 1,
     backgroundColor: Colors.primary,
   },
   container: {
     flex: 1,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     backgroundColor: Colors.white,
     // marginBottom: 10,
     // borderRadius: 20,
@@ -578,7 +563,7 @@ const styles = StyleSheet.create({
   },
   floatButton: {
     marginTop: 20,
-    alignSelf: "flex-end",
+    alignSelf: 'flex-end',
     marginRight: 10,
     // position: "absolute",
     // bottom: 20,
@@ -592,4 +577,5 @@ const styles = StyleSheet.create({
     shadowRadius: 50,
     elevation: 5,
   },
+  text: {},
 });

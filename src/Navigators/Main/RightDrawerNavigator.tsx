@@ -11,7 +11,7 @@ import {
   CreateActivityScreen,
   CreateGroupScreen,
   InstructorPersonalProfileScreen,
-  InstructorSettingsScreen,
+  InstructorSettingsScreen, InstructorsListScreen,
   OrganizationInfoScreen,
   ReportProblemScreen,
 } from '@/Screens';
@@ -38,6 +38,7 @@ export type MainStackNavigatorParamsList = {
     data: boolean,
   }
   InstructorGroupApprovalNavigator: undefined
+  InstructorList: { data: any }
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
@@ -120,6 +121,15 @@ const RightDrawerNavigator = () => {
           component={InstructorApprovalNavigator}
         />
         <Stack.Screen name="AddMembers" component={AddMembersNavigator} />
+        <Stack.Screen
+          name="InstructorGroupApproval"
+          component={InstructorGroupApprovalNavigator}
+        />
+        <Stack.Screen
+          name="InstructorList"
+          component={InstructorsListScreen}
+        />
+
 
 
         {/*{user_type === "student" && (*/}
@@ -179,15 +189,8 @@ const RightDrawerNavigator = () => {
         {/*/>*/}
 
 
-        <Stack.Screen
-          name="InstructorGroupApproval"
-          component={InstructorGroupApprovalNavigator}
-        />
 
-        {/*<Stack.Screen*/}
-        {/*  name="InstructorList"*/}
-        {/*  component={InstructorsListScreen}*/}
-        {/*/>*/}
+
         {/*<Stack.Screen name="BusInfo" component={OrganizationBusinformation} />*/}
         {/*<Stack.Screen*/}
         {/*  name="ParentDeletePermission"*/}
@@ -204,7 +207,7 @@ const RightDrawerNavigator = () => {
 const Placeholder = () => {
   let useNavigation1: any = useNavigation();
   return <View>
-    <Text onPress={() => useNavigation1.navigate('InstructorGroupApproval')}>
+    <Text onPress={() => useNavigation1.navigate('InstructorList')}>
       Open test page
     </Text>
   </View>;
