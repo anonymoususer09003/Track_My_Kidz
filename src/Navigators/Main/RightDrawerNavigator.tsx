@@ -9,7 +9,7 @@ import {
   ChangePasswordScreen,
   ContactUsScreen,
   CreateActivityScreen,
-  CreateGroupScreen,
+  CreateGroupScreen, InstructorHome,
   InstructorPersonalProfileScreen,
   InstructorSettingsScreen,
   InstructorsListScreen,
@@ -42,6 +42,7 @@ export type MainStackNavigatorParamsList = {
   InstructorGroupApprovalNavigator: undefined
   InstructorList: { data: any }
   BusInfo: { data: { buses: any, schoolId: number } }
+  InstructorHome: undefined
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
@@ -133,7 +134,7 @@ const RightDrawerNavigator = () => {
           component={InstructorsListScreen}
         />
         <Stack.Screen name="BusInfo" component={OrganizationBusinformation} />
-
+        <Stack.Screen name="InstructorHome" component={InstructorHome} />
 
         {/*{user_type === "student" && (*/}
         {/*  <Stack.Screen*/}
@@ -151,7 +152,6 @@ const RightDrawerNavigator = () => {
         {/*  name="StudentActivityDetails"*/}
         {/*  component={StudentActivityDetailsScreen}*/}
         {/*/>*/}
-        {/*<Stack.Screen name="InstructorHome" component={InstructorHome} />*/}
         {/*<Stack.Screen*/}
         {/*  name="InstructorChatNavigator"*/}
         {/*  component={InstructorChatNavigator}*/}
@@ -208,7 +208,7 @@ const Placeholder = () => {
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
 
   return <View>
-    <Text onPress={() => navigation.navigate('BusInfo', { data: { buses: [], schoolId: 1 } })}>
+    <Text onPress={() => navigation.navigate('InstructorHome')}>
       Open test page
     </Text>
   </View>;

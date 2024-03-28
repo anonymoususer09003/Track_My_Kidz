@@ -14,29 +14,17 @@ import {
   View
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { MONTHS } from '@/Constants';
 
 export interface CalendarProps {
   selectedMonth: number;
   selectedDay: number;
   setSelectedMonth: React.Dispatch<React.SetStateAction<number>>;
   setSelectedDay: React.Dispatch<React.SetStateAction<number>>;
-  style: any;
+  style?: any;
 }
 
-const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sept",
-  "Oct",
-  "Nov",
-  "Dec",
-];
+const months = MONTHS
 
 const Calendar = ({
   selectedMonth,
@@ -92,7 +80,7 @@ const Calendar = ({
     }
   };
   const isFirstRender = useRef(true);
-  const ref = useRef();
+  const ref = useRef<any>();
   const focused = useIsFocused();
   const dispatch = useDispatch();
   const [days, setDays] = useState(getDays(months[moment(new Date()).month()]));
@@ -142,7 +130,8 @@ const Calendar = ({
             <FlatList
               horizontal
               ref={ref}
-              keyExtractor={(item, index) => item}
+              //todo ???????
+              // keyExtractor={(item, index) => item}
               data={days}
               getItemLayout={(data, index) => {
                 return { length: 33, index, offset: 33 * index };

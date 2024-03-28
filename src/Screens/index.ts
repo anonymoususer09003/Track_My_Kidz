@@ -36,8 +36,9 @@ export { default as InstructorGroupDeclineScreen } from "./Main/InstructorGroupD
 export { default as InstructorGroupPendingScreen } from "./Main/InstructorGroupPending/InstructorGroupPendingScreen";
 export { default as InstructorsListScreen } from "./Main/InstructorSettings/InstructorOrganizationScreen";
 export { default as OrganizationBusinformation } from "./Main/InstructorSettings/OrganizationBusinformation";
-// export { default as InstructorHome } from "./Main/InstructorHome/HomeScreen";
+export { default as InstructorHome } from "./Main/InstructorHome/HomeScreen";
 // export { default as DragDropStudentScreen } from "./Main/DragDropStudent/DragDropStudentScreen";
+// export { default as InstructorActivityDetailScreen } from "./Main/InstructorActivity/InstructorActivityDetailScreen";
 
 // //PARENT
 // export { default as HomeScreen } from "./Main/Home/HomeScreen";
@@ -69,4 +70,3 @@ export { default as ChangePasswordScreen } from "./Main/Settings/ChangePasswordS
 // export { default as PaymentInfoScreen } from "./PaymentInfo/PaymentInfoScreen";
 export { default as ReportProblemScreen } from "./Main/Settings/ReportProblemScreen";
 export { default as ContactUsScreen } from "./Main/Settings/ContactUsScreen";
-// export { default as InstructorActivityDetailScreen } from "./Main/InstructorActivity/InstructorActivityDetailScreen";
