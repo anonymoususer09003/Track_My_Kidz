@@ -7,7 +7,7 @@ import {
   ActivityDetailsScreen,
   AppListScreen,
   ChangePasswordScreen,
-  ContactUsScreen, CreateActivityScreen,
+  ContactUsScreen, CreateActivityScreen, CreateGroupScreen,
   InstructorPersonalProfileScreen,
   InstructorSettingsScreen,
   OrganizationInfoScreen,
@@ -27,6 +27,7 @@ export type MainStackNavigatorParamsList = {
   InstructorActivityNavigator: undefined
   ActivityDetails: { activity?: any }
   CreateActivity: { isEdit?: boolean, groupId?: string }
+  CreateGroup: { data: { groupId: number, groupName: string } }
 } & ParamListBase;
 
 const RightDrawerNavigator = () => {
@@ -103,6 +104,7 @@ const RightDrawerNavigator = () => {
           component={ActivityDetailsScreen}
         />
         <Stack.Screen name="CreateActivity" component={CreateActivityScreen} />
+        <Stack.Screen name="CreateGroup" component={CreateGroupScreen} />
 
 
         {/*{user_type === "student" && (*/}
@@ -163,7 +165,6 @@ const RightDrawerNavigator = () => {
         {/*  name="StudentLocation"*/}
         {/*  component={StudentLocationScreen}*/}
         {/*/>*/}
-        {/*<Stack.Screen name="CreateGroup" component={CreateGroupScreen} />*/}
 
         {/*<Stack.Screen name="AddMembers" component={AddMembersNavigator} />*/}
 

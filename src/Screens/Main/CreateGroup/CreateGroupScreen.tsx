@@ -1,67 +1,68 @@
-import React, { useEffect, useState } from "react";
-import {
-  useFocusEffect,
-  useNavigation,
-  useIsFocused,
-} from "@react-navigation/native";
-import BackgroundLayout from "@/Components/BackgroundLayout";
-import { Text, Input } from "@ui-kitten/components";
-import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
-import { useDispatch } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Colors from "@/Theme/Colors";
-import { Formik } from "formik";
-import { AppHeader, LinearGradientButton } from "@/Components";
-import { useStateValue } from "@/Context/state/State";
-import { actions } from "@/Context/state/Reducer";
-import { GetOptInGroup } from "@/Services/Group";
-import * as yup from "yup";
+import React, { FC, useEffect, useState } from 'react';
+import { RouteProp, useIsFocused, useNavigation } from '@react-navigation/native';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { Input, Text } from '@ui-kitten/components';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { useDispatch } from 'react-redux';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Colors from '@/Theme/Colors';
+import { Formik } from 'formik';
+import { LinearGradientButton } from '@/Components';
+import { useStateValue } from '@/Context/state/State';
+import { actions } from '@/Context/state/Reducer';
+import { GetGroup, GetOptInGroup } from '@/Services/Group';
+import * as yup from 'yup';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-import { GetGroup } from "@/Services/Group";
-const CreateGroupScreen = ({ route }) => {
+type CreateGroupScreenProps = {
+  route: RouteProp<MainStackNavigatorParamsList, 'CreateGroup'>
+}
+const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
   const isFocused = useIsFocused();
-  const navigation = useNavigation();
-  const [, _dispatch] = useStateValue();
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
+
+  const [, _dispatch] : any= useStateValue();
   const dispatch = useDispatch();
-  const [selectedDependent, setSelectedDependent] = useState(null);
-  const [groupDetail, setGroupDetail] = useState({});
+  const [selectedDependent, setSelectedDependent] = useState<any>(null);
+  const [groupDetail, setGroupDetail] = useState<any>({});
   const ValidationSchema = yup.object().shape({
-    name: yup.string().min(3).max(20).required("Name is required"),
+    name: yup.string().min(3).max(20).required('Name is required'),
   });
-  const [infomation, setInformation] = useState({});
+  const [infomation, setInformation] = useState<any>({});
   const getGroupsOptInDetail = async () => {
     try {
       let res = await GetOptInGroup(route?.params?.data?.groupId);
       setInformation({ ...res, groupName: route?.params?.data?.groupName });
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
 
   const getGroupDetail = async () => {
     GetGroup(route?.params?.data?.groupId)
       .then((res) => {
-        console.log("groupinfo", res);
+        console.log('groupinfo', res);
 
-        let students = res?.studentsGroupList?.map((item) => ({
-          name: item?.firstName + " " + item.lastName,
+        let students = res?.studentsGroupList?.map((item: any) => ({
+          name: item?.firstName + ' ' + item.lastName,
 
           parent1_email: item.parentEmail1,
           parent2_email: item.parentEmail2,
           studentId: item?.studentsGroupId,
         }));
-        let instructors = res?.instructorsGroupList?.map((item, index) => ({
+        let instructors = res?.instructorsGroupList?.map((item: any, index: number) => ({
           firstname: item?.firstName,
           lastname: item?.lastName,
           email: item?.email,
           instructorId: item?.instructorGroupId,
           isEdit: true,
         }));
-        console.log("instructors", instructors);
+        console.log('instructors', instructors);
         setGroupDetail({ instructors, students });
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log('err', err);
       });
   };
 
@@ -79,16 +80,16 @@ const CreateGroupScreen = ({ route }) => {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
   }, [selectedDependent]);
-  console.log("9099090099099", infomation);
+  console.log('9099090099099', infomation);
   return (
     <BackgroundLayout title="Create Group">
       <ScrollView style={styles.layout}>
         <View>
           <Text
-            textBreakStrategy={"highQuality"}
+            textBreakStrategy={'highQuality'}
             style={{
-              textAlign: "center",
-              color: "#606060",
+              textAlign: 'center',
+              color: '#606060',
               fontSize: 18,
             }}
           >
@@ -99,10 +100,10 @@ const CreateGroupScreen = ({ route }) => {
             validationSchema={ValidationSchema}
             // validateOnMount={true}
             initialValues={{
-              name: infomation?.groupName || "",
-              instructions: infomation?.instructions || "",
-              disclaimer: infomation?.disclaimer || "",
-              agreement: infomation?.agreement || "",
+              name: infomation?.groupName || '',
+              instructions: infomation?.instructions || '',
+              disclaimer: infomation?.disclaimer || '',
+              agreement: infomation?.agreement || '',
             }}
             onSubmit={(values, { resetForm }) => {
               const data = {
@@ -122,50 +123,49 @@ const CreateGroupScreen = ({ route }) => {
                 payload: data,
               });
 
-              navigation.navigate("AddMembers", {
-                isEdit: route?.params ? true : false,
+              navigation.navigate('AddMembers', {
+                isEdit: !!route?.params,
                 data: { ...route?.params?.data, ...groupDetail },
               });
               resetForm();
             }}
           >
             {({
-              handleChange,
-              handleSubmit,
-              values,
-              errors,
-              isValid,
-              touched,
-              handleBlur,
-            }) => (
+                handleChange,
+                handleSubmit,
+                values,
+                errors,
+                isValid,
+                touched,
+                handleBlur,
+              }) => (
               <>
-                {console.log("values9999", values)}
                 <View style={styles.formContainer}>
                   <Input
                     style={styles.textInput}
-                    textStyle={{ minHeight: 30, textAlignVertical: "center" }}
+                    textStyle={{ minHeight: 30, textAlignVertical: 'center' }}
                     placeholder="Group name*"
-                    onBlur={handleBlur("name")}
-                    onChangeText={handleChange("name")}
+                    onBlur={handleBlur('name')}
+                    onChangeText={handleChange('name')}
                     value={values.name}
                   />
                   {errors.name && touched.name ? (
-                    <Text style={styles.errorText}>{errors.name}</Text>
+                    <Text style={styles.errorText}>{String(errors.name)}</Text>
                   ) : null}
                   <Input
                     style={styles.textArea}
-                    textStyle={{ minHeight: 70, textAlignVertical: "top" }}
+                    textStyle={{ minHeight: 70, textAlignVertical: 'top' }}
                     placeholder="Instructions"
-                    onChangeText={handleChange("instructions")}
+                    onChangeText={handleChange('instructions')}
                     value={values.instructions}
                     multiline={true}
                     maxLength={500}
                   />
                   <Input
                     style={styles.textArea}
-                    textStyle={{ minHeight: 70, textAlignVertical: "top" }}
+                    textStyle={{ minHeight: 70, textAlignVertical: 'top' }}
                     placeholder="Disclaimer"
-                    onChangeText={handleChange("disclaimer")}
+                    onChangeText={handleChange('disclaimer')}
                     value={values.disclaimer}
                     multiline={true}
                     maxLength={500}
@@ -174,7 +174,7 @@ const CreateGroupScreen = ({ route }) => {
                     style={styles.textArea}
                     textStyle={{ minHeight: 70 }}
                     placeholder="Agreement"
-                    onChangeText={handleChange("agreement")}
+                    onChangeText={handleChange('agreement')}
                     value={values.agreement}
                     multiline={true}
                     maxLength={500}
@@ -185,7 +185,7 @@ const CreateGroupScreen = ({ route }) => {
                       disabled={!isValid}
                       onPress={handleSubmit}
                     >
-                      {route?.params ? "Edit Members" : "Add Members"}
+                      {route?.params ? 'Edit Members' : 'Add Members'}
                     </LinearGradientButton>
                   </View>
                 </View>
@@ -203,7 +203,7 @@ export default CreateGroupScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     paddingTop: 20,
     backgroundColor: Colors.newBackgroundColor,
     borderTopLeftRadius: 30,
@@ -215,22 +215,22 @@ const styles = StyleSheet.create({
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "left",
+    fontWeight: 'bold',
+    textAlign: 'left',
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -245,16 +245,16 @@ const styles = StyleSheet.create({
   },
   buttonSettings: {
     marginTop: 20,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "70%",
-    alignSelf: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '70%',
+    alignSelf: 'center',
   },
   textInput: {
     marginTop: 10,
-    alignSelf: "center",
-    width: "95%",
+    alignSelf: 'center',
+    width: '95%',
     // marginLeft: "5%",
     borderRadius: 8,
     elevation: 2,
@@ -264,12 +264,12 @@ const styles = StyleSheet.create({
 
     borderRadius: 10,
     elevation: 2,
-    width: "95%",
-    alignSelf: "center",
+    width: '95%',
+    alignSelf: 'center',
   },
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
     marginLeft: 20,
     marginTop: 10,
   },
@@ -277,9 +277,9 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     borderRadius: 20,
-    width: "90%",
+    width: '90%',
     height: 40,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
