@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Colors from '@/Theme/Colors';
 import { PersonIcon } from '@/Components/SignUp/icons';
@@ -14,6 +13,9 @@ interface CustomDropdownProps {
 }
 
 const CustomDropdown: React.FC<CustomDropdownProps> = (props) => {
+  const chevronDownIcon = require('@/Assets/Images/chevron-down.png');
+  const chevronUpIcon = require('@/Assets/Images/chevron-up.png');
+
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
@@ -42,12 +44,17 @@ const CustomDropdown: React.FC<CustomDropdownProps> = (props) => {
         <Text style={[styles.selectedValue, { color: Colors.white }]}>
           {selectedValue || props.placeholder}
         </Text>
-        <Icon
-          name={isOpen ? 'chevron-up' : 'chevron-down'}
-          size={18}
-          color={Colors.white}
-          style={styles.rightIcon}
-        />
+        {isOpen ?
+          <Image
+            source={chevronUpIcon}
+            style={styles.rightIcon}
+          />
+          :
+          <Image
+            source={chevronDownIcon}
+            style={styles.rightIcon}
+          />
+        }
       </TouchableOpacity>
 
       {isOpen && (
@@ -99,6 +106,8 @@ const styles = StyleSheet.create({
   },
   rightIcon: {
     marginLeft: 10,
+    height: 18,
+    width: 18,
   },
   dropdownContainer: {
     position: 'absolute',
