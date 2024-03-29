@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
-import TrackPlayer from "react-native-track-player";
-import BackgroundTimer from "react-native-background-timer";
-import BackgroundFetch from "react-native-background-fetch";
+import { useEffect } from 'react';
+import TrackPlayer from 'react-native-track-player';
+import BackgroundTimer from 'react-native-background-timer';
+import BackgroundFetch from 'react-native-background-fetch';
 
 const SilentAudioPlayer = () => {
   useEffect(() => {
@@ -15,7 +15,7 @@ const SilentAudioPlayer = () => {
     TrackPlayer.setupPlayer();
 
     // Start playing the silent audio when background fetch is triggered
-    const handleBackgroundFetch = async (taskId) => {
+    const handleBackgroundFetch = async (taskId: string) => {
       try {
         await TrackPlayer.add(track);
         await TrackPlayer.play();

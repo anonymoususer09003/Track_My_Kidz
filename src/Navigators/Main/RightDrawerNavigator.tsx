@@ -27,6 +27,7 @@ import InstructorApprovalNavigator from '@/Navigators/Main/InstructorApprovalNav
 import AddMembersNavigator from '@/Navigators/Main/AddMembersNavigator';
 import InstructorGroupApprovalNavigator from '@/Navigators/Main/InstructorGroupApprovalNavigator';
 import InstructorActivityNavigator from '@/Navigators/Main/InstructorActivityNavigator';
+import StudentActivityNavigator from '@/Navigators/Main/StudentActivityNavigator';
 
 type InstructorStack = {
   InstructorPersonalProfileScreen: undefined
@@ -59,7 +60,11 @@ type SettingsStack = {
   ContactUs: undefined
 }
 
-export type MainStackNavigatorParamsList = InstructorStack & SettingsStack & ParamListBase;
+type StudentStack = {
+  StudentActivity: undefined
+}
+
+export type MainStackNavigatorParamsList = InstructorStack & SettingsStack & StudentStack & ParamListBase;
 
 const RightDrawerNavigator = () => {
   const dispatch = useDispatch();
@@ -162,17 +167,19 @@ const RightDrawerNavigator = () => {
         <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
         {/*////////////////////////////////////////////*/}
 
+        {/*Settings*/}
+        {user_type === "student" && (
+          <Stack.Screen
+            name="StudentActivity"
+            component={StudentActivityNavigator}
+          />
+        )}
+
 
         {/*{user_type === "parent" && (*/}
         {/*  <Stack.Screen name="Home" component={HomeNavigator} />*/}
         {/*)}*/}
 
-        {/*{user_type === "student" && (*/}
-        {/*  <Stack.Screen*/}
-        {/*    name="StudentActivity"*/}
-        {/*    component={StudentActivityNavigator}*/}
-        {/*  />*/}
-        {/*)}*/}
 
 
         {/*<Stack.Screen*/}
@@ -230,7 +237,7 @@ const Placeholder = () => {
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
 
   return <View>
-    <Text onPress={() => navigation.navigate('InstructorActivityDetail')}>
+    <Text onPress={() => navigation.navigate('StudentActivity')}>
       Open test page
     </Text>
   </View>;

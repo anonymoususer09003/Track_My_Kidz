@@ -8,12 +8,18 @@ import Colors from "@/Theme/Colors";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { TabBar } from "@ui-kitten/components";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { FC, useState } from 'react';
 import { StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+
+type StudentActivityNavigatorProp ={
+  StudentActivity: undefined
+  StudentGroup: undefined
+}
+
 // @refresh reset
-const StudentActivityNavigator = () => {
-  const TabNavigator = createMaterialTopTabNavigator();
+const StudentActivityNavigator: FC = () => {
+  const TabNavigator = createMaterialTopTabNavigator<StudentActivityNavigatorProp>();
   const tabNames = ["Activity", "Group"];
   const [selectedMonth, setSelectedMonth] = useState(
     moment(new Date()).month()
@@ -79,6 +85,7 @@ const StudentActivityNavigator = () => {
           setSelectedMonth={(m)=>{setSelectedMonth(m)
             dispatch(
               ChangeInstructorActivityState.action({
+            // @ts-ignore
                 selectedMonthForFilter: m,
               })
             );
@@ -88,10 +95,11 @@ const StudentActivityNavigator = () => {
             setSelectedDay(d);
             dispatch(
               ChangeInstructorActivityState.action({
+                // @ts-ignore
                 selectedDayForFilter: d,
               })
             );
-          
+
           }}
         />
       )}
@@ -114,7 +122,7 @@ const StudentActivityNavigator = () => {
       </TabNavigator.Navigator>
       <AppHeader
         hideCenterIcon={true}
-        hideCalendar={showFamilyMap ? true : false}
+        hideCalendar={!!showFamilyMap}
         showGlobe={true}
       />
     </BackgroundLayout>

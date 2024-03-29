@@ -57,9 +57,9 @@ export { default as InstructorActivityDetailScreen } from "./Main/InstructorActi
 // export { default as ParentDeletePermission } from "./Main/ParentDeletePermission/ParentDeletePermissionScreen";
 
 // //STUDENT
-// export { default as StudentActivityScreen } from "./Main/StudentActivity/StudentActivityScreen";
+export { default as StudentActivityScreen } from "./Main/StudentActivity/StudentActivityScreen";
+export { default as StudentGroupScreen } from "./Main/StudentGroup/StudentGroupScreen";
 // export { default as StudentActivityDetailsScreen } from "./Main/StudentActivityDetails/StudentActivityDetailsScreen";
-// export { default as StudentGroupScreen } from "./Main/StudentGroup/StudentGroupScreen";
 // export { default as StudentSettingsScreen } from "./Main/StudentSettings/StudentSettingsScreen";
 // export { default as StudentPersonalProfileScreen } from "./Main/StudentSettings/PersonalProfileScreen";
 

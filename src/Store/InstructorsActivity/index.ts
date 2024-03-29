@@ -8,6 +8,6 @@ export default buildSlice("InstructorActivity", [ChangeInstructorActivity], {
 }).reducer;
 
 export interface InstructorState {
-  selectedMonthForFilter: String;
-  selectedDayForFilter: String;
+  selectedMonthForFilter: number;
+  selectedDayForFilter: number;
 }
