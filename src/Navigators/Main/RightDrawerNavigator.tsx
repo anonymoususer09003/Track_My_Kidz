@@ -19,7 +19,10 @@ import {
   NotificationsScreen,
   OrganizationBusinformation,
   OrganizationInfoScreen,
-  ReportProblemScreen, StudentActivityDetailsScreen, StudentPersonalProfileScreen, StudentSettingsScreen,
+  ReportProblemScreen,
+  StudentActivityDetailsScreen,
+  StudentPersonalProfileScreen,
+  StudentSettingsScreen,
 } from '@/Screens';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
@@ -28,6 +31,7 @@ import AddMembersNavigator from '@/Navigators/Main/AddMembersNavigator';
 import InstructorGroupApprovalNavigator from '@/Navigators/Main/InstructorGroupApprovalNavigator';
 import InstructorActivityNavigator from '@/Navigators/Main/InstructorActivityNavigator';
 import StudentActivityNavigator from '@/Navigators/Main/StudentActivityNavigator';
+import HomeNavigator from '@/Navigators/Main/HomeNavigator';
 
 type InstructorStack = {
   InstructorPersonalProfileScreen: undefined
@@ -67,7 +71,11 @@ type StudentStack = {
   StudentPersonalProfile: undefined
 }
 
-export type MainStackNavigatorParamsList = InstructorStack & SettingsStack & StudentStack & ParamListBase;
+type ParentStack = {
+  Home: undefined
+}
+
+export type MainStackNavigatorParamsList = InstructorStack & SettingsStack & StudentStack & ParentStack & ParamListBase;
 
 const RightDrawerNavigator = () => {
   const dispatch = useDispatch();
@@ -90,10 +98,16 @@ const RightDrawerNavigator = () => {
   }
   const Stack = createStackNavigator<MainStackNavigatorParamsList>();
 
+  const initialRoute = {
+    instructor: 'InstructorActivity',
+    student: 'StudentActivity',
+    parent: 'Home',
+  };
 
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
+      initialRouteName={initialRoute[user_type]}
       // drawerContent={(props) => {
       //   rightNavigation = props.navigation;
       //   return <RightDrawerContent {...props} />;
@@ -171,7 +185,7 @@ const RightDrawerNavigator = () => {
         {/*////////////////////////////////////////////*/}
 
         {/*student*/}
-        {user_type === "student" && (
+        {user_type === 'student' && (
           <Stack.Screen
             name="StudentActivity"
             component={StudentActivityNavigator}
@@ -191,12 +205,11 @@ const RightDrawerNavigator = () => {
           component={StudentPersonalProfileScreen}
         />
 
-        {/*{user_type === "parent" && (*/}
-        {/*  <Stack.Screen name="Home" component={HomeNavigator} />*/}
-        {/*)}*/}
 
-
-
+        {/*parent*/}
+        {user_type === 'parent' && (
+          <Stack.Screen name="Home" component={HomeNavigator} />
+        )}
 
         {/*<Stack.Screen*/}
         {/*  name="InstructorChatNavigator"*/}

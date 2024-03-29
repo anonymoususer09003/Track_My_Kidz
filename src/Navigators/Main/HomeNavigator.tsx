@@ -1,18 +1,36 @@
-import React from 'react'
-import {
-    HomeScreen, ImportDependentScreen, StudentLocationScreen
-} from '@/Screens'
-import { createStackNavigator } from '@react-navigation/stack'
-import { AuthStackHeader } from '@/Components'
+import React from 'react';
+import { HomeScreen, ImportDependentScreen } from '@/Screens';
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+import { Text, View } from 'react-native';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
-const HomeNavigatior = createStackNavigator()
+export type HomeNavigationParamsList = {
+  HomeScreen: undefined
+  StudentLocationScreen: { student: any, parent: any }
+  ImportDependentScreen: undefined
+}
+
+const HomeNavigator = createStackNavigator<HomeNavigationParamsList>();
 const HomeStack = () => (
-    <HomeNavigatior.Navigator
-        initialRouteName="HomeScreen"
-    >
-        <HomeNavigatior.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
-        <HomeNavigatior.Screen name="StudentLocationScreen" component={StudentLocationScreen} options={{ headerShown: false }} />
-        <HomeNavigatior.Screen name="ImportDependentScreen" component={ImportDependentScreen} options={{ headerShown: false }} />
-    </HomeNavigatior.Navigator>
-)
-export default HomeStack
+  <HomeNavigator.Navigator
+    initialRouteName="HomeScreen"
+    screenOptions={{ headerShown: false }}
+  >
+    <HomeNavigator.Screen name="HomeScreen" component={HomeScreen} />
+    <HomeNavigator.Screen name="StudentLocationScreen" component={Placeholder} />
+    <HomeNavigator.Screen name="ImportDependentScreen" component={Placeholder} />
+  </HomeNavigator.Navigator>
+);
+
+const Placeholder = () => {
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
+
+  return <View>
+    <Text onPress={() => navigation.navigate('StudentActivity')}>
+      Open test page
+    </Text>
+  </View>;
+};
+
+export default HomeStack;

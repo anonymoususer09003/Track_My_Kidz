@@ -41,9 +41,9 @@ export { default as DragDropStudentScreen } from "./Main/DragDropStudent/DragDro
 export { default as InstructorActivityDetailScreen } from "./Main/InstructorActivity/InstructorActivityDetailScreen";
 
 // //PARENT
-// export { default as HomeScreen } from "./Main/Home/HomeScreen";
-// export { default as StudentLocationScreen } from "./Main/StudentLocation/StudentLocationScreen";
-// export { default as ImportDependentScreen } from "./Main/ImportDependent/ImportDependentScreen";
+export { default as HomeScreen } from "./Main/Home/HomeScreen";
+export { default as ImportDependentScreen } from "./Main/ImportDependent/ImportDependentScreen";
+export { default as StudentLocationScreen } from "./Main/StudentLocation/StudentLocationScreen";
 // export { default as ActivityScreen } from "./Main/Activity/ActivityScreen";
 // export { default as CreateParentActivityScreen } from "./Main/CreateParentActivity/CreateParentActivityScreen";
 // export { default as GroupScreen } from "./Main/Group/GroupScreen";

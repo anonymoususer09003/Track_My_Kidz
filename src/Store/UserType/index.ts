@@ -5,6 +5,8 @@ export default buildSlice('userType', [ChangeUserTypeState], {
     userType: ''
 }).reducer
 
+export type UserType = 'instructor' | 'student' | 'parent'
+
 export interface UserTypeState {
-    userType: string
+    userType: UserType
 }

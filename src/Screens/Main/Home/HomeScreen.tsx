@@ -25,10 +25,14 @@ import MapView, { Circle, Marker } from 'react-native-maps';
 import MaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
 
-const window = Dimensions.get("window");
-const { width, height } = window;
+// const window = Dimensions.get('window');
 
-interface Corditnations {latitude: any, longitude: any   }
+// const { width, height } = window;
+
+interface Coords {
+  latitude: any,
+  longitude: any
+}
 
 const HomeScreen = () => {
   const navigation: any = useNavigation();
@@ -36,11 +40,11 @@ const HomeScreen = () => {
   const swipeableRef = useRef(null);
   const ref = useRef();
   // todo remove any
-  const [_, _dispatch] : any= useStateValue();
+  const [_, _dispatch]: any = useStateValue();
   let row: Array<any> = [];
   let prevOpenedRow: any;
   const dispatch = useDispatch();
-  const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
+  const [initialRoute, setInitialRoute] = useState('FeaturedScreen');
   const [position, setPosition] = useState({
     latitude: 10,
     longitude: 10,
@@ -49,7 +53,7 @@ const HomeScreen = () => {
   });
 
   useEffect(() => {
-    Geolocation.getCurrentPosition((pos: {coords: Corditnations, }) => {
+    Geolocation.getCurrentPosition((pos: { coords: Coords, }) => {
       const crd = pos.coords;
       setPosition({
         latitude: crd.latitude,
@@ -57,7 +61,9 @@ const HomeScreen = () => {
         latitudeDelta: 0.0421,
         longitudeDelta: 0.0421,
       });
-    }, ()=>{}, ()=>{});
+    }, () => {
+    }, () => {
+    });
   }, []);
   useEffect(() => {
 
@@ -68,11 +74,11 @@ const HomeScreen = () => {
   const [getChildrendeviceIds, setChildrensDeviceIds] = useState<any[]>([]);
   const [originalChildren, setOriginalChildren] = useState<any[]>([]);
   const [thumbnail, setThumbnail] = useState<boolean>(false);
-  const [searchParam, setSearchParam] = useState<string>("");
+  const [searchParam, setSearchParam] = useState<string>('');
   const [selectedDependent, setSelectedDependent] = useState<any>(null);
   const [parentLatLong, setparentLatLong] = useState<any>();
   const [selectedMonth, setSelectedMonth] = useState<any>(
-    moment(new Date()).month()
+    moment(new Date()).month(),
   );
   const [region, setRegion] = useState({
     latitude: 37.78825,
@@ -82,12 +88,12 @@ const HomeScreen = () => {
   });
   const [studentsEmails, setStudentsEmail] = useState<any[]>([]);
   const [originalStudentsEmails, setOriginalStudentsEmail] = useState<any[]>([]);
-  const [selectedDay, setSelectedDay] = useState<any>(moment().format("D"));
+  const [selectedDay, setSelectedDay] = useState<any>(moment().format('D'));
   const [showChildFilter, setShowChildFilter] = useState(false);
-  const [selectedChild, setSelectedChild] = useState("All");
-  const [activities, setActivities] = useState([]);
+  const [selectedChild, setSelectedChild] = useState('All');
+  // const [activities, setActivities] = useState([]);
   const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
+    (state: { user: UserState }) => state.user.item,
   );
   const socketRef = useRef<any>();
 
@@ -102,20 +108,20 @@ const HomeScreen = () => {
       dispatch(
         ChangeModalState.action({
           parentPaymentModalVisibility: true,
-        })
+        }),
       );
     }
   };
   const getParentInfo = async () => {
     const userId = await loadUserId();
 
-    if (!userId) return
+    if (!userId) return;
 
     GetParent(userId)
       .then((res) => {
         setparentLatLong(res.data);
       })
-      .catch((err) => console.log("error", err));
+      .catch((err) => console.log('error', err));
   };
 
   useEffect(() => {
@@ -124,7 +130,7 @@ const HomeScreen = () => {
   }, []);
 
   const isCalendarVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.showCalendar
+    (state: { modal: ModalState }) => state.modal.showCalendar,
   );
   const closeRow = (index: number) => {
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
@@ -159,7 +165,7 @@ const HomeScreen = () => {
       setStudentsEmail(temp);
       setChildren(res);
     } catch (err) {
-      console.log("err in children", err);
+      console.log('err in children', err);
     }
   };
   const loadUserDetails = async () => {
@@ -167,18 +173,18 @@ const HomeScreen = () => {
       .then((res) => {
         getChildrens(res?.referenceCode);
       })
-      .catch((err) => console.log("loadUserDetails", err));
+      .catch((err) => console.log('loadUserDetails', err));
   };
 
   useEffect(() => {
     if (focused) {
       loadUserDetails();
     } else {
-      setSelectedChild("All");
+      setSelectedChild('All');
       setShowChildFilter(false);
     }
     return () => {
-      setSelectedChild("All");
+      setSelectedChild('All');
       setShowChildFilter(false);
     };
   }, [focused]);
@@ -207,7 +213,7 @@ const HomeScreen = () => {
   // };
   const subscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
-    console.log("Update Received", messageBody);
+    console.log('Update Received', messageBody);
     setTrackingList({
       ...trackingList,
       [messageBody.deviceId]: {
@@ -334,15 +340,15 @@ const HomeScreen = () => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
-      extrapolate: "clamp",
+      extrapolate: 'clamp',
     });
 
     return (
       <View
         style={{
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         {/* <TouchableOpacity
@@ -365,8 +371,8 @@ const HomeScreen = () => {
           }}
           style={{
             padding: 5,
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: 'center',
+            justifyContent: 'center',
             marginBottom: 15,
           }}
         >
@@ -381,11 +387,11 @@ const HomeScreen = () => {
           <TouchableOpacity
             style={{
               padding: 5,
-              alignItems: "center",
-              justifyContent: "center",
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             onPress={() => {
-              navigation.navigate("StudentLocationScreen", {
+              navigation.navigate('StudentLocationScreen', {
                 student: item,
                 parent: parentLatLong,
               });
@@ -405,14 +411,14 @@ const HomeScreen = () => {
 
   const [seconds, setSeconds] = useState<number>(0);
 
-useEffect(()=>{
-  const interval = setInterval(()=>{
-    console.log("test");
-  },1000);
-  return () => {
-    clearInterval(interval);
-  }
-},[]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('test');
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
 
   return (
@@ -435,7 +441,7 @@ useEffect(()=>{
       )}
       <AppHeader
         // title="Home"
-        onAddPress={() => navigation.navigate("CreateParentActivity")}
+        onAddPress={() => navigation.navigate('CreateParentActivity')}
         thumbnail={thumbnail}
         setThumbnail={(value) => setThumbnail(!!(value))}
         hideCalendar={!thumbnail}
@@ -459,7 +465,7 @@ useEffect(()=>{
           dispatch(
             ChangeModalState.action({
               showCalendar: false,
-            })
+            }),
           );
         }}
         thumbnail={thumbnail}
@@ -468,7 +474,7 @@ useEffect(()=>{
         showDropdown={showChildFilter}
         setShowDropdown={(value) => {
           if (showChildFilter) {
-            setSelectedChild("All");
+            setSelectedChild('All');
           }
           setShowChildFilter(value);
         }}
@@ -522,9 +528,9 @@ useEffect(()=>{
               <View
                 style={{
                   minHeight: 50,
-                  width: "95%",
+                  width: '95%',
                   marginTop: 5,
-                  alignSelf: "center",
+                  alignSelf: 'center',
                 }}
               >
                 <View style={styles.buttonText}>
@@ -540,7 +546,7 @@ useEffect(()=>{
                       dispatch(
                         ChangeModalState.action({
                           addStudentModal: true,
-                        })
+                        }),
                       );
                     }}
                   >
@@ -552,7 +558,7 @@ useEffect(()=>{
 
             <FlatList
               data={children}
-              style={{ padding: 10, width: "100%" }}
+              style={{ padding: 10, width: '100%' }}
               renderItem={({ item, index }) => (
                 <Swipeable
                   ref={(ref) => (row[index] = ref)}
@@ -565,12 +571,12 @@ useEffect(()=>{
                       styles.item,
                       {
                         backgroundColor: !item.approve
-                          ? "#fff"
+                          ? '#fff'
                           : index % 3 === 0
-                          ? "lightgreen"
-                          : index % 2 === 0
-                          ? "#F6DDCC"
-                          : "#fff",
+                            ? 'lightgreen'
+                            : index % 2 === 0
+                              ? '#F6DDCC'
+                              : '#fff',
                       },
                     ]}
                     onPress={() => {
@@ -578,21 +584,21 @@ useEffect(()=>{
                         type: actions.SET_SELECTED_CHILD,
                         payload: item,
                       });
-                      navigation.navigate("Activity", {
+                      navigation.navigate('Activity', {
                         dependent: item,
-                        setThumbnail:()=>setThumbnail(true),
+                        setThumbnail: () => setThumbnail(true),
                       });
                     }}
                   >
                     <View
-                      style={[styles.row, { justifyContent: "space-between" }]}
+                      style={[styles.row, { justifyContent: 'space-between' }]}
                     >
                       <Text
-                        style={[styles.text, { fontWeight: "600" }]}
+                        style={[styles.text, { fontWeight: '600' }]}
                       >{`${item.firstname} ${item.lastname}`}</Text>
                     </View>
                     <Text style={styles.text}>{`${
-                      (!!item.chidlSchool && item.childSchool) || ""
+                      (!!item.chidlSchool && item.childSchool) || ''
                     }`}</Text>
 
                     {item?.status ? (
@@ -630,8 +636,8 @@ useEffect(()=>{
             {children
               .filter(
                 (item) =>
-                  trackingList[item.childDevice]?.lat != "undefined" &&
-                  trackingList[item.childDevice]?.lat != null
+                  trackingList[item.childDevice]?.lat != 'undefined' &&
+                  trackingList[item.childDevice]?.lat != null,
               )
               .map((item, index) => {
                 let latitude = trackingList[item.childDevice]?.lat;
@@ -652,13 +658,13 @@ useEffect(()=>{
                         }}
                         radius={item?.allowedDistance || 50}
                         strokeWidth={10}
-                        strokeColor={"red"}
-                        fillColor={"rgba(230,238,255,0.5)"}
+                        strokeColor={'red'}
+                        fillColor={'rgba(230,238,255,0.5)'}
                       />
                     )}
 
                     <Marker
-                      onSelect={() => console.log("pressed")}
+                      onSelect={() => console.log('pressed')}
                       onPress={() => {
                         // todo: uncomment this
                         // ref.current.fitToSuppliedMarkers(
@@ -672,7 +678,7 @@ useEffect(()=>{
                         //         : 10,
                         //     },
                         //   ]
-                          // false, // not animated
+                        // false, // not animated
                         // );
                       }}
                       identifier={item?.email}
@@ -692,33 +698,33 @@ useEffect(()=>{
                             // height: ,
                             // width: 100,
                             borderRadius: 20,
-                            overflow: "hidden",
+                            overflow: 'hidden',
                             // top: 33,
                             // zIndex: 10,
                           }}
                         >
-                          {item?.studentImage == "" && (
+                          {item?.studentImage == '' && (
                             <View
                               style={{
                                 // height: "100%",
                                 // width: "100%",
                                 borderRadius: 20,
                                 backgroundColor: Colors.primary,
-                                justifyContent: "center",
-                                alignItems: "center",
+                                justifyContent: 'center',
+                                alignItems: 'center',
                               }}
                             >
                               <Text style={{ color: Colors.white }}>
                                 {item?.firstname
                                   ?.substring(0, 1)
-                                  ?.toUpperCase() || ""}
+                                  ?.toUpperCase() || ''}
                                 {item?.lastname
                                   ?.substring(0, 1)
-                                  ?.toUpperCase() || ""}
+                                  ?.toUpperCase() || ''}
                               </Text>
                             </View>
                           )}
-                          {item?.studentImage != "" && (
+                          {item?.studentImage != '' && (
                             <Image
                               source={{
                                 uri: item?.studentImage,
@@ -753,20 +759,20 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     backgroundColor: Colors.newBackgroundColor,
   },
   item: {
     borderRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginVertical: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     padding: 10,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 16,
@@ -777,34 +783,34 @@ const styles = StyleSheet.create({
     color: Colors.white,
     zIndex: -1,
     padding: 20,
-    width: "100%",
+    width: '100%',
     backgroundColor: Colors.primary,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   day: {
     width: 40,
     height: 40,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderWidth: 0.5,
     marginTop: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   buttonText: {
     flex: 1,
     borderRadius: 8,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     margin: 2,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
   },
 });
