@@ -59,9 +59,9 @@ export { default as InstructorActivityDetailScreen } from "./Main/InstructorActi
 // //STUDENT
 export { default as StudentActivityScreen } from "./Main/StudentActivity/StudentActivityScreen";
 export { default as StudentGroupScreen } from "./Main/StudentGroup/StudentGroupScreen";
-// export { default as StudentActivityDetailsScreen } from "./Main/StudentActivityDetails/StudentActivityDetailsScreen";
-// export { default as StudentSettingsScreen } from "./Main/StudentSettings/StudentSettingsScreen";
-// export { default as StudentPersonalProfileScreen } from "./Main/StudentSettings/PersonalProfileScreen";
+export { default as StudentActivityDetailsScreen } from "./Main/StudentActivityDetails/StudentActivityDetailsScreen";
+export { default as StudentSettingsScreen } from "./Main/StudentSettings/StudentSettingsScreen";
+export { default as StudentPersonalProfileScreen } from "./Main/StudentSettings/PersonalProfileScreen";
 
 // //SETTINGS
 export { default as AppListScreen } from "./Main/Settings/AppListScreen";

@@ -19,7 +19,7 @@ import {
   NotificationsScreen,
   OrganizationBusinformation,
   OrganizationInfoScreen,
-  ReportProblemScreen,
+  ReportProblemScreen, StudentActivityDetailsScreen, StudentPersonalProfileScreen, StudentSettingsScreen,
 } from '@/Screens';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
@@ -62,6 +62,9 @@ type SettingsStack = {
 
 type StudentStack = {
   StudentActivity: undefined
+  StudentActivityDetails: undefined
+  StudentSettings: undefined
+  StudentPersonalProfile: undefined
 }
 
 export type MainStackNavigatorParamsList = InstructorStack & SettingsStack & StudentStack & ParamListBase;
@@ -167,14 +170,26 @@ const RightDrawerNavigator = () => {
         <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
         {/*////////////////////////////////////////////*/}
 
-        {/*Settings*/}
+        {/*student*/}
         {user_type === "student" && (
           <Stack.Screen
             name="StudentActivity"
             component={StudentActivityNavigator}
           />
         )}
+        <Stack.Screen
+          name="StudentActivityDetails"
+          component={StudentActivityDetailsScreen}
+        />
+        <Stack.Screen
+          name="StudentSettings"
+          component={StudentSettingsScreen}
+        />
 
+        <Stack.Screen
+          name="StudentPersonalProfile"
+          component={StudentPersonalProfileScreen}
+        />
 
         {/*{user_type === "parent" && (*/}
         {/*  <Stack.Screen name="Home" component={HomeNavigator} />*/}
@@ -182,10 +197,7 @@ const RightDrawerNavigator = () => {
 
 
 
-        {/*<Stack.Screen*/}
-        {/*  name="StudentActivityDetails"*/}
-        {/*  component={StudentActivityDetailsScreen}*/}
-        {/*/>*/}
+
         {/*<Stack.Screen*/}
         {/*  name="InstructorChatNavigator"*/}
         {/*  component={InstructorChatNavigator}*/}
@@ -199,18 +211,12 @@ const RightDrawerNavigator = () => {
         {/*<Stack.Screen name="Approval" component={ApprovalNavigator} />*/}
 
         {/*<Stack.Screen name="Settings" component={SettingsScreen} />*/}
-        {/*<Stack.Screen*/}
-        {/*  name="StudentSettings"*/}
-        {/*  component={StudentSettingsScreen}*/}
-        {/*/>*/}
+
         {/*<Stack.Screen*/}
         {/*  name="PersonalProfile"*/}
         {/*  component={PersonalProfileScreen}*/}
         {/*/>*/}
-        {/*<Stack.Screen*/}
-        {/*  name="StudentPersonalProfile"*/}
-        {/*  component={StudentPersonalProfileScreen}*/}
-        {/*/>*/}
+
 
         {/*<Stack.Screen name="ActivationCode" component={ActivationCodeScreen} />*/}
         {/*<Stack.Screen name="DependentInfo" component={DependentInfoScreen} />*/}

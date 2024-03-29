@@ -1,113 +1,85 @@
-import React, {ReactElement, ReactText, useEffect, useState} from 'react';
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-  Image,
-} from 'react-native';
-import {useTheme} from '@/Theme';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {
-  Button,
-  Card,
-  CheckBox,
-  Icon,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Text,
-} from '@ui-kitten/components';
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '@/Theme';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Button, ButtonElement, ButtonProps, Icon, Input, Text } from '@ui-kitten/components';
 import ChangeUserState from '@/Store/User/FetchOne';
 import fetchOneUserService from '@/Services/User/FetchOne';
-import {ImagePickerModal} from '@/Modals';
+import { ImagePickerModal } from '@/Modals';
 import FA5 from 'react-native-vector-icons/FontAwesome5';
-import ProfileIcon from 'react-native-vector-icons/EvilIcons';
 import ImagePicker from 'react-native-image-crop-picker';
-import {AppHeader, ProfileAvatarPicker} from '@/Components';
-
-import {
-  ImagePickerResponse,
-  launchImageLibrary,
-} from 'react-native-image-picker';
-import {loadUserId} from '@/Storage/MainAppStorage';
-import {UpdateUser} from '../../../Services/SettingsServies';
-import {Formik} from 'formik';
+import { AppHeader, ProfileAvatarPicker } from '@/Components';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import { UpdateUser } from '../../../Services/SettingsServies';
+import { Formik } from 'formik';
 import * as yup from 'yup';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-// @ts-ignore
-import {useSelector, useDispatch} from 'react-redux';
-import {UserState} from '@/Store/User';
-import {PlaceState} from '@/Store/Places';
-import {GetAllCities} from '@/Services/PlaceServices';
-import FetchOne from '@/Store/User/FetchOne';
+import { useDispatch, useSelector } from 'react-redux';
+import { UserState } from '@/Store/User';
 import Colors from '@/Theme/Colors';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 
 const PersonalProfileScreen = () => {
   const userIcon = require('@/Assets/Images/approval_icon2.png');
   const phone = require('@/Assets/Images/phone.png');
-  const marker = require('@/Assets/Images/marker.png');
+  // const marker = require('@/Assets/Images/marker.png');
   const email = require('@/Assets/Images/email.png');
-  const {Layout} = useTheme();
-  const [selectedImage, setSelectedImage] = React.useState('');
+  const { Layout } = useTheme();
+  const [selectedImage, setSelectedImage] = React.useState<string>('');
 
-  const [uploadedImage, setUploadedImage] = React.useState();
-  const [languages, setLanguages] = useState<Array<ReactText>>(['English']);
+  const [uploadedImage, setUploadedImage] = React.useState<any>();
+  // const [languages, setLanguages] = useState<Array<ReactText>>(['English']);
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
-  const countries = useSelector(
-    (state: {places: PlaceState}) => state.places.countries,
-  );
-  const [isEditMode, setisEditMode] = useState(false);
-  const [isSending, setisSending] = useState(false);
-  const [isSent, setisSent] = useState(false);
-  const [userId, setuserId] = useState(null);
-  const [visible, setVisible] = useState(false);
-  const user = useSelector((state: {user: UserState}) => state.user.item);
+  // const countries = useSelector(
+  //   (state: { places: PlaceState }) => state.places.countries,
+  // );
+  const [isEditMode, setisEditMode] = useState<boolean>(false);
+  const [isSending, setisSending] = useState<boolean>(false);
+  // const [isSent, setisSent] = useState(false);
+  const [userId, setuserId] = useState<any>(null);
+  const [visible, setVisible] = useState<boolean>(false);
+  const user: any = useSelector((state: { user: UserState }) => state.user.item);
   const isLoading = useSelector(
-    (state: {user: UserState}) => state.user.fetchOne.loading,
+    (state: { user: UserState }) => state.user.fetchOne.loading,
   );
   const dispatch = useDispatch();
 
-  const renderPersonIcon = (props: any) => (
+  const renderPersonIcon = () => (
     <Image
       source={userIcon}
-      style={{height: 18, width: 18, marginRight: 10}}
+      style={{ height: 18, width: 18, marginRight: 10 }}
       resizeMode="contain"
     />
   );
-  const renderLocationIcon = (props: any) => (
-    <Image
-      source={marker}
-      style={{height: 20, width: 20}}
-      resizeMode="contain"
-    />
-  );
-  const renderEmailIcon = (props: any) => (
+  // const renderLocationIcon = (props: any) => (
+  //   <Image
+  //     source={marker}
+  //     style={{ height: 20, width: 20 }}
+  //     resizeMode="contain"
+  //   />
+  // );
+  const renderEmailIcon = () => (
     <Image
       source={email}
-      style={{height: 18, width: 18, marginRight: 12}}
+      style={{ height: 18, width: 18, marginRight: 12 }}
       resizeMode="contain"
     />
   );
-  const renderPhoneIcon = (props: any) => (
+  const renderPhoneIcon = () => (
     <Image
       source={phone}
-      style={{height: 20, width: 20, marginRight: 10}}
+      style={{ height: 20, width: 20, marginRight: 10 }}
       resizeMode="contain"
     />
   );
 
-  const renderSchoolIcon = (props: any) => (
+  const renderSchoolIcon = () => (
     <FA5
       name="school"
       size={20}
-      style={{height: 20, width: 20, marginRight: 10}}
+      style={{ height: 20, width: 20, marginRight: 10 }}
       color={Colors.secondaryDark}
-      resizeMode="contain"
+      // todo: check if it works
+      // resizeMode="contain"
     />
   );
   const getUserId = async () => {
@@ -120,9 +92,7 @@ const PersonalProfileScreen = () => {
     getUserId();
   }, []);
 
-  function getUriSource(): any {
-    return {uri: selectedImage};
-  }
+
   const onPasswordIconPress = (): void => {
     setPasswordVisible(!passwordVisible);
   };
@@ -137,28 +107,28 @@ const PersonalProfileScreen = () => {
       loadingLabelText: 'Loading image',
     }).then(image => {
       if (image != null) {
-        const source = {uri: image?.path};
+        const source = { uri: image?.path };
         setUploadedImage(image);
         setSelectedImage(source.uri);
         // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
       }
     });
   };
-  const renderPasswordIcon = (props: any): ReactElement => (
-    <TouchableWithoutFeedback onPress={onPasswordIconPress}>
-      <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
-    </TouchableWithoutFeedback>
-  );
+  // const renderPasswordIcon = (props: any): ReactElement => (
+  //   <TouchableWithoutFeedback onPress={onPasswordIconPress}>
+  //     <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
+  //   </TouchableWithoutFeedback>
+  // );
   const updateProfilePic = async () => {
     let formData = new FormData();
     formData.append(
       'image',
       uploadedImage
         ? {
-            uri: uploadedImage?.path,
-            name: uploadedImage.mime,
-            type: uploadedImage.mime,
-          }
+          uri: uploadedImage?.path,
+          name: uploadedImage.mime,
+          type: uploadedImage.mime,
+        }
         : '',
     );
     formData.append('id', user?.studentId);
@@ -185,7 +155,7 @@ const PersonalProfileScreen = () => {
     //   state: values.state,
     //   city: values.city,
     // };
-    UpdateUser(formData)
+    UpdateUser(formData, 'student')
       .then(async (response: any) => {
         console.log('res', response);
         if (response.status == 200) {
@@ -200,7 +170,7 @@ const PersonalProfileScreen = () => {
           dispatch(
             ChangeUserState.action({
               item: res,
-              fetchOne: {loading: false, error: null},
+              fetchOne: { loading: false, error: null },
             }),
           );
         }
@@ -208,7 +178,7 @@ const PersonalProfileScreen = () => {
       .catch((error: any) => {
         console.log('err', error);
         Alert.alert(error.response.data.title, error.response.data.detail, [
-          {text: 'OK', style: 'cancel'},
+          { text: 'OK', style: 'cancel' },
         ]);
         setisSending(false);
         setisEditMode(!isEditMode);
@@ -239,7 +209,7 @@ const PersonalProfileScreen = () => {
       loadingLabelText: 'Loading image',
     }).then(image => {
       if (image != null) {
-        const source = {uri: image?.path};
+        const source = { uri: image?.path };
         setSelectedImage(source.uri);
       }
     });
@@ -248,21 +218,23 @@ const PersonalProfileScreen = () => {
   const personalProfileValidationSchema = yup.object().shape({
     username: yup
       .string()
-      .min(4, ({min}) => `Username is not up to ${min} characters`)
+      .min(4, ({ min }) => `Username is not up to ${min} characters`)
       .required('Username is required'),
-    school: yup.string().when('professional', {
-      is: (professional: boolean) => professional === true,
-      then: yup.string().min(4).required('Year graduated is required'),
-    }),
-    yearGraduated: yup.string().when('professional', {
-      is: (professional: boolean) => professional === true,
-      then: yup.string().required('Year graduated is required'),
-    }),
+    // todo: check if it is redundant
+    // school: yup.string().when('professional', {
+    //   is: (professional: boolean) => professional === true,
+    //   then: yup.string().min(4).required('Year graduated is required'),
+    // }),
+    // yearGraduated: yup.string().when('professional', {
+    //   is: (professional: boolean) => professional === true,
+    //   then: yup.string().required('Year graduated is required'),
+    // }),
   });
 
-  function getUriSource(): any {
-    return {uri: selectedImage};
-  }
+  // function getUriSource(): any {
+  //   return { uri: selectedImage };
+  // }
+
   const renderEditButtonElement = (): ButtonElement => {
     const buttonElement: React.ReactElement<ButtonProps> =
       renderEditAvatarButton();
@@ -290,7 +262,7 @@ const PersonalProfileScreen = () => {
         </View>
       ) : (
         <BackgroundLayout title="Profile">
-          <View style={{width: '100%', marginBottom: 20}}>
+          <View style={{ width: '100%', marginBottom: 20 }}>
             {(selectedImage != '' || user?.studentPhoto.length > 0) && (
               <ProfileAvatarPicker
                 style={styles.profileImage}
@@ -299,10 +271,10 @@ const PersonalProfileScreen = () => {
                   uri:
                     selectedImage ||
                     user?.studentPhoto + '?time' + new Date().getTime(),
-                  headers: {Pragma: 'no-cache'},
+                  headers: { Pragma: 'no-cache' },
                 }}
                 // source={{ uri: selectedImage || user?.studentPhoto }}
-                editButton={true ? renderEditAvatarButton : null}
+                editButton={renderEditAvatarButton}
               />
             )}
             {user?.studentPhoto == null && selectedImage == '' && (
@@ -315,11 +287,11 @@ const PersonalProfileScreen = () => {
                     backgroundColor: Colors.lightgray,
                   },
                 ]}>
-                <Text style={{fontSize: 30}}>
+                <Text style={{ fontSize: 30 }}>
                   {user?.firstname?.substring(0, 1)?.toUpperCase()}{' '}
                   {user?.lastname?.substring(0, 1)?.toUpperCase()}
                 </Text>
-                {true && renderEditButtonElement()}
+                {renderEditButtonElement()}
               </View>
             )}
           </View>
@@ -346,23 +318,23 @@ const PersonalProfileScreen = () => {
                     parentemail1: user?.parentemail1 || '',
                     parentemail2: user?.parentemail2 || '',
                   }}
-                  onSubmit={(values, {resetForm}) => {
+                  onSubmit={(values: any) => {
                     let formData = new FormData();
                     formData.append(
                       'image',
                       uploadedImage
                         ? {
-                            uri: uploadedImage?.path,
-                            name: uploadedImage.mime,
-                            type: uploadedImage.mime,
-                          }
+                          uri: uploadedImage?.path,
+                          name: uploadedImage.mime,
+                          type: uploadedImage.mime,
+                        }
                         : {
-                            uri:
-                              user?.studentPhoto ||
-                              'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
-                            name: 'avatar',
-                            type: 'image/png',
-                          },
+                          uri:
+                            user?.studentPhoto ||
+                            'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
+                          name: 'avatar',
+                          type: 'image/png',
+                        },
                     );
                     formData.append('id', user.studentId);
                     formData.append('parentId', user?.parentId);
@@ -386,7 +358,7 @@ const PersonalProfileScreen = () => {
                     //   state: values.state,
                     //   city: values.city,
                     // };
-                    UpdateUser(formData)
+                    UpdateUser(formData, 'student')
                       .then((response: any) => {
                         if (response.status == 200) {
                           setisEditMode(false);
@@ -398,20 +370,18 @@ const PersonalProfileScreen = () => {
                         Alert.alert(
                           error.response.data.title,
                           error.response.data.detail,
-                          [{text: 'OK', style: 'cancel'}],
+                          [{ text: 'OK', style: 'cancel' }],
                         );
                         setisSending(false);
                         setisEditMode(!isEditMode);
                       });
                   }}>
                   {({
-                    handleChange,
-                    handleSubmit,
-                    setFieldValue,
-                    values,
-                    errors,
-                    touched,
-                  }) => (
+                      handleChange,
+                      handleSubmit,
+                      setFieldValue,
+                      values,
+                    }) => (
                     <>
                       {isSending ? (
                         <View style={styles.sppinerContainer}>
@@ -419,11 +389,11 @@ const PersonalProfileScreen = () => {
                         </View>
                       ) : (
                         <>
-                          <View style={{flexDirection: 'column'}}>
+                          <View style={{ flexDirection: 'column' }}>
                             <Text style={styles.editLabel}>Email</Text>
                             <View style={styles.editField}>
                               {renderEmailIcon()}
-                              <Text style={{fontSize: 15}}>{values.email}</Text>
+                              <Text style={{ fontSize: 15 }}>{values.email}</Text>
                             </View>
                           </View>
                           <View
@@ -442,7 +412,7 @@ const PersonalProfileScreen = () => {
 
                                 <View style={styles.editField}>
                                   {renderPersonIcon()}
-                                  <Text style={{fontSize: 15}}>
+                                  <Text style={{ fontSize: 15 }}>
                                     {' '}
                                     {values.firstName}
                                   </Text>
@@ -470,7 +440,7 @@ const PersonalProfileScreen = () => {
 
                                 <View style={styles.editField}>
                                   {renderPersonIcon()}
-                                  <Text style={{fontSize: 15}}>
+                                  <Text style={{ fontSize: 15 }}>
                                     {values.lastName}
                                   </Text>
                                 </View>
@@ -488,11 +458,11 @@ const PersonalProfileScreen = () => {
                             )}
                           </View>
                           {!isEditMode ? (
-                            <View style={{flexDirection: 'column'}}>
+                            <View style={{ flexDirection: 'column' }}>
                               <Text style={styles.editLabel}>School</Text>
                               <View style={styles.editField}>
                                 {renderSchoolIcon()}
-                                <Text style={{fontSize: 15}}>
+                                <Text style={{ fontSize: 15 }}>
                                   {values.school}
                                 </Text>
                               </View>
@@ -526,44 +496,45 @@ const PersonalProfileScreen = () => {
                           />
                         )} */}
 
-                          <View style={{flexDirection: 'column'}}>
+                          <View style={{ flexDirection: 'column' }}>
                             <Text style={styles.editLabel}>
                               Parent 1/Guardian 1 Email
                             </Text>
                             <View style={styles.editField}>
                               {renderEmailIcon()}
-                              <Text style={{fontSize: 15}}>
+                              <Text style={{ fontSize: 15 }}>
                                 {values.parentemail1}
                               </Text>
                             </View>
                           </View>
 
-                          <View style={{flexDirection: 'column'}}>
+                          <View style={{ flexDirection: 'column' }}>
                             <Text style={styles.editLabel}>
                               Parent 2/Guardian 2 Email
                             </Text>
                             <View style={styles.editField}>
                               {renderEmailIcon()}
-                              <Text style={{fontSize: 15}}>
+                              <Text style={{ fontSize: 15 }}>
                                 {values.parentemail2}
                               </Text>
                             </View>
                           </View>
 
-                          <View style={{flexDirection: 'column'}}>
+                          <View style={{ flexDirection: 'column' }}>
                             <Text style={styles.editLabel}>Phone Number</Text>
                             <View style={styles.editField}>
                               {renderPhoneIcon()}
-                              <Text style={{fontSize: 15}}>{values.phone}</Text>
+                              <Text style={{ fontSize: 15 }}>{values.phone}</Text>
                             </View>
                           </View>
 
                           {isEditMode ? (
-                            <View style={{marginTop: 10}}>
+                            <View style={{ marginTop: 10 }}>
                               <View style={styles.background}>
                                 <TouchableOpacity
                                   style={styles.background}
-                                  onPress={handleSubmit}>
+                                  onPress={(event: any) => handleSubmit(event)}
+                                >
                                   <Text style={styles.button}>Submit</Text>
                                 </TouchableOpacity>
                               </View>
@@ -578,15 +549,15 @@ const PersonalProfileScreen = () => {
                                   setFieldValue('city', user?.city);
                                   setisEditMode(false);
                                 }}
-                                style={{borderRadius: 10, width: '100%'}}>
+                                style={{ borderRadius: 10, width: '100%' }}>
                                 Cancel
                               </Button>
                             </View>
                           ) : (
-                            <View style={{marginTop: 10}}></View>
+                            <View style={{ marginTop: 10 }}></View>
                           )}
 
-                          <View style={{height: 100}} />
+                          <View style={{ height: 100 }} />
                         </>
                       )}
                     </>
@@ -716,23 +687,24 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     bottom: 0,
   },
-  profileAvatar: {
-    width: 116,
-    height: 116,
-    borderRadius: 58,
-    alignSelf: 'center',
-    backgroundColor: 'color-primary-default',
-    tintColor: 'background-basic-color-1',
-  },
-  profileImage: {
-    width: 116,
-    height: 116,
-    borderRadius: 58,
-    alignSelf: 'center',
-  },
-  editAvatarButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
+  // todo check if this is correct styles
+  // profileAvatar: {
+  //   width: 116,
+  //   height: 116,
+  //   borderRadius: 58,
+  //   alignSelf: 'center',
+  //   backgroundColor: 'color-primary-default',
+  //   tintColor: 'background-basic-color-1',
+  // },
+  // profileImage: {
+  //   width: 116,
+  //   height: 116,
+  //   borderRadius: 58,
+  //   alignSelf: 'center',
+  // },
+  // editAvatarButton: {
+  //   width: 40,
+  //   height: 40,
+  //   borderRadius: 20,
+  // },
 });

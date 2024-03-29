@@ -1,36 +1,42 @@
-import {useTheme} from '@/Theme';
-import {Card, Icon, Modal, Spinner} from '@ui-kitten/components';
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { useTheme } from '@/Theme';
+import { Card, Icon, Modal, Spinner } from '@ui-kitten/components';
+import React, { FC, useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import BackgroundService from 'react-native-background-actions';
 import Share from 'react-native-share';
 // @ts-ignore
-import {AppHeader, LinearGradientButton} from '@/Components';
+import { AppHeader, LinearGradientButton } from '@/Components';
 import BackgroundLayout from '@/Components/BackgroundLayout';
-import {TwoFactorAuthenticationModal, VerifyYourselfModal} from '@/Modals';
+import { TwoFactorAuthenticationModal, VerifyYourselfModal } from '@/Modals';
 import LogoutStore from '@/Store/Authentication/LogoutStore';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
-import {UserState} from '@/Store/User';
+import { UserState } from '@/Store/User';
 import ChangeUserState from '@/Store/UserType/ChangeUserTypeState';
 import Colors from '@/Theme/Colors';
 import Toast from 'react-native-toast-message';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RouteProp } from '@react-navigation/native';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
+type StudentSettingsScreenProps = {
+  navigation: StackNavigationProp<MainStackNavigatorParamsList, 'StudentSettings'>
+}
+const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) => {
   const dispatch = useDispatch();
-  const {Layout} = useTheme();
-  const [openDeactivateModal, setopenDeactivateModal] = useState(false);
-  const [canAdvertise, setcanAdvertise] = useState(false);
-  const user = useSelector((state: {user: UserState}) => state.user.item);
+  const { Layout } = useTheme();
+  const [openDeactivateModal, setopenDeactivateModal] = useState<boolean>(false);
+  // const [canAdvertise, setcanAdvertise] = useState(false);
+  const user: any = useSelector((state: { user: UserState }) => state.user.item);
   console.log('user', user);
-  const [twoFAActive, setTwoFAActive] = useState(user?.isTwoFA);
-  const [isSending, setisSending] = useState(false);
-  const [isSent, setisSent] = useState(false);
-  const [verifyType, setVerifyType] = useState('');
+  // const [twoFAActive, setTwoFAActive] = useState(user?.isTwoFA);
+  const [isSending, setisSending] = useState<boolean>(false);
+  const [isSent, setisSent] = useState<boolean>(false);
+  const [verifyType, setVerifyType] = useState<string>('');
 
   useEffect(() => {
     if (verifyType) {
-      dispatch(ChangeModalState.action({verifyYourselfModalVisibility: true}));
+      dispatch(ChangeModalState.action({ verifyYourselfModalVisibility: true }));
     }
   }, [verifyType]);
 
@@ -53,7 +59,8 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
           },
           linkMetadata: {
             title: 'TrackMykidz',
-            subject: 'trackmykidz.com',
+            // todo: solve this
+            // subject: 'trackmykidz.com',
             icon: require('@/Assets/AppIcons/appstore.png'),
           },
         },
@@ -69,9 +76,12 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
           autoHide: true,
           topOffset: 30,
           bottomOffset: 40,
-          onShow: () => {},
-          onHide: () => {},
-          onPress: () => {},
+          onShow: () => {
+          },
+          onHide: () => {
+          },
+          onPress: () => {
+          },
         });
         console.log(res);
       })
@@ -94,7 +104,7 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
         onBackdropPress={() => setopenDeactivateModal(false)}>
         <Card
           disabled={true}
-          style={{minHeight: 100, width: 300, borderRadius: 10}}>
+          style={{ minHeight: 100, width: 300, borderRadius: 10 }}>
           {isSending ? (
             isSent ? (
               <View style={styles.sppinerContainer}>
@@ -109,7 +119,7 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
             )
           ) : (
             <>
-              <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+              <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
                 Account Deactivation
               </Text>
               <Text
@@ -128,7 +138,8 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
                   justifyContent: 'flex-end',
                   marginTop: 15,
                 }}>
-                <TouchableOpacity onPress={() => {}}>
+                <TouchableOpacity onPress={() => {
+                }}>
                   <Text style={styles.modalButton}>OKAY</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setopenDeactivateModal(false)}>
@@ -140,7 +151,7 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
         </Card>
       </Modal>
       <View style={styles.layout}>
-        <View style={[styles.mainLayout, {paddingHorizontal: 20}]}>
+        <View style={[styles.mainLayout, { paddingHorizontal: 20 }]}>
           <TouchableOpacity
             onPress={() => navigation.navigate('StudentPersonalProfile')}
             style={[
@@ -151,7 +162,7 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
                 styles.firstItem,
               ],
             ]}>
-            <Text style={{fontSize: 16}}>Your Profile</Text>
+            <Text style={{ fontSize: 16 }}>Your Profile</Text>
             <Icon
               style={styles.icon}
               fill={Colors.gray}
@@ -168,7 +179,7 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
                 styles.otherItems,
               ],
             ]}>
-            <Text style={{fontSize: 16}}>Reset Password</Text>
+            <Text style={{ fontSize: 16 }}>Reset Password</Text>
             <Icon
               style={styles.icon}
               fill={Colors.gray}
@@ -217,7 +228,7 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
                 styles.otherItems,
               ],
             ]}>
-            <Text style={{fontSize: 16}}>Report a problem</Text>
+            <Text style={{ fontSize: 16 }}>Report a problem</Text>
             <Icon
               style={styles.icon}
               fill={Colors.gray}
@@ -234,7 +245,7 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
                 styles.otherItems,
               ],
             ]}>
-            <Text style={{fontSize: 16}}>Contact Us</Text>
+            <Text style={{ fontSize: 16 }}>Contact Us</Text>
             <Icon
               style={styles.icon}
               fill={Colors.gray}
@@ -251,7 +262,7 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
                 styles.otherItems,
               ],
             ]}>
-            <Text style={{fontSize: 16}}>Share with Friends</Text>
+            <Text style={{ fontSize: 16 }}>Share with Friends</Text>
             <Icon
               style={styles.icon}
               fill={Colors.gray}
@@ -268,7 +279,7 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
                 styles.lastItem,
               ],
             ]}>
-            <Text style={{fontSize: 16}}>Our Other Apps</Text>
+            <Text style={{ fontSize: 16 }}>Our Other Apps</Text>
             <Icon
               style={styles.icon}
               fill={Colors.gray}
@@ -276,7 +287,7 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
             />
           </TouchableOpacity>
           <View style={styles.buttonsContainer}>
-            <View style={{marginVertical: 5}}>
+            <View style={{ marginVertical: 5 }}>
               <LinearGradientButton
                 onPress={async () => {
                   dispatch(
@@ -285,12 +296,14 @@ const StudentSettingsScreen = ({navigation}: {navigation: any}) => {
                     }),
                   );
                   await BackgroundService.stop();
+                  // todo: solve this not a priority
+                  // @ts-ignore
                   dispatch(LogoutStore.action());
                 }}>
                 Log Out
               </LinearGradientButton>
-              <View style={{marginVertical: 5}}>
-                <Text style={[styles.button, {color: Colors.primary}]}>
+              <View style={{ marginVertical: 5 }}>
+                <Text style={[styles.button, { color: Colors.primary }]}>
                   Account can only be deleted by your parent/guardian
                 </Text>
               </View>
