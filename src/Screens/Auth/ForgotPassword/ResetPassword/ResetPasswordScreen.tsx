@@ -1,34 +1,28 @@
-import React, { ReactElement, useState } from "react";
-import {
-  Image,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  View,
-} from "react-native";
-import {
-  Button,
-  Icon,
-  Input,
-  Layout,
-  StyleService,
-  Text,
-  useStyleSheet,
-} from "@ui-kitten/components";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { Formik } from "formik";
-import * as yup from "yup";
-import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
-import { ResetPasswordVerify } from "@/Services/LoginServices";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { useDispatch } from "react-redux";
-import { LinearGradientButton } from "@/Components";
-import FastImage from "react-native-fast-image";
-import Colors from "@/Theme/Colors";
+import React, { FC, ReactElement, useState } from 'react';
+import { Image, KeyboardAvoidingView, TouchableWithoutFeedback, View } from 'react-native';
+import { Icon, Input, Layout, StyleService, Text, useStyleSheet } from '@ui-kitten/components';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import { Formik } from 'formik';
+import * as yup from 'yup';
+import { Normalize } from '@/Utils/Shared/NormalizeDisplay';
+import { ResetPasswordVerify } from '@/Services/LoginServices';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { useDispatch } from 'react-redux';
+import { LinearGradientButton } from '@/Components';
+import Colors from '@/Theme/Colors';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackNavigatorParamsList } from '@/Navigators/Auth/AuthNavigator';
+import { RouteProp } from '@react-navigation/native';
 
-// @ts-ignore
-const ResetPasswordScreen = ({ route, navigation }) => {
+type ReportProblemScreenProps = {
+  navigation: StackNavigationProp<AuthStackNavigatorParamsList, 'ResetPassword'>;
+  route: RouteProp<AuthStackNavigatorParamsList, 'ResetPassword'>;
+};
+
+
+const ResetPasswordScreen: FC<ReportProblemScreenProps> = ({ route, navigation }) => {
   const styles = useStyleSheet(themedStyles);
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState('');
   const [isValidCode, setIsValid] = useState(false);
   const [inValidCode, setInvalidCode] = useState(false);
   const { emailAddress, user_type } = route.params;
@@ -38,20 +32,20 @@ const ResetPasswordScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
 
   const onSignUpButtonPress = (): void => {
-    navigation && navigation.navigate("SignUp1");
+    navigation && navigation.navigate('SignUp1');
   };
-  console.log("route.params", route.params);
+  console.log('route.params', route.params);
   const onLoginButtonPress = (): void => {
-    navigation && navigation.navigate("Login");
+    navigation && navigation.navigate('Login');
   };
   const renderConfirmPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onConfirmPasswordIconPress}>
-      <Icon {...props} name={confirmPasswordVisible ? "eye-off" : "eye"} />
+      <Icon {...props} name={confirmPasswordVisible ? 'eye-off' : 'eye'} />
     </TouchableWithoutFeedback>
   );
   const renderPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onPasswordIconPress}>
-      <Icon {...props} name={passwordVisible ? "eye-off" : "eye"} />
+      <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
     </TouchableWithoutFeedback>
   );
   const onPasswordIconPress = (): void => {
@@ -61,7 +55,7 @@ const ResetPasswordScreen = ({ route, navigation }) => {
     setConfirmPasswordVisible(!confirmPasswordVisible);
   };
   const validateCode = () => {
-    console.log("route", route.params);
+    console.log('route', route.params);
     if (route?.params?.code == code) {
       setInvalidCode(false);
       setIsValid(true);
@@ -74,29 +68,24 @@ const ResetPasswordScreen = ({ route, navigation }) => {
       .string()
       .min(
         6,
-        ({ min }) => `Verification code must be at least ${min} characters`
+        ({ min }) => `Verification code must be at least ${min} characters`,
       )
       .max(
         6,
-        ({ max }) => `Verification code must be at least ${max} characters`
+        ({ max }) => `Verification code must be at least ${max} characters`,
       )
-      .required("Verification code is required"),
+      .required('Verification code is required'),
     password: yup
       .string()
       .min(8, ({ min }) => `Password must be at least ${min} characters`)
-      .required("Password is required"),
+      .required('Password is required'),
     confirmPassword: yup
       .string()
-      .when("password", {
-        is: (val: any) => (val && val.length > 0 ? true : false),
-        then: yup
-          .string()
-          .oneOf(
-            [yup.ref("password")],
-            "Password & Confirm Password does not match"
-          ),
+      .test('password-match', 'Password & Confirm Password do not match', function(value) {
+        const password = this.resolve(yup.ref('password'));
+        return value === password;
       })
-      .required("Re-Password is required"),
+      .when('password', (password, schema) => password && schema.required('Re-Password is required')),
   });
 
   return (
@@ -104,12 +93,12 @@ const ResetPasswordScreen = ({ route, navigation }) => {
       <View style={styles.headerContainer}>
         <Image
           style={{
-            justifyContent: "center",
-            alignItems: "center",
+            justifyContent: 'center',
+            alignItems: 'center',
             maxHeight: Normalize(160),
             maxWidth: Normalize(160),
           }}
-          source={require("@/Assets/Images/new-logo.png")}
+          source={require('@/Assets/Images/new-logo.png')}
           resizeMode="contain"
         />
       </View>
@@ -117,10 +106,10 @@ const ResetPasswordScreen = ({ route, navigation }) => {
         validationSchema={forgotPassValidationSchema}
         validateOnMount={true}
         initialValues={{
-          code: "",
-          password: "",
-          confirmPassword: "",
-          activationCode: "",
+          code: '',
+          password: '',
+          confirmPassword: '',
+          activationCode: '',
         }}
         onSubmit={(values, { resetForm }) => {
           let resetPasswordObject = {
@@ -134,26 +123,26 @@ const ResetPasswordScreen = ({ route, navigation }) => {
 
           ResetPasswordVerify(resetPasswordObject)
             .then((response) => {
-              console.log("response", response);
+              console.log('response', response);
               Toast.show({
-                type: "info",
-                position: "top",
-                text1: "Password reset successfully",
+                type: 'info',
+                position: 'top',
+                text1: 'Password reset successfully',
               });
 
               resetForm();
-              navigation.navigate("Login");
+              navigation.navigate('Login');
             })
             .catch((err) => {
               Toast.show({
-                type: "info",
-                position: "top",
+                type: 'info',
+                position: 'top',
                 text1:
                   err.status == 404
-                    ? "Invalid Activation code"
+                    ? 'Invalid Activation code'
                     : `An error occured`,
               });
-              console.log("err", err);
+              console.log('err', err);
             })
             .finally(() => {
               dispatch(ChangeModalState.action({ loading: false }));
@@ -162,17 +151,17 @@ const ResetPasswordScreen = ({ route, navigation }) => {
         }}
       >
         {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          setFieldValue,
-          values,
-          errors,
-          touched,
-          isValid,
-        }) => (
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            setFieldValue,
+            values,
+            errors,
+            touched,
+            isValid,
+          }) => (
           <>
-            {console.log("error", errors)}
+            {console.log('error', errors)}
             <Layout style={styles.formContainer}>
               <Input
                 placeholder="Activation Code"
@@ -180,9 +169,9 @@ const ResetPasswordScreen = ({ route, navigation }) => {
                 value={values.activationCode}
                 onChangeText={(text) => {
                   setCode(text);
-                  setFieldValue("activationCode", text);
+                  setFieldValue('activationCode', text);
                 }}
-                onBlur={handleBlur("activationCode")}
+                onBlur={handleBlur('activationCode')}
                 keyboardType="number-pad"
               />
 
@@ -198,8 +187,8 @@ const ResetPasswordScreen = ({ route, navigation }) => {
                 placeholder="New Password"
                 accessoryRight={renderPasswordIcon}
                 value={values.password}
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
               />
               {errors.password && touched.password && (
                 <Text style={styles.errorText}>{errors.password}</Text>
@@ -212,14 +201,14 @@ const ResetPasswordScreen = ({ route, navigation }) => {
                 placeholder="Confirm New Password"
                 accessoryRight={renderConfirmPasswordIcon}
                 value={values.confirmPassword}
-                onChangeText={handleChange("confirmPassword")}
-                onBlur={handleBlur("confirmPassword")}
+                onChangeText={handleChange('confirmPassword')}
+                onBlur={handleBlur('confirmPassword')}
               />
               {errors.confirmPassword && touched.confirmPassword && (
                 <Text style={styles.errorText}>{errors.confirmPassword}</Text>
               )}
 
-              <View style={{ marginBottom: !inValidCode && 18 }} />
+              <View style={{ marginBottom: !inValidCode ? 18 : 0 }} />
 
               <LinearGradientButton
                 style={styles.resetButton}
@@ -290,8 +279,8 @@ export default ResetPasswordScreen;
 const themedStyles = StyleService.create({
   container: {
     flex: 1,
-    flexDirection: "column",
-    backgroundColor: "background-basic-color-1",
+    flexDirection: 'column',
+    backgroundColor: 'background-basic-color-1',
   },
   inputSettings: {
     marginTop: 7,
@@ -299,10 +288,10 @@ const themedStyles = StyleService.create({
   },
   headerContainer: {
     marginTop: 10,
-    justifyContent: "flex-start",
-    alignItems: "center",
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   formContainer: {
     flex: 3,
@@ -334,6 +323,6 @@ const themedStyles = StyleService.create({
   },
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
   },
 });

@@ -1,10 +1,7 @@
 import { CompleteRegistration, Register } from '@//Services/SignUpServices';
 import { LinearGradientButton, ProfileAvatarPicker } from '@/Components';
 import BackgroundLayout from '@/Components/BackgroundLayout';
-import {
-  PersonIcon,
-  PhoneIcon,
-} from '@/Components/SignUp/icons';
+import { PersonIcon, PhoneIcon } from '@/Components/SignUp/icons';
 import { AddInstructorsModal, EditInstructorsModal, ImagePickerModal } from '@/Modals';
 import AddBusInformation from '@/Modals/AddBusInformation';
 import { CountryDTO } from '@/Models/CountryDTOs';
@@ -19,13 +16,18 @@ import LoginStore from '@/Store/Authentication/LoginStore';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import { PlaceState } from '@/Store/Places';
 import Colors from '@/Theme/Colors';
-import { useIsFocused } from '@react-navigation/native';
+import { RouteProp, useIsFocused } from '@react-navigation/native';
 import {
   Autocomplete,
   AutocompleteItem,
-  Button, ButtonElement, ButtonProps,
-  CheckBox, Icon, Input,
-  Layout, Select,
+  Button,
+  ButtonElement,
+  ButtonProps,
+  CheckBox,
+  Icon,
+  Input,
+  Layout,
+  Select,
   SelectItem,
   StyleService,
   Text,
@@ -33,15 +35,14 @@ import {
 } from '@ui-kitten/components';
 import { Props } from '@ui-kitten/components/devsupport/services/props/props.service';
 import { Formik } from 'formik';
-import React, {
-  ReactElement,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { FC, ReactElement, useContext, useEffect, useState } from 'react';
 import {
-  KeyboardAvoidingView, Linking, Platform,
-  ScrollView, TouchableOpacity, TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Linking,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import { getDeviceId } from 'react-native-device-info';
@@ -53,6 +54,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 import { ModalState } from '@/Store/Modal';
 import { ORGANISATIONS } from '@/Constants';
+import { AuthStackNavigatorParamsList } from '@/Navigators/Auth/AuthNavigator';
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -62,7 +64,7 @@ const isItemMatchQuery = (item: string, query: string) => {
   return item?.toLowerCase().includes(query.toLowerCase());
 };
 
-const organisations = ORGANISATIONS
+const organisations = ORGANISATIONS;
 
 // const schools = [
 //     {id: 1, label: "School 1", value: "School 1"},
@@ -72,7 +74,11 @@ const organisations = ORGANISATIONS
 
 const _instructors: any[] = [];
 
-const FinalOrgRegistrationScreen = ({ route }: Props) => {
+type FinalOrgRegistrationScreenProps = {
+  route: RouteProp<AuthStackNavigatorParamsList, 'FinalOrgRegistrationScreen'>;
+};
+
+const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route }: Props) => {
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] =
@@ -558,8 +564,8 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
                 formData.append('deviceId', getDeviceId());
 
                 // TODO check how it works
-                formData.append("schoolId", schoolId || "");
-                formData.append("orgId", orgId || "");
+                formData.append('schoolId', schoolId || '');
+                formData.append('orgId', orgId || '');
                 // values.schoolId
                 //   ? formData.append('schoolId', values.schoolId)
                 //   : formData.append('schoolId', '');
@@ -602,7 +608,7 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
                 };
                 console.log('values', values.schoolName);
                 // TODO: check in swagger real type
-                const schoolObject: UserRegistrationDTO | any= {
+                const schoolObject: UserRegistrationDTO | any = {
                   name:
                     values.school === 'Other'
                       ? values.school_name
@@ -666,6 +672,8 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
                               await storeInstructors(
                                 JSON.stringify(_instructors),
                               );
+                              // todo not a priority
+                              // @ts-ignore
                               dispatch(LoginStore.action(obj));
 
                               console.log('_instructors', _instructors);
@@ -736,6 +744,8 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
                           }));
                           await Login(loginObject, user_type.toLowerCase());
                           await storeInstructors(JSON.stringify(_instructors));
+                          // todo not a priority
+                          // @ts-ignore
                           dispatch(LoginStore.action(obj));
 
                           if (response.status == 201) {
@@ -803,6 +813,8 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
                               await storeInstructors(
                                 JSON.stringify(_instructors),
                               );
+                              // todo not a priority
+                              // @ts-ignore
                               dispatch(LoginStore.action(obj));
 
                               console.log('_instructors', _instructors);
@@ -873,6 +885,8 @@ const FinalOrgRegistrationScreen = ({ route }: Props) => {
                           }));
                           await Login(loginObject, user_type.toLowerCase());
                           await storeInstructors(JSON.stringify(_instructors));
+                          // todo not a priority
+                          // @ts-ignore
                           dispatch(LoginStore.action(obj));
 
                           console.log('_instructors', _instructors);

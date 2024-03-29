@@ -1,59 +1,51 @@
-import React, { useState } from "react";
-import { Image, KeyboardAvoidingView, View } from "react-native";
-import {
-  Button,
-  Icon,
-  Input,
-  Layout,
-  StyleService,
-  Text,
-  useStyleSheet,
-  Select,
-  SelectItem,
-} from "@ui-kitten/components";
-import CustomDropdown from "@/Components/CustomDropDown";
-import { Formik } from "formik";
-import * as yup from "yup";
-import { Normalize } from "../../../Utils/Shared/NormalizeDisplay";
-import { ForgotPassword } from "@/Services/LoginServices";
-import { useDispatch } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Toast from "react-native-toast-message";
-import { LinearGradientButton } from "@/Components";
-import FastImage from "react-native-fast-image";
-import Colors from "@/Theme/Colors";
-import { GetActivationCode } from "@/Services/ActivationCode";
-import { ChangePassword } from "@/Services/LoginServices";
-import BackgroundLayout from "@/Components/BackgroundLayout";
-// @ts-ignore
-const ForgotPasswordScreen = ({ navigation }) => {
+import React, { FC, useState } from 'react';
+import { Image, KeyboardAvoidingView, View } from 'react-native';
+import { Button, Input, Layout, StyleService, Text, useStyleSheet } from '@ui-kitten/components';
+import CustomDropdown from '@/Components/CustomDropDown';
+import { Formik } from 'formik';
+import * as yup from 'yup';
+import { Normalize } from '../../../Utils/Shared/NormalizeDisplay';
+import { ChangePassword } from '@/Services/LoginServices';
+import { useDispatch } from 'react-redux';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { LinearGradientButton } from '@/Components';
+import Colors from '@/Theme/Colors';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackNavigatorParamsList } from '@/Navigators/Auth/AuthNavigator';
+
+type ForgotPasswordScreenProps = {
+  navigation: StackNavigationProp<AuthStackNavigatorParamsList, 'FinalRegistrationScreen'>;
+};
+
+const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = ({ navigation }) => {
   const styles = useStyleSheet(themedStyles);
   const dispatch = useDispatch();
-  const [selectedUserType, setSelectedUserType] = useState("");
+  const [selectedUserType, setSelectedUserType] = useState<any>('');
   const onSignUpButtonPress = (): void => {
-    navigation && navigation.navigate("SignUp1");
+    navigation && navigation.navigate('SignUp1');
   };
   const user_type = [
-    { id: 1, label: "Parent", value: "Parent" },
-    { id: 2, label: "Instructor", value: "Instructor" },
-    { id: 3, label: "Student", value: "Student" },
+    { id: 1, label: 'Parent', value: 'Parent' },
+    { id: 2, label: 'Instructor', value: 'Instructor' },
+    { id: 3, label: 'Student', value: 'Student' },
   ];
   const onLoginButtonPress = (): void => {
-    navigation && navigation.navigate("Login");
+    navigation && navigation.navigate('Login');
   };
   // @ts-ignore
 
   const forgotPassValidationSchema = yup.object().shape({
     email: yup
       .string()
-      .email("Please enter valid email")
-      .required("Email is required"),
+      .email('Please enter valid email')
+      .required('Email is required'),
   });
   const renderPersonIcon = (props: any) => (
     <Image
-      source={require("@/Assets/Images/email.png")}
+      source={require('@/Assets/Images/email.png')}
       style={{ height: 20, width: 20 }}
-      resizeMode='contain'
+      resizeMode="contain"
     />
   );
   return (
@@ -62,13 +54,13 @@ const ForgotPasswordScreen = ({ navigation }) => {
         <View style={styles.headerContainer}>
           <Image
             style={{
-              justifyContent: "center",
-              alignItems: "center",
+              justifyContent: 'center',
+              alignItems: 'center',
               maxHeight: Normalize(160),
               maxWidth: Normalize(160),
             }}
-            source={require("@/Assets/Images/logo1.png")}
-            resizeMode='contain'
+            source={require('@/Assets/Images/logo1.png')}
+            resizeMode="contain"
           />
 
           <Text style={styles.logoText}>Forgot Password</Text>
@@ -77,7 +69,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
         <Formik
           validationSchema={forgotPassValidationSchema}
           validateOnMount={true}
-          initialValues={{ email: "", user_type: "" }}
+          initialValues={{ email: '', user_type: '' }}
           onSubmit={(values, { resetForm }) => {
             let resetPasswordObject = {
               email: values.email,
@@ -88,9 +80,9 @@ const ForgotPasswordScreen = ({ navigation }) => {
             dispatch(ChangeModalState.action({ loading: true }));
             ChangePassword(resetPasswordObject)
               .then((response) => {
-                console.log("response", response.data);
+                console.log('response', response.data);
 
-                navigation.navigate("ResetPassword", {
+                navigation.navigate('ResetPassword', {
                   emailAddress: values.email,
                   user_type: values.user_type,
                 });
@@ -101,24 +93,24 @@ const ForgotPasswordScreen = ({ navigation }) => {
           }}
         >
           {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            setFieldValue,
-            values,
-            errors,
-            touched,
-            isValid,
-          }) => (
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              setFieldValue,
+              values,
+              errors,
+              touched,
+              isValid,
+            }) => (
             <>
               <Layout style={styles.formContainer}>
                 <CustomDropdown
-                  placeholder='Select User'
+                  placeholder="Select User"
                   value={values.user_type}
                   onSelect={(index: any) => {
-                    console.log("index", index);
-                    setFieldValue("user_type", user_type[index].value);
-                    setSelectedUserType("user_type", user_type[index].value);
+                    console.log('index', index);
+                    setFieldValue('user_type', user_type[index].value);
+                    setSelectedUserType(user_type[index].value);
                   }}
                   dropDownList={user_type}
                 />
@@ -128,14 +120,14 @@ const ForgotPasswordScreen = ({ navigation }) => {
                   textStyle={{ color: Colors.white }}
                   style={styles.selectSettings}
                   placeholderTextColor={Colors.white}
-                  placeholder='Email'
-                  autoCapitalize='none'
+                  placeholder="Email"
+                  autoCapitalize="none"
                   autoCorrect={false}
                   accessoryLeft={renderPersonIcon}
-                  onChangeText={handleChange("email")}
-                  onBlur={handleBlur("email")}
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
                   value={values.email}
-                  keyboardType='email-address'
+                  keyboardType="email-address"
                 />
                 {errors.email && touched.email && (
                   <Text style={styles.errorText}>{errors.email}</Text>
@@ -144,8 +136,8 @@ const ForgotPasswordScreen = ({ navigation }) => {
                   <LinearGradientButton
                     gradient={[Colors.secondaryTint, Colors.primaryLight]}
                     style={styles.resetButton}
-                    appearance='filled'
-                    size='medium'
+                    appearance="filled"
+                    size="medium"
                     onPress={handleSubmit}
                     disabled={!isValid}
                   >
@@ -155,17 +147,17 @@ const ForgotPasswordScreen = ({ navigation }) => {
               </Layout>
               <View style={styles.bottomView}>
                 <Button
-                  appearance='ghost'
-                  status='basic'
-                  size='small'
+                  appearance="ghost"
+                  status="basic"
+                  size="small"
                   onPress={onLoginButtonPress}
                 >
                   {() => <Text style={styles.buttonMessage}>Login</Text>}
                 </Button>
                 <Button
-                  appearance='ghost'
-                  status='basic'
-                  size='small'
+                  appearance="ghost"
+                  status="basic"
+                  size="small"
                   onPress={onSignUpButtonPress}
                 >
                   {() => <Text style={styles.buttonMessage}>Sign Up</Text>}
@@ -182,17 +174,17 @@ export default ForgotPasswordScreen;
 const themedStyles = StyleService.create({
   container: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   headerContainer: {
     flex: 1,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 70,
   },
   formContainer: {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     paddingHorizontal: 20,
     // flex: 1,
   },
@@ -228,7 +220,7 @@ const themedStyles = StyleService.create({
   },
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
   },
   logoText: {
     color: Colors.white,
@@ -236,7 +228,7 @@ const themedStyles = StyleService.create({
   },
   selectSettings: {
     marginVertical: 15,
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     borderWidth: 0,
     borderBottomWidth: 2,
     borderBottomColor: Colors.white,

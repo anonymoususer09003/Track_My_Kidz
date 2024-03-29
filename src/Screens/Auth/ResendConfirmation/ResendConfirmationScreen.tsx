@@ -1,45 +1,49 @@
-import React, { useState, useEffect } from "react";
-import { Image, View, Dimensions } from "react-native";
+import React, { FC, useState } from 'react';
+import { Dimensions, Image, KeyboardAvoidingView, View } from 'react-native';
 import {
   Button,
+  CheckBox,
   Icon,
   Input,
   Layout,
+  Select,
+  SelectItem,
   StyleService,
   Text,
   useStyleSheet,
-  Select,
-  SelectItem,
-  CheckBox,
-} from "@ui-kitten/components";
-import { KeyboardAvoidingView } from "react-native";
-import { Formik } from "formik";
-import * as yup from "yup";
-import { Normalize } from "../../../Utils/Shared/NormalizeDisplay";
-import { ResendRegistrationCode } from "@/Services/SignUpServices";
-import { GetActivationCode } from "@/Services/ActivationCode";
-import Toast from "react-native-toast-message";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { useDispatch } from "react-redux";
-import { LinearGradientButton } from "@/Components";
-import FastImage from "react-native-fast-image";
-import Colors from "@/Theme/Colors";
-import { useIsFocused } from "@react-navigation/native";
+} from '@ui-kitten/components';
+import { Formik } from 'formik';
+import * as yup from 'yup';
+import { Normalize } from '../../../Utils/Shared/NormalizeDisplay';
+import { GetActivationCode } from '@/Services/ActivationCode';
+import Toast from 'react-native-toast-message';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { useDispatch } from 'react-redux';
+import { LinearGradientButton } from '@/Components';
+import Colors from '@/Theme/Colors';
+import { useIsFocused } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackNavigatorParamsList } from '@/Navigators/Auth/AuthNavigator';
 // @ts-ignore
-const screenHeight = Dimensions.get("screen").height;
-const ResendConfirmationScreen = ({ navigation }) => {
+const screenHeight = Dimensions.get('screen').height;
+
+type ResendConfirmationScreenProps = {
+  navigation: StackNavigationProp<AuthStackNavigatorParamsList, 'ResendConfirmation'>;
+};
+
+const ResendConfirmationScreen: FC<ResendConfirmationScreenProps> = ({ navigation }) => {
   const styles = useStyleSheet(themedStyles);
   const dispatch = useDispatch();
-  const [selectedUserType, setSelectedUserType] = useState("");
+  const [selectedUserType, setSelectedUserType] = useState('');
   const onSignUpButtonPress = (): void => {
-    navigation && navigation.navigate("SignUp1");
+    navigation && navigation.navigate('SignUp1');
   };
   const isFocuesed = useIsFocused();
   const [reRender, setRerender] = useState(false);
   const user_type = [
-    { id: 1, label: "Parent", value: "Parent" },
-    { id: 2, label: "Instructor", value: "Instructor" },
-    { id: 3, label: "Student", value: "Student" },
+    { id: 1, label: 'Parent', value: 'Parent' },
+    { id: 2, label: 'Instructor', value: 'Instructor' },
+    { id: 3, label: 'Student', value: 'Student' },
   ];
   // @ts-ignore
   const renderPersonIcon = (props: any) => (
@@ -48,8 +52,8 @@ const ResendConfirmationScreen = ({ navigation }) => {
   const reactivateValidationSchema = yup.object().shape({
     email: yup
       .string()
-      .email("Please enter valid email")
-      .required("Email is required"),
+      .email('Please enter valid email')
+      .required('Email is required'),
   });
   const [isDesignatedAdmin, setIsDesignatedAdmin] = useState(false);
 
@@ -58,12 +62,12 @@ const ResendConfirmationScreen = ({ navigation }) => {
       <View style={styles.headerContainer}>
         <Image
           style={{
-            justifyContent: "center",
-            alignItems: "center",
+            justifyContent: 'center',
+            alignItems: 'center',
             maxHeight: Normalize(160),
             maxWidth: Normalize(160),
           }}
-          source={require("@/Assets/Images/new-logo.png")}
+          source={require('@/Assets/Images/new-logo.png')}
           resizeMode="contain"
         />
       </View>
@@ -71,14 +75,14 @@ const ResendConfirmationScreen = ({ navigation }) => {
         <Formik
           validationSchema={reactivateValidationSchema}
           validateOnMount={true}
-          initialValues={{ email: "", user_type: "" }}
+          initialValues={{ email: '', user_type: '' }}
           onSubmit={(values, { resetForm }) => {
             dispatch(ChangeModalState.action({ loading: true }));
             // resetForm();
             GetActivationCode({ email: values.email }, values.user_type)
               .then((res) => {
-                console.log("res----", res);
-                navigation.navigate("EmailConfirmation", {
+                console.log('res----', res);
+                navigation.navigate('EmailConfirmation', {
                   emailAddress: values.email,
                   user_type: values.user_type,
                   isDesignatedAdmin: isDesignatedAdmin ? true : false,
@@ -87,19 +91,22 @@ const ResendConfirmationScreen = ({ navigation }) => {
                 // setActivationCode(res?.activation_code);
               })
               .catch((err) => {
-                console.log("err", err);
+                console.log('err', err);
                 Toast.show({
-                  type: "info",
-                  position: "top",
-                  text1: "Info",
-                  text2: "Please check your email address and try again ",
+                  type: 'info',
+                  position: 'top',
+                  text1: 'Info',
+                  text2: 'Please check your email address and try again ',
                   visibilityTime: 4000,
                   autoHide: true,
                   topOffset: 30,
                   bottomOffset: 40,
-                  onShow: () => {},
-                  onHide: () => {},
-                  onPress: () => {},
+                  onShow: () => {
+                  },
+                  onHide: () => {
+                  },
+                  onPress: () => {
+                  },
                 });
               })
               .finally(() => {
@@ -137,15 +144,15 @@ const ResendConfirmationScreen = ({ navigation }) => {
           }}
         >
           {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            setFieldValue,
-            values,
-            errors,
-            touched,
-            isValid,
-          }) => (
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              setFieldValue,
+              values,
+              errors,
+              touched,
+              isValid,
+            }) => (
             <>
               <Layout style={styles.formContainer}>
                 <Select
@@ -153,7 +160,7 @@ const ResendConfirmationScreen = ({ navigation }) => {
                   value={values.user_type}
                   placeholder="Select User"
                   onSelect={(index: any) => {
-                    setFieldValue("user_type", user_type[index.row].value);
+                    setFieldValue('user_type', user_type[index.row].value);
                     setSelectedUserType(user_type[index.row].value);
                   }}
                   label={(evaProps: any) => <Text {...evaProps}></Text>}
@@ -166,19 +173,19 @@ const ResendConfirmationScreen = ({ navigation }) => {
                   placeholder="Email"
                   autoCapitalize="none"
                   accessoryRight={renderPersonIcon}
-                  onChangeText={handleChange("email")}
-                  onBlur={handleBlur("email")}
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
                   value={values.email}
                   keyboardType="email-address"
                 />
                 {errors.email && touched.email && (
                   <Text style={styles.errorText}>{errors.email}</Text>
                 )}
-                {values.user_type === "Instructor" && (
+                {values.user_type === 'Instructor' && (
                   <View
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
+                      flexDirection: 'row',
+                      alignItems: 'center',
                       marginVertical: 20,
                     }}
                   >
@@ -186,9 +193,9 @@ const ResendConfirmationScreen = ({ navigation }) => {
                       checked={isDesignatedAdmin}
                       onChange={() => setIsDesignatedAdmin(!isDesignatedAdmin)}
                     >
-                      {""}
+                      {''}
                     </CheckBox>
-                    <Text style={{ marginLeft: 20, width: "90%" }}>
+                    <Text style={{ marginLeft: 20, width: '90%' }}>
                       I'm a designated admin for my organisation
                     </Text>
                   </View>
@@ -227,17 +234,17 @@ export default ResendConfirmationScreen;
 const themedStyles = StyleService.create({
   container: {
     flex: 1,
-    flexDirection: "column",
-    backgroundColor: "background-basic-color-1",
+    flexDirection: 'column',
+    backgroundColor: 'background-basic-color-1',
   },
   headerContainer: {
     marginTop: 10,
-    justifyContent: "flex-start",
-    alignItems: "center",
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     // flex: 1,
     height: screenHeight * 0.25,
-    width: "100%",
-    backgroundColor: "#fff",
+    width: '100%',
+    backgroundColor: '#fff',
   },
   formContainer: {
     // flex: 1,
@@ -263,6 +270,6 @@ const themedStyles = StyleService.create({
 
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
   },
 });

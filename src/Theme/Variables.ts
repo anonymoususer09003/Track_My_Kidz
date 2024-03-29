@@ -34,7 +34,7 @@ export const ReferenceCodeStyle = {
   borderWidth: 1,
   borderColor: CustomColors.default.textInputBorderColor,
   borderRadius: 5,
-  width: "100%",
+  width: 100,
   backgroundColor: CustomColors.default.textInputBackgroundColor,
   paddingHorizontal: 16,
   paddingVertical: 9,

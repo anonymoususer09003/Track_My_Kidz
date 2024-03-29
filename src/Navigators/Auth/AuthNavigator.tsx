@@ -5,22 +5,44 @@ import {
   ReactivateAccountScreen,
   ResendConfirmationScreen,
   ResetPasswordScreen,
-  SignInScreen
-} from "@/Screens";
-import { createStackNavigator } from "@react-navigation/stack";
-import React from "react";
-import { AuthProvider } from "./AuthProvider";
+  SignInScreen,
+} from '@/Screens';
+import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
+import { AuthProvider } from './AuthProvider';
 
 export type AuthStackNavigatorParamsList = {
   Login: undefined;
   SignUp1: undefined;
-  EmailConfirmation: undefined;
-  FinalRegistrationScreen: undefined;
-  FinalOrgRegistrationScreen: undefined;
+  EmailConfirmation: {
+    emailAddress?: string,
+    user_type?: string,
+    isDesignatedAdmin?: boolean,
+    reactivate?: boolean
+  } | undefined;
+  FinalRegistrationScreen: { emailAddress: string, user_type: string, student: any, activation_code: string };
+  FinalOrgRegistrationScreen: {
+    emailAddress: any,
+    registrationId: any,
+    user_type: any,
+    activation_code: any,
+    details: {
+      email: any,
+      firstname: any,
+      lastname: any,
+      phoneNumber: any,
+      state: any,
+      country: any,
+      city: any,
+      zipcode: any,
+      selected_entity: any,
+      photo?: any,
+    },
+  } | undefined;
   ForgotPassword: undefined;
-  ResendConfirmation: {resendCode: any};
+  ResendConfirmation: { resendCode: any };
   ReactivateAccount: undefined;
-  ResetPassword: undefined;
+  ResetPassword: { emailAddress?: string, user_type?: string, code?: string };
 };
 
 const AuthNavigator = createStackNavigator<AuthStackNavigatorParamsList>();

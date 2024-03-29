@@ -1,4 +1,4 @@
-import { useIsFocused } from '@react-navigation/native';
+import { RouteProp, useIsFocused } from '@react-navigation/native';
 
 import {
   Autocomplete,
@@ -16,7 +16,7 @@ import {
   Text,
   useStyleSheet,
 } from '@ui-kitten/components';
-import React, { ReactElement, useContext, useEffect, useState } from 'react';
+import React, { FC, ReactElement, useContext, useEffect, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -37,7 +37,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CompleteRegistration, Register } from '@//Services/SignUpServices';
 import { LocationIcon, PersonIcon, PhoneIcon } from '@/Components/SignUp/icons';
 import { RegisterDTO } from '@/Models/UserDTOs';
-import { Props } from '@ui-kitten/components/devsupport/services/props/props.service';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 import { CountryDTO } from '@/Models/CountryDTOs';
 import { AuthContext } from '@/Navigators/Auth/AuthProvider';
@@ -53,6 +52,8 @@ import { LinearGradientButton, ProfileAvatarPicker } from '@/Components';
 import { ImagePickerModal, ParentPaymentModal } from '@/Modals';
 import { Login } from '@/Services/LoginServices';
 import { ORGANISATIONS, USER_TYPES } from '@/Constants';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackNavigatorParamsList } from '@/Navigators/Auth/AuthNavigator';
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -67,7 +68,12 @@ const user_types = USER_TYPES;
 
 const organisations = ORGANISATIONS;
 
-const FinalRegistrationScreen = ({ navigation, route }: Props) => {
+type FinalRegistrationScreenProps = {
+  navigation: StackNavigationProp<AuthStackNavigatorParamsList, 'FinalRegistrationScreen'>;
+  route: RouteProp<AuthStackNavigatorParamsList, 'FinalRegistrationScreen'>;
+};
+
+const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation, route }) => {
   const [, setRerender] = useState(false);
   const isFocuesed = useIsFocused();
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
@@ -568,6 +574,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                   <ParentPaymentModal
                     loginObj={loginObj}
                     onPay={() => {
+                      // todo not a priority
+                      // @ts-ignore
                       dispatch(LoginStore.action(loginObj));
                       dispatch(
                         ChangeModalState.action({
@@ -914,6 +922,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                         console.log('responsefromback', response);
                         await Login(loginObject, user_type.toLowerCase());
                         dispatch(
+                          // todo not a priority
+                          // @ts-ignore
                           LoginStore.action({
                             token: response?.data?.token,
                             userType: 'instructor',
@@ -1360,6 +1370,8 @@ const FinalRegistrationScreen = ({ navigation, route }: Props) => {
                     console.log('response--', response.data);
                     await Login(loginObject, user_type.toLowerCase());
                     dispatch(
+                      // todo not a priority
+                      // @ts-ignore
                       LoginStore.action({
                         token: response?.data?.token,
                         userType: 'student',

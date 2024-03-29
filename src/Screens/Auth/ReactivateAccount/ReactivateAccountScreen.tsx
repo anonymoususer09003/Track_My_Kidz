@@ -1,45 +1,36 @@
-import React from 'react'
-import {
-  Image,
-  View
-} from 'react-native'
-import {
-  Button,
-  Icon,
-  Input,
-  Layout,
-  StyleService,
-  Text,
-  useStyleSheet,
-} from '@ui-kitten/components'
-import { KeyboardAvoidingView } from 'react-native'
-import { Formik } from 'formik'
-import * as yup from 'yup'
-import { Normalize } from '../../../Utils/Shared/NormalizeDisplay'
-import { SendReactivateCode } from '@/Services/SignUpServices'
-import Toast from 'react-native-toast-message'
-import ChangeModalState from '@/Store/Modal/ChangeModalState'
-import { useDispatch } from 'react-redux'
-import { LinearGradientButton } from "@/Components";
-import FastImage from 'react-native-fast-image'
-import Colors from '@/Theme/Colors'
+import React, { FC } from 'react';
+import { Image, KeyboardAvoidingView, View } from 'react-native';
+import { Icon, Input, Layout, StyleService, Text, useStyleSheet } from '@ui-kitten/components';
+import { Formik } from 'formik';
+import * as yup from 'yup';
+import { Normalize } from '../../../Utils/Shared/NormalizeDisplay';
+import { SendReactivateCode } from '@/Services/SignUpServices';
+import Toast from 'react-native-toast-message';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { useDispatch } from 'react-redux';
+import Colors from '@/Theme/Colors';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackNavigatorParamsList } from '@/Navigators/Auth/AuthNavigator';
 
-// @ts-ignore
-const ReactivateAccountScreen = ({ navigation }) => {
+type ReportProblemScreenProps = {
+  navigation: StackNavigationProp<AuthStackNavigatorParamsList, 'ReactivateAccount'>;
+};
 
-  const styles = useStyleSheet(themedStyles)
-  const dispatch = useDispatch()
+const ReactivateAccountScreen: FC<ReportProblemScreenProps> = ({ navigation }) => {
+
+  const styles = useStyleSheet(themedStyles);
+  const dispatch = useDispatch();
 
   // @ts-ignore
   const renderPersonIcon = (props: any) => (
-    <Icon {...props} name='person-outline' />
-  )
+    <Icon {...props} name="person-outline" />
+  );
   const reactivateValidationSchema = yup.object().shape({
     email: yup
       .string()
-      .email("Please enter valid email")
-      .required('Email is required')
-  })
+      .email('Please enter valid email')
+      .required('Email is required'),
+  });
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -52,7 +43,7 @@ const ReactivateAccountScreen = ({ navigation }) => {
             maxWidth: Normalize(160),
           }}
           source={require('@/Assets/Images/new-logo.png')}
-          resizeMode='contain'
+          resizeMode="contain"
         />
       </View>
 
@@ -61,12 +52,12 @@ const ReactivateAccountScreen = ({ navigation }) => {
         validateOnMount={true}
         initialValues={{ email: '' }}
         onSubmit={(values, { resetForm }) => {
-          dispatch(ChangeModalState.action({ loading: true }))
+          dispatch(ChangeModalState.action({ loading: true }));
 
           SendReactivateCode({
-            email: values.email
+            email: values.email,
           }).then(() => {
-            navigation.navigate('EmailConfirmation', { emailAddress: values.email, reactivate: true })
+            navigation.navigate('EmailConfirmation', { emailAddress: values.email, reactivate: true });
           })
             .catch(err => {
               Toast.show({
@@ -78,14 +69,17 @@ const ReactivateAccountScreen = ({ navigation }) => {
                 autoHide: true,
                 topOffset: 30,
                 bottomOffset: 40,
-                onShow: () => { },
-                onHide: () => { },
-                onPress: () => { },
-              })
+                onShow: () => {
+                },
+                onHide: () => {
+                },
+                onPress: () => {
+                },
+              });
             })
             .finally(() => {
-              dispatch(ChangeModalState.action({ loading: false }))
-            })
+              dispatch(ChangeModalState.action({ loading: false }));
+            });
           resetForm();
           // navigation && navigation.navigate('Registration')
         }
@@ -93,7 +87,7 @@ const ReactivateAccountScreen = ({ navigation }) => {
       >
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isValid }) => (
           <>
-            <Layout style={styles.formContainer} >
+            <Layout style={styles.formContainer}>
               <Input
                 placeholder="Email"
                 accessoryRight={renderPersonIcon}
@@ -101,7 +95,7 @@ const ReactivateAccountScreen = ({ navigation }) => {
                 onBlur={handleBlur('email')}
                 value={values.email}
                 keyboardType="email-address"
-                autoCapitalize='none'
+                autoCapitalize="none"
               />
               {(errors.email && touched.email) &&
                 <Text style={styles.errorText}>{errors.email}</Text>
@@ -113,8 +107,8 @@ const ReactivateAccountScreen = ({ navigation }) => {
         )}
       </Formik>
     </KeyboardAvoidingView>
-  )
-}
+  );
+};
 export default ReactivateAccountScreen;
 const themedStyles = StyleService.create({
   container: {
@@ -127,21 +121,21 @@ const themedStyles = StyleService.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
   formContainer: {
     flex: 3,
   },
   welcomeMessage: {
     marginTop: 16,
-    color: Colors.primary
+    color: Colors.primary,
   },
   reactivateAccButton: {
     marginHorizontal: 2,
-    borderRadius: 20
+    borderRadius: 20,
   },
   errorText: {
     fontSize: 10,
     color: 'red',
   },
-})
+});

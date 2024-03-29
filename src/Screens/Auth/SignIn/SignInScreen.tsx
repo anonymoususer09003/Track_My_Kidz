@@ -205,9 +205,13 @@ const SignInScreen = () => {
                         !res.data?.isSubscribed &&
                         values.user_type === 'Parent'
                       ) {
+                        // todo not a priority
+                        // @ts-ignore
                         dispatch(LoginStore.action(obj));
                       } else {
                         console.log(obj);
+                        // todo not a priority
+                        // @ts-ignore
                         dispatch(LoginStore.action(obj));
                         dispatch(ChangeModalState.action({ loading: false }));
                       }
@@ -274,6 +278,8 @@ const SignInScreen = () => {
                       loginObj={loginObj}
                       onPay={() => {
                         if (loginObj)
+                          // todo not a priority
+                          // @ts-ignore
                           dispatch(LoginStore.action(loginObj));
                         dispatch(ChangeModalState.action({ loading: false }));
                       }}
