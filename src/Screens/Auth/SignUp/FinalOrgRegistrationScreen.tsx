@@ -6,7 +6,6 @@ import { AddInstructorsModal, EditInstructorsModal, ImagePickerModal } from '@/M
 import AddBusInformation from '@/Modals/AddBusInformation';
 import { CountryDTO } from '@/Models/CountryDTOs';
 import { RegisterDTO, UserRegistrationDTO } from '@/Models/UserDTOs';
-import { AuthContext } from '@/Navigators/Auth/AuthProvider';
 import { Login } from '@/Services/LoginServices';
 import { GetAllOrg, GetOrgByFilters } from '@/Services/Org';
 import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
@@ -117,7 +116,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
   const [buses, setBuses] = useState<any[]>([]);
   const [uploadedImage, setUploadedImage] = React.useState<any>(null);
   const [selectedInstructor, setSelectedInstructor] = useState<any>({});
-  const { register } = useContext(AuthContext);
 
   const styles = useStyleSheet(themedStyles);
   const { emailAddress, user_type, details } = route.params;
@@ -683,7 +681,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                               );
 
                               if (response.status == 201) {
-                                register(emailAddress, values.password);
                                 // dispatch(
                                 //   ChangeModalState.action({
                                 //     welcomeMessageModal: true,
@@ -749,7 +746,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                           dispatch(LoginStore.action(obj));
 
                           if (response.status == 201) {
-                            register(emailAddress, values.password);
                             // dispatch(
                             //   ChangeModalState.action({
                             //     welcomeMessageModal: true,
@@ -826,7 +822,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
 
                               if (response.status == 201) {
                                 console.log('response4.1');
-                                register(emailAddress, values.password);
                                 // dispatch(
                                 //   ChangeModalState.action({
                                 //     welcomeMessageModal: true,
@@ -896,7 +891,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                           );
 
                           if (response.status == 201) {
-                            register(emailAddress, values.password);
                             // dispatch(
                             //   ChangeModalState.action({
                             //     welcomeMessageModal: true,

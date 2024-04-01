@@ -39,7 +39,6 @@ import { LocationIcon, PersonIcon, PhoneIcon } from '@/Components/SignUp/icons';
 import { RegisterDTO } from '@/Models/UserDTOs';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 import { CountryDTO } from '@/Models/CountryDTOs';
-import { AuthContext } from '@/Navigators/Auth/AuthProvider';
 import { GetOrgByFilters } from '@/Services/Org';
 import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
 import { GetSchoolByFilters } from '@/Services/School';
@@ -99,7 +98,6 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
   const [placement] = React.useState('bottom');
   const [phoneCodeNumber, setPhoneCodeNumber] = useState<string>('');
 
-  const { register } = useContext(AuthContext);
 
   const styles = useStyleSheet(themedStyles);
   const { emailAddress, user_type, student, activation_code } = route.params; //correct here
@@ -520,7 +518,6 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                         if (response.status == 201) {
                           console.log(emailAddress);
                           console.log(values.password);
-                          register(emailAddress, values.password);
 
 
                           dispatch(
@@ -932,7 +929,6 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                           }),
                         );
                         if (response.status == 201) {
-                          register(emailAddress, values.password).catch(console.error);
                         }
                       })
                       .catch((error: any) => {

@@ -9,7 +9,6 @@ import {
 } from '@/Screens';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import { AuthProvider } from './AuthProvider';
 
 export type AuthStackNavigatorParamsList = {
   Login: undefined;
@@ -47,70 +46,68 @@ export type AuthStackNavigatorParamsList = {
 
 const AuthNavigator = createStackNavigator<AuthStackNavigatorParamsList>();
 const AuthStack = () => (
-  <AuthProvider>
-    <AuthNavigator.Navigator initialRouteName="Login">
-      <AuthNavigator.Screen
-        name="Login"
-        component={SignInScreen}
-        options={{ headerShown: false }}
-      />
-      <AuthNavigator.Screen
-        name="SignUp1"
-        component={FirstSignUpScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <AuthNavigator.Screen
-        name="EmailConfirmation"
-        component={EmailConfirmationScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <AuthNavigator.Screen
-        name="FinalRegistrationScreen"
-        component={FinalRegistrationScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <AuthNavigator.Screen
-        name="FinalOrgRegistrationScreen"
-        component={FinalOrgRegistrationScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <AuthNavigator.Screen
-        name="ForgotPassword"
-        component={ForgotPasswordScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <AuthNavigator.Screen
-        name="ResendConfirmation"
-        component={ResendConfirmationScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <AuthNavigator.Screen
-        name="ReactivateAccount"
-        component={ReactivateAccountScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <AuthNavigator.Screen
-        name="ResetPassword"
-        component={ResetPasswordScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-    </AuthNavigator.Navigator>
-  </AuthProvider>
+  <AuthNavigator.Navigator initialRouteName="Login">
+    <AuthNavigator.Screen
+      name="Login"
+      component={SignInScreen}
+      options={{ headerShown: false }}
+    />
+    <AuthNavigator.Screen
+      name="SignUp1"
+      component={FirstSignUpScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <AuthNavigator.Screen
+      name="EmailConfirmation"
+      component={EmailConfirmationScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <AuthNavigator.Screen
+      name="FinalRegistrationScreen"
+      component={FinalRegistrationScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <AuthNavigator.Screen
+      name="FinalOrgRegistrationScreen"
+      component={FinalOrgRegistrationScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <AuthNavigator.Screen
+      name="ForgotPassword"
+      component={ForgotPasswordScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <AuthNavigator.Screen
+      name="ResendConfirmation"
+      component={ResendConfirmationScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <AuthNavigator.Screen
+      name="ReactivateAccount"
+      component={ReactivateAccountScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <AuthNavigator.Screen
+      name="ResetPassword"
+      component={ResetPasswordScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+  </AuthNavigator.Navigator>
 );
 export default AuthStack;
