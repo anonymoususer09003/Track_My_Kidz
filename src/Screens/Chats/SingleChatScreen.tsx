@@ -15,7 +15,14 @@ import { useStateValue } from '@/Context/state/State';
 import Colors from '@/Theme/Colors';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 
-export type SingleChatScreenRouteParams ={chatId?:any, receiverUser?: any, chattersIds: any, showHeader?:boolean, title?: any, params?: any,}
+export type SingleChatScreenRouteParams = {
+  chatId?: any,
+  receiverUser?: any,
+  chattersIds?: any,
+  showHeader?: boolean,
+  title?: any,
+  params?: any,
+}
 
 type SingleChatScreenProps = {
   route: any
