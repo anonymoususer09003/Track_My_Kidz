@@ -13,7 +13,8 @@ import {
   CreateGroupScreen,
   CreateParentActivityScreen,
   DependentInfoScreen,
-  DragDropStudentScreen, ImportDependentScreen,
+  DragDropStudentScreen,
+  ImportDependentScreen,
   InstructorActivityDetailScreen,
   InstructorHome,
   InstructorPersonalProfileScreen,
@@ -22,10 +23,12 @@ import {
   NotificationsScreen,
   OrganizationBusinformation,
   OrganizationInfoScreen,
-  ParentDeletePermission, PersonalProfileScreen,
+  ParentDeletePermission,
+  PersonalProfileScreen,
   ReportProblemScreen,
   SettingsScreen,
-  StudentActivityDetailsScreen, StudentLocationScreen,
+  StudentActivityDetailsScreen,
+  StudentLocationScreen,
   StudentPersonalProfileScreen,
   StudentSettingsScreen,
 } from '@/Screens';
@@ -39,8 +42,9 @@ import StudentActivityNavigator from '@/Navigators/Main/StudentActivityNavigator
 import HomeNavigator from '@/Navigators/Main/HomeNavigator';
 import ActivityNavigator from '@/Navigators/Main/ActivityNavigator';
 import ApprovalNavigator from '@/Navigators/Main/ApprovalNavigator';
-import { ParentChatScreen } from '@/Screens/Chats';
 import InstructorChatNavigator from '@/Navigators/Main/InstructorChatNavigator';
+import { SingleChatScreen } from '@/Screens/Chats';
+import { SingleChatScreenRouteParams } from '@/Screens/Chats/SingleChatScreen';
 
 type InstructorStack = {
   InstructorPersonalProfileScreen: undefined
@@ -63,6 +67,7 @@ type InstructorStack = {
   InstructorHome: undefined
   DragDropStudent: { students?: any[], attendanceMark?: any, activity: { activityId: any }, bus: { busId: any } }
   InstructorActivityDetail: { data?: any, activitiesCount?: any } | undefined
+  InstructorChatNavigator: { title: string }
 }
 
 type SettingsStack = {
@@ -83,7 +88,7 @@ type StudentStack = {
 type ParentStack = {
   Home: undefined
   Activity: undefined
-  ChatScreen: undefined | any
+  ChatScreen: SingleChatScreenRouteParams
   CreateParentActivity: undefined
   Approval: undefined
   ActivationCode: undefined
@@ -258,14 +263,11 @@ const RightDrawerNavigator = () => {
           component={StudentLocationScreen}
         />
 
-
-        {/*<Stack.Screen name="ChatScreen" component={ParentChatScreen} />*/}
-        {/*<Stack.Screen*/}
-        {/*  name="InstructorChatNavigator"*/}
-        {/*  component={InstructorChatNavigator}*/}
-        {/*/>*/}
-
-
+        <Stack.Screen name="ChatScreen" component={SingleChatScreen} />
+        <Stack.Screen
+          name="InstructorChatNavigator"
+          component={InstructorChatNavigator}
+        />
       </>
     </Stack.Navigator>
   );

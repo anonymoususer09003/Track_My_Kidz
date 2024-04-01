@@ -1,36 +1,43 @@
-import React, { useEffect } from "react";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { Button, TabBar } from "@ui-kitten/components";
-import { Alert, StyleSheet, View } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
-import { ParentChatScreen, StudentChatScreen } from "@/Screens/Chats";
-import { AppHeader } from "@/Components";
-import { useIsFocused } from "@react-navigation/native";
-import Colors from "@/Theme/Colors";
-import { useStateValue } from "@/Context/state/State";
-import SetChatParam from "@/Store/chat/SetChatParams";
-import { UserState } from "@/Store/User";
-import { useDispatch, useSelector } from "react-redux";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import React, { FC } from 'react';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { Button, TabBar } from '@ui-kitten/components';
+import { StyleSheet, View } from 'react-native';
+import { RouteProp, useIsFocused } from '@react-navigation/native';
+import Colors from '@/Theme/Colors';
+import SetChatParam from '@/Store/chat/SetChatParams';
+import { UserState } from '@/Store/User';
+import { useDispatch, useSelector } from 'react-redux';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+import SingleChatScreen, { SingleChatScreenRouteParams } from '@/Screens/Chats/SingleChatScreen';
 // @refresh reset
-const ActivityNavigator = ({ route }) => {
+
+type InstructorChatNavigatorProps = {
+  route: RouteProp<MainStackNavigatorParamsList, 'InstructorChatNavigator'>
+}
+
+type InstructorChatNavigatorParamList = {
+  ParentChat: SingleChatScreenRouteParams
+  StudentChat: SingleChatScreenRouteParams
+}
+const InstructorChatNavigator: FC<InstructorChatNavigatorProps> = ({ route }) => {
   const isFocused = useIsFocused();
   const TabNavigator = createMaterialTopTabNavigator();
-  const tabNames = ["Parents", "Participants"];
+  const tabNames = ['Parents', 'Participants'];
   const dispatch = useDispatch();
-  const chat = useSelector((state: { user: UserState }) => state.chat.item);
+  const chat = useSelector((state: { user: UserState, chat: any }) => state.chat.item);
   //   useEffect(() => {
   //     if (!isFocused) {
   //       dispatch(SetChatParam.action({}));
   //     }
   //   }, [isFocused]);
-  //@ts-ignore
-  const TopTabBar = ({ navigation, state, navRoutes }) => {
+
+  const TopTabBar = ({ navigation, state, navRoutes }: { navigation: any, state: any, navRoutes?: any }) => {
     return (
       <TabBar
         style={{ backgroundColor: Colors.newBackgroundColor }}
         selectedIndex={state.index}
-        indicatorStyle={{ display: "none" }}
+        indicatorStyle={{ display: 'none' }}
         onSelect={(index) => navigation.navigate(state.routeNames[index])}
       >
         {tabNames.map((tabName, index) => {
@@ -54,10 +61,10 @@ const ActivityNavigator = ({ route }) => {
                         ...chat,
 
                         subcollection:
-                          state.routeNames[index] == "ParentChat"
-                            ? "parent"
-                            : "student",
-                      })
+                          state.routeNames[index] == 'ParentChat'
+                            ? 'parent'
+                            : 'student',
+                      }),
                     );
 
                     navigation.navigate(state.routeNames[index], {
@@ -86,10 +93,10 @@ const ActivityNavigator = ({ route }) => {
                         ...chat,
 
                         subcollection:
-                          state.routeNames[index] == "ParentChat"
-                            ? "parent"
-                            : "student",
-                      })
+                          state.routeNames[index] == 'ParentChat'
+                            ? 'parent'
+                            : 'student',
+                      }),
                     );
                     navigation.navigate(state.routeNames[index], {
                       receiverUser: {},
@@ -116,20 +123,20 @@ const ActivityNavigator = ({ route }) => {
       >
         <TabNavigator.Screen
           name="ParentChat"
-          options={{ title: "ParentChat" }}
-          component={ParentChatScreen}
+          options={{ title: 'ParentChat' }}
+          component={SingleChatScreen}
         />
         <TabNavigator.Screen
           name="StudentChat"
-          options={{ title: "StudentChat" }}
-          component={ParentChatScreen}
+          options={{ title: 'StudentChat' }}
+          component={SingleChatScreen}
         />
       </TabNavigator.Navigator>
     </BackgroundLayout>
   );
 };
 
-export default ActivityNavigator;
+export default InstructorChatNavigator;
 const styles = StyleSheet.create({
   background: {
     color: Colors.white,
@@ -144,17 +151,17 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   buttonText: {
     borderRadius: 10,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     color: Colors.white,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
