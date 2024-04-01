@@ -1,59 +1,59 @@
-import { DeclineActivityModal, InstructionsModal } from "@/Modals";
-import ChildrenSelectionModal from "@/Modals/ChildrenSelectionModal";
-import { GetChildrenAcitivities } from "@/Services/Activity";
-import { GetChildrenGroups } from "@/Services/Group";
-import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import Colors from "@/Theme/Colors";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Icon, Text } from "@ui-kitten/components";
-import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View
-} from "react-native";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { useDispatch, useSelector } from "react-redux";
-const ParentApprovalScreen = ({ route }) => {
-  const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
-  const marker = require("@/Assets/Images/marker.png");
+import { Icon, Text } from '@ui-kitten/components';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { useDispatch, useSelector } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
 
-  const email = require("@/Assets/Images/email.png");
-  const clockIcon = require("@/Assets/Images/clock1.png");
-  const instructorImage = require("@/Assets/Images/approval_icon2.png");
-  const navigation = useNavigation();
+import { DeclineActivityModal, InstructionsModal } from '@/Modals';
+import ChildrenSelectionModal from '@/Modals/ChildrenSelectionModal';
+import { GetChildrenAcitivities } from '@/Services/Activity';
+import { GetChildrenGroups } from '@/Services/Group';
+import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserState } from '@/Store/User';
+import Colors from '@/Theme/Colors';
+
+const ParentApprovalScreen = () => {
+  // const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
+  const marker = require('@/Assets/Images/marker.png');
+
+  // const email = require("@/Assets/Images/email.png");
+  // const clockIcon = require("@/Assets/Images/clock1.png");
+  // const instructorImage = require("@/Assets/Images/approval_icon2.png");
+  // const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const dependent = route && route.params && route.params.dependent;
-  const swipeableRef = useRef(null);
+  // const dependent = route && route.params && route.params.dependent;
+  // const swipeableRef = useRef(null);
   const dispatch = useDispatch();
-  const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
-  const [loading, setLoading] = useState(true);
-  const [thumbnail, setThumbnail] = useState(false);
-  const [searchParam, setSearchParam] = useState("");
-  const [activities, setActivities] = useState([]);
-  const [selectedInstructions, setSelectedInstructions] = useState(null);
-  const [declineActivity, setDeclineActivity] = useState(null);
-  const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
+  // const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
+  // const [loading, setLoading] = useState(true);
+  // const [thumbnail, setThumbnail] = useState(false);
+  // const [searchParam, setSearchParam] = useState("");
+  const [activities, setActivities] = useState<any[]>([]);
+  const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
+  const [declineActivity, setDeclineActivity] = useState<any>(null);
+  const currentUser: any = useSelector(
+    (state: { user: UserState }) => state.user.item,
   );
-  const [activity, setActivity] = useState(null);
+  // const [activity, setActivity] = useState(null);
   let prevOpenedRow: any;
-  let row: Array<any> = [];
-  const [groups, setGroups] = useState([]);
-  const [children, setChildren] = useState([]);
-  const [pageGroup, pageNumberGroup] = useState(0);
-  const [pageSizeGroup, setPageSizeGroup] = useState(10);
-  const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
+  let row: any[] = [];
+  const [groups, setGroups] = useState<any[]>([]);
+  const [children, setChildren] = useState<any[]>([]);
+  const [pageGroup, pageNumberGroup] = useState<number>(0);
+  const [pageSizeGroup, setPageSizeGroup] = useState<number>(10);
+  const [totalRecordsGroup, setTotalRecordsGroup] = useState<number>(0);
 
-  const [pageActivity, pageNumberActivity] = useState(0);
-  const [pageSizeActivity, setPageSizeActivity] = useState(10);
-  const [totalRecordsActivity, setTotalRecordsActivity] = useState(0);
-  const [refreshing, setRefreshing] = useState(false);
-  const [selectedChild, setSelectedChild] = useState("");
+  const [pageActivity, pageNumberActivity] = useState<number>(0);
+  const [pageSizeActivity, setPageSizeActivity] = useState<number>(10);
+  const [totalRecordsActivity, setTotalRecordsActivity] = useState<number>(0);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [selectedChild, setSelectedChild] = useState<any>('');
 
-  const getActivities = async (refreshing: any) => {
+  const getActivities = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
@@ -62,10 +62,10 @@ const ParentApprovalScreen = ({ route }) => {
     let email = currentUser?.email;
     GetChildrenAcitivities(
       email,
-      "approved",
+      'approved',
 
       pageNumberActivityCount,
-      pageSizeActivity
+      pageSizeActivity,
     )
       .then((res) => {
         setTotalRecordsActivity(res.totalRecords);
@@ -73,7 +73,7 @@ const ParentApprovalScreen = ({ route }) => {
         setPageSizeActivity(10);
 
         pageNumberActivity(refreshing ? pageActivity + 1 : 1);
-        console.log("res", res.result);
+        console.log('res', res.result);
 
         if (refreshing) {
           setActivities([...activities, ...res.result]);
@@ -82,7 +82,7 @@ const ParentApprovalScreen = ({ route }) => {
         }
       })
       .catch((err) => {
-        console.log("Error:", err);
+        console.log('Error:', err);
         setRefreshing(false);
         setPageSizeActivity(10);
 
@@ -90,22 +90,22 @@ const ParentApprovalScreen = ({ route }) => {
       });
   };
 
-  const getGroups = async (refreshing: any) => {
+  const getGroups = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
 
     let pageNumberGroupCount = refreshing ? pageGroup : 0;
     let email = currentUser?.email;
-    GetChildrenGroups(email, "approved", pageNumberGroupCount, pageSizeGroup)
+    GetChildrenGroups(email, 'approved', pageNumberGroupCount, pageSizeGroup)
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         setTotalRecordsGroup(res.totalRecords);
         setRefreshing(false);
         setPageSizeGroup(10);
 
         pageNumberGroup(refreshing ? pageGroup + 1 : 1);
-        console.log("res", res);
+        console.log('res', res);
         if (refreshing) {
           setGroups([...groups, ...res?.result]);
         } else {
@@ -118,17 +118,17 @@ const ParentApprovalScreen = ({ route }) => {
         setPageSizeGroup(10);
 
         pageNumberGroup(pageGroup);
-        console.log("Error:", err);
+        console.log('Error:', err);
       });
   };
 
   const loadUserDetails = async () => {
     GetParentChildrens(currentUser?.referenceCode)
       .then((res) => {
-        console.log("children", res);
+        console.log('children', res);
         setChildren(res);
       })
-      .catch((err) => console.log("loadUserDetails", err));
+      .catch((err) => console.log('loadUserDetails', err));
   };
   useEffect(() => {
     loadUserDetails();
@@ -139,7 +139,7 @@ const ParentApprovalScreen = ({ route }) => {
       getGroups();
     }
   }, [isFocused, declineActivity]);
-  const closeRow = (index) => {
+  const closeRow = (index: number) => {
     console.log(index);
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
@@ -152,31 +152,31 @@ const ParentApprovalScreen = ({ route }) => {
     }
   }, [selectedInstructions]);
 
-  const RightActions = (dragX: any, item) => {
+  const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
-      extrapolate: "clamp",
+      extrapolate: 'clamp',
     });
     return (
       <View
         style={{
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <TouchableOpacity
           style={{
             padding: 10,
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
           onPress={() => {
             dispatch(
               ChangeModalState.action({
                 childrenSelectionModalVisibility: true,
-              })
+              }),
             );
             setDeclineActivity(item);
           }}
@@ -194,7 +194,7 @@ const ParentApprovalScreen = ({ route }) => {
       </View>
     );
   };
-  console.log("aaaaaaa", activities);
+  console.log('aaaaaaa', activities);
 
   return (
     <>
@@ -219,14 +219,14 @@ const ParentApprovalScreen = ({ route }) => {
             ...declineActivity,
             selectedStudentId: selectedChild.studentId,
           }}
-          setActivity={(id) => {
-            setSelectedChild("");
+          setActivity={(id: any) => {
+            setSelectedChild('');
             if (declineActivity?.activity) {
-              console.log("declinedactivity", declineActivity);
+              console.log('declinedactivity', declineActivity);
 
-              console.log("activites", activities);
+              console.log('activites', activities);
               let filter = activities.filter(
-                (item) => item?.activity?.activityId != id
+                (item) => item?.activity?.activityId != id,
               );
               setDeclineActivity(false);
               setActivities(filter);
@@ -242,7 +242,7 @@ const ParentApprovalScreen = ({ route }) => {
           <View
             style={{ padding: 10, backgroundColor: Colors.newBackgroundColor }}
           >
-            <Text style={[styles.text, { textAlign: "center" }]}>
+            <Text style={[styles.text, { textAlign: 'center' }]}>
               You do not have any approved activities or groups
             </Text>
           </View>
@@ -252,10 +252,10 @@ const ParentApprovalScreen = ({ route }) => {
           <FlatList
             data={[...activities, ...groups]}
             // style={{ padding: 20, width: "100%" }}
-            renderItem={({ item, index }) => {
+            renderItem={({ item }) => {
               if (item?.activity?.activityId) {
                 let date = item?.activity?.fromDate;
-                console.log(item)
+                console.log(item);
                 return (
                   <Swipeable
                     ref={(ref) => (row[item?.activity?.activityId] = ref)}
@@ -313,84 +313,84 @@ const ParentApprovalScreen = ({ route }) => {
                         >{`Instructions / Disclaimer / Agreement`}</Text>
                       </TouchableOpacity>
                       </View> */}
-                    
-                  <TouchableOpacity
-                        onPress={() => {
-                          // navigation.navigate('InstructorGroupApproval')
-                        }}
-                        style={[styles.item]}
-                      >
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        // navigation.navigate('InstructorGroupApproval')
+                      }}
+                      style={[styles.item]}
+                    >
                       <Text style={[styles.text, { fontSize: 25 }]}>
                         {`${item?.activity?.activityName}`}
                       </Text>
-                      
+
                       <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        
-                      }}
-                      >
-                      <Image
-                        source={require("@/Assets/Images/circle-dashed.png")}
                         style={{
-                          height: 40,
-                          width: 15,
-                          resizeMode: "contain",
-                         marginRight: 10,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+
                         }}
-                      />
+                      >
+                        <Image
+                          source={require('@/Assets/Images/circle-dashed.png')}
+                          style={{
+                            height: 40,
+                            width: 15,
+                            resizeMode: 'contain',
+                            marginRight: 10,
+                          }}
+                        />
                         <View>
                           <Text style={styles.text}>{`${moment(
-                          item?.activity?.fromDate == "string"
-                            ? new Date()
-                            : item?.activity?.fromDate
-                         ).format("MMM DD YYYY")} at ${moment.utc(
-                          item?.activity?.fromDate == "string"
-                            ? new Date()
-                            : item?.activity?.fromDate
+                            item?.activity?.fromDate == 'string'
+                              ? new Date()
+                              : item?.activity?.fromDate,
+                          ).format('MMM DD YYYY')} at ${moment.utc(
+                            item?.activity?.fromDate == 'string'
+                              ? new Date()
+                              : item?.activity?.fromDate,
                           )
-                          .format("hh:mm a")} `}</Text>
-                        <Text style={styles.text}>{`${moment(
-                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
-                        ).format("MMM DD YYYY")} at ${moment.utc(
-                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
-                        )
-                          .format("hh:mm a")} `}</Text>
-                      </View>
-                    </View>
-
-                      
-                      <View style={styles.horizontal}>
-                          <Image source={marker} style={styles.iconStyle} />
-                          <Text style={styles.text}>{item?.activity?.venueFromName}</Text>
-                      </View>
-
-                        <View style={styles.horizontal}>
-                          <Image source={marker} style={styles.iconStyle} />
-                          <View>
-                            <Text style={styles.text}>
-                            {`${item?.activity?.venueFromAddress}, ${item?.activity?.venueFromCity}, ${item?.activity?.venueFromState} ${item?.activity?.venueFromZip}, ${item?.activity?.venueFromCountry}`}
-                            </Text>
-                          </View>
+                            .format('hh:mm a')} `}</Text>
+                          <Text style={styles.text}>{`${moment(
+                            item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
+                          ).format('MMM DD YYYY')} at ${moment.utc(
+                            item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
+                          )
+                            .format('hh:mm a')} `}</Text>
                         </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                        onPress={() => {
-                          dispatch(
-                            ChangeModalState.action({
-                              instructionsModalVisibility: true,
-                            })
-                          );
-                          setSelectedInstructions(item);
-                        }}
-                        style={[styles.footer]}
-                      >
-                        <Text
-                          style={[styles.text, { textAlign: "center" }]}
-                        >{`Instructions / Disclaimer / Agreement`}</Text>
-                      </TouchableOpacity>
-                        {/* <TouchableOpacity
+                      </View>
+
+
+                      <View style={styles.horizontal}>
+                        <Image source={marker} style={styles.iconStyle} />
+                        <Text style={styles.text}>{item?.activity?.venueFromName}</Text>
+                      </View>
+
+                      <View style={styles.horizontal}>
+                        <Image source={marker} style={styles.iconStyle} />
+                        <View>
+                          <Text style={styles.text}>
+                            {`${item?.activity?.venueFromAddress}, ${item?.activity?.venueFromCity}, ${item?.activity?.venueFromState} ${item?.activity?.venueFromZip}, ${item?.activity?.venueFromCountry}`}
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        dispatch(
+                          ChangeModalState.action({
+                            instructionsModalVisibility: true,
+                          }),
+                        );
+                        setSelectedInstructions(item);
+                      }}
+                      style={[styles.footer]}
+                    >
+                      <Text
+                        style={[styles.text, { textAlign: 'center' }]}
+                      >{`Instructions / Disclaimer / Agreement`}</Text>
+                    </TouchableOpacity>
+                    {/* <TouchableOpacity
                         onPress={() => {
                           dispatch(
                             ChangeModalState.action({
@@ -406,13 +406,13 @@ const ParentApprovalScreen = ({ route }) => {
                         >{`Instructions / Disclaimer / Agreement`}</Text>
                       </TouchableOpacity> */}
 
-                      {/* <View style={styles.horizontal}>
+                    {/* <View style={styles.horizontal}>
                         <Image source={email} style={styles.iconStyle} />
 
                         <Text
                           style={styles.text}
                         >{`${item?.parentEmail1}`}</Text>
-                      </View> 
+                      </View>
                     </View>
                   </Swipeable>
                 );
@@ -449,16 +449,17 @@ const ParentApprovalScreen = ({ route }) => {
                           style={styles.text}
                         >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
                       </View> */}
-                      
-                    
-                   
+
+
                   </Swipeable>
                 );
+              } else {
+                return <></>;
               }
             }}
             onEndReached={async () => {
               if (totalRecordsActivity > activities.length) {
-                console.log("logs");
+                console.log('logs');
 
                 getActivities(true);
 
@@ -484,16 +485,16 @@ export default ParentApprovalScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     backgroundColor: Colors.newBackgroundColor,
   },
   item: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     paddingHorizontal: 15,
     paddingVertical: 15,
   },
@@ -502,29 +503,29 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.lightgray,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 16,
     marginVertical: 4,
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -536,20 +537,20 @@ const styles = StyleSheet.create({
   },
   buttonSettings: {
     marginTop: 10,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     marginBottom: 10,
   },
   iconStyle: {
     height: 25,
     width: 15,
     marginRight: 10,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     tintColor: Colors.secondary,
   },
   horizontal: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

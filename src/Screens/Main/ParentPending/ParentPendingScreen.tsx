@@ -1,58 +1,55 @@
-import {
-  ApproveActivityModal,
-  DeclineActivityModal, InstructionsModal
-} from "@/Modals";
-import ChildrenSelectionModal from "@/Modals/ChildrenSelectionModal";
-import { GetChildrenAcitivities } from "@/Services/Activity";
-import { GetChildrenGroups } from "@/Services/Group";
-import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import Colors from "@/Theme/Colors";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Icon, Text } from "@ui-kitten/components";
-import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View
-} from "react-native";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { useDispatch, useSelector } from "react-redux";
-const ParentPendingScreen = ({ route }) => {
-  const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
-  const marker = require("@/Assets/Images/marker.png");
+import { useIsFocused } from '@react-navigation/native';
+import { Icon, Text } from '@ui-kitten/components';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { useDispatch, useSelector } from 'react-redux';
 
-  const email = require("@/Assets/Images/email.png");
-  const clockIcon = require("@/Assets/Images/clock1.png");
-  const instructorImage = require("@/Assets/Images/approval_icon2.png");
-  const swipeableRef = useRef(null);
+import { ApproveActivityModal, DeclineActivityModal, InstructionsModal } from '@/Modals';
+import ChildrenSelectionModal from '@/Modals/ChildrenSelectionModal';
+import { GetChildrenAcitivities } from '@/Services/Activity';
+import { GetChildrenGroups } from '@/Services/Group';
+import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserState } from '@/Store/User';
+import Colors from '@/Theme/Colors';
+
+const ParentPendingScreen = () => {
+  const calendarIcon = require('@/Assets/Images/navigation_icon2.png');
+  const marker = require('@/Assets/Images/marker.png');
+
+  // const email = require("@/Assets/Images/email.png");
+  // const clockIcon = require("@/Assets/Images/clock1.png");
+  const instructorImage = require('@/Assets/Images/approval_icon2.png');
+  // const swipeableRef = useRef(null);
 
   let prevOpenedRow: any;
   let row: Array<any> = [];
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
-  const [pageActivity, pageNumberActivity] = useState(0);
-  const [pageSizeActivity, setPageSizeActivity] = useState(10);
-  const [totalRecordsActivity, setTotalRecordsActivity] = useState(0);
-  const [pageGroup, pageNumberGroup] = useState(0);
-  const [pageSizeGroup, setPageSizeGroup] = useState(10);
-  const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
-  const [children, setChildren] = useState([]);
-  const [activities, setActivities] = useState([]);
-  const [groups, setGroups] = useState([]);
-  const [activity, setActivity] = useState(null);
-  const [declineActivity, setDeclineActivity] = useState(null);
-  const [selectedInstructions, setSelectedInstructions] = useState(null);
-  const [selectedChild, setSelectedChild] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
-  const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
+  const [pageActivity, pageNumberActivity] = useState<number>(0);
+  const [pageSizeActivity, setPageSizeActivity] = useState<number>(10);
+  const [totalRecordsActivity, setTotalRecordsActivity] = useState<number>(0);
+  const [pageGroup, pageNumberGroup] = useState<number>(0);
+  const [pageSizeGroup, setPageSizeGroup] = useState<number>(10);
+  const [totalRecordsGroup, setTotalRecordsGroup] = useState<number>(0);
+  const [children, setChildren] = useState<any[]>([]);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [groups, setGroups] = useState<any[]>([]);
+  const [activity, setActivity] = useState<any>(null);
+  const [declineActivity, setDeclineActivity] = useState<any>(null);
+  const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
+  const [selectedChild, setSelectedChild] = useState<any>('');
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const currentUser: any = useSelector(
+    (state: { user: UserState }) => state.user.item,
   );
   const [showAcceptModal, setShowAcceptModal] = useState(false);
-  const closeRow = (index) => {
+  const closeRow = (index: number) => {
     console.log(index);
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
@@ -62,13 +59,13 @@ const ParentPendingScreen = ({ route }) => {
   const loadUserDetails = async () => {
     GetParentChildrens(currentUser?.referenceCode)
       .then((res) => {
-        console.log("children", res);
+        console.log('children', res);
         setChildren(res);
       })
-      .catch((err) => console.log("loadUserDetails", err));
+      .catch((err) => console.log('loadUserDetails', err));
   };
   // Alert.alert("jjh");
-  const getActivities = async (refreshing: any) => {
+  const getActivities = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
@@ -78,9 +75,9 @@ const ParentPendingScreen = ({ route }) => {
 
     GetChildrenAcitivities(
       email,
-      "pending",
+      'pending',
       pageNumberActivityCount,
-      pageSizeActivity
+      pageSizeActivity,
     )
       .then((res) => {
         setTotalRecordsActivity(res.totalRecords);
@@ -88,7 +85,7 @@ const ParentPendingScreen = ({ route }) => {
         setPageSizeActivity(20);
 
         pageNumberActivity(refreshing ? pageActivity + 1 : 1);
-        console.log("res", res);
+        console.log('res', res);
 
         if (refreshing) {
           setActivities([...activities, ...res.result]);
@@ -101,25 +98,25 @@ const ParentPendingScreen = ({ route }) => {
         setPageSizeActivity(20);
 
         pageNumberActivity(pageActivity);
-        console.log("Error:", err);
+        console.log('Error:', err);
       });
   };
-  const getGroups = async (refreshing: any) => {
+  const getGroups = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
 
     let pageNumberGroupCount = refreshing ? pageGroup : 0;
     let email = currentUser?.email;
-    GetChildrenGroups(email, "pending", pageNumberGroupCount, pageSizeGroup)
+    GetChildrenGroups(email, 'pending', pageNumberGroupCount, pageSizeGroup)
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         setTotalRecordsGroup(res.totalRecords);
         setRefreshing(false);
         setPageSizeGroup(20);
 
         pageNumberGroup(refreshing ? pageGroup + 1 : 1);
-        console.log("res", res);
+        console.log('res', res);
         if (refreshing) {
           setGroups([...groups, ...res?.result]);
         } else {
@@ -132,7 +129,7 @@ const ParentPendingScreen = ({ route }) => {
         setPageSizeGroup(20);
 
         pageNumberGroup(pageGroup);
-        console.log("Error:", err);
+        console.log('Error:', err);
       });
   };
 
@@ -158,35 +155,35 @@ const ParentPendingScreen = ({ route }) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
-      extrapolate: "clamp",
+      extrapolate: 'clamp',
     });
     return (
       <View
         style={{
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         {item.status && (
           <View
             style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <TouchableOpacity
               style={{
                 padding: 10,
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
               onPress={() => {
                 dispatch(
                   ChangeModalState.action({
                     childrenSelectionModalVisibility: true,
-                  })
+                  }),
                 );
                 setShowAcceptModal(true);
                 setActivity(item);
@@ -197,8 +194,8 @@ const ParentPendingScreen = ({ route }) => {
             <TouchableOpacity
               style={{
                 padding: 10,
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
               onPress={() => {
                 // dispatch(
@@ -210,7 +207,7 @@ const ParentPendingScreen = ({ route }) => {
                 dispatch(
                   ChangeModalState.action({
                     childrenSelectionModalVisibility: true,
-                  })
+                  }),
                 );
                 // setShowAcceptModal(true);
                 setActivity(item);
@@ -233,7 +230,7 @@ const ParentPendingScreen = ({ route }) => {
   };
 
   const approveActivityModalVisibility = useSelector(
-    (state: { modal: ModalState }) => state.modal.approveActivityModalVisibility
+    (state: { modal: ModalState }) => state.modal.approveActivityModalVisibility,
   );
 
   return (
@@ -247,7 +244,7 @@ const ParentPendingScreen = ({ route }) => {
       )}
       {activity && (
         <ChildrenSelectionModal
-          acceptModal={showAcceptModal ? true : false}
+          acceptModal={showAcceptModal}
           setSelectedChild={setSelectedChild}
           activity={activity}
           children={children}
@@ -262,14 +259,14 @@ const ParentPendingScreen = ({ route }) => {
           selectedChild={selectedChild}
           setSelectedChild={setSelectedChild}
           activity={{ ...activity, selectedStudentId: selectedChild.studentId }}
-          setActivity={(id) => {
-            setSelectedChild("");
+          setActivity={(id: any) => {
+            setSelectedChild('');
             if (activity?.activity) {
-              console.log("declinedactivity", activity);
+              console.log('declinedactivity', activity);
 
-              console.log("activites", activities);
+              console.log('activites', activities);
               let filter = activities.filter(
-                (item) => item?.activity?.activityId != id
+                (item) => item?.activity?.activityId != id,
               );
 
               setActivities(filter);
@@ -287,14 +284,14 @@ const ParentPendingScreen = ({ route }) => {
             ...declineActivity,
             selectedStudentId: selectedChild.studentId,
           }}
-          setActivity={(id) => {
-            setSelectedChild("");
+          setActivity={(id: any) => {
+            setSelectedChild('');
             if (declineActivity?.activity) {
-              console.log("declinedactivity", declineActivity);
+              console.log('declinedactivity', declineActivity);
 
-              console.log("activites", activities);
+              console.log('activites', activities);
               let filter = activities.filter(
-                (item) => item?.activity?.activityId != id
+                (item) => item?.activity?.activityId != id,
               );
               setDeclineActivity(false);
               setActivities(filter);
@@ -310,7 +307,7 @@ const ParentPendingScreen = ({ route }) => {
         <View
           style={{ backgroundColor: Colors.newBackgroundColor, padding: 10 }}
         >
-          <Text style={[styles.text, { textAlign: "center" }]}>
+          <Text style={[styles.text, { textAlign: 'center' }]}>
             You do not have any pending activities or groups to approve
           </Text>
         </View>
@@ -331,81 +328,81 @@ const ParentPendingScreen = ({ route }) => {
                     renderRightActions={(e) => RightActions(e, item)}
                   >
                     <TouchableOpacity
-                        onPress={() => {
-                          // navigation.navigate('InstructorGroupApproval')
-                        }}
-                        style={[styles.item]}
-                      >
+                      onPress={() => {
+                        // navigation.navigate('InstructorGroupApproval')
+                      }}
+                      style={[styles.item]}
+                    >
                       <Text style={[styles.text, { fontSize: 25 }]}>
                         {`${item?.activity?.activityName}`}
                       </Text>
-                      
+
                       <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        
-                      }}
-                      >
-                      <Image
-                        source={require("@/Assets/Images/circle-dashed.png")}
                         style={{
-                          height: 40,
-                          width: 15,
-                          resizeMode: "contain",
-                         marginRight: 10,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+
                         }}
-                      />
+                      >
+                        <Image
+                          source={require('@/Assets/Images/circle-dashed.png')}
+                          style={{
+                            height: 40,
+                            width: 15,
+                            resizeMode: 'contain',
+                            marginRight: 10,
+                          }}
+                        />
                         <View>
                           <Text style={styles.text}>{`${moment(
-                          item?.activity?.fromDate == "string"
-                            ? new Date()
-                            : item?.activity?.fromDate
-                         ).format("MMM DD YYYY")} at ${moment.utc(
-                          item?.activity?.fromDate == "string"
-                            ? new Date()
-                            : item?.activity?.fromDate
+                            item?.activity?.fromDate == 'string'
+                              ? new Date()
+                              : item?.activity?.fromDate,
+                          ).format('MMM DD YYYY')} at ${moment.utc(
+                            item?.activity?.fromDate == 'string'
+                              ? new Date()
+                              : item?.activity?.fromDate,
                           )
-                          .format("hh:mm a")} `}</Text>
-                        <Text style={styles.text}>{`${moment(
-                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
-                        ).format("MMM DD YYYY")} at ${moment.utc(
-                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
-                        )
-                          .format("hh:mm a")} `}</Text>
-                      </View>
-                    </View>
-
-                      
-                      <View style={styles.horizontal}>
-                          <Image source={marker} style={styles.iconStyle} />
-                          <Text style={styles.text}>{item?.activity?.venueFromName}</Text>
-                      </View>
-
-                        <View style={styles.horizontal}>
-                          <Image source={marker} style={styles.iconStyle} />
-                          <View>
-                            <Text style={styles.text}>
-                            {`${item?.activity?.venueFromAddress}, ${item?.activity?.venueFromCity}, ${item?.activity?.venueFromState} ${item?.activity?.venueFromZip}, ${item?.activity?.venueFromCountry}`}
-                            </Text>
-                          </View>
+                            .format('hh:mm a')} `}</Text>
+                          <Text style={styles.text}>{`${moment(
+                            item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
+                          ).format('MMM DD YYYY')} at ${moment.utc(
+                            item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
+                          )
+                            .format('hh:mm a')} `}</Text>
                         </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                        onPress={() => {
-                          dispatch(
-                            ChangeModalState.action({
-                              instructionsModalVisibility: true,
-                            })
-                          );
-                          setSelectedInstructions(item);
-                        }}
-                        style={[styles.footer]}
-                      >
-                        <Text
-                          style={[styles.text, { textAlign: "center" }]}
-                        >{`Instructions / Disclaimer / Agreement`}</Text>
-                      </TouchableOpacity>
+                      </View>
+
+
+                      <View style={styles.horizontal}>
+                        <Image source={marker} style={styles.iconStyle} />
+                        <Text style={styles.text}>{item?.activity?.venueFromName}</Text>
+                      </View>
+
+                      <View style={styles.horizontal}>
+                        <Image source={marker} style={styles.iconStyle} />
+                        <View>
+                          <Text style={styles.text}>
+                            {`${item?.activity?.venueFromAddress}, ${item?.activity?.venueFromCity}, ${item?.activity?.venueFromState} ${item?.activity?.venueFromZip}, ${item?.activity?.venueFromCountry}`}
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        dispatch(
+                          ChangeModalState.action({
+                            instructionsModalVisibility: true,
+                          }),
+                        );
+                        setSelectedInstructions(item);
+                      }}
+                      style={[styles.footer]}
+                    >
+                      <Text
+                        style={[styles.text, { textAlign: 'center' }]}
+                      >{`Instructions / Disclaimer / Agreement`}</Text>
+                    </TouchableOpacity>
 
                   </Swipeable>
                 );
@@ -432,8 +429,8 @@ const ParentPendingScreen = ({ route }) => {
                       <View style={styles.horizontal}>
                         <Image source={calendarIcon} style={styles.iconStyle} />
                         <Text style={styles.text}>{`${moment(
-                          item?.activity?.scheduler?.fromDate
-                        ).format("YYYY-MM-DD")}`}</Text>
+                          item?.activity?.scheduler?.fromDate,
+                        ).format('YYYY-MM-DD')}`}</Text>
                       </View>
 
                       {/* <View style={styles.horizontal}>
@@ -449,7 +446,7 @@ const ParentPendingScreen = ({ route }) => {
             }}
             onEndReached={async () => {
               if (totalRecordsActivity > activities.length) {
-                console.log("logs");
+                console.log('logs');
 
                 getActivities(true);
 
@@ -475,15 +472,15 @@ export default ParentPendingScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     backgroundColor: Colors.newBackgroundColor,
   },
   item: {
     borderRadius: 20,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     paddingHorizontal: 15,
     paddingVertical: 15,
   },
@@ -492,29 +489,29 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.lightgray,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 16,
     marginVertical: 4,
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -526,20 +523,20 @@ const styles = StyleSheet.create({
   },
   buttonSettings: {
     marginTop: 10,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     marginBottom: 10,
   },
   iconStyle: {
     height: 25,
     width: 15,
     marginRight: 10,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     tintColor: Colors.secondary,
   },
   horizontal: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

@@ -1,28 +1,30 @@
-import React from "react";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { Button, TabBar } from "@ui-kitten/components";
-import { StyleSheet, View } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
-import {
-  ParentApprovalScreen,
-  ParentDeclineScreen,
-  ParentPendingScreen,
-} from "@/Screens";
-import { AppHeader } from "@/Components";
-import Colors from "@/Theme/Colors";
-import { LinearGradientButton } from "@/Components";
-import BackgroundLayout from "@/Components/BackgroundLayout";
+import React from 'react';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { TabBar } from '@ui-kitten/components';
+import { StyleSheet, View } from 'react-native';
+
+import { ParentApprovalScreen, ParentDeclineScreen, ParentPendingScreen } from '@/Screens';
+import { LinearGradientButton } from '@/Components';
+import Colors from '@/Theme/Colors';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+
+type ApprovalNavigatorPramList = {
+  ParentApprovalScreen: undefined
+  ParentDeclineScreen: undefined
+  ParentPendingScreen: undefined
+}
+
 // @refresh reset
 const ApprovalNavigator = () => {
-  const TabNavigator = createMaterialTopTabNavigator();
-  const tabNames = ["Approved", "Declined", "Pending"];
+  const TabNavigator = createMaterialTopTabNavigator<ApprovalNavigatorPramList>();
+  const tabNames = ['Approved', 'Declined', 'Pending'];
   //@ts-ignore
 
   const TopTabBar = ({ navigation, state }) => (
     <TabBar
       style={styles.toolBar}
       selectedIndex={state.index}
-      indicatorStyle={{ display: "none" }}
+      indicatorStyle={{ display: 'none' }}
       onSelect={(index) => navigation.navigate(state.routeNames[index])}
     >
       {tabNames.map((tabName, index) => {
@@ -62,17 +64,17 @@ const ApprovalNavigator = () => {
       >
         <TabNavigator.Screen
           name="ParentApprovalScreen"
-          options={{ title: "Approved" }}
+          options={{ title: 'Approved' }}
           component={ParentApprovalScreen}
         />
         <TabNavigator.Screen
           name="ParentDeclineScreen"
-          options={{ title: "Declined" }}
+          options={{ title: 'Declined' }}
           component={ParentDeclineScreen}
         />
         <TabNavigator.Screen
           name="ParentPendingScreen"
-          options={{ title: "Pending" }}
+          options={{ title: 'Pending' }}
           component={ParentPendingScreen}
         />
       </TabNavigator.Navigator>
@@ -90,7 +92,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.newBackgroundColor,
     marginTop: 20,
     paddingHorizontal: 20,
-    width: "100%",
+    width: '100%',
   },
   topNav: {
     color: Colors.white,
@@ -102,19 +104,19 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     borderRadius: 10,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     color: Colors.white,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   toolBar: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
 
     backgroundColor: Colors.newBackgroundColor,
-    width: "100%",
+    width: '100%',
   },
 });

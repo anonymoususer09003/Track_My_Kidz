@@ -47,9 +47,9 @@ export { default as StudentLocationScreen } from "./Main/StudentLocation/Student
 export { default as ActivityScreen } from "./Main/Activity/ActivityScreen";
 export { default as GroupScreen } from "./Main/Group/GroupScreen";
 export { default as CreateParentActivityScreen } from "./Main/CreateParentActivity/CreateParentActivityScreen";
-// export { default as ParentApprovalScreen } from "./Main/ParentApproval/ParentApprovalScreen";
-// export { default as ParentDeclineScreen } from "./Main/ParentDecline/ParentDeclineScreen";
-// export { default as ParentPendingScreen } from "./Main/ParentPending/ParentPendingScreen";
+export { default as ParentApprovalScreen } from "./Main/ParentApproval/ParentApprovalScreen";
+export { default as ParentDeclineScreen } from "./Main/ParentDecline/ParentDeclineScreen";
+export { default as ParentPendingScreen } from "./Main/ParentPending/ParentPendingScreen";
 // export { default as ActivationCodeScreen } from "./Main/ActivationCode/ActivationCodeScreen";
 // export { default as DependentInfoScreen } from "./Main/DependentInfo/DependentInfoScreen";
 // export { default as SettingsScreen } from "./Main/Settings/SettingsScreen";

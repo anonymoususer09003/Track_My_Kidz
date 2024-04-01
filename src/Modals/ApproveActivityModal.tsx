@@ -2,17 +2,16 @@ import { LinearGradientButton } from '@/Components';
 import { useStateValue } from '@/Context/state/State';
 import { GetOptIn, InstructorUpdateStatus, UpdateActivityByStatus } from '@/Services/Activity';
 import { GetOptInGroup, UpdateGroupByStatus, UpdateInstructorGroupStatus } from '@/Services/Group';
-import { ModalState } from '@/Store/Modal';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import Colors from '@/Theme/Colors';
 import { useIsFocused } from '@react-navigation/native';
 import { Card, CheckBox, Modal, Text } from '@ui-kitten/components';
 import React, { FC, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 type ApproveActivityModal = {
-  selectedChild: any;
+  selectedChild?: any;
   setSelectedChild: (item: any) => void;
   activity: any;
   setActivity: Function;
@@ -23,7 +22,6 @@ type ApproveActivityModal = {
 
 const ApproveActivityModal: FC<ApproveActivityModal> = (
   {
-    selectedChild,
     setSelectedChild,
     activity,
     setActivity,

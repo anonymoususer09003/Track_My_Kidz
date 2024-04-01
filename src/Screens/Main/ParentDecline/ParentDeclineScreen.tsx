@@ -1,57 +1,57 @@
-import { ApproveActivityModal, InstructionsModal } from "@/Modals";
-import ChildrenSelectionModal from "@/Modals/ChildrenSelectionModal";
-import { GetChildrenAcitivities } from "@/Services/Activity";
-import { GetChildrenGroups } from "@/Services/Group";
-import GetParentChildrens from "@/Services/Parent/GetParentChildrens";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import Colors from "@/Theme/Colors";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Icon, Text } from "@ui-kitten/components";
-import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View
-} from "react-native";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { useDispatch, useSelector } from "react-redux";
-const ParentDeclineScreen = ({ route }) => {
-  const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
-  const marker = require("@/Assets/Images/marker.png");
+import { useIsFocused } from '@react-navigation/native';
+import { Icon, Text } from '@ui-kitten/components';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { useDispatch, useSelector } from 'react-redux';
 
-  const email = require("@/Assets/Images/email.png");
-  const clockIcon = require("@/Assets/Images/clock1.png");
-  const instructorImage = require("@/Assets/Images/approval_icon2.png");
-  const navigation = useNavigation();
+import { ApproveActivityModal, InstructionsModal } from '@/Modals';
+import ChildrenSelectionModal from '@/Modals/ChildrenSelectionModal';
+import { GetChildrenAcitivities } from '@/Services/Activity';
+import { GetChildrenGroups } from '@/Services/Group';
+import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserState } from '@/Store/User';
+import Colors from '@/Theme/Colors';
+
+const ParentDeclineScreen = () => {
+  const calendarIcon = require('@/Assets/Images/navigation_icon2.png');
+  const marker = require('@/Assets/Images/marker.png');
+
+  // const email = require("@/Assets/Images/email.png");
+  // const clockIcon = require("@/Assets/Images/clock1.png");
+  const instructorImage = require('@/Assets/Images/approval_icon2.png');
+  // const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const dependent = route && route.params && route.params.dependent;
-  const swipeableRef = useRef(null);
+  // const dependent = route && route.params && route.params.dependent;
+  // const swipeableRef = useRef(null);
   const dispatch = useDispatch();
-  const [children, setChildren] = useState([]);
-  const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
-  const [loading, setLoading] = useState(true);
-  const [thumbnail, setThumbnail] = useState(false);
-  const [searchParam, setSearchParam] = useState("");
-  const [activity, setActivity] = useState(null);
-  const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
+  const [children, setChildren] = useState<any[]>([]);
+  // const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
+  // const [loading, setLoading] = useState(true);
+  // const [thumbnail, setThumbnail] = useState(false);
+  // const [searchParam, setSearchParam] = useState("");
+  const [activity, setActivity] = useState<any>(null);
+  const currentUser: any = useSelector(
+    (state: { user: UserState }) => state.user.item,
   );
-  const [selectedChild, setSelectedChild] = useState("");
-  const [groups, setGroups] = useState([]);
-  const [pageGroup, pageNumberGroup] = useState(0);
-  const [pageSizeGroup, setPageSizeGroup] = useState(10);
-  const [totalRecordsGroup, setTotalRecordsGroup] = useState(0);
-  const [activities, setActivities] = useState([]);
-  const [selectedInstructions, setSelectedInstructions] = useState(null);
-  const [pageActivity, pageNumberActivity] = useState(0);
-  const [pageSizeActivity, setPageSizeActivity] = useState(10);
-  const [totalRecordsActivity, setTotalRecordsActivity] = useState(0);
-  const [refreshing, setRefreshing] = useState(false);
-  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [selectedChild, setSelectedChild] = useState<any>('');
+  const [groups, setGroups] = useState<any[]>([]);
+  const [pageGroup, pageNumberGroup] = useState<number>(0);
+  const [pageSizeGroup, setPageSizeGroup] = useState<number>(10);
+  const [totalRecordsGroup, setTotalRecordsGroup] = useState<number>(0);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
+  const [pageActivity, pageNumberActivity] = useState<number>(0);
+  const [pageSizeActivity, setPageSizeActivity] = useState<number>(10);
+  const [totalRecordsActivity, setTotalRecordsActivity] = useState<number>(0);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [showAcceptModal, setShowAcceptModal] = useState<boolean>(false);
   let prevOpenedRow: any;
   let row: Array<any> = [];
-  const getActivities = async (refreshing: any) => {
+  const getActivities = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
@@ -60,18 +60,18 @@ const ParentDeclineScreen = ({ route }) => {
     let email = currentUser?.email;
     GetChildrenAcitivities(
       email,
-      "declined",
+      'declined',
       pageNumberActivityCount,
-      pageSizeActivity
+      pageSizeActivity,
     )
       .then((res) => {
-        console.log("res98828989899889", res);
+        console.log('res98828989899889', res);
         setTotalRecordsActivity(res.totalRecords);
         setRefreshing(false);
         setPageSizeActivity(10);
 
         pageNumberActivity(refreshing ? pageActivity + 1 : 1);
-        console.log("res", res);
+        console.log('res', res);
 
         if (refreshing) {
           setActivities([...activities, ...res.result]);
@@ -80,29 +80,29 @@ const ParentDeclineScreen = ({ route }) => {
         }
       })
       .catch((err) => {
-        console.log("Error:", err);
+        console.log('Error:', err);
         setRefreshing(false);
         setPageSizeActivity(10);
 
         pageNumberActivity(pageActivity);
       });
   };
-  const getGroups = async (refreshing: any) => {
+  const getGroups = async (refreshing?: any) => {
     if (refreshing) {
       setRefreshing(true);
     }
 
     let pageNumberGroupCount = refreshing ? pageGroup : 0;
     let email = currentUser?.email;
-    GetChildrenGroups(email, "declined", pageNumberGroupCount, pageSizeGroup)
+    GetChildrenGroups(email, 'declined', pageNumberGroupCount, pageSizeGroup)
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         setTotalRecordsGroup(res.totalRecords);
         setRefreshing(false);
         setPageSizeGroup(10);
 
         pageNumberGroup(refreshing ? pageGroup + 1 : 1);
-        console.log("res", res);
+        console.log('res', res);
         if (refreshing) {
           setGroups([...groups, ...res.result]);
         } else {
@@ -115,19 +115,20 @@ const ParentDeclineScreen = ({ route }) => {
         setPageSizeGroup(10);
 
         pageNumberGroup(pageGroup);
-        console.log("Error:", err);
+        console.log('Error:', err);
       });
   };
 
   const loadUserDetails = async () => {
     GetParentChildrens(currentUser?.referenceCode)
       .then((res) => {
-        console.log("children", res);
+        console.log('children', res);
         setChildren(res);
       })
-      .catch((err) => console.log("loadUserDetails", err));
+      .catch((err) => console.log('loadUserDetails', err));
   };
-  const closeRow = (index) => {
+  const closeRow = (index?: number) => {
+    if (!index) return;
     console.log(index);
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
@@ -150,31 +151,31 @@ const ParentDeclineScreen = ({ route }) => {
     }
   }, [selectedInstructions]);
 
-  const RightActions = (dragX: any, item) => {
+  const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
-      extrapolate: "clamp",
+      extrapolate: 'clamp',
     });
     return (
       <View
         style={{
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <TouchableOpacity
           style={{
             padding: 10,
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
           onPress={() => {
             dispatch(
               ChangeModalState.action({
                 childrenSelectionModalVisibility: true,
-              })
+              }),
             );
             setShowAcceptModal(true);
             setActivity(item);
@@ -203,7 +204,7 @@ const ParentDeclineScreen = ({ route }) => {
       />
       {activity && (
         <ChildrenSelectionModal
-          acceptModal={showAcceptModal ? true : false}
+          acceptModal={showAcceptModal}
           setSelectedChild={setSelectedChild}
           activity={activity}
           children={children}
@@ -216,12 +217,12 @@ const ParentDeclineScreen = ({ route }) => {
           setSelectedChild={() => setActivity(null)}
           onClose={() => setShowAcceptModal(false)}
           activity={{ ...activity, selectedStudentId: selectedChild.studentId }}
-          setActivity={(id) => {
-            setSelectedChild("");
+          setActivity={(id: any) => {
+            setSelectedChild('');
             if (activity?.activityId) {
-              console.log("declinedactivity", activity);
+              console.log('declinedactivity', activity);
               closeRow();
-              console.log("activites", activities);
+              console.log('activites', activities);
               let filter = activities?.filter((item) => item?.activityId != id);
 
               setActivities(filter);
@@ -237,7 +238,7 @@ const ParentDeclineScreen = ({ route }) => {
         <View
           style={{ padding: 10, backgroundColor: Colors.newBackgroundColor }}
         >
-          <Text style={[styles.text, { textAlign: "center" }]}>
+          <Text style={[styles.text, { textAlign: 'center' }]}>
             You do not have any declined activities or groups
           </Text>
         </View>
@@ -256,81 +257,81 @@ const ParentDeclineScreen = ({ route }) => {
                   renderRightActions={(e) => RightActions(e, item)}
                 >
                   <TouchableOpacity
-                        onPress={() => {
-                          // navigation.navigate('InstructorGroupApproval')
-                        }}
-                        style={[styles.item]}
-                      >
-                      <Text style={[styles.text, { fontSize: 25 }]}>
-                        {`${item?.activity?.activityName}`}
-                      </Text>
-                      
-                      <View
+                    onPress={() => {
+                      // navigation.navigate('InstructorGroupApproval')
+                    }}
+                    style={[styles.item]}
+                  >
+                    <Text style={[styles.text, { fontSize: 25 }]}>
+                      {`${item?.activity?.activityName}`}
+                    </Text>
+
+                    <View
                       style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        
+                        flexDirection: 'row',
+                        alignItems: 'center',
+
                       }}
-                      >
+                    >
                       <Image
-                        source={require("@/Assets/Images/circle-dashed.png")}
+                        source={require('@/Assets/Images/circle-dashed.png')}
                         style={{
                           height: 40,
                           width: 15,
-                          resizeMode: "contain",
-                         marginRight: 10,
+                          resizeMode: 'contain',
+                          marginRight: 10,
                         }}
                       />
-                        <View>
-                          <Text style={styles.text}>{`${moment(
-                          item?.activity?.fromDate == "string"
-                            ? new Date()
-                            : item?.activity?.fromDate
-                         ).format("MMM DD YYYY")} at ${moment.utc(
-                          item?.activity?.fromDate == "string"
-                            ? new Date()
-                            : item?.activity?.fromDate
-                          )
-                          .format("hh:mm a")} `}</Text>
+                      <View>
                         <Text style={styles.text}>{`${moment(
-                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
-                        ).format("MMM DD YYYY")} at ${moment.utc(
-                          item?.activity?.toDate == "string" ? new Date() : item?.activity?.toDate
+                          item?.activity?.fromDate == 'string'
+                            ? new Date()
+                            : item?.activity?.fromDate,
+                        ).format('MMM DD YYYY')} at ${moment.utc(
+                          item?.activity?.fromDate == 'string'
+                            ? new Date()
+                            : item?.activity?.fromDate,
                         )
-                          .format("hh:mm a")} `}</Text>
+                          .format('hh:mm a')} `}</Text>
+                        <Text style={styles.text}>{`${moment(
+                          item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
+                        ).format('MMM DD YYYY')} at ${moment.utc(
+                          item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
+                        )
+                          .format('hh:mm a')} `}</Text>
                       </View>
                     </View>
 
-                      
-                      <View style={styles.horizontal}>
-                          <Image source={marker} style={styles.iconStyle} />
-                          <Text style={styles.text}>{item?.activity?.venueFromName}</Text>
-                      </View>
 
-                        <View style={styles.horizontal}>
-                          <Image source={marker} style={styles.iconStyle} />
-                          <View>
-                            <Text style={styles.text}>
-                            {`${item?.activity?.venueFromAddress}, ${item?.activity?.venueFromCity}, ${item?.activity?.venueFromState} ${item?.activity?.venueFromZip}, ${item?.activity?.venueFromCountry}`}
-                            </Text>
-                          </View>
-                        </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                        onPress={() => {
-                          dispatch(
-                            ChangeModalState.action({
-                              instructionsModalVisibility: true,
-                            })
-                          );
-                          setSelectedInstructions(item);
-                        }}
-                        style={[styles.footer]}
-                      >
-                        <Text
-                          style={[styles.text, { textAlign: "center" }]}
-                        >{`Instructions / Disclaimer / Agreement`}</Text>
-                      </TouchableOpacity>
+                    <View style={styles.horizontal}>
+                      <Image source={marker} style={styles.iconStyle} />
+                      <Text style={styles.text}>{item?.activity?.venueFromName}</Text>
+                    </View>
+
+                    <View style={styles.horizontal}>
+                      <Image source={marker} style={styles.iconStyle} />
+                      <View>
+                        <Text style={styles.text}>
+                          {`${item?.activity?.venueFromAddress}, ${item?.activity?.venueFromCity}, ${item?.activity?.venueFromState} ${item?.activity?.venueFromZip}, ${item?.activity?.venueFromCountry}`}
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      dispatch(
+                        ChangeModalState.action({
+                          instructionsModalVisibility: true,
+                        }),
+                      );
+                      setSelectedInstructions(item);
+                    }}
+                    style={[styles.footer]}
+                  >
+                    <Text
+                      style={[styles.text, { textAlign: 'center' }]}
+                    >{`Instructions / Disclaimer / Agreement`}</Text>
+                  </TouchableOpacity>
                 </Swipeable>
               );
             } else {
@@ -356,8 +357,8 @@ const ParentDeclineScreen = ({ route }) => {
                     <View style={styles.horizontal}>
                       <Image source={calendarIcon} style={styles.iconStyle} />
                       <Text style={styles.text}>{`${moment(
-                        item?.activity?.scheduler?.fromDate
-                      ).format("YYYY-MM-DD")}`}</Text>
+                        item?.activity?.scheduler?.fromDate,
+                      ).format('YYYY-MM-DD')}`}</Text>
                     </View>
 
                     {/* <View style={styles.horizontal}>
@@ -373,7 +374,7 @@ const ParentDeclineScreen = ({ route }) => {
           }}
           onEndReached={async () => {
             if (totalRecordsActivity > activities.length) {
-              console.log("logs");
+              console.log('logs');
 
               getActivities(true);
 
@@ -398,15 +399,15 @@ export default ParentDeclineScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     backgroundColor: Colors.newBackgroundColor,
   },
   item: {
     borderRadius: 20,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     paddingHorizontal: 15,
     paddingVertical: 15,
   },
@@ -415,29 +416,29 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.lightgray,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 16,
     marginVertical: 4,
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -449,20 +450,20 @@ const styles = StyleSheet.create({
   },
   buttonSettings: {
     marginTop: 10,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     marginBottom: 10,
   },
   iconStyle: {
     height: 25,
     width: 15,
     marginRight: 10,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     tintColor: Colors.secondary,
   },
   horizontal: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

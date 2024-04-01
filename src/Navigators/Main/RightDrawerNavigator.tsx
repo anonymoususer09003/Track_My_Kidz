@@ -33,6 +33,7 @@ import InstructorActivityNavigator from '@/Navigators/Main/InstructorActivityNav
 import StudentActivityNavigator from '@/Navigators/Main/StudentActivityNavigator';
 import HomeNavigator from '@/Navigators/Main/HomeNavigator';
 import ActivityNavigator from '@/Navigators/Main/ActivityNavigator';
+import ApprovalNavigator from '@/Navigators/Main/ApprovalNavigator';
 
 type InstructorStack = {
   InstructorPersonalProfileScreen: undefined
@@ -77,6 +78,7 @@ type ParentStack = {
   Activity: undefined
   ChatScreen: undefined | any
   CreateParentActivity: undefined
+  Approval: undefined
 }
 
 export type MainStackNavigatorParamsList = InstructorStack & SettingsStack & StudentStack & ParentStack & ParamListBase;
@@ -218,6 +220,7 @@ const RightDrawerNavigator = () => {
           name="CreateParentActivity"
           component={CreateParentActivityScreen}
         />
+        <Stack.Screen name="Approval" component={ApprovalNavigator} />
 
         {/*<Stack.Screen name="ChatScreen" component={Placeholder} />*/}
 
@@ -226,7 +229,6 @@ const RightDrawerNavigator = () => {
         {/*  name="InstructorChatNavigator"*/}
         {/*  component={InstructorChatNavigator}*/}
         {/*/>*/}
-        {/*<Stack.Screen name="Approval" component={ApprovalNavigator} />*/}
 
         {/*<Stack.Screen name="Settings" component={SettingsScreen} />*/}
 
