@@ -1,43 +1,44 @@
-import { useTheme } from "@/Theme";
-import {
-  Card, Icon, Modal, Spinner
-} from "@ui-kitten/components";
-import React, { useEffect, useState } from "react";
-import {
-  Platform,
-  ScrollView, StyleSheet, Text, TouchableOpacity, View
-} from "react-native";
-import Share from "react-native-share";
-// @ts-ignore
-import { AppHeader, LinearGradientButton } from "@/Components";
-import BackgroundLayout from "@/Components/BackgroundLayout";
-import { TwoFactorAuthenticationModal, VerifyYourselfModal } from "@/Modals";
-import { DeleteUser } from "@/Services/SettingsServies";
-import { loadId } from "@/Storage/MainAppStorage";
-import LogoutStore from "@/Store/Authentication/LogoutStore";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import ChangeUserState from "@/Store/UserType/ChangeUserTypeState";
-import Colors from "@/Theme/Colors";
-import { useIsFocused } from "@react-navigation/native";
-import Toast from "react-native-toast-message";
+import { useTheme } from '@/Theme';
+import { Card, Icon, Modal, Spinner } from '@ui-kitten/components';
+import React, { FC, useEffect, useState } from 'react';
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Share from 'react-native-share';
+import { AppHeader, LinearGradientButton } from '@/Components';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { TwoFactorAuthenticationModal, VerifyYourselfModal } from '@/Modals';
+import { DeleteUser } from '@/Services/SettingsServies';
+import { loadId } from '@/Storage/MainAppStorage';
+import LogoutStore from '@/Store/Authentication/LogoutStore';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserState } from '@/Store/User';
+import ChangeUserState from '@/Store/UserType/ChangeUserTypeState';
+import Colors from '@/Theme/Colors';
+import { useIsFocused } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
-import { useDispatch, useSelector } from "react-redux";
-const SettingsScreen = ({ navigation }: { navigation: any }) => {
+import { useDispatch, useSelector } from 'react-redux';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+
+type SettingsScreenProps = {
+  navigation: StackNavigationProp<MainStackNavigatorParamsList, 'Settings'>;
+};
+
+const SettingsScreen: FC<SettingsScreenProps> = ({ navigation }) => {
   const isFocuesed = useIsFocused();
   const dispatch = useDispatch();
   const { Layout } = useTheme();
-  const [openDeactivateModal, setopenDeactivateModal] = useState(false);
-  const [canAdvertise, setcanAdvertise] = useState(false);
-  const user = useSelector((state: { user: UserState }) => state.user.item);
-  console.log("user", user);
-  const [twoFAActive, setTwoFAActive] = useState(user?.isTwoFA);
-  const [isSending, setisSending] = useState(false);
-  const [isSent, setisSent] = useState(false);
-  const [verifyType, setVerifyType] = useState("");
+  const [openDeactivateModal, setopenDeactivateModal] = useState<boolean>(false);
+  // const [canAdvertise, setcanAdvertise] = useState(false);
+  const user: any = useSelector((state: { user: UserState }) => state.user.item);
+  console.log('user', user);
+  // const [twoFAActive, setTwoFAActive] = useState(user?.isTwoFA);
+  const [isSending, setisSending] = useState<boolean>(false);
+  const [isSent, setisSent] = useState<boolean>(false);
+  const [verifyType, setVerifyType] = useState<any>('');
 
   const getUserId = async () => {
-    setVerifyType("");
+    setVerifyType('');
     // const id: any = await loadUserId();
     // dispatch(FetchOne.action(id));
   };
@@ -45,33 +46,33 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
   useEffect(() => {
     if (verifyType) {
       dispatch(
-        ChangeModalState.action({ verifyYourselfModalVisibility: true })
+        ChangeModalState.action({ verifyYourselfModalVisibility: true }),
       );
     }
   }, [verifyType]);
 
-  let message = `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`
+  let message = `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`;
 
-     const options = Platform.select({
+  const options = Platform.select({
     ios: {
       activityItemSources: [
         {
           // For using custom icon instead of default text icon at share preview when sharing with message.
           placeholderItem: {
             type: 'url',
-            content:  require("@/Assets/AppIcons/appstore.png"),
+            content: require('@/Assets/AppIcons/appstore.png'),
           },
           item: {
             default: { type: 'text', content: `${message} https://trackmykidz.com/apps/` },
           },
           linkMetadata: {
-            icon: require("@/Assets/AppIcons/appstore.png"),
+            icon: require('@/Assets/AppIcons/appstore.png'),
           },
         },
       ],
     },
     default: {
-      title:'TrackMykidz',
+      title: 'TrackMykidz',
       subject: 'trackmykidz.com',
       message: `${message} https://trackmykidz.com/apps/`,
     },
@@ -82,37 +83,42 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
     Share.open(
       // options
       {
-      message: `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`,
-      url: "https://trackmykidz.com/apps/",
-      
-      activityItemSources:[{
-        placeholderItem: { 
-          type: 'url', 
-        content:  require("@/Assets/AppIcons/appstore.png")},
-        item: {
-          default: { type: 'url', content:  require("@/Assets/AppIcons/appstore.png") },
-        },
-      linkMetadata: {
-        title: 'TrackMykidz',
-        subject: 'trackmykidz.com',
-        icon: require("@/Assets/AppIcons/appstore.png"),
+        message: `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`,
+        url: 'https://trackmykidz.com/apps/',
+
+        activityItemSources: [{
+          placeholderItem: {
+            type: 'url',
+            content: require('@/Assets/AppIcons/appstore.png'),
+          },
+          item: {
+            default: { type: 'url', content: require('@/Assets/AppIcons/appstore.png') },
+          },
+          linkMetadata: {
+            title: 'TrackMykidz',
+            // todo solve this
+            // subject: 'trackmykidz.com',
+            icon: require('@/Assets/AppIcons/appstore.png'),
+          },
+        }],
       },
-      }],
-    }
     )
       .then((res) => {
         Toast.show({
-          type: "success",
-          position: "top",
-          text1: "Invite",
-          text2: "Invitation has been sent.",
+          type: 'success',
+          position: 'top',
+          text1: 'Invite',
+          text2: 'Invitation has been sent.',
           visibilityTime: 4000,
           autoHide: true,
           topOffset: 30,
           bottomOffset: 40,
-          onShow: () => {},
-          onHide: () => {},
-          onPress: () => {},
+          onShow: () => {
+          },
+          onHide: () => {
+          },
+          onPress: () => {
+          },
         });
         console.log(res);
       })
@@ -130,7 +136,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
       <AppHeader title="" hideCalendar={true} hideCenterIcon={true} />
       <TwoFactorAuthenticationModal />
       <VerifyYourselfModal
-        isActivationCode={verifyType === "activation-code"}
+        isActivationCode={verifyType === 'activation-code'}
         setIsActivationCode={setVerifyType}
       />
       <Modal
@@ -156,13 +162,13 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
             )
           ) : (
             <>
-              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+              <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
                 Account Deactivation
               </Text>
               <Text
                 style={{
                   fontSize: 15,
-                  color: "grey",
+                  color: 'grey',
                   marginTop: 10,
                   marginBottom: 20,
                 }}
@@ -172,16 +178,18 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
 
               <View
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "flex-end",
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
                   marginTop: 15,
                 }}
               >
                 <TouchableOpacity
                   onPress={async () => {
                     const userId = await loadId();
+                    if (!userId) return;
                     DeleteUser(parseInt(userId, 0))
-                      .then((res) => {})
+                      .then((res) => {
+                      })
                       .catch((err) => {
                         console.log(err);
                       });
@@ -201,7 +209,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
         <View style={styles.layout}>
           <View style={[styles.mainLayout, { paddingHorizontal: 20 }]}>
             <TouchableOpacity
-              onPress={() => navigation.navigate("PersonalProfile")}
+              onPress={() => navigation.navigate('PersonalProfile')}
               style={[
                 [
                   Layout.row,
@@ -219,7 +227,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigation.navigate("ChangePassword")}
+              onPress={() => navigation.navigate('ChangePassword')}
               style={[
                 [
                   Layout.row,
@@ -237,7 +245,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigation.navigate("Notifications")}
+              onPress={() => navigation.navigate('Notifications')}
               style={[
                 [
                   Layout.row,
@@ -282,7 +290,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
                         />
                     </TouchableOpacity>)} */}
             <TouchableOpacity
-              onPress={() => navigation.navigate("ActivationCode")}
+              onPress={() => navigation.navigate('ActivationCode')}
               style={[
                 [
                   Layout.row,
@@ -300,7 +308,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigation.navigate("DependentInfo")}
+              onPress={() => navigation.navigate('DependentInfo')}
               style={[
                 [
                   Layout.row,
@@ -318,7 +326,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigation.navigate("PaymentInfo")}
+              onPress={() => navigation.navigate('PaymentInfo')}
               style={[
                 [
                   Layout.row,
@@ -336,7 +344,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigation.navigate("ReportProblem")}
+              onPress={() => navigation.navigate('ReportProblem')}
               style={[
                 [
                   Layout.row,
@@ -354,7 +362,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigation.navigate("ContactUs")}
+              onPress={() => navigation.navigate('ContactUs')}
               style={[
                 [
                   Layout.row,
@@ -390,7 +398,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigation.navigate("AppList")}
+              onPress={() => navigation.navigate('AppList')}
               style={[
                 [
                   Layout.row,
@@ -418,12 +426,15 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
                   size="medium"
                   status="control"
                   onPress={() => {
+                    // todo slove this not a priority
                     dispatch(
                       ChangeUserState.action({
-                        userType: "",
-                      })
+                        // @ts-ignore
+                        userType: '',
+                      }),
                     );
 
+                    // @ts-ignore
                     dispatch(LogoutStore.action());
                   }}
                 >
@@ -451,7 +462,7 @@ export default SettingsScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     backgroundColor: Colors.newBackgroundColor,
     borderRadius: 25,
   },
@@ -493,34 +504,34 @@ const styles = StyleSheet.create({
     height: 32,
   },
   background: {
-    width: "100%",
+    width: '100%',
     borderRadius: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 10,
     backgroundColor: Colors.primary,
   },
   button: {
     fontSize: 16,
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     borderRadius: 10,
     paddingTop: 6,
   },
   buttonsContainer: {
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "flex-end",
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
   },
   backgroundOutline: {
     backgroundColor: Colors.transparent,
     marginBottom: 10,
-    width: "100%",
+    width: '100%',
     borderRadius: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     color: Colors.primaryTint,
     paddingBottom: 6,
     marginTop: 15,
@@ -529,13 +540,13 @@ const styles = StyleSheet.create({
   },
   buttonOutline: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.primary,
     borderRadius: 10,
     paddingTop: 6,
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalButton: {
     marginLeft: 15,
@@ -545,25 +556,25 @@ const styles = StyleSheet.create({
   sppinerContainer: {
     flex: 1,
     height: 150,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 16,
     marginLeft: 10,
     marginTop: 10,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.primary,
-    textAlign: "center",
+    textAlign: 'center',
   },
   deleteBackground: {
-    width: "100%",
+    width: '100%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     marginBottom: 35,
   },
@@ -572,6 +583,6 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     fontSize: 15,
     color: Colors.primary,
-    textAlign: "center",
+    textAlign: 'center',
   },
 });

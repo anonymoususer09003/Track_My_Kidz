@@ -50,11 +50,11 @@ export { default as CreateParentActivityScreen } from "./Main/CreateParentActivi
 export { default as ParentApprovalScreen } from "./Main/ParentApproval/ParentApprovalScreen";
 export { default as ParentDeclineScreen } from "./Main/ParentDecline/ParentDeclineScreen";
 export { default as ParentPendingScreen } from "./Main/ParentPending/ParentPendingScreen";
-// export { default as ActivationCodeScreen } from "./Main/ActivationCode/ActivationCodeScreen";
-// export { default as DependentInfoScreen } from "./Main/DependentInfo/DependentInfoScreen";
-// export { default as SettingsScreen } from "./Main/Settings/SettingsScreen";
-// export { default as PersonalProfileScreen } from "./Main/Settings/PersonalProfileScreen";
-// export { default as ParentDeletePermission } from "./Main/ParentDeletePermission/ParentDeletePermissionScreen";
+export { default as ActivationCodeScreen } from "./Main/ActivationCode/ActivationCodeScreen";
+export { default as DependentInfoScreen } from "./Main/DependentInfo/DependentInfoScreen";
+export { default as SettingsScreen } from "./Main/Settings/SettingsScreen";
+export { default as PersonalProfileScreen } from "./Main/Settings/PersonalProfileScreen";
+export { default as ParentDeletePermission } from "./Main/ParentDeletePermission/ParentDeletePermissionScreen";
 
 // //STUDENT
 export { default as StudentActivityScreen } from "./Main/StudentActivity/StudentActivityScreen";

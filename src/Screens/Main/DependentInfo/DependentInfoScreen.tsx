@@ -24,30 +24,32 @@ import { ModalState } from "@/Store/Modal";
 import Geolocation from "@react-native-community/geolocation";
 import moment from "moment";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
 const DependentInfoScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const focused = useIsFocused();
-  const swipeableRef = useRef(null);
+  // const swipeableRef = useRef(null);
   const dispatch = useDispatch();
-  const [visible, setVisible] = useState(false);
-  const [selectedDependent, setSelectedDependent] = useState(null);
-  const [dependent, setDependent] = useState(null);
-  const [selectedActivationCode, setSelectedActivationCode] = useState(null);
+  const [visible, setVisible] = useState<boolean>(false);
+  const [selectedDependent, setSelectedDependent] = useState<any>(null);
+  const [dependent, setDependent] = useState<any>(null);
+  const [selectedActivationCode, setSelectedActivationCode] = useState<any>(null);
   const isEditVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.editDependentModalVisibility
   );
   const [selectedStudentVisibility, setSelectedStudentVisibility] =
-    useState(null);
-  const [children, setChildren] = useState([]);
-  const [user, setUser] = useState(null);
-  let prevOpenedRow: any;
-  let row: Array<any> = [];
-  const [position, setPosition] = useState({});
+    useState<any>(null);
+  const [children, setChildren] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
+  // let prevOpenedRow: any;
+  // let row: Array<any> = [];
+  const [position, setPosition] = useState<any>({});
 
   useEffect(() => {
     console.log("-------00000");
-    Geolocation.getCurrentPosition((pos) => {
+    Geolocation.getCurrentPosition((pos: any) => {
       console.log("-------00000", pos);
       const crd = pos?.coords;
       setPosition({
@@ -56,7 +58,7 @@ const DependentInfoScreen = () => {
         latitudeDelta: 0.0421,
         longitudeDelta: 0.0421,
       });
-    });
+    }, ()=>{}, ()=>{});
   }, [focused]);
 
   // };
@@ -108,7 +110,7 @@ const DependentInfoScreen = () => {
     status: boolean,
     id: any,
     index: number,
-    coordinates: any
+    coordinates?: any
   ) => {
     try {
       const _date = moment(new Date()).format("YYYY-MM-DD");
@@ -188,7 +190,7 @@ const DependentInfoScreen = () => {
     }
   };
 
-  const onSubmit = (values) => {
+  const onSubmit = (values: any) => {
     setVisible(false);
     handleTrackStudent(
       dependent?.studentId,
@@ -220,7 +222,7 @@ const DependentInfoScreen = () => {
       />
       {visible && (
         <DistanceAlert
-          onSubmit={(values) => {
+          onSubmit={(values: any) => {
             onSubmit(values);
           }}
           visible={visible}

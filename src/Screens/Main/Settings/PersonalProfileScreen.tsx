@@ -1,36 +1,22 @@
-import {AppHeader, LinearGradientButton} from '@/Components';
-import {loadUserId} from '@/Storage/MainAppStorage';
-import {useTheme} from '@/Theme';
-import {
-  Autocomplete,
-  AutocompleteItem,
-  Button,
-  Icon,
-  Input,
-  Spinner,
-  Text,
-} from '@ui-kitten/components';
-import {Formik} from 'formik';
-import React, {ReactText, useEffect, useState} from 'react';
-import {
-  Alert,
-  Image,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Autocomplete, AutocompleteItem, Input, Text } from '@ui-kitten/components';
+import { Formik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as yup from 'yup';
-import {UpdateUser} from '../../../Services/SettingsServies';
-// @ts-ignore
+import { useSelector } from 'react-redux';
+
+import { AppHeader, LinearGradientButton } from '@/Components';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import { useTheme } from '@/Theme';
+import { UpdateUser } from '../../../Services/SettingsServies';
 import BackgroundLayout from '@/Components/BackgroundLayout';
-import {GetAllCities, GetAllStates} from '@/Services/PlaceServices';
-import {PlaceState} from '@/Store/Places';
-import {UserState} from '@/Store/User';
+import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
+import { PlaceState } from '@/Store/Places';
+import { UserState } from '@/Store/User';
 import Colors from '@/Theme/Colors';
-import {useDispatch, useSelector} from 'react-redux';
+import { CountryDTO } from '@/Models/CountryDTOs';
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -47,31 +33,31 @@ const PersonalProfileScreen = () => {
   const phone = require('@/Assets/Images/phone.png');
   const marker = require('@/Assets/Images/marker.png');
   const email = require('@/Assets/Images/email.png');
-  const {Layout} = useTheme();
-  const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
+  const { Layout } = useTheme();
+  const [selectedImage, setSelectedImage] = useState<string | undefined>(
     undefined,
   );
-  const [languages, setLanguages] = useState<Array<ReactText>>(['English']);
-  const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
+  // const [languages, setLanguages] = useState<string[]>(['English']);
+  // const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const countries = useSelector(
-    (state: {places: PlaceState}) => state.places.countries,
+    (state: { places: PlaceState }) => state.places.countries,
   );
-  const [isEditMode, setisEditMode] = useState(false);
-  const [isSending, setisSending] = useState(false);
-  const [isSent, setisSent] = useState(false);
-  const [userId, setuserId] = useState(null);
-  const user = useSelector((state: {user: UserState}) => state.user.item);
+  const [isEditMode, setisEditMode] = useState<boolean>(false);
+  const [isSending, setisSending] = useState<boolean>(false);
+  // const [isSent, setisSent] = useState(false);
+  const [userId, setuserId] = useState<any>(null);
+  const user: any = useSelector((state: { user: UserState }) => state.user.item);
   const isLoading = useSelector(
-    (state: {user: UserState}) => state.user.fetchOne.loading,
+    (state: { user: UserState }) => state.user.fetchOne.loading,
   );
-  const [placement, setPlacement] = React.useState('bottom');
-  const [countriesData, setCountriesData] = React.useState(countries);
-  const [statesData, setStatesData] = React.useState<Array<any>>([]);
-  const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
-  const dispatch = useDispatch();
+  const [placement, setPlacement] = useState<string>('bottom');
+  const [countriesData, setCountriesData] = useState(countries);
+  const [statesData, setStatesData] = useState<any[]>([]);
+  const [citiesData, setCitiesData] = useState<any[]>([]);
+  // const dispatch = useDispatch();
 
-  const [states, setStates] = useState<Array<any>>([]);
-  const [cities, setCities] = useState<Array<any>>([]);
+  const [states, setStates] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
 
   const getUserId = async () => {
     const id: any = await loadUserId();
@@ -83,46 +69,47 @@ const PersonalProfileScreen = () => {
     getUserId();
   }, []);
 
-  function getUriSource(): any {
-    return {uri: selectedImage};
-  }
-  const renderPersonIcon = (props: any) => (
+  // function getUriSource(): any {
+  //   return { uri: selectedImage };
+  // }
+
+  const renderPersonIcon = () => (
     <Image
       source={userIcon}
-      style={{height: 18, width: 18, marginRight: 10}}
+      style={{ height: 18, width: 18, marginRight: 10 }}
       resizeMode="contain"
     />
   );
-  const renderLocationIcon = (props: any) => (
+  const RenderLocationIcon = (props: any) => (
     <Image
       source={marker}
-      style={{height: 20, width: 20}}
+      style={{ height: 20, width: 20 }}
       resizeMode="contain"
     />
   );
-  const renderEmailIcon = (props: any) => (
+  const renderEmailIcon = () => (
     <Image
       source={email}
-      style={{height: 18, width: 18, marginRight: 12}}
+      style={{ height: 18, width: 18, marginRight: 12 }}
       resizeMode="contain"
     />
   );
-  const renderPhoneIcon = (props: any) => (
+  const renderPhoneIcon = () => (
     <Image
       source={phone}
-      style={{height: 20, width: 20, marginRight: 10}}
+      style={{ height: 20, width: 20, marginRight: 10 }}
       resizeMode="contain"
     />
   );
 
-  const renderEditAvatarButton = (): React.ReactElement => (
-    <Button
-      style={styles.editAvatarButton}
-      status="basic"
-      accessoryRight={<Icon name="plus" />}
-      onPress={imageGalleryLaunch}
-    />
-  );
+  // const renderEditAvatarButton = (): React.ReactElement => (
+  //   <Button
+  //     style={styles.editAvatarButton}
+  //     status="basic"
+  //     accessoryRight={<Icon name="plus" />}
+  //     onPress={imageGalleryLaunch}
+  //   />
+  // );
 
   const imageGalleryLaunch = () => {
     ImagePicker.openPicker({
@@ -134,7 +121,7 @@ const PersonalProfileScreen = () => {
       loadingLabelText: 'Loading image',
     }).then(image => {
       if (image != null) {
-        const source = {uri: image?.path};
+        const source = { uri: image?.path };
         setSelectedImage(source.uri);
       }
     });
@@ -143,7 +130,7 @@ const PersonalProfileScreen = () => {
   const personalProfileValidationSchema = yup.object().shape({
     username: yup
       .string()
-      .min(4, ({min}) => `Username is not up to ${min} characters`)
+      .min(4, ({ min }) => `Username is not up to ${min} characters`)
       .required('Username is required'),
   });
 
@@ -158,7 +145,7 @@ const PersonalProfileScreen = () => {
         </View>
       ) : (
         <BackgroundLayout title="Profile">
-          <KeyboardAwareScrollView style={{flex: 1}} extraScrollHeight={150}>
+          <KeyboardAwareScrollView style={{ flex: 1 }} extraScrollHeight={150}>
             <ScrollView style={styles.container}>
               <View style={[[Layout.column, Layout.justifyContentCenter]]}>
                 <Formik
@@ -180,7 +167,7 @@ const PersonalProfileScreen = () => {
                     seletedState: user?.state || '',
                     selectedCity: user?.city || '',
                   }}
-                  onSubmit={(values, {resetForm}) => {
+                  onSubmit={(values, { resetForm }) => {
                     setisSending(true);
                     let objectToPass = {
                       firstname: values.firstName,
@@ -206,20 +193,20 @@ const PersonalProfileScreen = () => {
                       .catch((error: any) => {
                         console.log('Error', error);
                         Alert.alert(error?.data.title, error?.data.detail, [
-                          {text: 'OK', style: 'cancel'},
+                          { text: 'OK', style: 'cancel' },
                         ]);
                         setisSending(false);
                         setisEditMode(!isEditMode);
                       });
                   }}>
                   {({
-                    handleChange,
-                    handleSubmit,
-                    setFieldValue,
-                    values,
-                    errors,
-                    touched,
-                  }) => (
+                      handleChange,
+                      handleSubmit,
+                      setFieldValue,
+                      values,
+                      errors,
+                      touched,
+                    }) => (
                     <>
                       {isSending ? (
                         <View style={styles.sppinerContainer}>
@@ -227,11 +214,11 @@ const PersonalProfileScreen = () => {
                         </View>
                       ) : (
                         <>
-                          <View style={{flexDirection: 'column'}}>
+                          <View style={{ flexDirection: 'column' }}>
                             <Text style={styles.editLabel}>Email</Text>
                             <View style={styles.editField}>
                               {renderEmailIcon()}
-                              <Text style={{fontSize: 15}}>{values.email}</Text>
+                              <Text style={{ fontSize: 15 }}>{values.email}</Text>
                             </View>
                           </View>
                           <View
@@ -250,7 +237,7 @@ const PersonalProfileScreen = () => {
 
                                 <View style={styles.editField}>
                                   {renderPersonIcon()}
-                                  <Text style={{fontSize: 15}}>
+                                  <Text style={{ fontSize: 15 }}>
                                     {' '}
                                     {values.firstName}
                                   </Text>
@@ -259,7 +246,7 @@ const PersonalProfileScreen = () => {
                             ) : (
                               <Input
                                 accessoryLeft={renderPersonIcon}
-                                style={[styles.inputSettings, {width: '45%'}]}
+                                style={[styles.inputSettings, { width: '45%' }]}
                                 autoCapitalize="none"
                                 label={evaProps => (
                                   <Text {...evaProps}>First Name</Text>
@@ -279,7 +266,7 @@ const PersonalProfileScreen = () => {
 
                                 <View style={styles.editField}>
                                   {renderPersonIcon()}
-                                  <Text style={{fontSize: 15}}>
+                                  <Text style={{ fontSize: 15 }}>
                                     {' '}
                                     {values.lastName}
                                   </Text>
@@ -288,7 +275,7 @@ const PersonalProfileScreen = () => {
                             ) : (
                               <Input
                                 accessoryLeft={renderPersonIcon}
-                                style={[styles.inputSettings, {width: '45%'}]}
+                                style={[styles.inputSettings, { width: '45%' }]}
                                 autoCapitalize="none"
                                 label={evaProps => (
                                   <Text {...evaProps}>Last Name</Text>
@@ -300,11 +287,11 @@ const PersonalProfileScreen = () => {
                           </View>
 
                           {!isEditMode ? (
-                            <View style={{flexDirection: 'column'}}>
+                            <View style={{ flexDirection: 'column' }}>
                               <Text style={styles.editLabel}>Phone Number</Text>
                               <View style={styles.editField}>
                                 {renderPhoneIcon()}
-                                <Text style={{fontSize: 15}}>
+                                <Text style={{ fontSize: 15 }}>
                                   {values.phone}
                                 </Text>
                               </View>
@@ -323,14 +310,14 @@ const PersonalProfileScreen = () => {
                           )}
 
                           {!isEditMode ? (
-                            <View style={{flexDirection: 'column'}}>
+                            <View style={{ flexDirection: 'column' }}>
                               <Text style={styles.editLabel}>
                                 Street Address
                               </Text>
 
                               <View style={styles.editField}>
-                                {renderLocationIcon()}
-                                <Text style={{marginLeft: 8, fontSize: 15}}>
+                                <RenderLocationIcon />
+                                <Text style={{ marginLeft: 8, fontSize: 15 }}>
                                   {' '}
                                   {values.address}
                                 </Text>
@@ -338,7 +325,7 @@ const PersonalProfileScreen = () => {
                             </View>
                           ) : (
                             <Input
-                              accessoryLeft={renderLocationIcon}
+                              accessoryLeft={RenderLocationIcon}
                               style={styles.inputSettings}
                               autoCapitalize="none"
                               label={evaProps => (
@@ -357,16 +344,16 @@ const PersonalProfileScreen = () => {
                               }}>
                               <Text style={styles.editLabel}> Ste/Apt</Text>
                               <View style={styles.editField}>
-                                {renderLocationIcon()}
-                                <Text style={{fontSize: 15}}>
+                                <RenderLocationIcon />
+                                <Text style={{ fontSize: 15 }}>
                                   {values?.apt}
                                 </Text>
                               </View>
                             </View>
                           ) : (
                             <Input
-                              style={[styles.inputSettings, {marginBottom: 5}]}
-                              accessoryLeft={renderLocationIcon}
+                              style={[styles.inputSettings, { marginBottom: 5 }]}
+                              accessoryLeft={RenderLocationIcon}
                               autoCapitalize="none"
                               label={evaProps => (
                                 <Text {...evaProps}>Ste/Apt</Text>
@@ -382,7 +369,7 @@ const PersonalProfileScreen = () => {
                                   City
                                 </Text>
                               )}
-                              accessoryLeft={renderLocationIcon}
+                              accessoryLeft={RenderLocationIcon}
                               placeholder="Enter City"
                               value={values.city}
                               placement={placement}
@@ -421,13 +408,13 @@ const PersonalProfileScreen = () => {
                               label={evaProps => (
                                 <Text
                                   {...evaProps}
-                                  style={[styles.editLabel, {marginTop: 4}]}>
+                                  style={[styles.editLabel, { marginTop: 4 }]}>
                                   Country
                                 </Text>
                               )}
                               placeholder="Enter Country*"
                               value={values.country}
-                              accessoryLeft={renderLocationIcon}
+                              accessoryLeft={RenderLocationIcon}
                               placement={placement}
                               style={{
                                 // marginTop: 10,
@@ -477,7 +464,7 @@ const PersonalProfileScreen = () => {
                                 State
                               </Text>
                             )}
-                            accessoryLeft={renderLocationIcon}
+                            accessoryLeft={RenderLocationIcon}
                             placeholder="Enter State*"
                             value={values.state}
                             placement={placement}
@@ -523,7 +510,7 @@ const PersonalProfileScreen = () => {
                                   City
                                 </Text>
                               )}
-                              accessoryLeft={renderLocationIcon}
+                              accessoryLeft={RenderLocationIcon}
                               placeholder="Enter City"
                               value={values.city}
                               placement={placement}
@@ -557,22 +544,22 @@ const PersonalProfileScreen = () => {
                             </Autocomplete>
                           )}
                           {!isEditMode ? (
-                            <View style={{flexDirection: 'column'}}>
+                            <View style={{ flexDirection: 'column' }}>
                               <Text style={styles.editLabel}>
                                 {' '}
                                 Zip/Post code
                               </Text>
                               <View style={styles.editField}>
-                                {renderLocationIcon()}
-                                <Text style={{fontSize: 15, marginLeft: 10}}>
+                                <RenderLocationIcon />
+                                <Text style={{ fontSize: 15, marginLeft: 10 }}>
                                   {values.zipcode}
                                 </Text>
                               </View>
                             </View>
                           ) : (
                             <Input
-                              accessoryLeft={renderLocationIcon}
-                              style={[styles.inputSettings, {marginBottom: 10}]}
+                              accessoryLeft={RenderLocationIcon}
+                              style={[styles.inputSettings, { marginBottom: 10 }]}
                               autoCapitalize="none"
                               label={evaProps => (
                                 <Text {...evaProps}>Zip/Post code</Text>
@@ -590,7 +577,7 @@ const PersonalProfileScreen = () => {
                               )}
                               placeholder="Enter Country*"
                               value={values.country}
-                              accessoryLeft={renderLocationIcon}
+                              accessoryLeft={RenderLocationIcon}
                               placement={placement}
                               style={{
                                 // marginTop: 10,
@@ -636,7 +623,7 @@ const PersonalProfileScreen = () => {
                           )}
 
                           {isEditMode ? (
-                            <View style={{marginVertical: 10}}>
+                            <View style={{ marginVertical: 10 }}>
                               <LinearGradientButton onPress={handleSubmit}>
                                 Submit
                               </LinearGradientButton>
@@ -650,7 +637,7 @@ const PersonalProfileScreen = () => {
                                   setFieldValue('city', user?.city);
                                   setisEditMode(false);
                                 }}
-                                style={{width: '100%', marginTop: 10}}>
+                                style={{ width: '100%', marginTop: 10 }}>
                                 <Text
                                   style={{
                                     color: Colors.primary,
@@ -661,7 +648,7 @@ const PersonalProfileScreen = () => {
                               </TouchableOpacity>
                             </View>
                           ) : (
-                            <View style={{marginTop: 10}}>
+                            <View style={{ marginTop: 10 }}>
                               <LinearGradientButton
                                 onPress={() => setisEditMode(true)}>
                                 Edit
@@ -675,7 +662,7 @@ const PersonalProfileScreen = () => {
                   )}
                 </Formik>
               </View>
-              <View style={{height: 80}} />
+              <View style={{ height: 80 }} />
             </ScrollView>
           </KeyboardAwareScrollView>
         </BackgroundLayout>

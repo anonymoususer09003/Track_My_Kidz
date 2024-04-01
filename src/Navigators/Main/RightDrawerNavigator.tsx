@@ -4,12 +4,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { UserTypeState } from '@/Store/UserType';
 import { Text, View } from 'react-native';
 import {
+  ActivationCodeScreen,
   ActivityDetailsScreen,
   AppListScreen,
   ChangePasswordScreen,
   ContactUsScreen,
   CreateActivityScreen,
-  CreateGroupScreen, CreateParentActivityScreen,
+  CreateGroupScreen,
+  CreateParentActivityScreen,
+  DependentInfoScreen,
   DragDropStudentScreen,
   InstructorActivityDetailScreen,
   InstructorHome,
@@ -19,7 +22,9 @@ import {
   NotificationsScreen,
   OrganizationBusinformation,
   OrganizationInfoScreen,
+  ParentDeletePermission,
   ReportProblemScreen,
+  SettingsScreen,
   StudentActivityDetailsScreen,
   StudentPersonalProfileScreen,
   StudentSettingsScreen,
@@ -54,7 +59,7 @@ type InstructorStack = {
   InstructorList: { data: any }
   BusInfo: { data: { buses: any, schoolId: number } }
   InstructorHome: undefined
-  DragDropStudent: { students: any[], attendanceMark: any, activity: { activityId: any }, bus: { busId: any } }
+  DragDropStudent: { students?: any[], attendanceMark?: any, activity: { activityId: any }, bus: { busId: any } }
   InstructorActivityDetail: { data?: any, activitiesCount?: any } | undefined
 }
 
@@ -79,6 +84,13 @@ type ParentStack = {
   ChatScreen: undefined | any
   CreateParentActivity: undefined
   Approval: undefined
+  ActivationCode: undefined
+  DependentInfo: undefined
+  ParentDeletePermission: {
+    dependentId?: any,
+    parentId?: any,
+  }
+  Settings: undefined
 }
 
 export type MainStackNavigatorParamsList = InstructorStack & SettingsStack & StudentStack & ParentStack & ParamListBase;
@@ -221,6 +233,13 @@ const RightDrawerNavigator = () => {
           component={CreateParentActivityScreen}
         />
         <Stack.Screen name="Approval" component={ApprovalNavigator} />
+        <Stack.Screen name="ActivationCode" component={ActivationCodeScreen} />
+        <Stack.Screen name="DependentInfo" component={DependentInfoScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen
+          name="ParentDeletePermission"
+          component={ParentDeletePermission}
+        />
 
         {/*<Stack.Screen name="ChatScreen" component={Placeholder} />*/}
 
@@ -230,7 +249,6 @@ const RightDrawerNavigator = () => {
         {/*  component={InstructorChatNavigator}*/}
         {/*/>*/}
 
-        {/*<Stack.Screen name="Settings" component={SettingsScreen} />*/}
 
         {/*<Stack.Screen*/}
         {/*  name="PersonalProfile"*/}
@@ -238,8 +256,6 @@ const RightDrawerNavigator = () => {
         {/*/>*/}
 
 
-        {/*<Stack.Screen name="ActivationCode" component={ActivationCodeScreen} />*/}
-        {/*<Stack.Screen name="DependentInfo" component={DependentInfoScreen} />*/}
         {/*<Stack.Screen*/}
         {/*  name="ImportParentDependentScreen"*/}
         {/*  component={ImportDependentScreen}*/}
@@ -250,10 +266,7 @@ const RightDrawerNavigator = () => {
         {/*/>*/}
 
 
-        {/*<Stack.Screen*/}
-        {/*  name="ParentDeletePermission"*/}
-        {/*  component={ParentDeletePermissionScreen}*/}
-        {/*/>*/}
+
 
       </>
     </Stack.Navigator>
