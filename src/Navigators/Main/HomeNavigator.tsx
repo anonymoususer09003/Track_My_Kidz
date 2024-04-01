@@ -17,7 +17,7 @@ const HomeStack = () => (
     initialRouteName="HomeScreen"
     screenOptions={{ headerShown: false }}
   >
-    <HomeNavigator.Screen name="HomeScreen" component={HomeScreen} />
+    <HomeNavigator.Screen name="HomeScreen" component={Placeholder} />
     <HomeNavigator.Screen name="StudentLocationScreen" component={Placeholder} />
     <HomeNavigator.Screen name="ImportDependentScreen" component={Placeholder} />
   </HomeNavigator.Navigator>
