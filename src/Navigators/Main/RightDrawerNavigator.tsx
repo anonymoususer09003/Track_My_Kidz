@@ -13,7 +13,7 @@ import {
   CreateGroupScreen,
   CreateParentActivityScreen,
   DependentInfoScreen,
-  DragDropStudentScreen,
+  DragDropStudentScreen, ImportDependentScreen,
   InstructorActivityDetailScreen,
   InstructorHome,
   InstructorPersonalProfileScreen,
@@ -22,10 +22,10 @@ import {
   NotificationsScreen,
   OrganizationBusinformation,
   OrganizationInfoScreen,
-  ParentDeletePermission,
+  ParentDeletePermission, PersonalProfileScreen,
   ReportProblemScreen,
   SettingsScreen,
-  StudentActivityDetailsScreen,
+  StudentActivityDetailsScreen, StudentLocationScreen,
   StudentPersonalProfileScreen,
   StudentSettingsScreen,
 } from '@/Screens';
@@ -39,6 +39,8 @@ import StudentActivityNavigator from '@/Navigators/Main/StudentActivityNavigator
 import HomeNavigator from '@/Navigators/Main/HomeNavigator';
 import ActivityNavigator from '@/Navigators/Main/ActivityNavigator';
 import ApprovalNavigator from '@/Navigators/Main/ApprovalNavigator';
+import { ParentChatScreen } from '@/Screens/Chats';
+import InstructorChatNavigator from '@/Navigators/Main/InstructorChatNavigator';
 
 type InstructorStack = {
   InstructorPersonalProfileScreen: undefined
@@ -91,6 +93,9 @@ type ParentStack = {
     parentId?: any,
   }
   Settings: undefined
+  ImportParentDependentScreen: undefined
+  PersonalProfile: undefined
+  StudentLocation: { student: any, parent: any }
 }
 
 export type MainStackNavigatorParamsList = InstructorStack & SettingsStack & StudentStack & ParentStack & ParamListBase;
@@ -240,32 +245,25 @@ const RightDrawerNavigator = () => {
           name="ParentDeletePermission"
           component={ParentDeletePermission}
         />
+        <Stack.Screen
+          name="PersonalProfile"
+          component={PersonalProfileScreen}
+        />
+        <Stack.Screen
+          name="ImportParentDependentScreen"
+          component={ImportDependentScreen}
+        />
+        <Stack.Screen
+          name="StudentLocation"
+          component={StudentLocationScreen}
+        />
 
-        {/*<Stack.Screen name="ChatScreen" component={Placeholder} />*/}
 
-
+        {/*<Stack.Screen name="ChatScreen" component={ParentChatScreen} />*/}
         {/*<Stack.Screen*/}
         {/*  name="InstructorChatNavigator"*/}
         {/*  component={InstructorChatNavigator}*/}
         {/*/>*/}
-
-
-        {/*<Stack.Screen*/}
-        {/*  name="PersonalProfile"*/}
-        {/*  component={PersonalProfileScreen}*/}
-        {/*/>*/}
-
-
-        {/*<Stack.Screen*/}
-        {/*  name="ImportParentDependentScreen"*/}
-        {/*  component={ImportDependentScreen}*/}
-        {/*/>*/}
-        {/*<Stack.Screen*/}
-        {/*  name="StudentLocation"*/}
-        {/*  component={StudentLocationScreen}*/}
-        {/*/>*/}
-
-
 
 
       </>

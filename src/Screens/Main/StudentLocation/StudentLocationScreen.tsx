@@ -6,7 +6,7 @@ import { GetChildTrackHistory } from '@/Services/Parent';
 import { ModalState } from '@/Store/Modal';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import Colors from '@/Theme/Colors';
-import { RouteProp, useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import { Button, Text } from '@ui-kitten/components';
 import moment from 'moment';
 import React, { FC, useEffect, useState } from 'react';
@@ -14,10 +14,9 @@ import { Image, Linking, StyleSheet, View } from 'react-native';
 import MapView, { Circle, Marker } from 'react-native-maps';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useDispatch, useSelector } from 'react-redux';
-import { HomeNavigationParamsList } from '@/Navigators/Main/HomeNavigator';
 
 type InstructorActivityDetailScreenProps = {
-  route: RouteProp<HomeNavigationParamsList, 'StudentLocationScreen'>
+  route: any
 }
 
 

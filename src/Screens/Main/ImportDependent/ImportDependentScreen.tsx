@@ -2,23 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '@ui-kitten/components';
-import { AppHeader, LinearGradientButton } from '@/Components';
 import { useDispatch, useSelector } from 'react-redux';
-import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import Entypo from 'react-native-vector-icons/Entypo';
-import Colors from '@/Theme/Colors';
-import { ImportDependentsModal, QRCodeModal } from '@/Modals';
 import MaskInput from 'react-native-mask-input';
-import { ReferenceCodeRegex, ReferenceCodeStyle } from '@/Theme/Variables';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserState } from '@/Store/User';
+import Colors from '@/Theme/Colors';
+import BackgroundLayout from '@/Components/BackgroundLayout';
 import FetchOne from '@/Services/Parent/GetParentChildrens';
 import { GetAuthStudentByActivationCode, ImportAllChildren, ImportSingleChildren } from '@/Services/Student';
-import { UserState } from '@/Store/User';
-import { Toast } from 'react-native-toast-message/lib/src/Toast';
-import BackgroundLayout from '@/Components/BackgroundLayout';
+import { AppHeader, LinearGradientButton } from '@/Components';
+import { ImportDependentsModal, QRCodeModal } from '@/Modals';
+import { ReferenceCodeRegex, ReferenceCodeStyle } from '@/Theme/Variables';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
 const ImportDependent = () => {
-  // todo remove any
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const user = useSelector((state: { user: UserState }) => state.user.item);
