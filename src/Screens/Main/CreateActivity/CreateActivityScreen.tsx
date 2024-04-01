@@ -50,6 +50,8 @@ import * as yup from 'yup';
 import { TIME_STAMP, WEEK_DAYS } from '@/Constants';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { TimeStampSelect } from '@/Components/TimeStampSelect/TimeStampSelect';
+import { SubmitButton } from '@/Components/SubmitButton/SubmitButton';
 
 const _days = WEEK_DAYS;
 
@@ -2082,41 +2084,6 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
   );
 };
 
-interface TimeStampSelectProps {
-  timeStamp: string[];
-}
-
-const TimeStampSelect: FC<TimeStampSelectProps> = ({ timeStamp }) => {
-  return (
-    <>
-      {timeStamp && timeStamp.length > 0 && (
-        timeStamp.map((_timeStamp, index) => {
-          return (
-            <SelectItem
-              key={index}
-              title={_timeStamp || ''}
-            />
-          );
-        })
-      )}
-    </>
-  );
-};
-
-interface SubmitButtonProps extends TouchableOpacityProps {
-  onSubmit: () => void;
-}
-
-const SubmitButton: FC<SubmitButtonProps> = ({ onSubmit, ...props }) => {
-  const handleSubmit = (event: GestureResponderEvent) => {
-    event.preventDefault(); // Зупиняємо стандартну поведінку події, якщо це необхідно
-    onSubmit(); // Викликаємо передану функцію обробки події
-  };
-
-  return (
-    <TouchableOpacity {...props} onPress={handleSubmit} />
-  );
-};
 
 
 export default CreateActivityScreen;
