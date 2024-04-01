@@ -188,3 +188,21 @@ export const TEST_CHILDREN = [
     approve: false,
   },
 ];
+
+
+export const CHILDREN_FROM_PARENT_GROUP_SCREEN = [
+  {
+    id: 1,
+    name: 'JV Basketball Team (Boys)',
+    status: true,
+    instructors: 'Mark K., John B.',
+    students: '10',
+  },
+  {
+    id: 2,
+    name: 'JV Swim Team (Boys)',
+    status: true,
+    instructors: 'Kent B., Mark K.',
+    students: '5',
+  },
+];

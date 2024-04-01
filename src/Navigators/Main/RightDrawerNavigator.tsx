@@ -32,6 +32,7 @@ import InstructorGroupApprovalNavigator from '@/Navigators/Main/InstructorGroupA
 import InstructorActivityNavigator from '@/Navigators/Main/InstructorActivityNavigator';
 import StudentActivityNavigator from '@/Navigators/Main/StudentActivityNavigator';
 import HomeNavigator from '@/Navigators/Main/HomeNavigator';
+import ActivityNavigator from '@/Navigators/Main/ActivityNavigator';
 
 type InstructorStack = {
   InstructorPersonalProfileScreen: undefined
@@ -73,6 +74,8 @@ type StudentStack = {
 
 type ParentStack = {
   Home: undefined
+  Activity: undefined
+  ChatScreen: undefined | any
 }
 
 export type MainStackNavigatorParamsList = InstructorStack & SettingsStack & StudentStack & ParentStack & ParamListBase;
@@ -101,7 +104,7 @@ const RightDrawerNavigator = () => {
   const initialRoute = {
     instructor: 'InstructorActivity',
     student: 'StudentActivity',
-    parent: 'Home',
+    parent: 'Activity',
   };
 
   return (
@@ -210,6 +213,9 @@ const RightDrawerNavigator = () => {
         {user_type === 'parent' && (
           <Stack.Screen name="Home" component={HomeNavigator} />
         )}
+        <Stack.Screen name="Activity" component={ActivityNavigator} />
+        {/*<Stack.Screen name="ChatScreen" component={Placeholder} />*/}
+
 
         {/*<Stack.Screen*/}
         {/*  name="InstructorChatNavigator"*/}
@@ -219,8 +225,6 @@ const RightDrawerNavigator = () => {
         {/*  name="CreateParentActivity"*/}
         {/*  component={CreateParentActivityScreen}*/}
         {/*/>*/}
-        {/*<Stack.Screen name="ChatScreen" component={ParentChatScreen} />*/}
-        {/*<Stack.Screen name="Activity" component={ActivityNavigator} />*/}
         {/*<Stack.Screen name="Approval" component={ApprovalNavigator} />*/}
 
         {/*<Stack.Screen name="Settings" component={SettingsScreen} />*/}

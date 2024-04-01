@@ -1,79 +1,65 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { Text, Icon } from "@ui-kitten/components";
-import { StyleSheet, View, FlatList, TouchableOpacity } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import Colors from "@/Theme/Colors";
-import Entypo from "react-native-vector-icons/Entypo";
-import { InstructionsModal, ShowStudentsInstructorsGroupModal } from "@/Modals";
-import { useStateValue } from "@/Context/state/State";
-import {
-  GetGroupByStudentId,
-  GetGroupCount,
-  FindGroupsByName,
-} from "@/Services/Group";
-import { UserState } from "@/Store/User";
-import SetChatParam from "@/Store/chat/SetChatParams";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import setHeaderParams from "@/Store/header/setHeaderParams";
-import { Image } from "react-native";
-const children = [
-  {
-    id: 1,
-    name: "JV Basketball Team (Boys)",
-    status: true,
-    instructors: "Mark K., John B.",
-    students: "10",
-  },
-  {
-    id: 2,
-    name: "JV Swim Team (Boys)",
-    status: true,
-    instructors: "Kent B., Mark K.",
-    students: "5",
-  },
-];
+import React, { useEffect, useState } from 'react';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { Icon, Text } from '@ui-kitten/components';
+import { FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Colors from '@/Theme/Colors';
+import Entypo from 'react-native-vector-icons/Entypo';
+import { InstructionsModal, ShowStudentsInstructorsGroupModal } from '@/Modals';
+import { useStateValue } from '@/Context/state/State';
+import { FindGroupsByName, GetGroupByStudentId, GetGroupCount } from '@/Services/Group';
+import { UserState } from '@/Store/User';
+import SetChatParam from '@/Store/chat/SetChatParams';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import setHeaderParams from '@/Store/header/setHeaderParams';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+import { ModalState } from '@/Store/Modal';
+import { CHILDREN_FROM_PARENT_GROUP_SCREEN } from '@/Constants';
 
-const GroupScreen = ({ route }) => {
-  const instructorImage = require("@/Assets/Images/approval_icon2.png");
-  const navigation = useNavigation();
+const children = CHILDREN_FROM_PARENT_GROUP_SCREEN;
+
+const GroupScreen = () => {
+  const instructorImage = require('@/Assets/Images/approval_icon2.png');
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
+
   const isFocused = useIsFocused();
-  const swipeableRef = useRef(null);
+  // const swipeableRef = useRef(null);
   const dispatch = useDispatch();
 
-  const [{ selectedDependentActivity, child }] = useStateValue();
-  const [selectedInstructorGroup, setSelectedInstructorGroup] = useState(null);
-  const [selectionData, setSelectionData] = useState({
-    type: "student",
-    status: "pending",
+  const [{ selectedDependentActivity, child }]: any = useStateValue();
+  // const [selectedInstructorGroup, setSelectedInstructorGroup] = useState(null);
+  const [selectionData, setSelectionData] = useState<any>({
+    type: 'student',
+    status: 'pending',
     group: null,
   });
   let prevOpenedRow: any;
   let row: Array<any> = [];
 
   const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
-    useState(false);
+    useState<boolean>(false);
   const searchBarValue = useSelector(
-    (state: any) => state.header.searchBarValue
+    (state: any) => state.header.searchBarValue,
   );
-  const [selectedInstructions, setSelectedInstructions] = useState(null);
-  const dependent = route && route.params && route.params.dependent;
+  const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
+  // const dependent = route && route.params && route.params.dependent;
 
-  const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
+  const currentUser: any = useSelector(
+    (state: { user: UserState }) => state.user.item,
   );
-  const [groupCount, setGroupCount] = useState({});
-  const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
-  const [loading, setLoading] = useState(true);
-  const [thumbnail, setThumbnail] = useState(false);
-  const [searchParam, setSearchParam] = useState("");
-  const [selectedDependent, setSelectedDependent] = useState(null);
+  const [groupCount, setGroupCount] = useState<any>({});
+  // const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
+  // const [loading, setLoading] = useState(true);
+  // const [thumbnail, setThumbnail] = useState(false);
+  // const [searchParam, setSearchParam] = useState("");
+  const [selectedDependent, setSelectedDependent] = useState<any>(null);
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
+    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility,
   );
-  const [groups, setGroups] = useState([]);
+  const [groups, setGroups] = useState<any[]>([]);
 
   const getGroups = async () => {
     GetGroupByStudentId(child?.studentId)
@@ -81,12 +67,12 @@ const GroupScreen = ({ route }) => {
         setGroups(res);
       })
       .catch((err) => {
-        console.log("Error:", err);
+        console.log('Error:', err);
       });
   };
 
   const search = (text: String) => {
-    if (text == "") {
+    if (text == '') {
       getGroups();
     } else {
       FindGroupsByName({ groupName: text }, 0, 30)
@@ -94,7 +80,7 @@ const GroupScreen = ({ route }) => {
           setGroups(res?.result);
         })
         .catch((err) => {
-          console.log("Error:", err);
+          console.log('Error:', err);
         });
     }
   };
@@ -105,9 +91,9 @@ const GroupScreen = ({ route }) => {
     } else {
       dispatch(
         setHeaderParams.action({
-          selectedDropDownOption: "",
-          searchBarValue: "",
-        })
+          selectedDropDownOption: '',
+          searchBarValue: '',
+        }),
       );
     }
   }, [isFocused]);
@@ -119,19 +105,19 @@ const GroupScreen = ({ route }) => {
 
   const getGroupCountApi = async (body: any) => {
     try {
-      let temp = {};
-      let res = await GetGroupCount(body);
+      let temp: any = {};
+      let res: any[] = await GetGroupCount(body);
       res.map((item) => {
         temp[item.groupId] = item;
       });
       setGroupCount({ ...groupCount, ...temp });
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
   useEffect(() => {
     if (isFocused) {
-      let temp = [];
+      let temp: any[] = [];
       if (groups?.length > 0) {
         groups?.forEach(async (element) => {
           temp.push(element.groupId);
@@ -142,18 +128,18 @@ const GroupScreen = ({ route }) => {
     }
   }, [groups?.length, isFocused]);
 
-  const RightActions = (dragX: any, item) => {
+  const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
-      extrapolate: "clamp",
+      extrapolate: 'clamp',
     });
     return (
       <View
         style={{
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <TouchableOpacity
@@ -162,28 +148,28 @@ const GroupScreen = ({ route }) => {
               SetChatParam.action({
                 title: item?.groupName,
                 chatId: `activity_${item?.groupId}`,
-                subcollection: "student",
+                subcollection: 'student',
                 user: {
                   _id: currentUser?.studentId,
                   avatar: currentUser?.imageurl,
                   name: currentUser?.firstname
                     ? currentUser?.firstname[0].toUpperCase() +
-                      currentUser?.firstname.slice(1) +
-                      " " +
-                      currentUser?.lastname[0].toUpperCase()
-                    : currentUser?.firstname + "" + currentUser?.lastname,
+                    currentUser?.firstname.slice(1) +
+                    ' ' +
+                    currentUser?.lastname[0].toUpperCase()
+                    : currentUser?.firstname + '' + currentUser?.lastname,
                 },
-              })
+              }),
             );
-            navigation.navigate("ChatScreen", {
+            navigation.navigate('ChatScreen', {
               title: item?.groupName,
               showHeader: true,
             });
           }}
           style={{
             padding: 5,
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
@@ -193,8 +179,8 @@ const GroupScreen = ({ route }) => {
             onPress={() => setSelectedDependent(item)}
             style={{
               padding: 10,
-              alignItems: "center",
-              justifyContent: "center",
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <Icon
@@ -207,7 +193,7 @@ const GroupScreen = ({ route }) => {
       </View>
     );
   };
-  const closeRow = (index) => {
+  const closeRow = (index: number) => {
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow?.close();
     }
@@ -248,14 +234,14 @@ const GroupScreen = ({ route }) => {
             data={groups || []}
             style={{
               padding: 10,
-              width: "100%",
+              width: '100%',
               marginTop: 10,
               marginBottom: 20,
             }}
             renderItem={({ item, index }) => {
-              let temp = [];
-              let instructor = item?.instructors?.map((item) =>
-                temp.push(item?.firstName)
+              let temp: any[] = [];
+              let instructor = item?.instructors?.map((item: any) =>
+                temp.push(item?.firstName),
               );
               return (
                 <Swipeable
@@ -263,13 +249,13 @@ const GroupScreen = ({ route }) => {
                   onSwipeableOpen={() => closeRow(index)}
                   renderRightActions={(e) => RightActions(e, item)}
                 >
-                  <View style={[styles.item, { backgroundColor: "#fff" }]}>
+                  <View style={[styles.item, { backgroundColor: '#fff' }]}>
                     <Text
                       style={[
                         styles.text,
                         {
                           fontSize: 20,
-                          fontWeight: "800",
+                          fontWeight: '800',
                           paddingLeft: 25,
                         },
                       ]}
@@ -283,21 +269,21 @@ const GroupScreen = ({ route }) => {
                         styles.text,
                         {
                           fontSize: 12,
-                          fontWeight: "700",
+                          fontWeight: '700',
                           paddingLeft: 25,
                         },
                       ]}
                     >{`Instructors: ${temp.toString()}`}</Text>
                     <View style={styles.divider}>
-                      <View style={{ alignItems: "center" }}>
+                      <View style={{ alignItems: 'center' }}>
                         <Text style={styles.text}>{`Approval`}</Text>
-                        <View style={{ flexDirection: "row" }}>
+                        <View style={{ flexDirection: 'row' }}>
                           <TouchableOpacity
                             style={styles.horizontal}
                             onPress={() => {
                               setSelectionData({
-                                status: "approved",
-                                type: "student",
+                                status: 'approved',
+                                type: 'student',
                                 group: item,
                               });
                               setShowStudentsInstructorsModal(true);
@@ -305,7 +291,7 @@ const GroupScreen = ({ route }) => {
                           >
                             <Text style={styles.footerText}>{`${
                               groupCount[item.groupId]?.countApprovedStudents ||
-                              "0"
+                              '0'
                             }`}</Text>
                             <Entypo
                               name="book"
@@ -318,8 +304,8 @@ const GroupScreen = ({ route }) => {
                             style={styles.horizontal}
                             onPress={() => {
                               setSelectionData({
-                                status: "approved",
-                                type: "instructor",
+                                status: 'approved',
+                                type: 'instructor',
                                 group: item,
                               });
                               setShowStudentsInstructorsModal(true);
@@ -327,7 +313,7 @@ const GroupScreen = ({ route }) => {
                           >
                             <Text style={styles.text}>
                               {groupCount[item.groupId]
-                                ?.countApprovedInstructors || "0"}
+                                ?.countApprovedInstructors || '0'}
                             </Text>
                             <Image
                               source={instructorImage}
@@ -337,15 +323,15 @@ const GroupScreen = ({ route }) => {
                         </View>
                       </View>
 
-                      <View style={{ alignItems: "center" }}>
+                      <View style={{ alignItems: 'center' }}>
                         <Text style={styles.footerText}>{`Declined`}</Text>
-                        <View style={{ flexDirection: "row" }}>
+                        <View style={{ flexDirection: 'row' }}>
                           <TouchableOpacity
                             style={styles.horizontal}
                             onPress={() => {
                               setSelectionData({
-                                status: "declined",
-                                type: "student",
+                                status: 'declined',
+                                type: 'student',
                                 group: item,
                               });
                               setShowStudentsInstructorsModal(true);
@@ -353,7 +339,7 @@ const GroupScreen = ({ route }) => {
                           >
                             <Text style={styles.text}>{`${
                               groupCount[item.groupId]?.countDeclinedStudents ||
-                              "0"
+                              '0'
                             }`}</Text>
                             <Entypo
                               name="book"
@@ -366,8 +352,8 @@ const GroupScreen = ({ route }) => {
                             style={styles.horizontal}
                             onPress={() => {
                               setSelectionData({
-                                status: "declined",
-                                type: "instructor",
+                                status: 'declined',
+                                type: 'instructor',
                                 group: item,
                               });
                               setShowStudentsInstructorsModal(true);
@@ -375,7 +361,7 @@ const GroupScreen = ({ route }) => {
                           >
                             <Text style={styles.text}>
                               {groupCount[item.groupId]
-                                ?.countDeclinedInstructors || "0"}
+                                ?.countDeclinedInstructors || '0'}
                             </Text>
                             <Image
                               source={instructorImage}
@@ -385,14 +371,14 @@ const GroupScreen = ({ route }) => {
                         </View>
                       </View>
 
-                      <View style={{ alignItems: "center" }}>
+                      <View style={{ alignItems: 'center' }}>
                         <Text style={styles.footerText}>{`Pending`}</Text>
-                        <View style={{ flexDirection: "row" }}>
+                        <View style={{ flexDirection: 'row' }}>
                           <TouchableOpacity
                             onPress={() => {
                               setSelectionData({
-                                status: "pending",
-                                type: "student",
+                                status: 'pending',
+                                type: 'student',
                                 group: item,
                               });
                               setShowStudentsInstructorsModal(true);
@@ -402,7 +388,7 @@ const GroupScreen = ({ route }) => {
                             <Text style={styles.text}>
                               {`${
                                 groupCount[item.groupId]
-                                  ?.countPendingStudents || "0"
+                                  ?.countPendingStudents || '0'
                               }`}
                             </Text>
                             <Entypo
@@ -416,8 +402,8 @@ const GroupScreen = ({ route }) => {
                             style={styles.horizontal}
                             onPress={() => {
                               setSelectionData({
-                                status: "pending",
-                                type: "instructor",
+                                status: 'pending',
+                                type: 'instructor',
                                 group: item,
                               });
                               setShowStudentsInstructorsModal(true);
@@ -425,7 +411,7 @@ const GroupScreen = ({ route }) => {
                           >
                             <Text style={styles.text}>
                               {groupCount[item.groupId]
-                                ?.countPendingInstructors || "0"}
+                                ?.countPendingInstructors || '0'}
                               {/* {item.countPendingInstructors || `0`} */}
                             </Text>
                             <Image
@@ -443,10 +429,10 @@ const GroupScreen = ({ route }) => {
                         dispatch(
                           ChangeModalState.action({
                             instructionsModalVisibility: true,
-                          })
+                          }),
                         );
                       }}
-                      style={{ width: "100%", alignItems: "center" }}
+                      style={{ width: '100%', alignItems: 'center' }}
                     >
                       <Text
                         style={[
@@ -475,23 +461,23 @@ export default GroupScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     backgroundColor: Colors.newBackgroundColor,
   },
   item: {
     borderRadius: 15,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     // paddingHorizontal: 10,
     paddingTop: 10,
     minHeight: 205,
   },
 
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 13,
@@ -501,7 +487,7 @@ const styles = StyleSheet.create({
   iconImages: {
     height: 15,
     width: 15,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     marginLeft: 5,
     marginRight: 5,
   },
@@ -512,20 +498,20 @@ const styles = StyleSheet.create({
   footer: {
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
   horizontal: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   divider: {
-    flexDirection: "row",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
     borderColor: Colors.lightgray,
