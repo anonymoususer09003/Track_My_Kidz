@@ -46,7 +46,7 @@ export { default as ImportDependentScreen } from "./Main/ImportDependent/ImportD
 export { default as StudentLocationScreen } from "./Main/StudentLocation/StudentLocationScreen";
 export { default as ActivityScreen } from "./Main/Activity/ActivityScreen";
 export { default as GroupScreen } from "./Main/Group/GroupScreen";
-// export { default as CreateParentActivityScreen } from "./Main/CreateParentActivity/CreateParentActivityScreen";
+export { default as CreateParentActivityScreen } from "./Main/CreateParentActivity/CreateParentActivityScreen";
 // export { default as ParentApprovalScreen } from "./Main/ParentApproval/ParentApprovalScreen";
 // export { default as ParentDeclineScreen } from "./Main/ParentDecline/ParentDeclineScreen";
 // export { default as ParentPendingScreen } from "./Main/ParentPending/ParentPendingScreen";

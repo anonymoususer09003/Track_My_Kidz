@@ -1,66 +1,39 @@
-import { LinearGradientButton } from "@/Components";
-import BackgroundLayout from "@/Components/BackgroundLayout";
-import { AddIndividialMembersModal, GroupSelectionModal } from "@/Modals";
-import { CreateActivity } from "@/Services/Activity";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import { GetAllStudents } from "@/Services/Student";
-import Colors from "@/Theme/Colors";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { LinearGradientButton } from '@/Components';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import { AddIndividialMembersModal, GroupSelectionModal } from '@/Modals';
+import { CreateActivity } from '@/Services/Activity';
+import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
+import { GetAllStudents } from '@/Services/Student';
+import Colors from '@/Theme/Colors';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import {
   Autocomplete,
-  AutocompleteItem, CheckBox, Datepicker, Divider,
+  AutocompleteItem,
+  CheckBox,
+  Datepicker,
+  Divider,
   Input,
   Radio,
   RadioGroup,
   Select,
-  SelectItem, Text
-} from "@ui-kitten/components";
-import { Formik } from "formik";
-import moment from "moment";
-import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { useDispatch, useSelector } from "react-redux";
+  SelectItem,
+  Text,
+} from '@ui-kitten/components';
+import { Formik } from 'formik';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { useSelector } from 'react-redux';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+import { TIME_STAMP, WEEK_DAYS } from '@/Constants';
+import { CountryDTO } from '@/Models/CountryDTOs';
+import { TimeStampSelect } from '@/Components/TimeStampSelect/TimeStampSelect';
 
 
-const _days = [
-  {
-    id: 1,
-    name: "Mon",
-    selected: false,
-  },
-  {
-    id: 1,
-    name: "Tue",
-    selected: false,
-  },
-  {
-    id: 1,
-    name: "Wed",
-    selected: false,
-  },
-  {
-    id: 1,
-    name: "Thu",
-    selected: false,
-  },
-  {
-    id: 1,
-    name: "Fri",
-    selected: false,
-  },
-  {
-    id: 1,
-    name: "Sat",
-    selected: false,
-  },
-  {
-    id: 1,
-    name: "Sun",
-    selected: false,
-  },
-];
+const _days = WEEK_DAYS;
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -71,76 +44,41 @@ const filterCities = (item: string, query: string) => {
   return item?.toLowerCase().includes(query.toLowerCase());
 };
 
-const CreateParentActivityScreen = ({ route }) => {
+const CreateParentActivityScreen = () => {
   const isFocused = useIsFocused();
-  const navigation = useNavigation();
-  const currentUser = useSelector((state) => state.user.item);
-  console.log("current User", currentUser);
-  const dispatch = useDispatch();
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
+  const currentUser = useSelector((state: any) => state.user.item);
+  console.log('current User', currentUser);
+  // const dispatch = useDispatch();
   const [days, setDays] = useState(_days);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [timeSelectedIndex, setTimeSelectedIndex] = useState(0);
-  const [selectedDay, setSelectedDay] = useState("");
-  const [askPermission, setAskPermission] = useState(false);
-  const [groups, setGroups] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [studentsData, setStudentsData] = useState([]);
-  const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [timeSelectedIndex, setTimeSelectedIndex] = useState<number>(0);
+  // const [selectedDay, setSelectedDay] = useState("");
+  const [askPermission, setAskPermission] = useState<boolean>(false);
+  const [groups, setGroups] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
+  const [studentsData, setStudentsData] = useState<any[]>([]);
+  const countries: any[] = useSelector(
+    (state: { places: any }) => state.places.countries,
   );
-  const [statesData, setStatesData] = React.useState<Array<any>>([]);
-  const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
-  const [countriesData, setCountriesData] = React.useState(countries);
-  const [states, setStates] = useState<Array<any>>([]);
-  const [cities, setCities] = useState<Array<any>>([]);
-  const [selectedStudentIndexNew, setSelectedStudentIndex] = useState([]);
-  const timeStamp = [
-    "7:00 AM",
-    "7:30 AM",
-    "8:00 AM",
-    "8:30 AM",
-    "9:00 AM",
-    "9:30 AM",
-    "10:00 AM",
-    "10:30 AM",
-    "11:00 AM",
-    "11:30 AM",
-    "01:00 PM",
-    "01:30 PM",
-    "02:00 PM",
-    "02:30 PM",
-    "03:00 PM",
-    "03:30 PM",
-    "04:00 PM",
-    "04:30 PM",
-    "05:00 PM",
-    "05:30 PM",
-    "06:00 PM",
-    "06:30 PM",
-    "07:00 PM",
-    "07:30 PM",
-    "08:00 PM",
-    "08:30 PM",
-    "09:00 PM",
-    "09:30 PM",
-    "10:00 PM",
-    "10:30 PM",
-    "11:00 PM",
-    "11:30 PM",
-    "12:00 AM",
-    "12:30 AM",
-  ];
+  const [statesData, setStatesData] = React.useState<any[]>([]);
+  const [citiesData, setCitiesData] = React.useState<any[]>([]);
+  const [countriesData, setCountriesData] = React.useState<any[]>(countries);
+  const [states, setStates] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+  const [selectedStudentIndexNew, setSelectedStudentIndex] = useState<any[]>([]);
+  const timeStamp = TIME_STAMP;
 
   let selectedStudentIndex: any[] = [];
-  const [fromCheckBox, setFromCheckBox] = useState(false);
-  const [toCheckBox, setToCheckBox] = useState(false);
-  const handleRemoveStudent = (item) => {
+  const [fromCheckBox, setFromCheckBox] = useState<boolean>(false);
+  const [toCheckBox, setToCheckBox] = useState<boolean>(false);
+  const handleRemoveStudent = (item: any) => {
     let data = [...students];
     data = data.filter((d) => d.parent1_email !== item.parent1_email);
     setStudents(data);
   };
 
-  const handleRemoveGroup = (item) => {
+  const handleRemoveGroup = (item: any) => {
     let data = [...groups];
     data = data.filter((d) => d.id !== item.id);
     setGroups(data);
@@ -152,7 +90,7 @@ const CreateParentActivityScreen = ({ route }) => {
         setStudentsData(res.result);
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log('err', err);
       });
   };
 
@@ -166,7 +104,7 @@ const CreateParentActivityScreen = ({ route }) => {
     }
   }, [isFocused]);
 
-  console.log("currentUser29992929292929", currentUser);
+  console.log('currentUser29992929292929', currentUser);
   return (
     <BackgroundLayout title="Create Event">
       <GroupSelectionModal individuals={groups} setIndividuals={setGroups} />
@@ -179,74 +117,74 @@ const CreateParentActivityScreen = ({ route }) => {
         <Formik
           validateOnMount={true}
           initialValues={{
-            name: "",
-            activityType: "",
+            name: '',
+            activityType: '',
             from: new Date(),
-            fromTime: "",
+            fromTime: '',
             to: new Date(),
-            toTime: "",
-            fromVenueName: "",
-            fromAddress: "",
-            fromCity: "",
-            fromSelectedCity: "",
-            fromState: "",
-            fromSelectedState: "",
-            fromZipCode: "",
-            venueName: "",
-            address: "",
-            city: "",
-            selectedCity: "",
-            state: "",
-            selectedState: "",
-            zipCode: "",
-            instructions: "",
-            disclaimer: "",
-            agreement: "",
+            toTime: '',
+            fromVenueName: '',
+            fromAddress: '',
+            fromCity: '',
+            fromSelectedCity: '',
+            fromState: '',
+            fromSelectedState: '',
+            fromZipCode: '',
+            venueName: '',
+            address: '',
+            city: '',
+            selectedCity: '',
+            state: '',
+            selectedState: '',
+            zipCode: '',
+            instructions: '',
+            disclaimer: '',
+            agreement: '',
             starting: new Date(),
-            startingFrom: "",
-            startingTo: "",
-            students: "",
+            startingFrom: '',
+            startingTo: '',
+            students: '',
             noEnd: false,
           }}
           onSubmit={async (values, { resetForm }) => {
             const fromTime =
               values.fromTime.length > 0
-                ? values.fromTime.includes("AM")
-                  ? values.fromTime.split("AM")[0]
-                  : parseInt(values.fromTime.split(":")[0], 0) +
-                    12 +
-                    ":" +
-                    values.fromTime.split(":")[1].split("PM")[0]
-                : "";
+                ? values.fromTime.includes('AM')
+                  ? values.fromTime.split('AM')[0]
+                  : parseInt(values.fromTime.split(':')[0], 0) +
+                  12 +
+                  ':' +
+                  values.fromTime.split(':')[1].split('PM')[0]
+                : '';
             const toTime =
               values.toTime.length > 0
-                ? values.toTime.includes("AM")
-                  ? values.toTime.split("AM")[0]
-                  : parseInt(values.toTime.split(":")[0], 0) +
-                    12 +
-                    ":" +
-                    values.toTime.split(":")[1].split("PM")[0]
-                : "";
+                ? values.toTime.includes('AM')
+                  ? values.toTime.split('AM')[0]
+                  : parseInt(values.toTime.split(':')[0], 0) +
+                  12 +
+                  ':' +
+                  values.toTime.split(':')[1].split('PM')[0]
+                : '';
             const fromDateTime =
               fromTime.length > 0
-                ? moment(values.from).format("yyyy-MM-DD") +
-                  "T" +
-                  fromTime +
-                  ":00.000Z"
+                ? moment(values.from).format('yyyy-MM-DD') +
+                'T' +
+                fromTime +
+                ':00.000Z'
                 : values.from;
             const toDateTime =
               toTime.length > 0
-                ? moment(values.to).format("yyyy-MM-DD") +
-                  "T" +
-                  toTime +
-                  ":00.000Z"
+                ? moment(values.to).format('yyyy-MM-DD') +
+                'T' +
+                toTime +
+                ':00.000Z'
                 : values.to;
             const unixFrom = moment(fromDateTime).unix();
             const unixTo = moment(toDateTime).unix();
             const data = {
               name: values.name,
               requestPermission: askPermission,
-              type: selectedIndex === 2 ? "trip" : "activity",
+              type: selectedIndex === 2 ? 'trip' : 'activity',
               where: values.venueName,
               address: values.address,
               venueToName: values.venueName,
@@ -266,12 +204,12 @@ const CreateParentActivityScreen = ({ route }) => {
                 id: 0,
                 recurrence: timeSelectedIndex === 2 ? 1 : 0,
                 fromDate: unixFrom,
-                toDate: values.noEnd ? "9999-12-31T12:00.000Z" : unixTo,
+                toDate: values.noEnd ? '9999-12-31T12:00.000Z' : unixTo,
                 days:
                   timeSelectedIndex === 2
-                    ? days.map((d) => (d.selected ? 1 : 0)).join("")
+                    ? days.map((d) => (d.selected ? 1 : 0)).join('')
                     : 0,
-                status: "enabled",
+                status: 'enabled',
               },
               optin: {
                 instructions: values.instructions,
@@ -280,8 +218,8 @@ const CreateParentActivityScreen = ({ route }) => {
                 status: true,
               },
               journey: {
-                journeyStartToDestination: "",
-                journeyStartToOrgin: "",
+                journeyStartToDestination: '',
+                journeyStartToOrgin: '',
                 eta: 0,
                 id: 0,
               },
@@ -290,8 +228,8 @@ const CreateParentActivityScreen = ({ route }) => {
               .then((res) => {
                 resetForm();
                 Toast.show({
-                  type: "success",
-                  text2: "Activity has been successfully created",
+                  type: 'success',
+                  text2: 'Activity has been successfully created',
                 });
                 setGroups([]);
                 setStudents([]);
@@ -303,26 +241,26 @@ const CreateParentActivityScreen = ({ route }) => {
               })
               .catch((err) => {
                 Toast.show({
-                  type: "info",
-                  text2: "Something went wrong",
+                  type: 'info',
+                  text2: 'Something went wrong',
                 });
               });
           }}
         >
           {({
-            handleChange,
-            handleSubmit,
-            setFieldValue,
-            values,
-            errors,
-            isValid,
-          }) => (
+              handleChange,
+              handleSubmit,
+              setFieldValue,
+              values,
+              errors,
+              isValid,
+            }) => (
             <>
               <View style={styles.formContainer}>
                 <Input
-                  style={[styles.textInput, { marginLeft: "5%" }]}
+                  style={[styles.textInput, { marginLeft: '5%' }]}
                   placeholder="Event Name*"
-                  onChangeText={handleChange("name")}
+                  onChangeText={handleChange('name')}
                   value={values.name}
                 />
                 {errors.name ? (
@@ -330,24 +268,24 @@ const CreateParentActivityScreen = ({ route }) => {
                 ) : null}
                 <View
                   style={{
-                    flexDirection: "column",
+                    flexDirection: 'column',
 
                     // justifyContent: "space-between",
-                    marginLeft: "5%",
-                    width: "100%",
+                    marginLeft: '5%',
+                    width: '100%',
                   }}
                 >
                   <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}>
-                    {" "}
+                    {' '}
                     Event Type*
                   </Text>
                   <RadioGroup
                     selectedIndex={selectedIndex}
+                    // todo check if styles didn't change
                     style={{
-                      flexDirection: "row",
-                      alignItems: "space-between",
-                      width: "50%",
-                      icon: () => null,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      width: 50,
                     }}
                     onChange={(index) => {
                       setSelectedIndex(index);
@@ -360,7 +298,7 @@ const CreateParentActivityScreen = ({ route }) => {
                         styles.radioButton,
                         {
                           borderColor:
-                            selectedIndex == 0 ? Colors.primary : "transparent",
+                            selectedIndex == 0 ? Colors.primary : 'transparent',
                         },
                       ]}
                     >
@@ -369,7 +307,7 @@ const CreateParentActivityScreen = ({ route }) => {
                           {...evaProps}
                           style={{ fontSize: 14, marginLeft: 10 }}
                         >
-                          {" "}
+                          {' '}
                           Activity
                         </Text>
                       )}
@@ -380,7 +318,7 @@ const CreateParentActivityScreen = ({ route }) => {
                         styles.radioButton,
                         {
                           borderColor:
-                            selectedIndex == 2 ? Colors.primary : "transparent",
+                            selectedIndex == 2 ? Colors.primary : 'transparent',
                         },
                       ]}
                     >
@@ -396,16 +334,16 @@ const CreateParentActivityScreen = ({ route }) => {
                     <Divider />
                   </RadioGroup>
                   <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}>
-                    {" "}
+                    {' '}
                     Event Duration*
                   </Text>
                   <RadioGroup
                     selectedIndex={timeSelectedIndex}
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      width: "50%",
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '50%',
                     }}
                     onChange={(index) => setTimeSelectedIndex(index)}
                   >
@@ -416,7 +354,7 @@ const CreateParentActivityScreen = ({ route }) => {
                           borderColor:
                             timeSelectedIndex == 0
                               ? Colors.primary
-                              : "transparent",
+                              : 'transparent',
                         },
                       ]}
                     >
@@ -425,7 +363,7 @@ const CreateParentActivityScreen = ({ route }) => {
                           {...evaProps}
                           style={{ fontSize: 14, marginLeft: 10 }}
                         >
-                          {" "}
+                          {' '}
                           One-Time
                         </Text>
                       )}
@@ -438,7 +376,7 @@ const CreateParentActivityScreen = ({ route }) => {
                           borderColor:
                             timeSelectedIndex == 2
                               ? Colors.primary
-                              : "transparent",
+                              : 'transparent',
                         },
                       ]}
                     >
@@ -447,7 +385,7 @@ const CreateParentActivityScreen = ({ route }) => {
                           {...evaProps}
                           style={{ fontSize: 14, marginLeft: 10 }}
                         >
-                          {" "}
+                          {' '}
                           Recurring
                         </Text>
                       )}
@@ -515,82 +453,64 @@ const CreateParentActivityScreen = ({ route }) => {
                   <>
                     <View
                       style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "90%",
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '90%',
                       }}
                     >
                       <Datepicker
                         min={new Date(1900, 0, 0)}
-                        style={[styles.selectSettings, { width: "60%" }]}
+                        style={[styles.selectSettings, { width: '60%' }]}
                         label="From*"
                         placeholder="From"
                         date={values.from}
                         onSelect={(date: Date | null) => {
-                          setFieldValue("from", date);
-                          setFieldValue("to", date);
+                          setFieldValue('from', date);
+                          setFieldValue('to', date);
                         }}
                       />
                       <Select
                         value={values.fromTime}
-                        style={{ marginTop: 5, marginLeft: 5, width: "45%" }}
+                        style={{ marginTop: 5, marginLeft: 5, width: '45%' }}
                         placeholder="From"
                         onSelect={(index: any) => {
-                          setFieldValue("fromTime", timeStamp[index.row]);
+                          setFieldValue('fromTime', timeStamp[index.row]);
                         }}
                         label={(evaProps: any) => <Text {...evaProps}></Text>}
                       >
-                        {timeStamp &&
-                          timeStamp.length > 0 &&
-                          timeStamp.map((_timeStamp, index) => {
-                            return (
-                              <SelectItem
-                                key={index}
-                                title={_timeStamp || ""}
-                              />
-                            );
-                          })}
+                        <TimeStampSelect timeStamp={timeStamp} />
                       </Select>
                     </View>
                     <View
                       style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "90%",
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '90%',
                       }}
                     >
                       <Datepicker
                         min={new Date(1900, 0, 0)}
-                        style={[styles.selectSettings, { width: "60%" }]}
+                        style={[styles.selectSettings, { width: '60%' }]}
                         label="To*"
                         placeholder="To"
                         date={values.to}
                         onSelect={(date: Date | null) => {
-                          setFieldValue("to", date);
+                          setFieldValue('to', date);
                         }}
                       />
                       {/* {console.log("values", values.toTime)} */}
                       <Select
                         value={values.toTime}
-                        style={{ marginTop: 5, marginLeft: 5, width: "45%" }}
+                        style={{ marginTop: 5, marginLeft: 5, width: '45%' }}
                         placeholder="To"
                         onSelect={(index: any) => {
-                          setFieldValue("toTime", timeStamp[index.row]);
+                          setFieldValue('toTime', timeStamp[index.row]);
                         }}
                         label={(evaProps: any) => <Text {...evaProps}></Text>}
                       >
-                        {timeStamp &&
-                          timeStamp.length > 0 &&
-                          timeStamp.map((_timeStamp, index) => {
-                            return (
-                              <SelectItem
-                                key={index}
-                                title={_timeStamp || ""}
-                              />
-                            );
-                          })}
+                        <TimeStampSelect timeStamp={timeStamp} />
                       </Select>
                     </View>
                   </>
@@ -600,21 +520,21 @@ const CreateParentActivityScreen = ({ route }) => {
                     <>
                       <View
                         style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          width: "90%",
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          width: '90%',
                         }}
                       >
                         <Datepicker
                           min={new Date(1900, 0, 0)}
-                          style={[styles.selectSettings, { width: "60%" }]}
+                          style={[styles.selectSettings, { width: '60%' }]}
                           label="From*"
                           placeholder="From"
                           date={values.from}
                           onSelect={(date: Date | null) => {
-                            setFieldValue("from", date);
-                            setFieldValue("to", date);
+                            setFieldValue('from', date);
+                            setFieldValue('to', date);
                           }}
                         />
                         <Select
@@ -622,43 +542,34 @@ const CreateParentActivityScreen = ({ route }) => {
                           style={{
                             marginTop: 5,
                             marginLeft: 5,
-                            width: "45%",
+                            width: '45%',
                           }}
                           placeholder="From"
                           onSelect={(index: any) => {
-                            setFieldValue("fromTime", timeStamp[index.row]);
+                            setFieldValue('fromTime', timeStamp[index.row]);
                           }}
                           label={(evaProps: any) => <Text {...evaProps}></Text>}
                         >
-                          {timeStamp &&
-                            timeStamp.length > 0 &&
-                            timeStamp.map((_timeStamp, index) => {
-                              return (
-                                <SelectItem
-                                  key={index}
-                                  title={_timeStamp || ""}
-                                />
-                              );
-                            })}
+                          <TimeStampSelect timeStamp={timeStamp} />
                         </Select>
                       </View>
                       <View
                         style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          width: "90%",
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          width: '90%',
                         }}
                       >
                         <Datepicker
                           disabled={values?.noEnd}
                           min={new Date(1900, 0, 0)}
-                          style={[styles.selectSettings, { width: "60%" }]}
+                          style={[styles.selectSettings, { width: '60%' }]}
                           label="To*"
                           placeholder="To"
                           date={values.to}
                           onSelect={(date: Date | null) => {
-                            setFieldValue("to", date);
+                            setFieldValue('to', date);
                           }}
                         />
                         {/* {console.log("values", values.toTime)} */}
@@ -668,33 +579,24 @@ const CreateParentActivityScreen = ({ route }) => {
                           style={{
                             marginTop: 5,
                             marginLeft: 5,
-                            width: "45%",
+                            width: '45%',
                           }}
                           placeholder="To"
                           onSelect={(index: any) => {
-                            setFieldValue("toTime", timeStamp[index.row]);
+                            setFieldValue('toTime', timeStamp[index.row]);
                           }}
                           label={(evaProps: any) => <Text {...evaProps}></Text>}
                         >
-                          {timeStamp &&
-                            timeStamp.length > 0 &&
-                            timeStamp.map((_timeStamp, index) => {
-                              return (
-                                <SelectItem
-                                  key={index}
-                                  title={_timeStamp || ""}
-                                />
-                              );
-                            })}
+                          <TimeStampSelect timeStamp={timeStamp} />
                         </Select>
                       </View>
                     </>
 
                     <View
                       style={{
-                        flexDirection: "row",
+                        flexDirection: 'row',
 
-                        alignItems: "center",
+                        alignItems: 'center',
                       }}
                     >
                       <Text style={{ marginHorizontal: 15, marginTop: 10 }}>
@@ -704,9 +606,9 @@ const CreateParentActivityScreen = ({ route }) => {
                         style={[{ flex: 1, marginTop: 15 }]}
                         checked={values?.noEnd}
                         onChange={(checked) => {
-                          setFieldValue("noEnd", checked);
+                          setFieldValue('noEnd', checked);
 
-                          console.log("checked", checked);
+                          console.log('checked', checked);
                           // if (checked) {
                           //   Alert.alert(checked);
                           // } else {
@@ -714,23 +616,23 @@ const CreateParentActivityScreen = ({ route }) => {
                           // }
                         }}
                       >
-                        {""}
+                        {''}
                       </CheckBox>
                     </View>
 
                     <Text
                       style={{
-                        color: "#000",
+                        color: '#000',
                         marginTop: 15,
                         marginLeft: 15,
-                        alignSelf: "flex-start",
+                        alignSelf: 'flex-start',
                       }}
                     >
                       Every
                     </Text>
                     <ScrollView
-                      style={{ flexDirection: "row" }}
-                      contentContainerStyle={{ alignItems: "center" }}
+                      style={{ flexDirection: 'row' }}
+                      contentContainerStyle={{ alignItems: 'center' }}
                       horizontal
                     >
                       {days &&
@@ -742,7 +644,7 @@ const CreateParentActivityScreen = ({ route }) => {
                             onPress={() => {
                               const data = [...days];
                               const index = data.findIndex(
-                                (i) => i.name === day.name
+                                (i) => i.name === day.name,
                               );
                               data[index].selected = !day.selected;
                               setDays(data);
@@ -750,7 +652,7 @@ const CreateParentActivityScreen = ({ route }) => {
                           >
                             <Text
                               style={{
-                                color: day.selected ? "#fff" : "#000",
+                                color: day.selected ? '#fff' : '#000',
                               }}
                             >
                               {day.name}
@@ -762,28 +664,28 @@ const CreateParentActivityScreen = ({ route }) => {
                 )}
                 <View
                   style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    width: "100%",
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    width: '100%',
                   }}
                 >
                   <Text
                     style={{
                       color: Colors.primary,
                       fontSize: 18,
-                      fontWeight: "700",
+                      fontWeight: '700',
                       marginVertical: 10,
-                      alignSelf: "flex-start",
-                      marginLeft: "5%",
+                      alignSelf: 'flex-start',
+                      marginLeft: '5%',
                     }}
                   >
-                    {selectedIndex === 0 ? "At*" : "From*"}
+                    {selectedIndex === 0 ? 'At*' : 'From*'}
                   </Text>
                   <View
                     style={{
-                      flexDirection: "row",
+                      flexDirection: 'row',
 
-                      alignItems: "center",
+                      alignItems: 'center',
                     }}
                   >
                     <Text style={{ marginRight: 20, marginTop: 10 }}>
@@ -796,25 +698,25 @@ const CreateParentActivityScreen = ({ route }) => {
                       onChange={(checked) => {
                         setFromCheckBox(checked);
                         if (!fromCheckBox) {
-                          setFieldValue("fromVenueName", currentUser?.name);
-                          setFieldValue("fromAddress", currentUser?.address);
+                          setFieldValue('fromVenueName', currentUser?.name);
+                          setFieldValue('fromAddress', currentUser?.address);
 
-                          setFieldValue("fromState", currentUser?.state);
+                          setFieldValue('fromState', currentUser?.state);
 
-                          setFieldValue("fromCountry", currentUser?.country);
-                          setFieldValue("fromCity", currentUser?.city);
-                          setFieldValue("fromZipCode", currentUser?.zipcode);
+                          setFieldValue('fromCountry', currentUser?.country);
+                          setFieldValue('fromCity', currentUser?.city);
+                          setFieldValue('fromZipCode', currentUser?.zipcode);
                         } else {
-                          setFieldValue("fromVenueName", "");
-                          setFieldValue("fromAddress", "");
+                          setFieldValue('fromVenueName', '');
+                          setFieldValue('fromAddress', '');
 
-                          setFieldValue("fromState", "");
+                          setFieldValue('fromState', '');
 
-                          setFieldValue("fromCountry", "");
-                          setFieldValue("fromCity", "");
-                          setFieldValue("fromZipCode", "");
+                          setFieldValue('fromCountry', '');
+                          setFieldValue('fromCity', '');
+                          setFieldValue('fromZipCode', '');
                         }
-                        console.log("checked", checked);
+                        console.log('checked', checked);
                         // if (checked) {
                         //   Alert.alert(checked);
                         // } else {
@@ -822,7 +724,7 @@ const CreateParentActivityScreen = ({ route }) => {
                         // }
                       }}
                     >
-                      {""}
+                      {''}
                     </CheckBox>
                   </View>
                 </View>
@@ -833,29 +735,35 @@ const CreateParentActivityScreen = ({ route }) => {
                     borderWidth: 1,
                     borderRadius: 20,
                     borderColor: Colors.primary,
-                    width: "100%",
-                    marginLeft: "5%",
+                    width: '100%',
+                    marginLeft: '5%',
                     marginVertical: 10,
                   }}
                 >
                   <Input
                     style={styles.textInput}
                     placeholder="Venue name*"
-                    onChangeText={handleChange("fromVenueName")}
+                    onChangeText={handleChange('fromVenueName')}
                     value={values.fromVenueName}
                   />
-                  {errors.venueName && touched.venueName && (
-                    <Text style={styles.errorText}>{errors.venueName}</Text>
-                  )}
+                  {/*todo: here were no touched variable */}
+                  {errors.venueName &&
+                    // touched.venueName &&
+                    (
+                      <Text style={styles.errorText}>{errors.venueName}</Text>
+                    )}
                   <Input
                     style={styles.textInput}
                     placeholder="Address*"
-                    onChangeText={handleChange("fromAddress")}
+                    onChangeText={handleChange('fromAddress')}
                     value={values.fromAddress}
                   />
-                  {errors.address && touched.address && (
-                    <Text style={styles.errorText}>{errors.address}</Text>
-                  )}
+                  {/*todo: here were no touched variable */}
+                  {errors.venueName &&
+                    // touched.venueName &&
+                    (
+                      <Text style={styles.errorText}>{errors.address}</Text>
+                    )}
                   {/* <Select
                     style={[styles.selectSettings, { marginVertical: 5 }]}
                     value={values.fromState}
@@ -871,29 +779,29 @@ const CreateParentActivityScreen = ({ route }) => {
                   /> */}
                   <Autocomplete
                     placeholder="Country*"
-                    value={values?.fromCountry}
+                    value={(values as any)?.fromCountry}
                     placement="bottom"
                     style={styles.textInput}
                     // label={evaProps => <Text {...evaProps}>Country*</Text>}
                     onChangeText={(query) => {
-                      setFieldValue("fromCountry", query);
+                      setFieldValue('fromCountry', query);
                       setCountriesData(
-                        countries.filter((item) => filterCountries(item, query))
+                        countries.filter((item) => filterCountries(item, query)),
                       );
                     }}
                     onSelect={(query) => {
                       const selectedCountry = countriesData[query];
-                      console.log("000000", selectedCountry.name);
-                      setFieldValue("fromCountry", selectedCountry.name);
-                      setFieldValue("selectedCountry", selectedCountry.name);
-                      setFieldValue("fromSelectedState", "");
-                      setFieldValue("fromState", "");
+                      console.log('000000', selectedCountry.name);
+                      setFieldValue('fromCountry', selectedCountry.name);
+                      setFieldValue('selectedCountry', selectedCountry.name);
+                      setFieldValue('fromSelectedState', '');
+                      setFieldValue('fromState', '');
                       setStates([]);
-                      GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
+                      GetAllStates(selectedCountry.name.replace(/ /g, '')).then(
                         (res) => {
                           setStates(res.data);
                           setStatesData(states);
-                        }
+                        },
                       );
                     }}
                   >
@@ -908,22 +816,22 @@ const CreateParentActivityScreen = ({ route }) => {
                     style={styles.textInput}
                     // label={evaProps => <Text {...evaProps}>State</Text>}
                     onChangeText={(query) => {
-                      setFieldValue("fromState", query);
+                      setFieldValue('fromState', query);
                       setStatesData(
-                        states.filter((item) => filterStates(item, query))
+                        states.filter((item) => filterStates(item, query)),
                       );
                     }}
                     onSelect={(query) => {
                       const selectedState = statesData[query];
-                      setFieldValue("fromState", selectedState);
-                      setFieldValue("fromSelectedState", selectedState);
-                      setFieldValue("fromSelectedCity", "");
-                      setFieldValue("fromCity", "");
+                      setFieldValue('fromState', selectedState);
+                      setFieldValue('fromSelectedState', selectedState);
+                      setFieldValue('fromSelectedCity', '');
+                      setFieldValue('fromCity', '');
                       setCities([]);
-                      GetAllCities(values.selectedCountry, selectedState).then(
+                      GetAllCities((values as any).selectedCountry, selectedState).then(
                         (res) => {
                           setCities(res.data);
-                        }
+                        },
                       );
                     }}
                   >
@@ -938,14 +846,14 @@ const CreateParentActivityScreen = ({ route }) => {
                     style={styles.textInput}
                     // label={evaProps => <Text {...evaProps}>City</Text>}
                     onChangeText={(query) => {
-                      setFieldValue("fromCity", query);
+                      setFieldValue('fromCity', query);
                       setCitiesData(
-                        cities.filter((item) => filterCities(item, query))
+                        cities.filter((item) => filterCities(item, query)),
                       );
                     }}
                     onSelect={(query) => {
-                      setFieldValue("fromCity", citiesData[query]);
-                      setFieldValue("fromSelectedCity", citiesData[query]);
+                      setFieldValue('fromCity', citiesData[query]);
+                      setFieldValue('fromSelectedCity', citiesData[query]);
                     }}
                   >
                     {citiesData.map((item, index) => {
@@ -955,7 +863,7 @@ const CreateParentActivityScreen = ({ route }) => {
                   <Input
                     style={styles.textInput}
                     placeholder="Zip/Post Code"
-                    onChangeText={handleChange("fromZipCode")}
+                    onChangeText={handleChange('fromZipCode')}
                     value={values.fromZipCode}
                   />
                 </View>
@@ -963,19 +871,19 @@ const CreateParentActivityScreen = ({ route }) => {
                   <>
                     <View
                       style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        width: "100%",
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        width: '100%',
                       }}
                     >
                       <Text
                         style={{
                           color: Colors.primary,
                           fontSize: 18,
-                          fontWeight: "700",
+                          fontWeight: '700',
                           marginVertical: 10,
-                          alignSelf: "flex-start",
-                          marginLeft: "5%",
+                          alignSelf: 'flex-start',
+                          marginLeft: '5%',
                         }}
                       >
                         To*
@@ -983,9 +891,9 @@ const CreateParentActivityScreen = ({ route }) => {
 
                       <View
                         style={{
-                          flexDirection: "row",
+                          flexDirection: 'row',
 
-                          alignItems: "center",
+                          alignItems: 'center',
                         }}
                       >
                         <Text style={{ marginRight: 20, marginTop: 10 }}>
@@ -998,25 +906,25 @@ const CreateParentActivityScreen = ({ route }) => {
                           onChange={(checked) => {
                             setToCheckBox(checked);
                             if (!toCheckBox) {
-                              setFieldValue("venueName", currentUser?.name);
-                              setFieldValue("address", currentUser?.address);
+                              setFieldValue('venueName', currentUser?.name);
+                              setFieldValue('address', currentUser?.address);
 
-                              setFieldValue("state", currentUser?.state);
+                              setFieldValue('state', currentUser?.state);
 
-                              setFieldValue("country", currentUser?.country);
-                              setFieldValue("city", currentUser?.city);
-                              setFieldValue("zipCode", currentUser?.zipcode);
+                              setFieldValue('country', currentUser?.country);
+                              setFieldValue('city', currentUser?.city);
+                              setFieldValue('zipCode', currentUser?.zipcode);
                             } else {
-                              setFieldValue("venueName", "");
-                              setFieldValue("address", "");
+                              setFieldValue('venueName', '');
+                              setFieldValue('address', '');
 
-                              setFieldValue("state", "");
+                              setFieldValue('state', '');
 
-                              setFieldValue("country", "");
-                              setFieldValue("city", "");
-                              setFieldValue("zipCode", "");
+                              setFieldValue('country', '');
+                              setFieldValue('city', '');
+                              setFieldValue('zipCode', '');
                             }
-                            console.log("checked", checked);
+                            console.log('checked', checked);
                             // if (checked) {
                             //   Alert.alert(checked);
                             // } else {
@@ -1024,7 +932,7 @@ const CreateParentActivityScreen = ({ route }) => {
                             // }
                           }}
                         >
-                          {""}
+                          {''}
                         </CheckBox>
                       </View>
                     </View>
@@ -1034,51 +942,51 @@ const CreateParentActivityScreen = ({ route }) => {
                         borderWidth: 1,
                         borderRadius: 20,
                         borderColor: Colors.primary,
-                        width: "100%",
-                        marginLeft: "5%",
+                        width: '100%',
+                        marginLeft: '5%',
                         marginVertical: 10,
                       }}
                     >
                       <Input
                         style={styles.textInput}
                         placeholder="Venue name"
-                        onChangeText={handleChange("venueName")}
+                        onChangeText={handleChange('venueName')}
                         value={values.venueName}
                       />
                       <Input
                         style={styles.textInput}
                         placeholder="Address"
-                        onChangeText={handleChange("address")}
+                        onChangeText={handleChange('address')}
                         value={values.address}
                       />
 
                       <Autocomplete
                         placeholder="Country*"
-                        value={values.country}
+                        value={(values as any).country}
                         placement="bottom"
                         style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>Country*</Text>}
                         onChangeText={(query) => {
-                          setFieldValue("country", query);
+                          setFieldValue('country', query);
                           setCountriesData(
                             countries.filter((item) =>
-                              filterCountries(item, query)
-                            )
+                              filterCountries(item, query),
+                            ),
                           );
                         }}
                         onSelect={(query) => {
                           const selectedCountry = countriesData[query];
 
-                          setFieldValue("country", selectedCountry.name);
+                          setFieldValue('country', selectedCountry.name);
                           setFieldValue(
-                            "selectedCountry",
-                            selectedCountry.name
+                            'selectedCountry',
+                            selectedCountry.name,
                           );
-                          setFieldValue("toSelectedState", "");
-                          setFieldValue("state", "");
+                          setFieldValue('toSelectedState', '');
+                          setFieldValue('state', '');
                           setStates([]);
                           GetAllStates(
-                            selectedCountry.name.replace(/ /g, "")
+                            selectedCountry.name.replace(/ /g, ''),
                           ).then((res) => {
                             setStates(res.data);
                             setStatesData(states);
@@ -1098,21 +1006,21 @@ const CreateParentActivityScreen = ({ route }) => {
                         style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>State</Text>}
                         onChangeText={(query) => {
-                          setFieldValue("state", query);
+                          setFieldValue('state', query);
                           setStatesData(
-                            states.filter((item) => filterStates(item, query))
+                            states.filter((item) => filterStates(item, query)),
                           );
                         }}
                         onSelect={(query) => {
                           const selectedState = statesData[query];
-                          setFieldValue("state", selectedState);
-                          setFieldValue("toSelectedState", selectedState);
-                          setFieldValue("toSelectedCity", "");
-                          setFieldValue("city", "");
+                          setFieldValue('state', selectedState);
+                          setFieldValue('toSelectedState', selectedState);
+                          setFieldValue('toSelectedCity', '');
+                          setFieldValue('city', '');
                           setCities([]);
                           GetAllCities(
-                            values.selectedCountry,
-                            selectedState
+                            (values as any).selectedCountry,
+                            selectedState,
                           ).then((res) => {
                             setCities(res.data);
                           });
@@ -1129,14 +1037,14 @@ const CreateParentActivityScreen = ({ route }) => {
                         style={styles.textInput}
                         // label={evaProps => <Text {...evaProps}>City</Text>}
                         onChangeText={(query) => {
-                          setFieldValue("city", query);
+                          setFieldValue('city', query);
                           setCitiesData(
-                            cities.filter((item) => filterCities(item, query))
+                            cities.filter((item) => filterCities(item, query)),
                           );
                         }}
                         onSelect={(query) => {
-                          setFieldValue("city", citiesData[query]);
-                          setFieldValue("toSelectedCity", citiesData[query]);
+                          setFieldValue('city', citiesData[query]);
+                          setFieldValue('toSelectedCity', citiesData[query]);
                         }}
                       >
                         {citiesData.map((item, index) => {
@@ -1147,7 +1055,7 @@ const CreateParentActivityScreen = ({ route }) => {
                       <Input
                         style={styles.textInput}
                         placeholder="Zip/Post Code"
-                        onChangeText={handleChange("zipCode")}
+                        onChangeText={handleChange('zipCode')}
                         value={values.zipCode}
                       />
                     </View>
@@ -1156,40 +1064,40 @@ const CreateParentActivityScreen = ({ route }) => {
 
                 <Input
                   style={styles.textArea}
-                  textStyle={{ minHeight: 70, textAlignVertical: "top" }}
+                  textStyle={{ minHeight: 70, textAlignVertical: 'top' }}
                   placeholder="Instructions"
-                  onChangeText={handleChange("instructions")}
+                  onChangeText={handleChange('instructions')}
                   value={values.instructions}
                   multiline={true}
                   maxLength={500}
                 />
                 <Input
                   style={styles.textArea}
-                  textStyle={{ minHeight: 70, textAlignVertical: "top" }}
+                  textStyle={{ minHeight: 70, textAlignVertical: 'top' }}
                   placeholder="Disclaimer"
-                  onChangeText={handleChange("disclaimer")}
+                  onChangeText={handleChange('disclaimer')}
                   value={values.disclaimer}
                   multiline={true}
                   maxLength={500}
                 />
                 <Input
                   style={styles.textArea}
-                  textStyle={{ minHeight: 70, textAlignVertical: "top" }}
+                  textStyle={{ minHeight: 70, textAlignVertical: 'top' }}
                   placeholder="Agreement"
-                  onChangeText={handleChange("agreement")}
+                  onChangeText={handleChange('agreement')}
                   value={values.agreement}
                   multiline={true}
                   maxLength={500}
                 />
                 {students && students.length > 0 && (
                   <View
-                    style={{ width: "100%", marginTop: 15, marginLeft: "5%" }}
+                    style={{ width: '100%', marginTop: 15, marginLeft: '5%' }}
                   >
                     <Text
                       style={{
                         color: Colors.primary,
                         fontSize: 18,
-                        fontWeight: "700",
+                        fontWeight: '700',
                         marginBottom: 10,
                       }}
                     >
@@ -1208,16 +1116,16 @@ const CreateParentActivityScreen = ({ route }) => {
                         students?.map((item) => (
                           <View
                             style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent: "space-between",
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
                               paddingVertical: 2.5,
                             }}
                           >
                             <View
                               style={{
-                                flexDirection: "row",
-                                alignItems: "center",
+                                flexDirection: 'row',
+                                alignItems: 'center',
                               }}
                             >
                               <Text>{item.name}</Text>
@@ -1237,8 +1145,8 @@ const CreateParentActivityScreen = ({ route }) => {
                 <Select
                   style={{
                     marginTop: 10,
-                    width: "90%",
-                    marginHorizontal: "5%",
+                    width: '90%',
+                    marginHorizontal: '5%',
                   }}
                   value={values?.students?.toString()}
                   selectedIndex={
@@ -1248,28 +1156,28 @@ const CreateParentActivityScreen = ({ route }) => {
                   }
                   multiSelect={true}
                   onSelect={(indexes) => {
-                    if (indexes.length === 0) {
+                    if (Array.isArray(indexes) && indexes.length === 0) {
                       setSelectedStudentIndex([]);
                     }
-                    selectedStudentIndex = indexes;
-                    setFieldValue("students", "");
+                    selectedStudentIndex = Array.isArray(indexes) ? indexes : [indexes];
+                    setFieldValue('students', '');
                     const _students = studentsData;
                     let newValue: string[] = [];
-                    indexes.forEach((index) => {
+                    Array.isArray(indexes) && indexes.forEach((index) => {
                       newValue.push(
                         _students[index.row]?.firstname +
-                          " " +
-                          _students[index.row]?.lastname
+                        ' ' +
+                        _students[index.row]?.lastname,
                       );
                     });
-                    setFieldValue("students", newValue);
+                    setFieldValue('students', newValue);
                   }}
                 >
                   {studentsData &&
                     studentsData
                       ?.map((c, index) => ({
                         id: index + 1,
-                        title: c?.firstname + " " + c?.lastname,
+                        title: c?.firstname + ' ' + c?.lastname,
                       }))
                       .map((student, index) => {
                         return (
@@ -1279,13 +1187,13 @@ const CreateParentActivityScreen = ({ route }) => {
                 </Select>
                 {groups && groups.length > 0 && (
                   <View
-                    style={{ width: "100%", marginTop: 15, marginLeft: "5%" }}
+                    style={{ width: '100%', marginTop: 15, marginLeft: '5%' }}
                   >
                     <Text
                       style={{
                         color: Colors.primary,
                         fontSize: 18,
-                        fontWeight: "700",
+                        fontWeight: '700',
                         marginBottom: 10,
                       }}
                     >
@@ -1304,16 +1212,16 @@ const CreateParentActivityScreen = ({ route }) => {
                         groups?.map((item) => (
                           <View
                             style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent: "space-between",
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
                               paddingVertical: 2.5,
                             }}
                           >
                             <View
                               style={{
-                                flexDirection: "row",
-                                alignItems: "center",
+                                flexDirection: 'row',
+                                alignItems: 'center',
                               }}
                             >
                               <Text>{item.groupName}</Text>
@@ -1338,13 +1246,13 @@ const CreateParentActivityScreen = ({ route }) => {
                       checked={askPermission}
                       onChange={() => setAskPermission(!askPermission)}
                     >
-                      {"Request Permission from Parents/Guardian"}
+                      {'Request Permission from Parents/Guardian'}
                     </CheckBox>
                   </View>
                   <View style={styles.buttonSettings}>
                     <LinearGradientButton
                       onPress={handleSubmit}
-                      colors={[Colors.primary, "#EC5ADD"]}
+                      colors={[Colors.primary, '#EC5ADD']}
                       start={{ x: 0, y: 1 }}
                       end={{ x: 1, y: 1 }}
                       style={styles.linearGradient}
@@ -1367,7 +1275,7 @@ export default CreateParentActivityScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     paddingTop: 20,
     backgroundColor: Colors.newBackgroundColor,
     borderTopLeftRadius: 30,
@@ -1379,25 +1287,25 @@ const styles = StyleSheet.create({
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "left",
+    fontWeight: 'bold',
+    textAlign: 'left',
   },
   background: {
-    width: "98%",
+    width: '98%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignSelf: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignSelf: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
-    marginLeft: "5%",
+    marginLeft: '5%',
   },
   button: {
     paddingTop: 5,
@@ -1407,34 +1315,34 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
-    width: "95%",
-    alignItems: "center",
+    width: '95%',
+    alignItems: 'center',
   },
   buttonSettings: {
     marginTop: 20,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 70,
-    width: "90%",
+    width: '90%',
   },
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
     marginLeft: 10,
     marginTop: 10,
   },
   selectSettings: {
-    width: "100%",
+    width: '100%',
   },
   day: {
     paddingHorizontal: 5,
     height: 40,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderWidth: 0.5,
     marginTop: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginLeft: 5,
   },
   selectedDay: {
@@ -1443,9 +1351,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderWidth: 0.5,
     marginTop: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    borderColor: "#fff",
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: '#fff',
     marginLeft: 5,
   },
   inputLabels: {
@@ -1454,19 +1362,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   radioButton: {
-    width: "60%",
+    width: '60%',
     height: 40,
     borderRadius: 8,
     borderWidth: 1,
     backgroundColor: Colors.white,
     elevation: 2,
     paddingLeft: 10,
-    marginLeft: "10%",
+    marginLeft: '10%',
   },
   participantContainer: {
-    width: "95%",
+    width: '95%',
     marginVertical: 5,
-    marginLeft: "2%",
+    marginLeft: '2%',
   },
   participantListView: {
     borderRadius: 10,
@@ -1475,9 +1383,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   participantsListCards: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 2.5,
     borderColor: Colors.newBackgroundColor,
     paddingBottom: 10,
@@ -1488,31 +1396,31 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     borderRadius: 20,
-    width: "80%",
+    width: '80%',
     height: 40,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textArea: {
     marginRight: 20,
     marginTop: 10,
-    marginLeft: "8%",
+    marginLeft: '8%',
     borderRadius: 10,
     elevation: 2,
-    width: "95%",
+    width: '95%',
   },
   textInput: {
     marginTop: 10,
-    alignSelf: "center",
-    width: "95%",
+    alignSelf: 'center',
+    width: '95%',
 
     borderRadius: 8,
     elevation: 2,
   },
   autoCompleteItem: {
     // elevation: 2,
-    backgroundColor: "transparent",
-    width: "100%",
-    marginLeft: "1%",
+    backgroundColor: 'transparent',
+    width: '100%',
+    marginLeft: '1%',
   },
 });

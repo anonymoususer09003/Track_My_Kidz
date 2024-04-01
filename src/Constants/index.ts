@@ -206,3 +206,56 @@ export const CHILDREN_FROM_PARENT_GROUP_SCREEN = [
     students: '5',
   },
 ];
+
+export const GROUPS  =[
+  {
+    id: 1,
+    name: "Group one",
+    students: [
+      { id: 1, name: "John Doe" },
+      { id: 2, name: "John Doe" },
+    ],
+    instructors: [
+      { id: 1, name: "John Doe" },
+      { id: 2, name: "John Doe" },
+    ],
+    visible: false,
+  },
+  {
+    id: 2,
+    name: "Group two",
+    students: [
+      { id: 1, name: "John Doe" },
+      { id: 2, name: "John Doe" },
+    ],
+    instructors: [
+      { id: 1, name: "John Doe" },
+      { id: 2, name: "John Doe" },
+    ],
+    visible: false,
+  },
+  {
+    id: 3,
+    name: "Group three",
+    students: [
+      { id: 1, name: "John Doe" },
+      { id: 2, name: "John Doe" },
+    ],
+    instructors: [
+      { id: 1, name: "John Doe" },
+      { id: 2, name: "John Doe" },
+    ],
+    visible: false,
+  },
+];
+
+export const AVAILABLE_PAYMENT_AMOUNTS = [
+  {
+    amount: 1,
+    label: "$50 - Annually (Best Deal)",
+  },
+  {
+    amount: 5,
+    label: "$4.99 - Monthly",
+  },
+];
