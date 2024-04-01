@@ -13,7 +13,7 @@ import { StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
 type StudentActivityNavigatorProp ={
-  StudentActivity: undefined
+  StudentActivityInner: undefined
   StudentGroup: undefined
 }
 
@@ -110,7 +110,7 @@ const StudentActivityNavigator: FC = () => {
         }
       >
         <TabNavigator.Screen
-          name="StudentActivity"
+          name="StudentActivityInner"
           options={{ title: "Activity" }}
           component={StudentActivityScreen}
         />
