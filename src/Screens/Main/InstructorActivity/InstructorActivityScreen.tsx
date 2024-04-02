@@ -53,8 +53,6 @@ import {
 import BackgroundService from 'react-native-background-actions';
 import GeolocationAndroid from 'react-native-geolocation-service';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import Entypo from 'react-native-vector-icons/Entypo';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useDispatch, useSelector } from 'react-redux';
 import { UserTypeState } from '@/Store/UserType';
 import { InstructorActivityNavigatorParamList } from '@/Navigators/Main/InstructorActivityNavigator';
@@ -63,8 +61,10 @@ import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavig
 // todo solve problem with Stomp
 // import SockJS from "sockjs-client";
 // import * as Stomp from "stompjs";
-const studentImage = require("@/Assets/Images/approval_icon1.png");
+// const studentImage = require("@/Assets/Images/approval_icon1.png");
 const instructorImage = require("@/Assets/Images/approval_icon2.png");
+const bookImage = require("@/Assets/Images/book.png");
+const thLargeImage = require("@/Assets/Images/th-large.png");
 
 
 type InstructorActivityScreenProps = {
@@ -647,7 +647,10 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
             setVisible(true);
           }}
         >
-          <FontAwesome5 size={35} name="th-large" color={Colors.primary} />
+          <Image
+            source={thLargeImage}
+            style={{height:35, width:35}}
+          />
         </TouchableOpacity>
       </View>
     );
@@ -1030,11 +1033,9 @@ if(!isCalendarVisible){
                             activitiesCount[item.activityId]
                               ?.countApprovedStudents || "0"
                           }`}</Text>
-                          <Entypo
-                            name="book"
-                            color={Colors.primary}
-                            size={20}
-                            style={{ marginHorizontal: 5 }}
+                          <Image
+                            source={bookImage}
+                            style={styles.iconImages}
                           />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -1084,11 +1085,9 @@ if(!isCalendarVisible){
                             activitiesCount[item.activityId]
                               ?.countDeclinedStudents || "0"
                           }`}</Text>
-                          <Entypo
-                            name="book"
-                            color={Colors.primary}
-                            size={20}
-                            style={{ marginHorizontal: 5 }}
+                          <Image
+                            source={bookImage}
+                            style={styles.iconImages}
                           />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -1140,11 +1139,9 @@ if(!isCalendarVisible){
                                 ?.countPendingStudents || "0"
                             }`}
                           </Text>
-                          <Entypo
-                            name="book"
-                            color={Colors.primary}
-                            size={20}
-                            style={{ marginHorizontal: 5 }}
+                          <Image
+                            source={bookImage}
+                            style={styles.iconImages}
                           />
                         </TouchableOpacity>
                         <TouchableOpacity
