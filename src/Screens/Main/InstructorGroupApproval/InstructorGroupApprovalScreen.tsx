@@ -42,7 +42,6 @@ const InstructorGroupApprovalScreen = () => {
 
   return (
     <>
-      {/*// todo check is it works*/}
       <SetupVehicleModal />
       <View style={styles.layout}>
         <View style={{ flex: 1, paddingHorizontal: 20 }}>

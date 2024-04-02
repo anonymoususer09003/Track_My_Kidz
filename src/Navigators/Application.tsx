@@ -138,7 +138,7 @@ const Application = () => {
   return (
     <>
       <IconRegistry icons={[EvaIconsPack, FeatherIconsPack]} />
-      {/*// TODO sole this*/}
+      {/*// TODO mapping have an inappropriate type, but it works */}
       {/*//@ts-ignore*/}
       <ApplicationProvider {...eva} mapping={mapping} theme={customTheme}>
         <>

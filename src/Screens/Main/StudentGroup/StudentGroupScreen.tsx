@@ -337,15 +337,6 @@ const StudentGroupScreen = () => {
                         <View style={{ flexDirection: 'row' }}>
                           <TouchableOpacity
                             style={styles.horizontal}
-                            onPress={() => {
-                              // todo why?
-                              // setSelectionData({
-                              //   status: 'approved',
-                              //   type: 'student',
-                              //   group: item,
-                              // });
-                              // setShowStudentsInstructorsModal(true);
-                            }}
                           >
                             <Text style={styles.footerText}>{`${
                               groupCount[item.groupId]?.countApprovedStudents ||
@@ -360,15 +351,6 @@ const StudentGroupScreen = () => {
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={styles.horizontal}
-                            onPress={() => {
-                              // todo why?
-                              // setSelectionData({
-                              //   status: 'approved',
-                              //   type: 'instructor',
-                              //   group: item,
-                              // });
-                              // setShowStudentsInstructorsModal(true);
-                            }}
                           >
                             <Text style={styles.text}>
                               {groupCount[item.groupId]
@@ -387,15 +369,6 @@ const StudentGroupScreen = () => {
                         <View style={{ flexDirection: 'row' }}>
                           <TouchableOpacity
                             style={styles.horizontal}
-                            onPress={() => {
-                              // todo why?
-                              // setSelectionData({
-                              //   status: 'declined',
-                              //   type: 'student',
-                              //   group: item,
-                              // });
-                              // setShowStudentsInstructorsModal(true);
-                            }}
                           >
                             <Text style={styles.text}>{`${
                               groupCount[item.groupId]?.countDeclinedStudents ||
@@ -410,15 +383,6 @@ const StudentGroupScreen = () => {
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={styles.horizontal}
-                            onPress={() => {
-                              // todo why?
-                              // setSelectionData({
-                              //   status: 'declined',
-                              //   type: 'instructor',
-                              //   group: item,
-                              // });
-                              // setShowStudentsInstructorsModal(true);
-                            }}
                           >
                             <Text style={styles.text}>
                               {groupCount[item.groupId]
@@ -436,15 +400,6 @@ const StudentGroupScreen = () => {
                         <Text style={styles.footerText}>{`Pending`}</Text>
                         <View style={{ flexDirection: 'row' }}>
                           <TouchableOpacity
-                            onPress={() => {
-                              // todo why?
-                              // setSelectionData({
-                              //   status: 'pending',
-                              //   type: 'student',
-                              //   group: item,
-                              // });
-                              // setShowStudentsInstructorsModal(true);
-                            }}
                             style={styles.horizontal}
                           >
                             <Text style={styles.text}>
@@ -462,15 +417,6 @@ const StudentGroupScreen = () => {
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={styles.horizontal}
-                            onPress={() => {
-                              // todo why?
-                              // setSelectionData({
-                              //   status: 'pending',
-                              //   type: 'instructor',
-                              //   group: item,
-                              // });
-                              // setShowStudentsInstructorsModal(true);
-                            }}
                           >
                             <Text style={styles.text}>
                               {groupCount[item.groupId]

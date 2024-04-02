@@ -22,6 +22,7 @@ export type SingleChatScreenRouteParams = {
   showHeader?: boolean,
   title?: any,
   params?: any,
+  fromChat?: any
 }
 
 type SingleChatScreenProps = {

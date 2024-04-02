@@ -307,7 +307,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
         console.log('err-----', err);
       });
   };
-  const getGroupDetail = async (id: any) => {
+  const getGroupDetail = async (id?: any) => {
     GetGroup(id || route?.params?.groupId)
       .then((res) => {
         console.log('groupinfo', res);
@@ -353,8 +353,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
       getInstructors();
       handleStudentAutoSelect();
       if (route?.params?.groupId) {
-        // todo ??????
-        // getGroupDetail();
+        getGroupDetail(route?.params?.groupId);
       }
     }
   }, [isFocused]);
@@ -384,8 +383,6 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
         setHideForm(true);
       }
       if (isFocused) {
-        // todo ??????
-        // setInitialValues();
       }
     }
     return () => {
@@ -1043,21 +1040,15 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                               setFieldValue('to', date);
                             }}
                           >
-                            // todo ?????? solve this
-                            {/*{({ date, onFocus, onBlur }:{ date: any, onFocus: any, onBlur: any } ) => (*/}
-                            {/*  <TextInput*/}
-                            {/*    value={date ? date.toLocaleDateString() : ""}*/}
-                            {/*    onFocus={onFocus}*/}
-                            {/*    onBlur={onBlur}*/}
-                            {/*    onChangeText={() => {}}*/}
-                            {/*    placeholder="Select date"*/}
-                            {/*    style={{*/}
-                            {/*      color: "red",*/}
-                            {/*      backgroundColor: "red",*/}
-                            {/*      width: 2,*/}
-                            {/*    }} // set the color of the text input*/}
-                            {/*  />*/}
-                            {/*)}*/}
+                            <TextInput
+                              value={values.from ? values.from.toLocaleDateString() : ""}
+                              placeholder="Select date"
+                              style={{
+                                color: "red",
+                                backgroundColor: "red",
+                                width: 2,
+                              }}
+                            />
                           </Datepicker>
                           <Select
                             value={values.fromTime}
@@ -1177,21 +1168,18 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                                 setFieldValue('to', date);
                               }}
                             >
-                              // todo ?????? solve this
-                              {/*{({ date, onFocus, onBlur }:{ date: any, onFocus: any, onBlur: any }) => (*/}
-                              {/*  <TextInput*/}
-                              {/*    value={date ? date.toLocaleDateString() : ""}*/}
-                              {/*    onFocus={onFocus}*/}
-                              {/*    onBlur={onBlur}*/}
-                              {/*    onChangeText={() => {}}*/}
-                              {/*    placeholder="Select date"*/}
-                              {/*    style={{*/}
-                              {/*      color: "red",*/}
-                              {/*      backgroundColor: "red",*/}
-                              {/*      width: 2,*/}
-                              {/*    }} // set the color of the text input*/}
-                              {/*  />*/}
-                              {/*)}*/}
+                              <TextInput
+                                value={values.from ? values.from.toLocaleDateString() : ""}
+                                onFocus={() => {}}
+                                onBlur={() => {}}
+                                onChangeText={() => {}}
+                                placeholder="Select date"
+                                style={{
+                                  color: "red",
+                                  backgroundColor: "red",
+                                  width: 2,
+                                }}
+                              />
                             </Datepicker>
                             <Select
                               value={values.fromTime}
@@ -2087,6 +2075,25 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
 
 
 export default CreateActivityScreen;
+
+type DatepickerTextInputProps = { date: any, onFocus: any, onBlur: any }
+const DatepickerTextInput: FC<DatepickerTextInputProps> =  ({ date, onFocus, onBlur }:{ date: any, onFocus: any, onBlur: any } ) => {
+  return (
+    <TextInput
+      value={date ? date.toLocaleDateString() : ''}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      onChangeText={() => {
+      }}
+      placeholder="Select date"
+      style={{
+        color: 'red',
+        backgroundColor: 'red',
+        width: 2,
+      }} // set the color of the text input
+    />
+  );
+}
 
 const styles = StyleSheet.create({
   layout: {

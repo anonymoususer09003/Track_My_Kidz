@@ -163,8 +163,7 @@ const PersonalProfileScreen = () => {
       size={20}
       style={{height: 20, width: 20, marginRight: 10}}
       color={Colors.secondaryDark}
-      // todo solve this
-      // resizeMode="contain"
+      adjustsFontSizeToFit
     />
   );
 
@@ -278,23 +277,6 @@ const PersonalProfileScreen = () => {
                   }}
                   onSubmit={(values, {resetForm}) => {
                     setisSending(true);
-                    // todo check if can be removed
-                    // let objectToPass = {
-                    //   firstname: values.firstName,
-                    //   lastname: values.lastName,
-                    //   id: currentUser?.instructorId,
-                    //   address: values.address,
-                    //   state: values.state,
-                    //   country: values.country,
-                    //   city: values.city,
-                    //   zipcode: values.zipcode,
-                    //   phone: values.phone,
-                    //   schoolName: values?.schoolName || '',
-                    //   schoolId: values.schoolId,
-                    //   term: true,
-                    //   grades: [],
-                    //   isAdmin: currentUser?.isAdmin,
-                    // };
 
                     let formData = new FormData();
                     formData.append(

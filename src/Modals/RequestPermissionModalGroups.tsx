@@ -597,8 +597,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   topNav: {
-    // todo: solve this
-    // color: Colors.white,
   },
   layout: {
     flex: 1,

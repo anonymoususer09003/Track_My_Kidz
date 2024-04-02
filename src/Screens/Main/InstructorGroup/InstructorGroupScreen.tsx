@@ -74,8 +74,6 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
   const [page, pageNumber] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalRecords, setTotalRecords] = useState<number>(0);
-  // todo find out about usePrevious hook
-  // const previousSearchParam = usePrevious(searchParam);
   const [groupCount, setGroupCount] = useState<any>({});
   const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
     useState<boolean>(false);
@@ -171,16 +169,6 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
       .catch((err) => console.log('getGroupByInstructor'));
   };
 
-  // todo check if redundant
-  // const getInstructors = async () => {
-  //   GetAllInstructors(0, 20)
-  //     .then((res) => {
-  //       setInstructors(res);
-  //     })
-  //     .catch((err) => {
-  //       console.log("getInstructors Error:", err);
-  //     });
-  // };
 
   const findInstructorBySchoolId = async (res: any) => {
     try {
@@ -204,9 +192,6 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
           payload: { result: instructorsList },
         });
 
-        // todo check if redundant
-        // setInstructors({ result: instructorsList });
-        // setOrgInfo(org);
         //   })
       }
     } catch (err) {
@@ -485,8 +470,6 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
     () => {
       if (
         searchParam &&
-        // todo check previous hook
-        // searchParam !== previousSearchParam &&
         (searchParam.length === 0 || searchParam.length > 3)
       ) {
         search();

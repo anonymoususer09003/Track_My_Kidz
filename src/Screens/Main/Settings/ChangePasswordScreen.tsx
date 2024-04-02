@@ -131,7 +131,7 @@ const ChangePasswordScreen = () => {
           position: 'top',
           text1: 'Password reset successfully',
         });
-        // todo solve this problem
+        // todo redux ts warning not a priority
         // @ts-ignore
         dispatch(LogoutStore.action());
       })

@@ -281,7 +281,6 @@ const CreateParentActivityScreen = () => {
                   </Text>
                   <RadioGroup
                     selectedIndex={selectedIndex}
-                    // todo check if styles didn't change
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
@@ -746,9 +745,7 @@ const CreateParentActivityScreen = () => {
                     onChangeText={handleChange('fromVenueName')}
                     value={values.fromVenueName}
                   />
-                  {/*todo: here were no touched variable */}
                   {errors.venueName &&
-                    // touched.venueName &&
                     (
                       <Text style={styles.errorText}>{errors.venueName}</Text>
                     )}
@@ -758,9 +755,7 @@ const CreateParentActivityScreen = () => {
                     onChangeText={handleChange('fromAddress')}
                     value={values.fromAddress}
                   />
-                  {/*todo: here were no touched variable */}
                   {errors.venueName &&
-                    // touched.venueName &&
                     (
                       <Text style={styles.errorText}>{errors.address}</Text>
                     )}

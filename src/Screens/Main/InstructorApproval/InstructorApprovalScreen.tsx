@@ -217,8 +217,6 @@ const InstructorGroupPendingScreen = () => {
           {isFocused && (
             <FlatList
               data={[...activities, ...groups]}
-              // todo solve this
-              // keyExtractor={(item, index) => index}
               style={{ padding: 10, width: '100%', marginTop: 10 }}
               contentContainerStyle={{ paddingBottom: 15 }}
               renderItem={({ item, index }) => {

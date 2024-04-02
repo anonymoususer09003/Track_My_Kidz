@@ -411,8 +411,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
   },
   topNav: {
-    // TODO find solution
-    // color: Colors.white
   },
   icon: {
     width: 32,

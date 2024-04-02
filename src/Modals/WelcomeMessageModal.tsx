@@ -8,6 +8,8 @@ import { UserState } from '@/Store/User';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '@/Theme/Colors';
 import { UserTypeState } from '@/Store/UserType';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
 interface AvailableBoost {
   freeBoostEligible: boolean;
@@ -16,7 +18,7 @@ interface AvailableBoost {
 }
 
 const WelcomeMessageModal = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const isVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.welcomeMessageModal
   );
@@ -96,10 +98,9 @@ const WelcomeMessageModal = () => {
                     welcomeMessageModal: false,
                   })
                 );
-                // TODO check if this is existing
-                // navigation.navigate("ImportDependentScreen", {
-                //   fromHome: true,
-                // });
+                navigation.navigate("ImportDependentScreen", {
+                  fromHome: true,
+                });
               }}
             >
               <Text style={styles.buttonText}>

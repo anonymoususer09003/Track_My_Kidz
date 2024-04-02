@@ -62,9 +62,9 @@ import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavig
 // import SockJS from "sockjs-client";
 // import * as Stomp from "stompjs";
 // const studentImage = require("@/Assets/Images/approval_icon1.png");
-const instructorImage = require("@/Assets/Images/approval_icon2.png");
-const bookImage = require("@/Assets/Images/book.png");
-const thLargeImage = require("@/Assets/Images/th-large.png");
+const instructorImage = require('@/Assets/Images/approval_icon2.png');
+const bookImage = require('@/Assets/Images/book.png');
+const thLargeImage = require('@/Assets/Images/th-large.png');
 
 
 type InstructorActivityScreenProps = {
@@ -81,7 +81,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   const source = cancelToken.source();
   // const { abortControllerRef } = abortController();
   const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries
+    (state: { places: PlaceState }) => state.places.countries,
   );
   // let abortControllerRef = useRef<AbortController>(new AbortController());
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
@@ -90,58 +90,58 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   const [activitiesCount, setActivitiesCount] = useState<any>({});
   const dispatch = useDispatch();
   const user_type = useSelector(
-    (state: { userType: UserTypeState }) => state.userType.userType
+    (state: { userType: UserTypeState }) => state.userType.userType,
   );
 
   const showVehicle = useSelector(
-    (state: { modal: ModalState }) => state.modal.setupVehicleModal
+    (state: { modal: ModalState }) => state.modal.setupVehicleModal,
   );
   const showJourneytracker = useSelector(
-    (state: { modal: ModalState }) => state.modal.journeyTrackerModalVisibility
+    (state: { modal: ModalState }) => state.modal.journeyTrackerModalVisibility,
   );
   const rollCallModal = useSelector(
-    (state: { modal: ModalState }) => state.modal.rollCallModalVisibility
+    (state: { modal: ModalState }) => state.modal.rollCallModalVisibility,
   );
   const searchBarValue = useSelector(
-    (state: any) => state.header.searchBarValue
+    (state: any) => state.header.searchBarValue,
   );
   const dropDownValue = useSelector((state: any) => state.header.dropDownValue);
 
   const [cancelModal, setCancelModal] = useState<boolean>(false);
-  const [searchParam, setSearchParam] = useState<string>("");
-  const [activities, setActivities] = useState<Activity[]|  any>([]);
-  const [originalActivities, setOriginalActivities] = useState<Activity[]| any>([]);
+  const [searchParam, setSearchParam] = useState<string>('');
+  const [activities, setActivities] = useState<Activity[] | any>([]);
+  const [originalActivities, setOriginalActivities] = useState<Activity[] | any>([]);
 
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
-  const [selectedInstructions, setSelectedInstructions] = useState<Optin| null>(null);
-  const [selectedInstructor, setSelectedInstructor] = useState<string| null>("");
+  const [selectedInstructions, setSelectedInstructions] = useState<Optin | null>(null);
+  const [selectedInstructor, setSelectedInstructor] = useState<string | null>('');
   const [visible, setVisible] = useState<boolean>(false);
   const [page, pageNumber] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalRecords, setTotalRecords] = useState<number>(0);
-  const [userId, setUserId] = useState<string| null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [selectedInstructorActivities, setSelectedInstructorActivities] =
     useState<any>(null);
-    const [originalInstructorActivities, setOriginalInstructorActivities] =
+  const [originalInstructorActivities, setOriginalInstructorActivities] =
     useState<any>(null);
   const isCalendarVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.showCalendar
+    (state: { modal: ModalState }) => state.modal.showCalendar,
   );
   const isVisible = useSelector(
     (state: { modal: ModalState }) =>
-      state.modal.requestPermissionModalVisibility
+      state.modal.requestPermissionModalVisibility,
   );
   const showInstructorModal = useSelector(
-    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
+    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility,
   );
   const showRolCall = useSelector(
-    (state: { modal: ModalState }) => state.modal.rollCallModalVisibility
+    (state: { modal: ModalState }) => state.modal.rollCallModalVisibility,
   );
   const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
     useState(false);
   const [selectionData, setSelectionData] = useState({
-    type: "student",
-    status: "pending",
+    type: 'student',
+    status: 'pending',
   });
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [user, setUser] = useState<any>(null);
@@ -149,12 +149,12 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   let prevOpenedRow: any;
   let row: Array<any> = [];
   const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
+    (state: { user: UserState }) => state.user.item,
   );
 
   const { selectedDayForFilter, selectedMonthForFilter } = useSelector(
     (state: { instructorsActivity: InstructorState }) =>
-      state.instructorsActivity
+      state.instructorsActivity,
   );
   // console.log("filterday and month", filterDayAndMonth);
   const setOrgInstructors = async () => {
@@ -165,13 +165,14 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         await CreateMultipleInstructor(JSON.parse(res), userId);
         removeInstructors();
       }
-    } catch (err) {}
+    } catch (err) {
+    }
   };
   useEffect(() => {
     dispatch(
       ChangeNavigationCustomState.action({
-        navigationLeftDrawer: "activity",
-      })
+        navigationLeftDrawer: 'activity',
+      }),
     );
     if (selectedInstructions) {
       dispatch(ChangeModalState.action({ instructionsModalVisibility: true }));
@@ -196,10 +197,10 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         const data = res && res.result;
         if (page == 0) {
           storeHomeScreenCacheInfo(
-            "instructor_activites",
+            'instructor_activites',
             JSON.stringify({
               result: data,
-            })
+            }),
           );
         }
         // res.result
@@ -234,7 +235,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         setPageSize(pageSize);
 
         pageNumber(page);
-        console.log("getActivities Error:", err);
+        console.log('getActivities Error:', err);
       });
   };
 
@@ -246,7 +247,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
       cancelToken: source.token,
     })
       .then((res) => {
-        console.log("FindActivitiesByUserId", res);
+        console.log('FindActivitiesByUserId', res);
         setTotalRecords(res.totalRecords);
 
         setRefreshing(false);
@@ -269,10 +270,10 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         // console.log("data", data);
         if (page == 0) {
           storeHomeScreenCacheInfo(
-            "instructor_activites",
+            'instructor_activites',
             JSON.stringify({
               result: data,
-            })
+            }),
           );
         }
         if (refreshing) {
@@ -292,7 +293,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         }
       })
       .catch((err) => {
-        console.log("getActivities user Error:", err);
+        console.log('getActivities user Error:', err);
         setRefreshing(false);
         setPageSize(pageSize);
 
@@ -302,18 +303,18 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
 
   const getInstructor = async () => {
     const userId = await loadUserId();
-    if(userId) {
+    if (userId) {
       setUserId(userId);
     }
     try {
       if (Object.keys(currentUser).length == 0) {
-        if (!userId) return
+        if (!userId) return;
         let res = await GetInstructor(userId);
         dispatch(
           ChangeUserState.action({
             item: res,
             fetchOne: { loading: false, error: null },
-          })
+          }),
         );
         _dispatch({
           type: actions.INSTRUCTOR_DETAIL,
@@ -322,10 +323,10 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         setUser(res);
 
         if (res?.isAdmin) {
-          console.log("if------------------");
+          console.log('if------------------');
           await getActivities(false);
         } else {
-          console.log("else------------------");
+          console.log('else------------------');
           await getActivitiesByUser(userId);
         }
       } else {
@@ -335,10 +336,10 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         });
         setUser(currentUser);
         if ((currentUser as any)?.isAdmin) {
-          console.log("if------------------");
+          console.log('if------------------');
           await getActivities(false);
         } else {
-          console.log("else------------------");
+          console.log('else------------------');
           await getActivitiesByUser(userId);
         }
       }
@@ -347,7 +348,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         fetchCountries();
       }
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
 
     // GetInstructor(userId)
@@ -390,7 +391,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   };
 
   const getActivityByName = async () => {
-    if (searchParam === "") {
+    if (searchParam === '') {
       getActivities();
     } else {
       const _activities = await GetActivityByName(searchParam.toLowerCase());
@@ -408,13 +409,13 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         filterInstructorActivities(
           selectedMonthForFilter,
           selectedDayForFilter,
-          res
+          res,
         );
       })
-      .catch((err) => console.log("getActivitiesByInstructor"));
+      .catch((err) => console.log('getActivitiesByInstructor'));
   };
   const getCacheActivites = async () => {
-    let activites = await getHomeScreenCacheInfo("instructor_activites");
+    let activites = await getHomeScreenCacheInfo('instructor_activites');
     if (activites) {
       setActivities(JSON.parse(activites));
       setOriginalActivities(JSON.parse(activites));
@@ -427,7 +428,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
       //   dispatch(ChangeCountryState.action({ countries: res }));
       // }
     } catch (err) {
-      console.log("err fetch coutnries", err);
+      console.log('err fetch coutnries', err);
     }
   };
   useEffect(() => {
@@ -468,16 +469,16 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   //   });
   // };
   const locationPermission = async () => {
-    if (Platform.OS === "android") {
+    if (Platform.OS === 'android') {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
         {
-          title: "Background Location Permission",
-          message: "TrackMyKidz App needs access to your location",
-          buttonNeutral: "Ask Me Later",
-          buttonNegative: "Cancel",
-          buttonPositive: "OK",
-        }
+          title: 'Background Location Permission',
+          message: 'TrackMyKidz App needs access to your location',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
       );
       // const granted = await PermissionsAndroid.request(
       //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
@@ -512,10 +513,10 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   const handleHistorySchedule = async () => {
     // if (currentUser?.childTrackHistory) {
     try {
-      if (Platform.OS == "android") {
+      if (Platform.OS == 'android') {
         GeolocationAndroid.getCurrentPosition(async (pos) => {
           const crd = pos.coords;
-          console.log("crd", crd);
+          console.log('crd', crd);
 
           sendCoordinates(crd.latitude, crd.longitude);
         });
@@ -524,10 +525,12 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
           const crd = pos.coords;
 
           sendCoordinates(crd.latitude, crd.longitude);
-        }, ()=>{},()=>{});
+        }, () => {
+        }, () => {
+        });
       }
     } catch (err) {
-      console.log("er99999999999999", err);
+      console.log('er99999999999999', err);
     }
 
     // }
@@ -560,27 +563,27 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
     };
 
     const options = {
-      taskName: "Example",
-      taskTitle: "TrackMyKidz",
-      taskDesc: "Tracking your Location",
+      taskName: 'Example',
+      taskTitle: 'TrackMyKidz',
+      taskDesc: 'Tracking your Location',
       taskIcon: {
-        name: "ic_launcher",
-        type: "mipmap",
+        name: 'ic_launcher',
+        type: 'mipmap',
       },
-      color: "#ff00ff",
-      linkingURI: "yourSchemeHere://chat/jane", // See Deep Lking for more info
+      color: '#ff00ff',
+      linkingURI: 'yourSchemeHere://chat/jane', // See Deep Lking for more info
       parameters: {
         delay: 2000,
       },
     };
-    BackgroundService.on("expiration", () => {
-      console.log("I am being closed :(");
+    BackgroundService.on('expiration', () => {
+      console.log('I am being closed :(');
     });
 
     // await BackgroundService.start(veryIntensiveTask, options);
     await BackgroundService.start(veryIntensiveTask, options);
     await BackgroundService.updateNotification({
-      taskDesc: "Tracking Location",
+      taskDesc: 'Tracking Location',
     }); // Only Android, iOS will ignore this call
     // iOS will also run everything here in the background until .stop() is called
     // await BackgroundService.stop();
@@ -599,7 +602,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
       }
     }
     return () => {
-      source.cancel("axios request cancelled");
+      source.cancel('axios request cancelled');
       // abortControllerRef.current.abort();
       // abortControllerRef = null;
     };
@@ -623,23 +626,23 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
-      extrapolate: "clamp",
+      extrapolate: 'clamp',
     });
     return (
       <View
         style={{
-          flexDirection: "column",
-          alignItems: "center",
+          flexDirection: 'column',
+          alignItems: 'center',
           // backgroundColor: "red",
-          justifyContent: "center",
+          justifyContent: 'center',
           paddingVertical: 3,
         }}
       >
         <TouchableOpacity
           style={{
             padding: 5,
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
           onPress={() => {
             prevOpenedRow?.close();
@@ -649,45 +652,45 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         >
           <Image
             source={thLargeImage}
-            style={{height:35, width:35}}
+            style={{ height: 35, width: 35 }}
           />
         </TouchableOpacity>
       </View>
     );
   };
 
-  const renderIcon = (props: any) => <Icon {...props} name={"search"} />;
+  const renderIcon = (props: any) => <Icon {...props} name={'search'} />;
   const filterActivities = (month: any, day: any) => {
-      let allActivities = { ...activities }
+    let allActivities = { ...activities };
 
-    let date = new Date().getFullYear() + "-" + month + "-" + day;
+    let date = new Date().getFullYear() + '-' + month + '-' + day;
     let temp: any[] = [];
-    if(originalInstructorActivities?.length){
-      originalInstructorActivities.map((item: any)=>{
+    if (originalInstructorActivities?.length) {
+      originalInstructorActivities.map((item: any) => {
 
-        const date1 = moment(item?.fromDate, ["YYYY-MM-DDTHH:mm:ss.SSSZ", "MMM DD, YYYYTHH:mm:ss.SSSZ"],true);
-        const date2 = moment(date, ["YYYY-M-D"],true).add(1,'month').add(1,'day');
-        console.log('date1: ', date1)
-        console.log('date2: ', date2)
+        const date1 = moment(item?.fromDate, ['YYYY-MM-DDTHH:mm:ss.SSSZ', 'MMM DD, YYYYTHH:mm:ss.SSSZ'], true);
+        const date2 = moment(date, ['YYYY-M-D'], true).add(1, 'month').add(1, 'day');
+        console.log('date1: ', date1);
+        console.log('date2: ', date2);
         if (
-          moment(date1).isSame(date2,'day') &&
-          moment(date1).isSame(date2,'month')
+          moment(date1).isSame(date2, 'day') &&
+          moment(date1).isSame(date2, 'month')
         ) {
           temp.push(item);
         }
-      })
-      setSelectedInstructorActivities(temp)
-    }else{
- originalActivities?.result?.map((item: any, index: number) => {
-      // let itemDate = item?.date.split("T");
+      });
+      setSelectedInstructorActivities(temp);
+    } else {
+      originalActivities?.result?.map((item: any, index: number) => {
+        // let itemDate = item?.date.split("T");
 
-      if (
-        moment(item?.fromDate).format('MMM DD, YYYY') ==
-        moment(date).format('MMM DD, YYYY')
-      ) {
-        temp.push(item);
-      }
-    });
+        if (
+          moment(item?.fromDate).format('MMM DD, YYYY') ==
+          moment(date).format('MMM DD, YYYY')
+        ) {
+          temp.push(item);
+        }
+      });
     }
 
     allActivities.result = temp;
@@ -699,18 +702,18 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   const filterInstructorActivities = (
     month: any,
     day: any,
-    activities: any
+    activities: any,
   ) => {
     let allActivities = [...activities];
 
-    if(!isCalendarVisible){
-      setSelectedInstructorActivities(activities)
+    if (!isCalendarVisible) {
+      setSelectedInstructorActivities(activities);
       setOriginalInstructorActivities(activities);
-    } else{
-      let date = new Date().getFullYear() + "-" + month + "-" + day;
+    } else {
+      let date = new Date().getFullYear() + '-' + month + '-' + day;
       let temp: any[] = [];
       allActivities.map((item, index) => {
-        let itemDate = item?.date?.split(" ");
+        let itemDate = item?.date?.split(' ');
 
         if (itemDate[0] == date) {
           temp.push(item);
@@ -732,7 +735,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
     let allActivities = { ...activities };
 
     allActivities.result = originalActivities?.result?.filter((item: any, index: number) =>
-      item.activityName.toLowerCase().includes(text.toLowerCase())
+      item.activityName.toLowerCase().includes(text.toLowerCase()),
     );
     setActivities(allActivities);
   };
@@ -754,25 +757,25 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
       res.map((item: any) => {
         temp[item.activityId] = item;
       });
-      console.log("res", res);
+      console.log('res', res);
       setActivitiesCount({ ...activitiesCount, ...temp });
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
 
-  useEffect(()=>{
-if(!isCalendarVisible){
-  if( user_type === 'instructor')
-  setSelectedInstructorActivities(originalInstructorActivities)
-}
-  },[isCalendarVisible])
+  useEffect(() => {
+    if (!isCalendarVisible) {
+      if (user_type === 'instructor')
+        setSelectedInstructorActivities(originalInstructorActivities);
+    }
+  }, [isCalendarVisible]);
 
   useEffect(() => {
     if (countries && isFocused) {
       let temp: any = [];
       if (activities?.result?.length > 0) {
-        activities?.result?.forEach(async (element:any) => {
+        activities?.result?.forEach(async (element: any) => {
           temp.push(element.activityId);
           // await getActivityesCountApi(element?.activityId);
         });
@@ -803,20 +806,20 @@ if(!isCalendarVisible){
       } else {
         setSelectedInstructor(
           instructors?.result[dropDownValue.row - 1]?.firstname +
-            " " +
-            instructors?.result[dropDownValue.row - 1]?.lastname
+          ' ' +
+          instructors?.result[dropDownValue.row - 1]?.lastname,
         );
 
         getActivitiesByInstructor(
-          instructors?.result[dropDownValue.row - 1]?.instructorId
+          instructors?.result[dropDownValue.row - 1]?.instructorId,
         );
       }
-    }else if (userId){
+    } else if (userId) {
       getActivitiesByInstructor(
-        userId
+        userId,
       );
     }
-  }, [dropDownValue,userId]);
+  }, [dropDownValue, userId]);
   useEffect(() => {
     if (searchBarValue) {
       search(searchBarValue);
@@ -885,11 +888,7 @@ if(!isCalendarVisible){
         />
       )}
       {isVisible && (
-        <RequestPermissionModal
-          // todo check if it works
-          // activity={selectedActivity}
-          // setSelectedActivity={setSelectedActivity}
-        />
+        <RequestPermissionModal />
       )}
       {showInstructorModal && (
         <InstructionsModal
@@ -904,11 +903,11 @@ if(!isCalendarVisible){
 
       <View style={styles.layout}>
         {
-        (activities?.result?.length == 0 && selectedInstructorActivities?.length == 0) && (
-          <Text style={{ textAlign: "center", marginTop: 5 }}>
-            You currently do not have any activities
-          </Text>
-        )}
+          (activities?.result?.length == 0 && selectedInstructorActivities?.length == 0) && (
+            <Text style={{ textAlign: 'center', marginTop: 5 }}>
+              You currently do not have any activities
+            </Text>
+          )}
         <FlatList
           data={
             selectedInstructorActivities
@@ -917,7 +916,7 @@ if(!isCalendarVisible){
           }
           style={{
             padding: 10,
-            width: "100%",
+            width: '100%',
             marginTop: 10,
           }}
           contentContainerStyle={{ paddingBottom: 100 }}
@@ -939,13 +938,13 @@ if(!isCalendarVisible){
                   style={[
                     styles.item,
                     {
-                      backgroundColor: "#fff",
+                      backgroundColor: '#fff',
                     },
                   ]}
                 >
                   <TouchableOpacity
                     onPress={() => {
-                      navigation.navigate("InstructorActivityDetail", {
+                      navigation.navigate('InstructorActivityDetail', {
                         data: item,
                         activitiesCount: activitiesCount,
                       });
@@ -956,7 +955,7 @@ if(!isCalendarVisible){
                         styles.text,
                         {
                           fontSize: 20,
-                          fontWeight: "800",
+                          fontWeight: '800',
                           paddingLeft: 25,
                         },
                       ]}
@@ -965,8 +964,8 @@ if(!isCalendarVisible){
                     </Text>
                     <View
                       style={{
-                        flexDirection: "row",
-                        alignItems: "center",
+                        flexDirection: 'row',
+                        alignItems: 'center',
                         paddingBottom: 20,
                         borderBottomWidth: 0.5,
                         paddingHorizontal: 10,
@@ -974,47 +973,47 @@ if(!isCalendarVisible){
                       }}
                     >
                       <Image
-                        source={require("@/Assets/Images/circle-dashed.png")}
+                        source={require('@/Assets/Images/circle-dashed.png')}
                         style={{
                           height: 40,
                           width: 40,
-                          resizeMode: "contain",
+                          resizeMode: 'contain',
                           // marginRight: 10,
                         }}
                       />
                       <View>
                         <Text style={styles.text}>{`${moment.utc(
-                          item?.fromDate == "string"
+                          item?.fromDate == 'string'
                             ? new Date()
-                            : item?.fromDate
+                            : item?.fromDate,
                         ).format('MMM DD, YYYY')} at ${moment.utc(
-                          item?.fromDate == "string"
+                          item?.fromDate == 'string'
                             ? new Date()
-                            : item?.fromDate
-                        ).format("hh:mm a")} `}</Text>
+                            : item?.fromDate,
+                        ).format('hh:mm a')} `}</Text>
                         <Text style={styles.text}>{`${moment(
-                          item?.toDate == "string" ? new Date() : item?.toDate
+                          item?.toDate == 'string' ? new Date() : item?.toDate,
                         ).format('MMM DD, YYYY')} at ${moment.utc(
-                          item?.toDate == "string" ? new Date() : item?.toDate
+                          item?.toDate == 'string' ? new Date() : item?.toDate,
                         )
-                          .format("hh:mm a")} `}</Text>
+                          .format('hh:mm a')} `}</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
 
                   <View
                     style={{
-                      flexDirection: "row",
-                      justifyContent: "space-around",
+                      flexDirection: 'row',
+                      justifyContent: 'space-around',
                     }}
                   >
                     <View
                       style={{
-                        alignItems: "center",
+                        alignItems: 'center',
                       }}
                     >
                       <Text style={styles.footerText}>{`Approved`}</Text>
-                      <View style={{ flexDirection: "row" }}>
+                      <View style={{ flexDirection: 'row' }}>
                         <TouchableOpacity
                           style={styles.horizontal}
                           onPress={() => {
@@ -1023,15 +1022,15 @@ if(!isCalendarVisible){
                               payload: item,
                             });
                             setSelectionData({
-                              status: "approved",
-                              type: "student",
+                              status: 'approved',
+                              type: 'student',
                             });
                             setShowStudentsInstructorsModal(true);
                           }}
                         >
                           <Text style={styles.footerText}>{`${
                             activitiesCount[item.activityId]
-                              ?.countApprovedStudents || "0"
+                              ?.countApprovedStudents || '0'
                           }`}</Text>
                           <Image
                             source={bookImage}
@@ -1046,15 +1045,15 @@ if(!isCalendarVisible){
                               payload: item,
                             });
                             setSelectionData({
-                              status: "approved",
-                              type: "instructor",
+                              status: 'approved',
+                              type: 'instructor',
                             });
                             setShowStudentsInstructorsModal(true);
                           }}
                         >
                           <Text style={styles.text}>
                             {activitiesCount[item.activityId]
-                              ?.countApprovedInstructors || "0"}
+                              ?.countApprovedInstructors || '0'}
                           </Text>
                           <Image
                             source={instructorImage}
@@ -1064,9 +1063,9 @@ if(!isCalendarVisible){
                       </View>
                     </View>
 
-                    <View style={{ alignItems: "center" }}>
+                    <View style={{ alignItems: 'center' }}>
                       <Text style={styles.footerText}>{`Declined`}</Text>
-                      <View style={{ flexDirection: "row" }}>
+                      <View style={{ flexDirection: 'row' }}>
                         <TouchableOpacity
                           style={styles.horizontal}
                           onPress={() => {
@@ -1075,15 +1074,15 @@ if(!isCalendarVisible){
                               payload: item,
                             });
                             setSelectionData({
-                              status: "declined",
-                              type: "student",
+                              status: 'declined',
+                              type: 'student',
                             });
                             setShowStudentsInstructorsModal(true);
                           }}
                         >
                           <Text style={styles.text}>{`${
                             activitiesCount[item.activityId]
-                              ?.countDeclinedStudents || "0"
+                              ?.countDeclinedStudents || '0'
                           }`}</Text>
                           <Image
                             source={bookImage}
@@ -1098,15 +1097,15 @@ if(!isCalendarVisible){
                               payload: item,
                             });
                             setSelectionData({
-                              status: "declined",
-                              type: "instructor",
+                              status: 'declined',
+                              type: 'instructor',
                             });
                             setShowStudentsInstructorsModal(true);
                           }}
                         >
                           <Text style={styles.text}>
                             {activitiesCount[item.activityId]
-                              ?.countDeclinedInstructors || "0"}
+                              ?.countDeclinedInstructors || '0'}
                           </Text>
                           <Image
                             source={instructorImage}
@@ -1116,9 +1115,9 @@ if(!isCalendarVisible){
                       </View>
                     </View>
 
-                    <View style={{ alignItems: "center" }}>
+                    <View style={{ alignItems: 'center' }}>
                       <Text style={styles.footerText}>{`Pending`}</Text>
-                      <View style={{ flexDirection: "row" }}>
+                      <View style={{ flexDirection: 'row' }}>
                         <TouchableOpacity
                           onPress={() => {
                             _dispatch({
@@ -1126,8 +1125,8 @@ if(!isCalendarVisible){
                               payload: item,
                             });
                             setSelectionData({
-                              status: "pending",
-                              type: "student",
+                              status: 'pending',
+                              type: 'student',
                             });
                             setShowStudentsInstructorsModal(true);
                           }}
@@ -1136,7 +1135,7 @@ if(!isCalendarVisible){
                           <Text style={styles.text}>
                             {`${
                               activitiesCount[item.activityId]
-                                ?.countPendingStudents || "0"
+                                ?.countPendingStudents || '0'
                             }`}
                           </Text>
                           <Image
@@ -1152,15 +1151,15 @@ if(!isCalendarVisible){
                               payload: item,
                             });
                             setSelectionData({
-                              status: "pending",
-                              type: "instructor",
+                              status: 'pending',
+                              type: 'instructor',
                             });
                             setShowStudentsInstructorsModal(true);
                           }}
                         >
                           <Text style={styles.text}>
                             {activitiesCount[item.activityId]
-                              ?.countPendingInstructors || "0"}
+                              ?.countPendingInstructors || '0'}
                             {/* {item.countPendingInstructors || `0`} */}
                           </Text>
                           <Image
@@ -1177,7 +1176,7 @@ if(!isCalendarVisible){
           }}
           onEndReached={async () => {
             if (totalRecords > originalActivities?.result?.length) {
-              console.log("logs");
+              console.log('logs');
               const userId = await loadUserId();
               user?.isAdmin ? getActivities(true) : getActivitiesByUser(userId);
             }
@@ -1193,7 +1192,7 @@ if(!isCalendarVisible){
 
       <AppHeader
         onAddPress={() => {
-          navigation.navigate("CreateActivity");
+          navigation.navigate('CreateActivity');
           _dispatch({
             type: actions.SET_SELECTED_ACTIVITY,
             payload: false,
@@ -1209,33 +1208,33 @@ export default InstructorActivityScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     backgroundColor: Colors.newBackgroundColor,
   },
   item: {
     borderRadius: 15,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     // paddingHorizontal: 10,
     paddingTop: 10,
     // height: 175,
-    paddingBottom:10
+    paddingBottom: 10,
   },
   footer: {
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 14,
@@ -1245,7 +1244,7 @@ const styles = StyleSheet.create({
   iconImages: {
     height: 18,
     width: 18,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     marginLeft: 5,
     marginRight: 5,
   },
@@ -1254,7 +1253,7 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   horizontal: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

@@ -557,8 +557,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   topNav: {
-    // todo find analog
-    // color: Colors.white,
   },
   layout: {
     flex: 1,

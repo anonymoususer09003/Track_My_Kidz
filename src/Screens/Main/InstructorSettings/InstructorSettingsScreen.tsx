@@ -277,6 +277,8 @@ const InstructorSettingsScreen = ({navigation}: {navigation: any}) => {
                 onPress={() => {
                   dispatch(
                     ChangeUserState.action({
+                      // todo redux ts warning not a priority
+                      // @ts-ignore
                       userType: '',
                     }),
                   );

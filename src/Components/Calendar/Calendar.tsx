@@ -130,8 +130,6 @@ const Calendar = ({
             <FlatList
               horizontal
               ref={ref}
-              //todo ???????
-              // keyExtractor={(item, index) => item}
               data={days}
               getItemLayout={(data, index) => {
                 return { length: 33, index, offset: 33 * index };

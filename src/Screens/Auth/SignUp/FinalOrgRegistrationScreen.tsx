@@ -605,7 +605,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                   orgId: orgId,
                 };
                 console.log('values', values.schoolName);
-                // TODO: check in swagger real type
+
                 const schoolObject: UserRegistrationDTO | any = {
                   name:
                     values.school === 'Other'

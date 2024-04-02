@@ -292,6 +292,8 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
                 onPress={async () => {
                   dispatch(
                     ChangeUserState.action({
+                      // todo redux ts warning not a priority
+                      // @ts-ignore
                       userType: '',
                     }),
                   );

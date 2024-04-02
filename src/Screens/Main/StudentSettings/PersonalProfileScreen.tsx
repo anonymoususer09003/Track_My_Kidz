@@ -78,8 +78,7 @@ const PersonalProfileScreen = () => {
       size={20}
       style={{ height: 20, width: 20, marginRight: 10 }}
       color={Colors.secondaryDark}
-      // todo: check if it works
-      // resizeMode="contain"
+      adjustsFontSizeToFit
     />
   );
   const getUserId = async () => {
@@ -220,20 +219,8 @@ const PersonalProfileScreen = () => {
       .string()
       .min(4, ({ min }) => `Username is not up to ${min} characters`)
       .required('Username is required'),
-    // todo: check if it is redundant
-    // school: yup.string().when('professional', {
-    //   is: (professional: boolean) => professional === true,
-    //   then: yup.string().min(4).required('Year graduated is required'),
-    // }),
-    // yearGraduated: yup.string().when('professional', {
-    //   is: (professional: boolean) => professional === true,
-    //   then: yup.string().required('Year graduated is required'),
-    // }),
   });
 
-  // function getUriSource(): any {
-  //   return { uri: selectedImage };
-  // }
 
   const renderEditButtonElement = (): ButtonElement => {
     const buttonElement: React.ReactElement<ButtonProps> =

@@ -275,8 +275,6 @@ const InstructorGroupPendingScreen = () => {
             <FlatList
               data={[...activities, ...groups]}
               style={{ padding: 10, width: '100%', marginTop: 10 }}
-              // todo check what it is
-              // keyExtractor={(item, index) => index}
               renderItem={({ item, index }) => {
                 if (item?.activityId) {
                   let date = moment(item.fromDate).format('YYYY-MM-DD');

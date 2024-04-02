@@ -53,31 +53,7 @@ const InstructorGroupPendingScreen = () => {
   const [declineActivity, setDeclineActivity] = useState<any>(null);
   const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
   const [{ instructorDetail: instructorDetail }, _dispatch]: any = useStateValue();
-  // todo delete if redundant
-  // const handleSelectAll = () => {
-  //   setSelectAll(!selectAll);
-  //   if (!selectAll) {
-  //     const data = [...students];
-  //     const _data = [];
-  //     data.forEach((i) =>
-  //       _data.push({
-  //         name: i.name,
-  //         selected: true,
-  //       }),
-  //     );
-  //     setStudents(_data);
-  //   } else {
-  //     const data = [...students];
-  //     const _data = [];
-  //     data.forEach((i) =>
-  //       _data.push({
-  //         name: i.name,
-  //         selected: false,
-  //       }),
-  //     );
-  //     setStudents(_data);
-  //   }
-  // };
+
   const closeRow = (index?: number) => {
     if (!index) return;
     console.log(index);
@@ -315,8 +291,6 @@ const InstructorGroupPendingScreen = () => {
           {isFocused && (
             <FlatList
               data={[...activities, ...groups] || []}
-              // todo check what it is
-              // keyExtractor={(item, index) => index}
               style={{ padding: 10, width: '100%', marginTop: 10 }}
               contentContainerStyle={{ paddingBottom: 15 }}
               renderItem={({ item, index }) => {
@@ -526,8 +500,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     marginVertical: 4,
-    // todo solve this
-    // whiteSpace: 'nowrap',
+    textAlign: 'left',
   },
   background: {
     width: '80%',

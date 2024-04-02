@@ -290,8 +290,6 @@ const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route
                   nestedScrollEnabled
                   keyboardShouldPersistTaps="handled"
                   data={tableData.tableData}
-                  // todo ??????
-                  // keyExtractor={(item, index) => index}
                   renderItem={({ item, index }) => {
                     return (
                       <View key={index}>
@@ -304,8 +302,7 @@ const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route
                               <Cell
                                 style={{
                                   marginLeft: cellIndex < 2 ? 5 : 0,
-                                  // todo: solve this
-                                  // textAlign: "center",
+                                  alignItems: 'center'
                                 }}
                                 width={
                                   cellIndex == 0 || cellIndex == 1

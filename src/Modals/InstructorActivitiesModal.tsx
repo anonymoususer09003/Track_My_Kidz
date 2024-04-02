@@ -47,39 +47,7 @@ const InstructorActivityModal = (
   }: InstructorActivityModal) => {
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const user: any = useSelector((state: { user: UserState }) => state.user.item);
-  // todo check if it can be removed
-  // const amountValues = [
-  //   { id: 0, amount: 500, label: "$5" },
-  //   { id: 1, amount: 1000, label: "$10" },
-  //   {
-  //     id: 3,
-  //     amount: 2000,
-  //     label: "$20",
-  //   },
-  //   { id: 4, amount: 5000, label: "$50" },
-  //   { id: 5, amount: 10000, label: "$100" },
-  // ];
-  //
-  // const { Layout } = useTheme();
-  // const [selectedAmountIndex, setSelectedAmountIndex] =
-  //   useState<IndexPath | null>(null);
-  // const [cardData, setCardData] = useState({});
-  // const [isValid, setIsValid] = useState(false);
-  // const [payment, setPayment] = useState(false);
-  // const [selectedIndex, setSelectedIndex] = React.useState(0);
-  // const availableAmounts = [
-  //   {
-  //     amount: 1,
-  //     label: "$50 - Annually (Best Deal)",
-  //   },
-  //   {
-  //     amount: 5,
-  //     label: "$4.99 - Monthly",
-  //   },
-  // ];
-  // //   const isVisible = useSelector(
-  //     (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
-  //   );
+
   console.log('item', item);
   const dispatch = useDispatch();
   const [{ item: activity }, _dispatch]: any = useStateValue();
@@ -128,8 +96,6 @@ const InstructorActivityModal = (
             onPress={() => {
               console.log(item, buses);
 
-              // todo check if it can be removed
-              // const bus = buses.find((b) => b?.activityId === item?.activityId);
               // / // console.log();
               console.log('item-------', item);
 

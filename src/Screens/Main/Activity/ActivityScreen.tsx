@@ -12,7 +12,7 @@ import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Icon, Text } from '@ui-kitten/components';
 import axios from 'axios';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import MapView, { Marker } from 'react-native-maps';
@@ -31,6 +31,7 @@ import { calculateDistance } from '@/Utils/DistanceCalculator';
 const ActivityScreen = () => {
   const isFocused = useIsFocused();
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
+  const ref = useRef<any>();
   // const swipeableRef = useRef(null);
   const [, _dispatch]: any = useStateValue();
   const searchBarValue = useSelector(
@@ -702,7 +703,7 @@ const ActivityScreen = () => {
             />
           </>
         ) : (
-          <MapView style={{ flex: 1 }}>
+          <MapView style={{ flex: 1 }} ref={ref}>
             {partcipants.map((item, index) => {
               let latitude = trackingList[item?.childDeviceId]?.lat;
               let longititude = trackingList[item?.childDeviceId]?.lang;
@@ -714,20 +715,19 @@ const ActivityScreen = () => {
                       onSelect={() => console.log('pressed')}
                       onPress={() => {
                         if (!item?.group) {
-                          // todo: ????? here were no ref variable
-                          // ref.current.fitToSuppliedMarkers(
-                          //   [
-                          //     {
-                          //       latitude: latitude
-                          //         ? parseFloat(latitude)
-                          //         : parseFloat(10),
-                          //       longitude: longititude
-                          //         ? parseFloat(longititude)
-                          //         : parseFloat(10),
-                          //     },
-                          //   ],
-                          //   // false, // not animated
-                          // );
+                          ref.current.fitToSuppliedMarkers(
+                            [
+                              {
+                                latitude: latitude
+                                  ? parseFloat(latitude)
+                                  : 10,
+                                longitude: longititude
+                                  ? parseFloat(longititude)
+                                  : 10,
+                              },
+                            ],
+                            // false, // not animated
+                          );
                         } else {
                           setModal(true);
                           setSelectedGroup(item?.groupName);
