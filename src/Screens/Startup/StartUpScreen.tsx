@@ -1,15 +1,17 @@
-import React, {useEffect} from 'react';
-import {ActivityIndicator, View, Text} from 'react-native';
-import {useTheme} from '@/Theme';
-import {useDispatch} from 'react-redux';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import { useTheme } from '@/Theme';
+import { useDispatch } from 'react-redux';
 import InitStartup from '@/Store/Startup/Init';
 
 const StartUpScreen = () => {
-  const {Layout, Gutters, Fonts} = useTheme();
+  const { Layout, Gutters } = useTheme();
 
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // todo solve not a priority
+    // @ts-ignore
     dispatch(InitStartup.action());
   });
 
