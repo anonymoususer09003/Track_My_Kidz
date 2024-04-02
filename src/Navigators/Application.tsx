@@ -166,7 +166,7 @@ const Application = () => {
               ref={navigationRef}>
               {/* <AddBusInformation /> */}
               <LoadingModal />
-              <TwoFACodeModal />
+              {/*<TwoFACodeModal />*/}
               <MainStack />
             </NavigationContainer>
             <Toast />
