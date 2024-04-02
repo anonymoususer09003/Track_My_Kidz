@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 // @refresh reset
 
 type ActivityNavigatorPramList = {
-  Activity: undefined
+  ActivityInner: undefined
   Group: undefined
 }
 
@@ -119,7 +119,7 @@ const ActivityNavigator = () => {
         tabBar={(props) => <TopTabBar {...props} />}
       >
         <TabNavigator.Screen
-          name="Activity"
+          name="ActivityInner"
           options={{ title: 'Activity' }}
           component={ActivityScreen}
         />
