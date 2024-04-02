@@ -16,9 +16,9 @@ import { UserState } from '@/Store/User';
 import Colors from '@/Theme/Colors';
 
 interface ParentPaymentModalProps {
-  onPay: any,
-  onCancel: any,
-  loginObj: any
+  onPay?: any,
+  onCancel?: any,
+  loginObj?: any
 }
 
 const ParentPaymentModal = ({ onCancel, loginObj }: ParentPaymentModalProps) => {

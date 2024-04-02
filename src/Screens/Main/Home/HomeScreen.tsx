@@ -2,7 +2,7 @@ import { loadIsSubscribed, loadUserId } from '@/Storage/MainAppStorage';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Icon, Text } from '@ui-kitten/components';
 import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 // import SockJS from "sockjs-client";
 // import * as Stomp from "stompjs";
 // import { LinearGradientButton } from "@/Components/LinearGradientButton/LinearGradientButton";
@@ -10,7 +10,7 @@ import { AppHeader, Calendar, LinearGradientButton } from '@/Components';
 import SearchBar from '@/Components/SearchBar/SearchBar';
 import { actions } from '@/Context/state/Reducer';
 import { useStateValue } from '@/Context/state/State';
-import { AddStudentModal, EditDependentModal } from '@/Modals';
+import { AddStudentModal, EditDependentModal, ParentPaymentModal } from '@/Modals';
 import { GetParent } from '@/Services/Parent';
 import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
 import FetchOne from '@/Services/User/FetchOne';
@@ -24,6 +24,7 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import MapView, { Circle, Marker } from 'react-native-maps';
 import MaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
+import LogoutStore from '@/Store/Authentication/LogoutStore';
 
 // const window = Dimensions.get('window');
 
@@ -37,9 +38,8 @@ interface Coords {
 const HomeScreen = () => {
   const navigation: any = useNavigation();
   const focused = useIsFocused();
-  const swipeableRef = useRef(null);
-  const ref = useRef();
-  // todo remove any
+  // const swipeableRef = useRef(null);
+  const ref = useRef<any>();
   const [_, _dispatch]: any = useStateValue();
   let row: Array<any> = [];
   let prevOpenedRow: any;
@@ -317,17 +317,16 @@ const HomeScreen = () => {
             : 10,
         });
       });
-      // ref.current.fitToSuppliedMarkers(temp.map(({ studentId }) => studentId));
-      // todo solve this
-      // ref?.current?.fitToCoordinates(temp, {
-      //   edgePadding: {
-      //     top: 2,
-      //     right: 2,
-      //     bottom: 2,
-      //     left: 2,
-      //   },
-      //   animated: true,
-      // });
+      ref?.current?.fitToSuppliedMarkers(temp.map(({ studentId }) => studentId));
+      ref?.current?.fitToCoordinates(temp, {
+        edgePadding: {
+          top: 2,
+          right: 2,
+          bottom: 2,
+          left: 2,
+        },
+        animated: true,
+      });
     }
   };
   // useEffect(() => {
@@ -432,12 +431,10 @@ const HomeScreen = () => {
         />
       )}
       {!isSubscribed && (
-        <View></View>
-        // todo uncomment this
-        // <ParentPaymentModal
-        //   onPay={() => {}}
-        //   onCancel={() => dispatch(LogoutStore.action())}
-        // />
+        <ParentPaymentModal
+          // @ts-ignore
+          onCancel={() => dispatch(LogoutStore.action())}
+        />
       )}
       <AppHeader
         // title="Home"
@@ -615,21 +612,19 @@ const HomeScreen = () => {
           </View>
         ) : (
           <MapView
-            // todo: uncomment this
-            // ref={ref}
+            ref={ref}
             onLayout={() => {
               let temp = studentsEmails.filter((item) => item.latitude != null);
 
-              // todo: uncomment this
-              // ref?.current?.fitToCoordinates(temp, {
-              //   edgePadding: {
-              //     top: 10,
-              //     right: 10,
-              //     bottom: 10,
-              //     left: 10,
-              //   },
-              //   animated: true,
-              // });
+              ref?.current?.fitToCoordinates(temp, {
+                edgePadding: {
+                  top: 10,
+                  right: 10,
+                  bottom: 10,
+                  left: 10,
+                },
+                animated: true,
+              });
             }}
             style={{ flex: 1 }}
           >
@@ -637,60 +632,40 @@ const HomeScreen = () => {
               .filter(
                 (item) =>
                   trackingList[item.childDevice]?.lat != 'undefined' &&
+                  !isNaN(parseFloat(trackingList[item.childDevice]?.lat)) &&
                   trackingList[item.childDevice]?.lat != null,
               )
               .map((item, index) => {
-                let latitude = trackingList[item.childDevice]?.lat;
-                let longititude = trackingList[item.childDevice]?.lang;
+                const latitude = parseFloat(trackingList[item.childDevice]?.lat) || 10;
+                const longitude = parseFloat(trackingList[item.childDevice]?.lang) || 10;
 
                 return (
                   <>
                     {item?.toggleAlert && (
                       <Circle
                         key={index}
-                        center={{
-                          latitude: latitude
-                            ? parseFloat(latitude)
-                            : 10,
-                          longitude: longititude
-                            ? parseFloat(longititude)
-                            : 10,
-                        }}
+                        center={{ latitude, longitude }}
                         radius={item?.allowedDistance || 50}
                         strokeWidth={10}
                         strokeColor={'red'}
                         fillColor={'rgba(230,238,255,0.5)'}
                       />
                     )}
-
                     <Marker
                       onSelect={() => console.log('pressed')}
                       onPress={() => {
-                        // todo: uncomment this
-                        // ref.current.fitToSuppliedMarkers(
-                        //   [
-                        //     {
-                        //       latitude: latitude
-                        //         ? parseFloat(latitude)
-                        //         : 10,
-                        //       longitude: longititude
-                        //         ? parseFloat(longititude)
-                        //         : 10,
-                        //     },
-                        //   ]
-                        // false, // not animated
-                        // );
+                        ref.current.fitToSuppliedMarkers(
+                          [
+                            {
+                              latitude,
+                              longitude,
+                            },
+                          ],
+                        );
                       }}
                       identifier={item?.email}
                       key={index}
-                      coordinate={{
-                        latitude: latitude
-                          ? parseFloat(latitude)
-                          : 10,
-                        longitude: longititude
-                          ? parseFloat(longititude)
-                          : 10,
-                      }}
+                      coordinate={{ latitude, longitude }}
                     >
                       <View style={{}}>
                         <View
@@ -715,12 +690,8 @@ const HomeScreen = () => {
                               }}
                             >
                               <Text style={{ color: Colors.white }}>
-                                {item?.firstname
-                                  ?.substring(0, 1)
-                                  ?.toUpperCase() || ''}
-                                {item?.lastname
-                                  ?.substring(0, 1)
-                                  ?.toUpperCase() || ''}
+                                {item?.firstname?.substring(0, 1)?.toUpperCase() || ''}
+                                {item?.lastname?.substring(0, 1)?.toUpperCase() || ''}
                               </Text>
                             </View>
                           )}
@@ -743,8 +714,6 @@ const HomeScreen = () => {
                       </View>
                     </Marker>
                   </>
-                  // </>
-                  // </Circle>
                 );
               })}
           </MapView>
