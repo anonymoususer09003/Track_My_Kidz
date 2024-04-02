@@ -129,7 +129,7 @@ const RightDrawerNavigator = () => {
   const initialRoute = {
     instructor: 'InstructorActivity',
     student: 'StudentActivity',
-    parent: 'Activity',
+    parent: 'Home',
   };
 
   return (
