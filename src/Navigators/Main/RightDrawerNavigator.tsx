@@ -90,7 +90,9 @@ type ParentStack = {
   Activity: undefined
   ChatScreen: SingleChatScreenRouteParams
   CreateParentActivity: undefined
-  Approval: undefined
+  Approval: {
+    screen: string,
+  } | undefined
   ActivationCode: undefined
   DependentInfo: undefined
   ParentDeletePermission: {
