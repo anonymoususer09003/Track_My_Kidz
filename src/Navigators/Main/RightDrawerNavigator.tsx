@@ -53,7 +53,7 @@ type InstructorStack = {
   InstructorSettings: undefined
   InstructorActivityNavigator: undefined
   ActivityDetails: { activity?: any }
-  CreateActivity: { isEdit?: boolean, groupId?: string }
+  CreateActivity: { isEdit?: boolean, groupId?: string } | undefined
   CreateGroup: { data: { groupId: number, groupName: string } } | undefined
   InstructorApproval: { screen: string } | undefined
   AddMembers: {

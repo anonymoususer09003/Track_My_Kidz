@@ -140,7 +140,10 @@ const InstructorActivityNavigator = () => {
       setSelectedDay(moment().format('D'));
       dispatch(
         ChangeInstructorActivityState.action({
+          // todo solve this not a priority
+          // @ts-ignore
           selectedMonthForFilter: moment().subtract(1, 'M').format('M'),
+          // @ts-ignore
           selectedDayForFilter: moment().format('DD'),
         }),
       );
@@ -170,6 +173,8 @@ const InstructorActivityNavigator = () => {
               setSelectedMonth(value);
               dispatch(
                 ChangeInstructorActivityState.action({
+                  // todo solve this not a priority
+                  // @ts-ignore
                   selectedMonthForFilter: String(value),
                 }),
               );
