@@ -26,7 +26,7 @@ const MainNavigator = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Main" component={Screen} />
+      <Stack.Screen name="MainNavigation" component={Screen} />
     </Stack.Navigator>
   );
 };
