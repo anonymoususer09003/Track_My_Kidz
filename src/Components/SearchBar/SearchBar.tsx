@@ -1,10 +1,9 @@
-import { useTheme } from "@/Theme";
-import Colors from "@/Theme/Colors";
-import { Icon, Input } from "@ui-kitten/components";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Switch, TouchableOpacity, View } from "react-native";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { useTheme } from '@/Theme';
+import Colors from '@/Theme/Colors';
+import { Icon, Input } from '@ui-kitten/components';
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 export interface SearchBarProps {
   onChangeText?: (nextValue: string) => void;
@@ -21,28 +20,30 @@ export interface SearchBarProps {
 }
 
 const SearchBar = ({
-  showDropdown,
-  setShowDropdown,
-  showFilter,
-  searchText,
-  onChangeText,
-  onToggleChange,
-  viewName,
-  thumbnailView,
-  isThumbnail,
-  isThumbnailOnly,
-  thumbnail,
-}: SearchBarProps) => {
+                     showDropdown,
+                     setShowDropdown,
+                     showFilter,
+                     searchText,
+                     onChangeText,
+                     onToggleChange,
+                     thumbnailView,
+                     isThumbnail,
+                     isThumbnailOnly,
+                     thumbnail,
+                   }: SearchBarProps) => {
   const { Layout } = useTheme();
 
   const [toggle, setToggle] = useState(false);
-  const renderSearchIcon = (props: any) => <Icon {...props} name={"search"} />;
+  const renderSearchIcon = (props: any) => <Icon {...props} name={'search'} />;
+
+  const settingsInputCompositeIcon = require('@/Assets/Images/settings-input-composite.png');
+
 
   const handleClearSearch = () =>
     searchText && searchText.length > 0 ? (
       <TouchableOpacity
-        onPress={() => onChangeText("")}
-        style={{ flexDirection: "column" }}
+        onPress={() => onChangeText && onChangeText('')}
+        style={{ flexDirection: 'column' }}
       >
         <AntDesign name="closecircle" size={20} color="gray" />
       </TouchableOpacity>
@@ -50,24 +51,23 @@ const SearchBar = ({
       <></>
     );
   useEffect(() => {
-    setToggle(thumbnail);
+    setToggle(!!thumbnail);
   }, [thumbnail]);
   return (
-    <View style={[Layout.alignItemsStart, { width: "100%", minHeight: 80 }]}>
+    <View style={[Layout.alignItemsStart, { width: '100%', minHeight: 80 }]}>
       <View style={styles.background}>
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
           {showFilter && (
-            <TouchableOpacity onPress={() => setShowDropdown(!showDropdown)}>
-              <MaterialIcons
-                name="settings-input-composite"
-                color="#fff"
-                size={30}
+            <TouchableOpacity onPress={() => setShowDropdown && setShowDropdown(!showDropdown)}>
+              <Image
+                source={settingsInputCompositeIcon}
+                style={{ height: 30, width: 30 }}
               />
             </TouchableOpacity>
           )}
@@ -75,7 +75,7 @@ const SearchBar = ({
             <Input
               value={searchText}
               style={{
-                width: showFilter ? "65%" : isThumbnail ? "80%" : "100%",
+                width: showFilter ? '65%' : isThumbnail ? '80%' : '100%',
                 marginLeft: showFilter ? 20 : 0,
               }}
               placeholder="Search"
@@ -87,11 +87,11 @@ const SearchBar = ({
           {isThumbnail && (
             <Switch
               style={{ marginLeft: 20 }}
-              trackColor={{ false: "#767577", true: "#50CBC7" }}
+              trackColor={{ false: '#767577', true: '#50CBC7' }}
               thumbColor={Colors.white}
               ios_backgroundColor="#3e3e3e"
               onValueChange={() => {
-                onToggleChange(!thumbnailView);
+                onToggleChange && onToggleChange(!thumbnailView);
               }}
               value={thumbnailView}
             />
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     color: Colors.white,
     zIndex: -1,
     padding: 20,
-    width: "100%",
+    width: '100%',
     backgroundColor: Colors.primary,
   },
 });

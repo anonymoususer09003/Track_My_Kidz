@@ -1,6 +1,6 @@
 import { loadIsSubscribed, loadUserId } from '@/Storage/MainAppStorage';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { Icon, Text } from '@ui-kitten/components';
+import {  Text } from '@ui-kitten/components';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 // import SockJS from "sockjs-client";
@@ -22,13 +22,12 @@ import Geolocation from '@react-native-community/geolocation';
 import moment from 'moment';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import MapView, { Circle, Marker } from 'react-native-maps';
-import MaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
 import LogoutStore from '@/Store/Authentication/LogoutStore';
 
-// const window = Dimensions.get('window');
+const restartIcon = require('@/Assets/Images/restart.png');
+const edit2Icon = require('@/Assets/Images/edit-2.png');
 
-// const { width, height } = window;
 
 interface Coords {
   latitude: any,
@@ -375,11 +374,7 @@ const HomeScreen = () => {
             marginBottom: 15,
           }}
         >
-          <Icon
-            style={{ width: 23, height: 23 }}
-            fill={Colors.primary}
-            name="edit-2"
-          />
+          <Image style={{ height: 23, width: 23 }} source={edit2Icon} />
         </TouchableOpacity>
 
         {item.childTrackHistory && (
@@ -397,11 +392,7 @@ const HomeScreen = () => {
             }}
             // prevOpenedRow?.close();
           >
-            <MaterialCommunity
-              size={23}
-              color={Colors.primary}
-              name="restart"
-            />
+            <Image style={{ height: 23, width: 23 }} source={restartIcon} />
           </TouchableOpacity>
         )}
       </View>

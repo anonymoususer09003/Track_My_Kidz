@@ -21,6 +21,8 @@ const calendarIcon = require('@/Assets/Images/navigation_icon2.png');
 const activitiesIcon = require('@/Assets/Images/navigation_icon3.png');
 const settings = require('@/Assets/Images/navigation_icon4.png');
 const addIcon = require('@/Assets/Images/add.png');
+const listIcon = require('@/Assets/Images/list.png');
+const arrowLeftIcon = require('@/Assets/Images/arrow-left.png');
 
 type AppHeaderProps = {
   showGlobe?: boolean;
@@ -131,7 +133,7 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
         case 'Activity':
           return <Image style={{ height: 27, width: 27 }} source={calendarIcon} />;
         case 'HomeScreen':
-          return <Icon name="list" size={25} color="white" />;
+          return <Image style={{ height: 27, width: 27 }} source={listIcon} />;
       }
     } else if (user_type === 'student') {
       if (route.name !== 'StudentSettings')
@@ -182,7 +184,7 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
     >
       {isStack ? (
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Feather name="arrow-left" color={Colors.white} size={25} />
+           <Image style={{ height: 25, width: 25 }} source={arrowLeftIcon} />
         </TouchableOpacity>
       ) : (
         <TopNavigationAction
@@ -294,7 +296,7 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
           }
         }}
       >
-        <Feather name="arrow-left" color={Colors.white} size={25} />
+        <Image style={{ height: 25, width: 25 }} source={arrowLeftIcon} />
       </TouchableOpacity>
     ) : (
       <LeftDrawerAction />

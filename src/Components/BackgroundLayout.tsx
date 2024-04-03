@@ -80,7 +80,7 @@ const BackgroundLayout: FC<BackgroundLayoutProps> = (
             {!hideLeftIcon && (
               <Image
                 source={arrowBackIcon}
-                style={{ height: 20, width: 20 }}
+                style={{ height: 25, width: 25 }}
               />
             )}
           </TouchableOpacity>
