@@ -12,11 +12,12 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import MapView, { Marker } from 'react-native-maps';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import { useDispatch } from 'react-redux';
-// todo resolve
-// import SockJS from "sockjs-client";
-// import * as Stomp from "stompjs";
+import SockJS from "sockjs-client";
+// @ts-ignore
+import * as Stomp from 'react-native-stompjs';
 import { calculateDistance } from '@/Utils/DistanceCalculator';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
+import { loadToken } from '@/Storage/MainAppStorage';
 
 const ActivityDetailsScreen = () => {
   const ref = useRef<any>();
@@ -62,31 +63,29 @@ const ActivityDetailsScreen = () => {
 
       setParticipantsIds(deviceIds);
       deviceIds.length > 0
-      // todo solve stomp
-      // && turnOnTracker(activity?.activityId, deviceIds, "activity");
+      && turnOnTracker(deviceIds);
       // , { childDeviceId: 1 }, { childDeviceId: 2 }
       setParticipants([...res]);
     } catch (err) {
       console.log("err", err);
     }
   };
-  // todo solve stomp
-  // let stompClient: any = React.createRef<Stomp.Client>();
-  // const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
-  //   try {
-  //     const token = await loadToken();
-  //
-  //     const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
-  //     stompClient = Stomp.over(socket);
-  //     stompClient.connect({ token }, () => {
-  //       deviceIds.map((item) => {
-  //         stompClient.subscribe(`/device/${item}`, subscriptionCallback);
-  //       });
-  //     });
-  //   } catch (err) {
-  //     console.log("Error:", err);
-  //   }
-  // };
+  let stompClient: any = React.createRef<Stomp.Client>();
+  const turnOnTracker = async ( deviceIds: any[]) => {
+    try {
+      const token = await loadToken();
+
+      const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+      stompClient = Stomp.over(socket);
+      stompClient.connect({ token }, () => {
+        deviceIds.map((item) => {
+          stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+        });
+      });
+    } catch (err) {
+      console.log("Error:", err);
+    }
+  };
   const subscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
 

@@ -34,9 +34,9 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
-// todo solve SockJS problem
-// import SockJS from "sockjs-client";
-// import * as Stomp from "stompjs";
+import SockJS from "sockjs-client";
+// @ts-ignore
+import * as Stomp from 'react-native-stompjs';
 
 import BackgroundFetching from '@/Components/BackgroundFetching';
 import { actions } from '@/Context/state/Reducer';
@@ -149,8 +149,7 @@ const StudentActivityScreen: FC = () => {
     const _date = moment(new Date()).format();
 
     const res = await TrackHistory(status, id, _date, latitude, longitude);
-    // todo solve SockJS problem
-    // sendCoordinates(latitude, longitude);
+    sendCoordinates(latitude, longitude);
   };
 
   const handleTrackHistorySchedule = async (tracking?: any) => {
@@ -161,8 +160,7 @@ const StudentActivityScreen: FC = () => {
           const crd = pos.coords;
 
           if (tracking) {
-            // todo solve SockJS problem
-            // sendCoordinates(crd.latitude, crd.longitude);
+            sendCoordinates(crd.latitude, crd.longitude);
           } else {
             await handleTrackHistory(
               true,
@@ -177,8 +175,7 @@ const StudentActivityScreen: FC = () => {
           const crd = pos.coords;
 
           if (tracking) {
-            // todo solve SockJS problem
-            // sendCoordinates(crd.latitude, crd.longitude);
+            sendCoordinates(crd.latitude, crd.longitude);
           } else {
             await handleTrackHistory(
               true,
@@ -188,8 +185,7 @@ const StudentActivityScreen: FC = () => {
             );
           }
         }, () => {
-        }, () => {
-        });
+        }, {});
       }
     } catch (err) {
       console.log('er99999999999999', err);
@@ -358,8 +354,7 @@ const StudentActivityScreen: FC = () => {
 
       setParticipantsIds(deviceIds);
       deviceIds.length > 0 &&
-      // todo solve SockJS problem
-      // turnOnParticipantsTracker(activityId, deviceIds, "activity");
+      turnOnParticipantsTracker(deviceIds);
 
       setParticipants(res);
     } catch (err) {
@@ -367,30 +362,27 @@ const StudentActivityScreen: FC = () => {
     }
   };
 
-  // todo solve SockJS problem
-  // const turnOnParticipantsTracker = async (
-  //   id: any,
-  //   deviceIds: any,
-  //   from: any
-  // ) => {
-  //   try {
-  //     const token = await loadToken();
-  //
-  //     const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
-  //     stompClient = Stomp.over(socket);
-  //     stompClient.connect({ token }, () => {
-  //       console.log("Connected");
-  //       deviceIds.map((item) => {
-  //         stompClient.subscribe(
-  //           `/device/${item}`,
-  //           participantSubscriptionCallback
-  //         );
-  //       });
-  //     });
-  //   } catch (err) {
-  //     console.log("Error:", err);
-  //   }
-  // };
+  const turnOnParticipantsTracker = async (
+    deviceIds: any[],
+  ) => {
+    try {
+      const token = await loadToken();
+
+      const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+      stompClient = Stomp.over(socket);
+      stompClient.connect({ token }, () => {
+        console.log("Connected");
+        deviceIds.map((item) => {
+          stompClient.subscribe(
+            `/device/${item}`,
+            participantSubscriptionCallback
+          );
+        });
+      });
+    } catch (err) {
+      console.log("Error:", err);
+    }
+  };
   const participantSubscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
 
@@ -513,8 +505,7 @@ const StudentActivityScreen: FC = () => {
           deviceIds.push(item?.childDevice);
         }
       });
-      // todo solve SockJS problem
-      // connectSockets(deviceIds);
+      connectSockets(deviceIds);
       setOriginalChildren(res);
       setChildrensDeviceIds(deviceIds);
       setOriginalStudentsEmail(temp);
@@ -524,19 +515,18 @@ const StudentActivityScreen: FC = () => {
       console.log('err in children', err);
     }
   };
-  // todo solve SockJS problem
-  // const connectSockets = async (deviceIds: any) => {
-  //   const token = await loadToken();
-  //   const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
-  //   stompClient = Stomp.over(socket);
-  //   stompClient.connect({ token }, () => {
-  //     console.log('Connected');
-  //     locationPermissionForTracking(true);
-  //     deviceIds.map((item) => {
-  //       stompClient.subscribe(`/device/${item}`, subscriptionCallback);
-  //     });
-  //   });
-  // };
+  const connectSockets = async (deviceIds: any[]) => {
+    const token = await loadToken();
+    const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({ token }, () => {
+      console.log('Connected');
+      locationPermissionForTracking(true);
+      deviceIds.map((item) => {
+        stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+      });
+    });
+  };
   const subscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
     console.log('Update Received', messageBody);
@@ -549,20 +539,19 @@ const StudentActivityScreen: FC = () => {
       },
     });
   };
-  // todo solve SockJS problem
-  // let stompClient: any = React.createRef<Stomp.Client>();
-  // const sendCoordinates = async (lat: any, lang: any) => {
-  //   const token = await loadToken();
-  //   stompClient.send(
-  //     '/socket/ws-location',
-  //     { token },
-  //     JSON.stringify({
-  //       latitude: lat,
-  //       longitude: lang,
-  //       deviceId: currentUser?.childDevice,
-  //     }),
-  //   );
-  // };
+  let stompClient: any = React.createRef<Stomp.Client>();
+  const sendCoordinates = async (lat: any, lang: any) => {
+    const token = await loadToken();
+    stompClient.send(
+      '/socket/ws-location',
+      { token },
+      JSON.stringify({
+        latitude: lat,
+        longitude: lang,
+        deviceId: currentUser?.childDevice,
+      }),
+    );
+  };
 
   useEffect(() => {
     if (selectedInstructions) {

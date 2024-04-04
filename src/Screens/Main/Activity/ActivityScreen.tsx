@@ -20,13 +20,14 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
-// todo resolve sock error
-// import SockJS from 'sockjs-client';
-// import * as Stomp from 'stompjs';
+import SockJS from 'sockjs-client';
+// @ts-ignore
+import * as Stomp from 'react-native-stompjs';
 import { UserState } from '@/Store/User';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 import { calculateDistance } from '@/Utils/DistanceCalculator';
+import { loadToken } from '@/Storage/MainAppStorage';
 
 const ActivityScreen = () => {
   const isFocused = useIsFocused();
@@ -167,8 +168,7 @@ const ActivityScreen = () => {
       });
 
       setParticipantsIds(deviceIds);
-// todo resolve sock error
-      // connectSockets(deviceIds);
+      connectSockets(deviceIds);
       console.log('res', res);
       setParticipants(res);
     } catch (err) {
@@ -210,35 +210,35 @@ const ActivityScreen = () => {
     }
     prevOpenedRow = row[index];
   };
-// todo resolve sock error
-  // let stompClient: any = React.createRef<Stomp.Client>();
-  // const connectSockets = async (deviceIds: any[]) => {
-  //   try {
-  //     const token = await loadToken();
-  //
-  //     const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
-  //     stompClient = Stomp.over(socket);
-  //     stompClient.connect({ token }, () => {
-  //       console.log('Connected');
-  //       deviceIds.map((item) => {
-  //         stompClient.subscribe(`/device/${item}`, subscriptionCallback);
-  //       });
-  //     });
-  //   } catch (err) {
-  //     console.log('Error:', err);
-  //   }
-  // };
-  // const subscriptionCallback = (subscriptionMessage: any) => {
-  //   const messageBody = JSON.parse(subscriptionMessage.body);
-  //   setTrackingList({
-  //     ...trackingList,
-  //     [messageBody.deviceId]: {
-  //       lat: messageBody.latitude,
-  //       lang: messageBody.longitude,
-  //     },
-  //   });
-  //   console.log('Update Received', messageBody);
-  // };
+
+  let stompClient: any = React.createRef<Stomp.Client>();
+  const connectSockets = async (deviceIds: any[]) => {
+    try {
+      const token = await loadToken();
+
+      const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
+      stompClient = Stomp.over(socket);
+      stompClient.connect({ token }, () => {
+        console.log('Connected');
+        deviceIds.map((item) => {
+          stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+        });
+      });
+    } catch (err) {
+      console.log('Error:', err);
+    }
+  };
+  const subscriptionCallback = (subscriptionMessage: any) => {
+    const messageBody = JSON.parse(subscriptionMessage.body);
+    setTrackingList({
+      ...trackingList,
+      [messageBody.deviceId]: {
+        lat: messageBody.latitude,
+        lang: messageBody.longitude,
+      },
+    });
+    console.log('Update Received', messageBody);
+  };
 
   const search = (text: String) => {
     let allActivities = { ...activities };

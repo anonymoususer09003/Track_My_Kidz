@@ -26,9 +26,9 @@ import MapView, { Marker } from 'react-native-maps';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
-// todo solve SockJS problem
-// import SockJS from "sockjs-client";
-// import * as Stomp from "stompjs";
+import SockJS from 'sockjs-client';
+// @ts-ignore
+import * as Stomp from 'react-native-stompjs';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
@@ -153,28 +153,26 @@ const StudentGroupScreen = () => {
           deviceIds.push(item?.childDevice);
         }
       });
-      // todo solve SockJS problem
-      // connectSockets(deviceIds);
+      connectSockets(deviceIds);
       setStudentsEmail(temp);
       setChildren(res);
     } catch (err) {
       console.log('err in children', err);
     }
   };
-  // todo solve SockJS problem
-  // let stompClient: any = React.createRef<Stomp.Client>();
-  // const connectSockets = async (deviceIds: any) => {
-  //   const token = await loadToken();
-  //   const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
-  //   stompClient = Stomp.over(socket);
-  //   stompClient.connect({ token }, () => {
-  //     console.log('Connected');
-  //
-  //     deviceIds.map((item) => {
-  //       stompClient.subscribe(`/device/${item}`, subscriptionCallback);
-  //     });
-  //   });
-  // };
+  let stompClient: any = React.createRef<Stomp.Client>();
+  const connectSockets = async (deviceIds: any[]) => {
+    const token = await loadToken();
+    const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({ token }, () => {
+      console.log('Connected');
+
+      deviceIds.map((item) => {
+        stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+      });
+    });
+  };
   const subscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
     console.log('Update Received', messageBody);
@@ -295,7 +293,7 @@ const StudentGroupScreen = () => {
               marginTop: 10,
               marginBottom: 20,
             }}
-            renderItem={({ item, index }: {item: any, index: number }) => {
+            renderItem={({ item, index }: { item: any, index: number }) => {
               let temp: any[] = [];
               let instructor = item?.instructors?.map((item: any) =>
                 temp.push(item?.firstName),

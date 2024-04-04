@@ -58,10 +58,9 @@ import { UserTypeState } from '@/Store/UserType';
 import { InstructorActivityNavigatorParamList } from '@/Navigators/Main/InstructorActivityNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
-// todo solve problem with Stomp
-// import SockJS from "sockjs-client";
-// import * as Stomp from "stompjs";
-// const studentImage = require("@/Assets/Images/approval_icon1.png");
+import SockJS from "sockjs-client";
+// @ts-ignore
+import * as Stomp from 'react-native-stompjs';
 const instructorImage = require('@/Assets/Images/approval_icon2.png');
 const bookImage = require('@/Assets/Images/book.png');
 const thLargeImage = require('@/Assets/Images/th-large.png');
@@ -148,7 +147,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   const [buses, setBuses] = useState<any[]>([]);
   let prevOpenedRow: any;
   let row: Array<any> = [];
-  const currentUser = useSelector(
+  const currentUser: any = useSelector(
     (state: { user: UserState }) => state.user.item,
   );
 
@@ -457,17 +456,16 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   //   [searchParam, user],
   //   300
   // );
-  // todo solve problem witn Stomp
-  // let stompClient: any = React.createRef<Stomp.Client>();
-  // const connectSockets = async () => {
-  //   const token = await loadToken();
-  //   const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
-  //   stompClient = Stomp.over(socket);
-  //   stompClient.connect({ token }, () => {
-  //     console.log("Connected");
-  //     locationPermission(true);
-  //   });
-  // };
+  let stompClient: any = React.createRef<Stomp.Client>();
+  const connectSockets = async () => {
+    const token = await loadToken();
+    const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+    stompClient = Stomp.over(socket);
+    stompClient.connect({ token }, () => {
+      console.log("Connected");
+      locationPermission();
+    });
+  };
   const locationPermission = async () => {
     if (Platform.OS === 'android') {
       const granted = await PermissionsAndroid.request(
@@ -498,16 +496,15 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
 
   const sendCoordinates = async (lat: any, lang: any) => {
     const token = await loadToken();
-    // todo solve problem with Stomp
-    // stompClient.send(
-    //   "/socket/ws-location",
-    //   { token },
-    //   JSON.stringify({
-    //     latitude: lat,
-    //     longitude: lang,
-    //     deviceId: currentUser?.deviceId,
-    //   })
-    // );
+    stompClient.send(
+      "/socket/ws-location",
+      { token },
+      JSON.stringify({
+        latitude: lat,
+        longitude: lang,
+        deviceId: currentUser?.deviceId,
+      })
+    );
   };
 
   const handleHistorySchedule = async () => {
@@ -526,8 +523,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
 
           sendCoordinates(crd.latitude, crd.longitude);
         }, () => {
-        }, () => {
-        });
+        }, {});
       }
     } catch (err) {
       console.log('er99999999999999', err);

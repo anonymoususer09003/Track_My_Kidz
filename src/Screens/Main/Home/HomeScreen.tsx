@@ -1,11 +1,11 @@
-import { loadIsSubscribed, loadUserId } from '@/Storage/MainAppStorage';
+import { loadIsSubscribed, loadToken, loadUserId } from '@/Storage/MainAppStorage';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import {  Text } from '@ui-kitten/components';
+import { Text } from '@ui-kitten/components';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-// import SockJS from "sockjs-client";
-// import * as Stomp from "stompjs";
-// import { LinearGradientButton } from "@/Components/LinearGradientButton/LinearGradientButton";
+import SockJS from 'sockjs-client';
+// @ts-ignore
+import * as Stomp from 'react-native-stompjs';
 import { AppHeader, Calendar, LinearGradientButton } from '@/Components';
 import SearchBar from '@/Components/SearchBar/SearchBar';
 import { actions } from '@/Context/state/Reducer';
@@ -60,7 +60,6 @@ const HomeScreen = () => {
         latitudeDelta: 0.0421,
         longitudeDelta: 0.0421,
       });
-    }, () => {
     }, () => {
     });
   }, []);
@@ -155,8 +154,7 @@ const HomeScreen = () => {
       });
       setChildrensDeviceIds(deviceIds);
 
-      // todo: find analog or fix this one
-      // turnOnTracker(currentUser?.id, deviceIds, "activity");
+      turnOnTracker(deviceIds);
 
       setOriginalChildren(res);
 
@@ -193,23 +191,26 @@ const HomeScreen = () => {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
   }, [selectedDependent]);
-  // todo: find analog or fix this one
-  // let stompClient: any = React.createRef<Stomp.Client>();
-  // const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
-  //   try {
-  //     const token = await loadToken();
-  //
-  //     const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
-  //     stompClient = Stomp.over(socket);
-  //     stompClient.connect({ token }, () => {
-  //       deviceIds.map((item) => {
-  //         stompClient.subscribe(`/device/${item}`, subscriptionCallback);
-  //       });
-  //     });
-  //   } catch (err) {
-  //     console.log("Error:", err);
-  //   }
-  // };
+
+
+  let stompClient: any = React.createRef<Stomp.Client>();
+  const turnOnTracker = async (deviceIds: any) => {
+    try {
+      const token = await loadToken();
+
+      const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
+      stompClient = Stomp.over(socket);
+      stompClient.connect({ token }, () => {
+        deviceIds.map((item: any) => {
+          console.log('connected');
+          stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+        });
+      });
+    } catch (err) {
+      console.log('Error:', err);
+    }
+  };
+
   const subscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
     console.log('Update Received', messageBody);
@@ -399,16 +400,16 @@ const HomeScreen = () => {
     );
   };
 
-  const [seconds, setSeconds] = useState<number>(0);
+  // const [seconds, setSeconds] = useState<number>(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log('test');
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     // console.log('test');
+  //   }, 1000);
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, []);
 
 
   return (
