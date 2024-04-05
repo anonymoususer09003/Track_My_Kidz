@@ -3,21 +3,20 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useSelector } from 'react-redux';
 
 import { WelcomeMessageModal } from '@/Modals';
-import LogicComponent from '@/Components/LogicComponent';
 import { ModalState } from '@/Store/Modal';
 import RightDrawerNavigator from '@/Navigators/Main/RightDrawerNavigator';
+import { TrackerProvider } from '@/Providers/TrackerProvider';
 
 const Screen = () => {
   const welcomeMessageModal = useSelector(
     (state: { modal: ModalState }) => state.modal.welcomeMessageModal,
   );
-  console.log('MainNavigator.tsx line 14 welcomeMessageModal', welcomeMessageModal);
 
   return (
-    <>
+    <TrackerProvider>
       {welcomeMessageModal && <WelcomeMessageModal />}
       <RightDrawerNavigator />
-    </>
+    </TrackerProvider>
   );
 };
 

@@ -259,3 +259,18 @@ export const AVAILABLE_PAYMENT_AMOUNTS = [
     label: "$4.99 - Monthly",
   },
 ];
+
+export const BACKGROUND_TASK_START_OPTIONS ={
+  taskName: 'Example',
+  taskTitle: 'TrackMyKidz',
+  taskDesc: 'Tracking your Location',
+  taskIcon: {
+    name: 'ic_launcher',
+    type: 'mipmap',
+  },
+  color: '#ff00ff',
+  linkingURI: 'yourSchemeHere://chat/jane', // See Deep Lking for more info
+  parameters: {
+    delay: 2000,
+  },
+};

@@ -24,6 +24,7 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import MapView, { Circle, Marker } from 'react-native-maps';
 import { useDispatch, useSelector } from 'react-redux';
 import LogoutStore from '@/Store/Authentication/LogoutStore';
+import { useTracker } from '@/Providers/TrackerProvider';
 
 const restartIcon = require('@/Assets/Images/restart.png');
 const edit2Icon = require('@/Assets/Images/edit-2.png');
@@ -35,6 +36,7 @@ interface Coords {
 }
 
 const HomeScreen = () => {
+  const {  trackedDevicesCoordinates } = useTracker();
   const navigation: any = useNavigation();
   const focused = useIsFocused();
   // const swipeableRef = useRef(null);
@@ -43,7 +45,7 @@ const HomeScreen = () => {
   let row: Array<any> = [];
   let prevOpenedRow: any;
   const dispatch = useDispatch();
-  const [initialRoute, setInitialRoute] = useState('FeaturedScreen');
+  // const [initialRoute, setInitialRoute] = useState('FeaturedScreen');
   const [position, setPosition] = useState({
     latitude: 10,
     longitude: 10,
@@ -64,11 +66,11 @@ const HomeScreen = () => {
     });
   }, []);
   useEffect(() => {
-
+    // initTracking()
     // setThumbnail(false);
   }, [focused]);
   const [children, setChildren] = useState<any[]>([]);
-  const [trackingList, setTrackingList] = useState<any>({});
+  // const [trackingList, setTrackingList] = useState<any>({});
   const [getChildrendeviceIds, setChildrensDeviceIds] = useState<any[]>([]);
   const [originalChildren, setOriginalChildren] = useState<any[]>([]);
   const [thumbnail, setThumbnail] = useState<boolean>(false);
@@ -78,12 +80,12 @@ const HomeScreen = () => {
   const [selectedMonth, setSelectedMonth] = useState<any>(
     moment(new Date()).month(),
   );
-  const [region, setRegion] = useState({
-    latitude: 37.78825,
-    longitude: -122.4324,
-    latitudeDelta: 60,
-    longitudeDelta: 0.0421,
-  });
+  // const [region, setRegion] = useState({
+  //   latitude: 37.78825,
+  //   longitude: -122.4324,
+  //   latitudeDelta: 60,
+  //   longitudeDelta: 0.0421,
+  // });
   const [studentsEmails, setStudentsEmail] = useState<any[]>([]);
   const [originalStudentsEmails, setOriginalStudentsEmail] = useState<any[]>([]);
   const [selectedDay, setSelectedDay] = useState<any>(moment().format('D'));
@@ -193,35 +195,27 @@ const HomeScreen = () => {
   }, [selectedDependent]);
 
 
-  let stompClient: any = React.createRef<Stomp.Client>();
   const turnOnTracker = async (deviceIds: any) => {
     try {
-      const token = await loadToken();
-
-      const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
-      stompClient = Stomp.over(socket);
-      stompClient.connect({ token }, () => {
-        deviceIds.map((item: any) => {
-          console.log('connected');
-          stompClient.subscribe(`/device/${item}`, subscriptionCallback);
-        });
-      });
+      // const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
+      // const over: any = Stomp.over(socket);
+      // setStompClient(over, deviceIds);
     } catch (err) {
       console.log('Error:', err);
     }
   };
 
-  const subscriptionCallback = (subscriptionMessage: any) => {
-    const messageBody = JSON.parse(subscriptionMessage.body);
-    console.log('Update Received', messageBody);
-    setTrackingList({
-      ...trackingList,
-      [messageBody.deviceId]: {
-        lat: messageBody.latitude,
-        lang: messageBody.longitude,
-      },
-    });
-  };
+  // const subscriptionCallback = (subscriptionMessage: any) => {
+  //   const messageBody = JSON.parse(subscriptionMessage.body);
+  //   console.log('Update Received', messageBody);
+  //   setTrackingList({
+  //     ...trackingList,
+  //     [messageBody.deviceId]: {
+  //       lat: messageBody.latitude,
+  //       lang: messageBody.longitude,
+  //     },
+  //   });
+  // };
   // const RightActions = (dragX: any, item) => {
   //   const scale = dragX.interpolate({
   //     inputRange: [-100, 0],
@@ -412,6 +406,8 @@ const HomeScreen = () => {
   // }, []);
 
 
+  // @ts-ignore
+  // @ts-ignore
   return (
     <>
       {/* <WelcomeMessageModal /> */}
@@ -622,14 +618,18 @@ const HomeScreen = () => {
           >
             {children
               .filter(
-                (item) =>
-                  trackingList[item.childDevice]?.lat != 'undefined' &&
-                  !isNaN(parseFloat(trackingList[item.childDevice]?.lat)) &&
-                  trackingList[item.childDevice]?.lat != null,
+                (item: any) =>
+                  // @ts-ignore
+                  trackedDevicesCoordinates[item.childDevice]?.lat != 'undefined' &&
+                  // @ts-ignore
+                  !isNaN(parseFloat(trackedDevicesCoordinates[item.childDevice]?.lat)) &&
+                  trackedDevicesCoordinates[item.childDevice]?.lat != null,
               )
               .map((item, index) => {
-                const latitude = parseFloat(trackingList[item.childDevice]?.lat) || 10;
-                const longitude = parseFloat(trackingList[item.childDevice]?.lang) || 10;
+                // @ts-ignore
+                const latitude = parseFloat(trackedDevicesCoordinates[item.childDevice]?.lat) || 10;
+                // @ts-ignore
+                const longitude = parseFloat(trackedDevicesCoordinates[item.childDevice]?.lang) || 10;
 
                 return (
                   <>

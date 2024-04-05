@@ -6,6 +6,7 @@ export const Config = {
   // BUCKET: 'baftrendspostsartifactsprod',
   // STRIPE_PK: 'pk_live_51J3XIEHpP2GPUgoko3NIF9po8yOlaCzmspoAJNICnVU46PQFPW0nsJy6lsI0EFQossiQFO97ay5jn5c6xvhsoTXd00pP8etsw6'
   API_URL: "https://live-api.trackmykidz.com",
+  WS_URL: "https://live-api.trackmykidz.com/ws-location",
   ACCESSKEYID: "AKIAYHZBPYYBLVFK45L7",
   SECRETKEYID: "t/WCNdCPS/vy9FR+LngOnqh1+yC08pJPT61HgABF",
   REGION: "us-east-2",

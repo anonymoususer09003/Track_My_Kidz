@@ -587,7 +587,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
 
   useEffect(() => {
     if (isFocused) {
-      // connectSockets();
+      connectSockets();
 
       // if (countries) {
       // fetchCountries();
