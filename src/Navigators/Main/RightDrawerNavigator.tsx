@@ -1,8 +1,7 @@
-import ChangeNavigationCustomState from '@/Store/Navigation/ChangeNavigationCustomState';
 import React, { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { UserTypeState } from '@/Store/UserType';
-import { PermissionsAndroid, Platform, Text, View } from 'react-native';
+import { PermissionsAndroid, Platform } from 'react-native';
 import {
   ActivationCodeScreen,
   ActivityDetailsScreen,
@@ -32,8 +31,8 @@ import {
   StudentPersonalProfileScreen,
   StudentSettingsScreen,
 } from '@/Screens';
-import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
-import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { ParamListBase } from '@react-navigation/native';
 import InstructorApprovalNavigator from '@/Navigators/Main/InstructorApprovalNavigator';
 import AddMembersNavigator from '@/Navigators/Main/AddMembersNavigator';
 import InstructorGroupApprovalNavigator from '@/Navigators/Main/InstructorGroupApprovalNavigator';
@@ -56,6 +55,7 @@ import { getUniqueId } from 'react-native-device-info';
 import GeolocationAndroid from 'react-native-geolocation-service';
 import Geolocation from '@react-native-community/geolocation';
 import { MessageBody, useTracker } from '@/Providers/TrackerProvider';
+import BackgroundTimer from 'react-native-background-timer';
 
 
 type InstructorStack = {
@@ -150,56 +150,99 @@ const RightDrawerNavigator = () => {
 
   const locationPermission = async () => {
     if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-        {
-          title: 'Background Location Permission',
-          message: 'TrackMyKidz App needs access to your location',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      console.log(granted);
+      const granted = await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
 
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+
+
+      ]);
+      // const granted = await PermissionsAndroid.request(
+      //   PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+      //   {
+      //     title: 'Background Location Permission',
+      //     message: 'TrackMyKidz App needs access to your location',
+      //     buttonNeutral: 'Ask Me Later',
+      //     buttonNegative: 'Cancel',
+      //     buttonPositive: 'OK',
+      //   },
+      // );
+      // const granted2 = await PermissionsAndroid.request(
+      //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      //   {
+      //     title: 'Background Location Permission',
+      //     message: 'TrackMyKidz App needs access to your location',
+      //     buttonNeutral: 'Ask Me Later',
+      //     buttonNegative: 'Cancel',
+      //     buttonPositive: 'OK',
+      //   },
+      // );
+      // const granted3 = await PermissionsAndroid.request(
+      //   PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+      //   {
+      //     title: 'Background Location Permission',
+      //     message: 'TrackMyKidz App needs access to your location',
+      //     buttonNeutral: 'Ask Me Later',
+      //     buttonNegative: 'Cancel',
+      //     buttonPositive: 'OK',
+      //   },
+      // );
+      // console.log(granted);
+      // console.log(granted2);
+      // console.log(granted3);
+
+      if (granted['android.permission.ACCESS_BACKGROUND_LOCATION'] === PermissionsAndroid.RESULTS.GRANTED) {
         backgroundCall();
       }
     } else {
-      backgroundCall();
+      // todo: add logic for ios
+      // backgroundCall();
     }
   };
 
   const backgroundCall = async () => {
-    const sleep = (time: number) =>
-      new Promise((resolve: any) => setTimeout(() => resolve(), time));
 
-    // comments from Nouman
-    // You can do anything in your task such as network requests, timers and so on,
-    // as long as it doesn't touch UI. Once your task completes (i.e. the promise is resolved),
-    // React Native will go into "paused" mode (unless there are other tasks running,
-    // or there is a foreground app).
-    const infiniteTrackingEvery2Seconds = async () => {
-
-      await new Promise(async () => {
-        for (let i = 1; BackgroundService.isRunning(); i++) {
-          try {
-            await trackAndroidAnIos();
-          } catch (error) {
-            console.log(error);
-          }
-          // sending location every 2 seconds
-          await sleep(2000);
+    BackgroundTimer.runBackgroundTimer(async () => {
+        console.log('i background a call');
+        try {
+          trackAndroidAnIos();
+        } catch (error) {
+          console.log(error);
         }
-      });
-    };
 
-    BackgroundService.on('expiration', () => {
-      console.log('I am being closed :(');
-    });
+      },
+      5000);
 
-    await BackgroundService.start(infiniteTrackingEvery2Seconds, BACKGROUND_TASK_START_OPTIONS);
-    await BackgroundService.updateNotification({ taskDesc: 'Tracking Location' });
+    // const sleep = (time: number) =>
+    //   new Promise((resolve: any) => setTimeout(() => resolve(), time));
+    //
+    // // comments from Nouman
+    //
+    // // You can do anything in your task such as network requests, timers and so on,
+    // // as long as it doesn't touch UI. Once your task completes (i.e. the promise is resolved),
+    // // React Native will go into "paused" mode (unless there are other tasks running,
+    // // or there is a foreground app).
+    // const infiniteTrackingEvery2Seconds = async () => {
+    //
+    //   await new Promise(async () => {
+    //     for (let i = 1; BackgroundService.isRunning(); i++) {
+    //       try {
+    //         // await trackAndroidAnIos();
+    //       } catch (error) {
+    //         console.log(error);
+    //       }
+    //       // sending location every 2 seconds
+    //       await sleep(2000);
+    //     }
+    //   });
+    // };
+    //
+    // BackgroundService.on('expiration', () => {
+    //   console.log('I am being closed :(');
+    // });
+    //
+    // await BackgroundService.start(infiniteTrackingEvery2Seconds, BACKGROUND_TASK_START_OPTIONS);
+    // await BackgroundService.updateNotification({ taskDesc: 'Tracking Location' });
     // comments from Nouman
     // Only Android, iOS will ignore this call
     // iOS will also run everything here in the background until .stop() is called
@@ -223,6 +266,8 @@ const RightDrawerNavigator = () => {
   };
 
   const sendCoordinates = async (latitude: number, longitude: number) => {
+    console.log('I am sendCoordinates', latitude,
+      longitude);
     const token = await loadToken();
     const deviceId = await getUniqueId();
 
@@ -239,17 +284,19 @@ const RightDrawerNavigator = () => {
 
 
   const trackAndroidAnIos = async () => {
+    console.log('i am inside trackAndroidAnIos');
+    console.log(Platform.OS);
     try {
       if (Platform.OS === 'android') {
         GeolocationAndroid.getCurrentPosition(async ({ coords }) => {
           console.log('coords', coords);
-          sendCoordinates(coords.latitude, coords.longitude);
-        });
+          await sendCoordinates(coords.latitude, coords.longitude);
+        }, console.log , { enableHighAccuracy: true, timeout: 2000, maximumAge: 2000 });
       } else {
         Geolocation.getCurrentPosition(async ({ coords }) => {
           console.log('coords', coords);
           sendCoordinates(coords.latitude, coords.longitude);
-        });
+        }, console.log);
       }
     } catch (err) {
       console.log('trackAndroidAnIos error TrackerProvider.tsx line 139', err);
