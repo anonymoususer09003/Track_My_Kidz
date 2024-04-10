@@ -49,10 +49,7 @@ import * as Stomp from 'react-native-stompjs';
 import { loadToken } from '@/Storage/MainAppStorage';
 import SockJS from 'sockjs-client';
 import { Config } from '@/Config';
-import BackgroundService from 'react-native-background-actions';
-import { BACKGROUND_TASK_START_OPTIONS } from '@/Constants';
 import { getUniqueId } from 'react-native-device-info';
-import GeolocationAndroid from 'react-native-geolocation-service';
 import Geolocation from '@react-native-community/geolocation';
 import { MessageBody, useTracker } from '@/Providers/TrackerProvider';
 import BackgroundTimer from 'react-native-background-timer';
@@ -150,46 +147,11 @@ const RightDrawerNavigator = () => {
 
   const locationPermission = async () => {
     if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-
+      const granted = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
-
-
       ]);
-      // const granted = await PermissionsAndroid.request(
-      //   PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-      //   {
-      //     title: 'Background Location Permission',
-      //     message: 'TrackMyKidz App needs access to your location',
-      //     buttonNeutral: 'Ask Me Later',
-      //     buttonNegative: 'Cancel',
-      //     buttonPositive: 'OK',
-      //   },
-      // );
-      // const granted2 = await PermissionsAndroid.request(
-      //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      //   {
-      //     title: 'Background Location Permission',
-      //     message: 'TrackMyKidz App needs access to your location',
-      //     buttonNeutral: 'Ask Me Later',
-      //     buttonNegative: 'Cancel',
-      //     buttonPositive: 'OK',
-      //   },
-      // );
-      // const granted3 = await PermissionsAndroid.request(
-      //   PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
-      //   {
-      //     title: 'Background Location Permission',
-      //     message: 'TrackMyKidz App needs access to your location',
-      //     buttonNeutral: 'Ask Me Later',
-      //     buttonNegative: 'Cancel',
-      //     buttonPositive: 'OK',
-      //   },
-      // );
-      // console.log(granted);
-      // console.log(granted2);
-      // console.log(granted3);
 
       if (granted['android.permission.ACCESS_BACKGROUND_LOCATION'] === PermissionsAndroid.RESULTS.GRANTED) {
         backgroundCall();
@@ -201,73 +163,30 @@ const RightDrawerNavigator = () => {
   };
 
   const backgroundCall = async () => {
-
+    let times = 1;
     BackgroundTimer.runBackgroundTimer(async () => {
-        console.log('i background a call');
         try {
+          console.log('I am called for ' + ++times + ' times');
           trackAndroidAnIos();
         } catch (error) {
           console.log(error);
         }
-
       },
-      5000);
-
-    // const sleep = (time: number) =>
-    //   new Promise((resolve: any) => setTimeout(() => resolve(), time));
-    //
-    // // comments from Nouman
-    //
-    // // You can do anything in your task such as network requests, timers and so on,
-    // // as long as it doesn't touch UI. Once your task completes (i.e. the promise is resolved),
-    // // React Native will go into "paused" mode (unless there are other tasks running,
-    // // or there is a foreground app).
-    // const infiniteTrackingEvery2Seconds = async () => {
-    //
-    //   await new Promise(async () => {
-    //     for (let i = 1; BackgroundService.isRunning(); i++) {
-    //       try {
-    //         // await trackAndroidAnIos();
-    //       } catch (error) {
-    //         console.log(error);
-    //       }
-    //       // sending location every 2 seconds
-    //       await sleep(2000);
-    //     }
-    //   });
-    // };
-    //
-    // BackgroundService.on('expiration', () => {
-    //   console.log('I am being closed :(');
-    // });
-    //
-    // await BackgroundService.start(infiniteTrackingEvery2Seconds, BACKGROUND_TASK_START_OPTIONS);
-    // await BackgroundService.updateNotification({ taskDesc: 'Tracking Location' });
-    // comments from Nouman
-    // Only Android, iOS will ignore this call
-    // iOS will also run everything here in the background until .stop() is called
+      2000);
   };
 
-  const trackDevicesById = async (stompClient: any, deviceIds: string[]) => {
+  const trackAndroidAnIos = async () => {
     try {
-
-      deviceIds.map((item) => {
-        stompClient.subscribe(`/device/${item}`, subscriptionCallback);
-      });
+      Geolocation.getCurrentPosition(({ coords }) => {
+        console.log('coords', coords);
+        sendCoordinates(coords.latitude, coords.longitude);
+      }, console.log);
     } catch (err) {
-      console.log('Error:', err);
+      console.log('trackAndroidAnIos error TrackerProvider.tsx line 139', err);
     }
   };
-  const subscriptionCallback = (subscriptionMessage: { body: string }) => {
-    const messageBody: MessageBody = JSON.parse(subscriptionMessage.body);
-    console.log('Update Received', messageBody);
-
-    updateCoordinates(messageBody);
-  };
-
   const sendCoordinates = async (latitude: number, longitude: number) => {
-    console.log('I am sendCoordinates', latitude,
-      longitude);
+
     const token = await loadToken();
     const deviceId = await getUniqueId();
 
@@ -282,25 +201,23 @@ const RightDrawerNavigator = () => {
     );
   };
 
-
-  const trackAndroidAnIos = async () => {
-    console.log('i am inside trackAndroidAnIos');
-    console.log(Platform.OS);
+  const trackDevicesById = async (stompClient: any, deviceIds: string[]) => {
     try {
-      if (Platform.OS === 'android') {
-        GeolocationAndroid.getCurrentPosition(async ({ coords }) => {
-          console.log('coords', coords);
-          await sendCoordinates(coords.latitude, coords.longitude);
-        }, console.log , { enableHighAccuracy: true, timeout: 2000, maximumAge: 2000 });
-      } else {
-        Geolocation.getCurrentPosition(async ({ coords }) => {
-          console.log('coords', coords);
-          sendCoordinates(coords.latitude, coords.longitude);
-        }, console.log);
-      }
+
+      deviceIds.map((item) => {
+        stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+      });
     } catch (err) {
-      console.log('trackAndroidAnIos error TrackerProvider.tsx line 139', err);
+      console.log('Error:', err);
     }
+  };
+
+
+  const subscriptionCallback = (subscriptionMessage: { body: string }) => {
+    const messageBody: MessageBody = JSON.parse(subscriptionMessage.body);
+    console.log('Update Received', messageBody);
+
+    updateCoordinates(messageBody);
   };
 
 
