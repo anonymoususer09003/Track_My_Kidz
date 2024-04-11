@@ -41,6 +41,7 @@
     "react-native": "0.73.6",
     "react-native-background-actions": "^3.0.1",
     "react-native-background-fetch": "^4.2.4",
+    "react-native-background-geolocation": "^4.16.0",
     "react-native-background-timer": "^2.4.1",
     "react-native-camera": "^4.2.1",
     "react-native-device-info": "^10.13.1",

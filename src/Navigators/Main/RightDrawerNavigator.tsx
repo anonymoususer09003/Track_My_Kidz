@@ -50,9 +50,10 @@ import { loadToken } from '@/Storage/MainAppStorage';
 import SockJS from 'sockjs-client';
 import { Config } from '@/Config';
 import { getUniqueId } from 'react-native-device-info';
-import Geolocation from '@react-native-community/geolocation';
+// import Geolocation from '@react-native-community/geolocation';
 import { MessageBody, useTracker } from '@/Providers/TrackerProvider';
 import BackgroundTimer from 'react-native-background-timer';
+import BackgroundGeolocation from "react-native-background-geolocation";
 
 
 type InstructorStack = {
@@ -177,10 +178,18 @@ const RightDrawerNavigator = () => {
 
   const trackAndroidAnIos = async () => {
     try {
-      Geolocation.getCurrentPosition(({ coords }) => {
-        console.log('coords', coords);
-        sendCoordinates(coords.latitude, coords.longitude);
-      }, console.log);
+      // Geolocation.setRNConfiguration({ enableBackgroundLocationUpdates: true, skipPermissionRequests: true });
+      // Geolocation.getCurrentPosition(({ coords }) => {
+      //   console.log('coords', coords);
+      //   sendCoordinates(coords.latitude, coords.longitude);
+      // }, console.log);
+      BackgroundGeolocation.ready({}).then((state: any) => {
+        // YES -- .ready() has now resolved.
+        setInterval(()=>{
+          BackgroundGeolocation.getCurrentPosition({  }).then(console.log).catch(console.log);
+        },2000)
+        BackgroundGeolocation.start();
+      });
     } catch (err) {
       console.log('trackAndroidAnIos error TrackerProvider.tsx line 139', err);
     }
