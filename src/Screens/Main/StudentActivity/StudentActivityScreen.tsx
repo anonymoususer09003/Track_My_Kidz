@@ -7,7 +7,11 @@ import {
 } from '@/Services/Activity';
 import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
 import TrackHistory from '@/Services/Parent/TrackHistory';
-import { getHomeScreenCacheInfo, loadToken, storeHomeScreenCacheInfo } from '@/Storage/MainAppStorage';
+import {
+  getHomeScreenCacheInfo,
+  loadToken,
+  storeHomeScreenCacheInfo,
+} from '@/Storage/MainAppStorage';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import ChangeStudentActivityState from '@/Store/StudentActivity/ChangeStudentActivityState';
 import { UserState } from '@/Store/User';
@@ -34,7 +38,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
-import SockJS from "sockjs-client";
+import SockJS from 'sockjs-client';
 // @ts-ignore
 import * as Stomp from 'react-native-stompjs';
 
@@ -52,21 +56,17 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { calculateDistance } from '@/Utils/DistanceCalculator';
 
 const StudentActivityScreen: FC = () => {
-
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
 
   const isFocused = useIsFocused();
-  const searchBarValue = useSelector(
-    (state: any) => state.header.searchBarValue,
-  );
+  const searchBarValue = useSelector((state: any) => state.header.searchBarValue);
   const cancelToken = axios.CancelToken;
   const source = cancelToken.source();
   const [selectionData, setSelectionData] = useState({
     type: 'student',
     status: 'pending',
   });
-  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
-    useState(false);
+  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] = useState(false);
   const [{ selectedActivity: activity }, _dispatch]: any = useStateValue();
   const [originalActivities, setOriginalActivities] = useState<Activity[]>([]);
   const [activitiesCount, setActivitiesCount] = useState<any>({});
@@ -90,20 +90,15 @@ const StudentActivityScreen: FC = () => {
   const [showModal, setModal] = useState<boolean>(false);
   const [selectedGroup, setSelectedGroup] = useState<any>(null);
   const [groups, setGroups] = useState<any>({});
-  const currentUser: any = useSelector(
-    (state: { user: UserState }) => state.user.item,
-  );
-  const isCalendarVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.showCalendar,
-  );
+  const currentUser: any = useSelector((state: { user: UserState }) => state.user.item);
+  const isCalendarVisible = useSelector((state: { modal: ModalState }) => state.modal.showCalendar);
 
   const instructorImage = require('@/Assets/Images/approval_icon2.png');
   const { showFamilyMap, showParticipantMap } = useSelector(
-    (state: { studentActivity: StudentState }) => state.studentActivity,
+    (state: { studentActivity: StudentState }) => state.studentActivity
   );
   const { selectedDayForFilter, selectedMonthForFilter } = useSelector(
-    (state: { instructorsActivity: InstructorState }) =>
-      state.instructorsActivity,
+    (state: { instructorsActivity: InstructorState }) => state.instructorsActivity
   );
 
   const ref = useRef<any>();
@@ -140,12 +135,7 @@ const StudentActivityScreen: FC = () => {
   //   }
   // }, []);
 
-  const handleTrackHistory = async (
-    status: boolean,
-    id: any,
-    latitude: any,
-    longitude: any,
-  ) => {
+  const handleTrackHistory = async (status: boolean, id: any, latitude: any, longitude: any) => {
     const _date = moment(new Date()).format();
 
     const res = await TrackHistory(status, id, _date, latitude, longitude);
@@ -162,30 +152,23 @@ const StudentActivityScreen: FC = () => {
           if (tracking) {
             sendCoordinates(crd.latitude, crd.longitude);
           } else {
-            await handleTrackHistory(
-              true,
-              currentUser?.studentId,
-              crd.latitude,
-              crd.longitude,
-            );
+            await handleTrackHistory(true, currentUser?.studentId, crd.latitude, crd.longitude);
           }
         });
       } else {
-        Geolocation.getCurrentPosition(async (pos: any) => {
-          const crd = pos.coords;
+        Geolocation.getCurrentPosition(
+          async (pos: any) => {
+            const crd = pos.coords;
 
-          if (tracking) {
-            sendCoordinates(crd.latitude, crd.longitude);
-          } else {
-            await handleTrackHistory(
-              true,
-              currentUser?.studentId,
-              crd.latitude,
-              crd.longitude,
-            );
-          }
-        }, () => {
-        }, {});
+            if (tracking) {
+              sendCoordinates(crd.latitude, crd.longitude);
+            } else {
+              await handleTrackHistory(true, currentUser?.studentId, crd.latitude, crd.longitude);
+            }
+          },
+          () => {},
+          {}
+        );
       }
     } catch (err) {
       console.log('er99999999999999', err);
@@ -223,7 +206,7 @@ const StudentActivityScreen: FC = () => {
       dispatch(
         ChangeStudentActivityState.action({
           showFamilyMap: false,
-        }),
+        })
       );
     }
   }, [isFocused]);
@@ -243,7 +226,7 @@ const StudentActivityScreen: FC = () => {
           buttonNeutral: 'Ask Me Later',
           buttonNegative: 'Cancel',
           buttonPositive: 'OK',
-        },
+        }
       );
       // const granted = await PermissionsAndroid.request(
       //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
@@ -270,7 +253,7 @@ const StudentActivityScreen: FC = () => {
           buttonNeutral: 'Ask Me Later',
           buttonNegative: 'Cancel',
           buttonPositive: 'OK',
-        },
+        }
       );
       // const granted = await PermissionsAndroid.request(
       //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
@@ -289,8 +272,7 @@ const StudentActivityScreen: FC = () => {
   };
 
   const backgroundCall = async (tracking?: any) => {
-    const sleep = (time: any) =>
-      new Promise<void>((resolve) => setTimeout(() => resolve(), time));
+    const sleep = (time: any) => new Promise<void>((resolve) => setTimeout(() => resolve(), time));
 
     // You can do anything in your task such as network requests, timers and so on,
     // as long as it doesn't touch UI. Once your task completes (i.e. the promise is resolved),
@@ -308,9 +290,7 @@ const StudentActivityScreen: FC = () => {
           } catch (error) {
             // console.log(error);
           }
-          await sleep(
-            tracking ? 12000 : Platform.OS == 'ios' ? 900000 : 300000,
-          );
+          await sleep(tracking ? 12000 : Platform.OS == 'ios' ? 900000 : 300000);
         }
       });
 
@@ -353,8 +333,7 @@ const StudentActivityScreen: FC = () => {
       });
 
       setParticipantsIds(deviceIds);
-      deviceIds.length > 0 &&
-      turnOnParticipantsTracker(deviceIds);
+      deviceIds.length > 0 && turnOnParticipantsTracker(deviceIds);
 
       setParticipants(res);
     } catch (err) {
@@ -362,25 +341,20 @@ const StudentActivityScreen: FC = () => {
     }
   };
 
-  const turnOnParticipantsTracker = async (
-    deviceIds: any[],
-  ) => {
+  const turnOnParticipantsTracker = async (deviceIds: any[]) => {
     try {
       const token = await loadToken();
 
-      const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+      const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
       stompClient = Stomp.over(socket);
       stompClient.connect({ token }, () => {
-        console.log("Connected");
+        console.log('Connected');
         deviceIds.map((item) => {
-          stompClient.subscribe(
-            `/device/${item}`,
-            participantSubscriptionCallback
-          );
+          stompClient.subscribe(`/device/${item}`, participantSubscriptionCallback);
         });
       });
     } catch (err) {
-      console.log("Error:", err);
+      console.log('Error:', err);
     }
   };
   const participantSubscriptionCallback = (subscriptionMessage: any) => {
@@ -425,7 +399,7 @@ const StudentActivityScreen: FC = () => {
               showFamilyMap: false,
               hideCalendar: true,
               showParticipantMap: true,
-            }),
+            })
           );
           getParticipantLocation(item?.activityId);
         }}
@@ -448,12 +422,12 @@ const StudentActivityScreen: FC = () => {
                 avatar: currentUser?.studentPhoto,
                 name: currentUser?.firstname
                   ? currentUser?.firstname[0].toUpperCase() +
-                  currentUser?.firstname.slice(1) +
-                  '' +
-                  currentUser?.lastname[0]?.toUpperCase()
+                    currentUser?.firstname.slice(1) +
+                    '' +
+                    currentUser?.lastname[0]?.toUpperCase()
                   : currentUser?.firstname + '' + currentUser?.lastname,
               },
-            }),
+            })
           );
           navigation.navigate('ChatScreen', {
             title: item?.activityName,
@@ -479,11 +453,7 @@ const StudentActivityScreen: FC = () => {
             justifyContent: 'center',
           }}
         >
-          <Icon
-            style={{ width: 30, height: 30 }}
-            fill={Colors.primary}
-            name="trash"
-          />
+          <Icon style={{ width: 30, height: 30 }} fill={Colors.primary} name="trash" />
         </TouchableOpacity>
       )}
     </View>
@@ -549,7 +519,7 @@ const StudentActivityScreen: FC = () => {
         latitude: lat,
         longitude: lang,
         deviceId: currentUser?.childDevice,
-      }),
+      })
     );
   };
 
@@ -584,34 +554,32 @@ const StudentActivityScreen: FC = () => {
     let allActivities = { ...activities };
 
     let temp = originalActivities?.filter((item, index) =>
-      item.activityName.toLowerCase().includes(text.toLowerCase()),
+      item.activityName.toLowerCase().includes(text.toLowerCase())
     );
     allActivities = temp;
     setActivities(allActivities);
   };
   const filterActivities = (month: any, day: any) => {
-
     let date = new Date().getFullYear() + '-' + month + '-' + day;
     let temp: any = [];
     console.log('originalActivities', originalActivities?.length);
     if (originalActivities?.length) {
       originalActivities.map((item: any) => {
         console.log('item', item?.fromDate);
-        const date1 = moment(item?.fromDate, ['YYYY-MM-DDTHH:mm:ss.SSSZ', 'MMM DD, YYYYTHH:mm:ss.SSSZ'], true);
+        const date1 = moment(
+          item?.fromDate,
+          ['YYYY-MM-DDTHH:mm:ss.SSSZ', 'MMM DD, YYYYTHH:mm:ss.SSSZ'],
+          true
+        );
         const date2 = moment(date, ['YYYY-M-D'], true).add(1, 'month').add(1, 'day');
         console.log('date1', date1);
         console.log('date2', date2);
-        if (
-          moment(date1).isSame(date2, 'day') &&
-          moment(date1).isSame(date2, 'month')
-        ) {
+        if (moment(date1).isSame(date2, 'day') && moment(date1).isSame(date2, 'month')) {
           temp.push(item);
         }
       });
       setActivities(temp);
     }
-
-
   };
   useEffect(() => {
     console.log('isCalendarVisible', isCalendarVisible);
@@ -619,7 +587,6 @@ const StudentActivityScreen: FC = () => {
       filterActivities(selectedMonthForFilter, selectedDayForFilter);
     }
   }, [selectedDayForFilter, selectedMonthForFilter, isCalendarVisible]);
-
 
   useEffect(() => {
     if (isFocused) {
@@ -654,15 +621,10 @@ const StudentActivityScreen: FC = () => {
         let nextParticipant = trackingList[trackingListKeys[j]];
         let latitude2 = nextParticipant?.lat;
         let longititude2 = nextParticipant?.lang;
-        let distance = calculateDistance(
-          latitude1,
-          longititude1,
-          latitude2,
-          longititude2,
-        );
+        let distance = calculateDistance(latitude1, longititude1, latitude2, longititude2);
         const isUnderEqual100Meters = distance <= 100;
         let participant = partcipants.find(
-          (pers) => pers.childDeviceId == nextParticipant.childDeviceId,
+          (pers) => pers.childDeviceId == nextParticipant.childDeviceId
         );
         if (isUnderEqual100Meters) {
           participant['group'] = true;
@@ -684,13 +646,9 @@ const StudentActivityScreen: FC = () => {
         }
       }
 
-      let firstPers = partcipants.find(
-        (firPer) => firPer?.childDeviceId == item,
-      );
+      let firstPers = partcipants.find((firPer) => firPer?.childDeviceId == item);
 
-      let isAnyParticipantExist = temp.find(
-        (temMember: any) => temMember?.groupName == index + 1,
-      );
+      let isAnyParticipantExist = temp.find((temMember: any) => temMember?.groupName == index + 1);
       if (isAnyParticipantExist) {
         firstPers['group'] = true;
         firstPers['groupName'] = index + 1;
@@ -767,7 +725,7 @@ const StudentActivityScreen: FC = () => {
                 width: '100%',
                 marginTop: 10,
               }}
-              renderItem={({ item, index }: { item: any, index: number }) => (
+              renderItem={({ item, index }: { item: any; index: number }) => (
                 <Swipeable
                   ref={(ref) => (row[index] = ref)}
                   // ref={swipeableRef}
@@ -824,20 +782,14 @@ const StudentActivityScreen: FC = () => {
                         />
                         <View>
                           <Text style={styles.text}>{`${moment(
-                            item?.fromDate == 'string'
-                              ? new Date()
-                              : item?.fromDate,
-                          ).format('YYYY-MM-DD')} at ${moment.utc(
-                            item?.fromDate == 'string'
-                              ? new Date()
-                              : item?.fromDate,
-                          )
+                            item?.fromDate == 'string' ? new Date() : item?.fromDate
+                          ).format('YYYY-MM-DD')} at ${moment
+                            .utc(item?.fromDate == 'string' ? new Date() : item?.fromDate)
                             .format('hh:mm a')} `}</Text>
                           <Text style={styles.text}>{`${moment(
-                            item?.toDate == 'string' ? new Date() : item?.toDate,
-                          ).format('YYYY-MM-DD')} at ${moment.utc(
-                            item?.toDate == 'string' ? new Date() : item?.toDate,
-                          )
+                            item?.toDate == 'string' ? new Date() : item?.toDate
+                          ).format('YYYY-MM-DD')} at ${moment
+                            .utc(item?.toDate == 'string' ? new Date() : item?.toDate)
                             .format('hh:mm a')} `}</Text>
                         </View>
                       </View>
@@ -867,8 +819,7 @@ const StudentActivityScreen: FC = () => {
                             }}
                           >
                             <Text style={styles.footerText}>{`${
-                              activitiesCount[item.activityId]
-                                ?.countApprovedStudents || '0'
+                              activitiesCount[item.activityId]?.countApprovedStudents || '0'
                             }`}</Text>
                             <Entypo
                               name="book"
@@ -892,13 +843,9 @@ const StudentActivityScreen: FC = () => {
                             }}
                           >
                             <Text style={styles.text}>
-                              {activitiesCount[item.activityId]
-                                ?.countApprovedInstructors || '0'}
+                              {activitiesCount[item.activityId]?.countApprovedInstructors || '0'}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -921,8 +868,7 @@ const StudentActivityScreen: FC = () => {
                             }}
                           >
                             <Text style={styles.text}>{`${
-                              activitiesCount[item.activityId]
-                                ?.countDeclinedStudents || '0'
+                              activitiesCount[item.activityId]?.countDeclinedStudents || '0'
                             }`}</Text>
                             <Entypo
                               name="book"
@@ -946,13 +892,9 @@ const StudentActivityScreen: FC = () => {
                             }}
                           >
                             <Text style={styles.text}>
-                              {activitiesCount[item.activityId]
-                                ?.countDeclinedInstructors || '0'}
+                              {activitiesCount[item.activityId]?.countDeclinedInstructors || '0'}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -975,10 +917,7 @@ const StudentActivityScreen: FC = () => {
                             style={styles.horizontal}
                           >
                             <Text style={styles.text}>
-                              {`${
-                                activitiesCount[item.activityId]
-                                  ?.countPendingStudents || '0'
-                              }`}
+                              {`${activitiesCount[item.activityId]?.countPendingStudents || '0'}`}
                             </Text>
                             <Entypo
                               name="book"
@@ -1002,14 +941,10 @@ const StudentActivityScreen: FC = () => {
                             }}
                           >
                             <Text style={styles.text}>
-                              {activitiesCount[item.activityId]
-                                ?.countPendingInstructors || '0'}
+                              {activitiesCount[item.activityId]?.countPendingInstructors || '0'}
                               {/* {item.countPendingInstructors || `0`} */}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -1075,12 +1010,8 @@ const StudentActivityScreen: FC = () => {
                               }}
                             >
                               <Text style={{ color: Colors.white }}>
-                                {item?.firstName
-                                  ?.substring(0, 1)
-                                  ?.toUpperCase() || ''}
-                                {item?.lastName
-                                  ?.substring(0, 1)
-                                  ?.toUpperCase() || ''}
+                                {item?.firstName?.substring(0, 1)?.toUpperCase() || ''}
+                                {item?.lastName?.substring(0, 1)?.toUpperCase() || ''}
                               </Text>
                             </View>
                           )}
@@ -1153,9 +1084,7 @@ const StudentActivityScreen: FC = () => {
           //   longitudeDelta: 0.0421,
           // }}
           onLayout={() => {
-            let temp = studentsEmails.filter(
-              (item) => trackingList[item.childDevice]?.lat != null,
-            );
+            let temp = studentsEmails.filter((item) => trackingList[item.childDevice]?.lat != null);
 
             ref?.current?.fitToCoordinates(temp, {
               edgePadding: {
@@ -1184,26 +1113,18 @@ const StudentActivityScreen: FC = () => {
                       ref.current.fitToSuppliedMarkers(
                         [
                           {
-                            latitude: latitude
-                              ? parseFloat(latitude)
-                              : 10,
-                            longitude: longititude
-                              ? parseFloat(longititude)
-                              : 10,
+                            latitude: latitude ? parseFloat(latitude) : 10,
+                            longitude: longititude ? parseFloat(longititude) : 10,
                           },
-                        ],
+                        ]
                         // false, // not animated
                       );
                     }}
                     identifier={item?.email}
                     key={index}
                     coordinate={{
-                      latitude: latitude
-                        ? parseFloat(latitude)
-                        : 10,
-                      longitude: longititude
-                        ? parseFloat(longititude)
-                        : 10,
+                      latitude: latitude ? parseFloat(latitude) : 10,
+                      longitude: longititude ? parseFloat(longititude) : 10,
                     }}
                   >
                     <View style={{}}>
@@ -1225,11 +1146,8 @@ const StudentActivityScreen: FC = () => {
                             }}
                           >
                             <Text style={{ color: Colors.white }}>
-                              {item?.firstname
-                                ?.substring(0, 1)
-                                ?.toUpperCase() || ''}
-                              {item?.lastname?.substring(0, 1)?.toUpperCase() ||
-                                ''}
+                              {item?.firstname?.substring(0, 1)?.toUpperCase() || ''}
+                              {item?.lastname?.substring(0, 1)?.toUpperCase() || ''}
                             </Text>
                           </View>
                         )}

@@ -28,22 +28,19 @@ import { AuthStackNavigatorParamsList } from '@/Navigators/Auth/AuthNavigator';
 const user_type = USER_TYPES;
 const screenHeight = Dimensions.get('screen').height;
 const SignInScreen = () => {
-  const navigation =
-    useNavigation<StackNavigationProp<AuthStackNavigatorParamsList>>();
+  const navigation = useNavigation<StackNavigationProp<AuthStackNavigatorParamsList>>();
 
   const dispatch = useDispatch();
   const isFocuesed = useIsFocused();
   const [, setLoading] = useState(false);
   const [loginObj, setLoginObj] = useState<UserLoginResponse | null>(null);
 
-  const countries = useSelector(
-    (state: { places: any }) => state?.places.countries,
-  );
+  const countries = useSelector((state: { places: any }) => state?.places.countries);
   let values = { email: '', password: '', user_type: '', is_default: false };
   const [intitialValues, setInitialValues] = useState({
-    email: '',
-    password: '',
-    user_type: '',
+    email: 'femibalogu.n@gmail.com',
+    password: 'TrackMyKidz',
+    user_type: 'student',
     is_default: false,
   });
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
@@ -94,8 +91,7 @@ const SignInScreen = () => {
     // })
   };
   const onResendActivationButtonPress = (value: boolean): void => {
-    navigation &&
-    navigation.navigate('ResendConfirmation', { resendCode: value });
+    navigation && navigation.navigate('ResendConfirmation', { resendCode: value });
   };
   const onReactivateButtonPress = (): void => {
     navigation && navigation.navigate('ReactivateAccount');
@@ -124,10 +120,7 @@ const SignInScreen = () => {
   );
 
   const loginValidationSchema = yup.object().shape({
-    email: yup
-      .string()
-      .email('Please enter valid email')
-      .required('Email is required'),
+    email: yup.string().email('Please enter valid email').required('Email is required'),
     password: yup
       .string()
       .min(8, ({ min }) => `Password must be at least ${min} characters`)
@@ -137,10 +130,8 @@ const SignInScreen = () => {
 
   const saveTokenToDatabase = (token: string) => {
     UpdateDeviceToken(token)
-      .then(data => {
-      })
-      .catch(err => {
-      });
+      .then((data) => {})
+      .catch((err) => {});
   };
 
   const requestUserPermission = async () => {
@@ -154,7 +145,8 @@ const SignInScreen = () => {
       <ImageBackground
         style={{ flex: 1 }}
         source={require('../../../Assets/Images/childBackground.png')}
-        resizeMode="stretch">
+        resizeMode="stretch"
+      >
         <KeyboardAwareScrollView style={{ flex: 1 }}>
           <View style={{ flex: 1 }}>
             <View style={styles.headerContainer}>
@@ -176,7 +168,7 @@ const SignInScreen = () => {
                 validationSchema={loginValidationSchema}
                 validateOnMount={true}
                 initialValues={intitialValues}
-                onSubmit={values => {
+                onSubmit={(values) => {
                   console.log('values.user_type', values.user_type);
                   let objectToPass = {
                     email: values.email,
@@ -186,7 +178,7 @@ const SignInScreen = () => {
 
                   dispatch(ChangeModalState.action({ loading: true }));
                   Login(objectToPass, values.user_type.toLowerCase())
-                    .then(res => {
+                    .then((res) => {
                       console.log('SignInScreen.tsx line 206 - res', res);
                       // console.log('res',res.data);
                       const obj: UserLoginResponse = {
@@ -194,17 +186,13 @@ const SignInScreen = () => {
                         userType: values.user_type.toLowerCase(),
                         id: res.data.userTypeId,
                         mainId: res.data?.userId,
-                        ...((res.data?.isSubscribed ||
-                          res.data?.isSubscribed == false) && {
+                        ...((res.data?.isSubscribed || res.data?.isSubscribed == false) && {
                           isSubscribed: res.data?.isSubscribed,
                         }),
                       };
                       setLoginObj(obj);
                       //show the modal if not subscribed
-                      if (
-                        !res.data?.isSubscribed &&
-                        values.user_type === 'Parent'
-                      ) {
+                      if (!res.data?.isSubscribed && values.user_type === 'Parent') {
                         // todo not a priority
                         // @ts-ignore
                         dispatch(LoginStore.action(obj));
@@ -217,62 +205,52 @@ const SignInScreen = () => {
                       }
                       setLoading(false);
                     })
-                    .catch(err => {
+                    .catch((err) => {
                       setLoading(false);
                       console.log('err', err);
                       dispatch(ChangeModalState.action({ loading: false }));
-                      if (
-                        err?.data &&
-                        err?.data?.detail === 'Account is not active.'
-                      ) {
+                      if (err?.data && err?.data?.detail === 'Account is not active.') {
                         Toast.show({
                           type: 'info',
                           position: 'top',
                           text1: 'Info',
-                          text2:
-                            'This account was temporarily deactivated. Reactivate below',
+                          text2: 'This account was temporarily deactivated. Reactivate below',
                           visibilityTime: 4000,
                           autoHide: true,
                           topOffset: 30,
                           bottomOffset: 40,
-                          onShow: () => {
-                          },
-                          onHide: () => {
-                          },
-                          onPress: () => {
-                          },
+                          onShow: () => {},
+                          onHide: () => {},
+                          onPress: () => {},
                         });
                       } else {
                         Toast.show({
                           type: 'info',
                           position: 'top',
                           text1: 'Info',
-                          text2:
-                            'Please check your email address or password and try again',
+                          text2: 'Please check your email address or password and try again',
                           visibilityTime: 4000,
                           autoHide: true,
                           topOffset: 30,
                           bottomOffset: 40,
-                          onShow: () => {
-                          },
-                          onHide: () => {
-                          },
-                          onPress: () => {
-                          },
+                          onShow: () => {},
+                          onHide: () => {},
+                          onPress: () => {},
                         });
                       }
                     });
-                }}>
+                }}
+              >
                 {({
-                    handleChange,
-                    handleBlur,
-                    handleSubmit,
-                    setFieldValue,
-                    values,
-                    errors,
-                    touched,
-                    isValid,
-                  }) => (
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  setFieldValue,
+                  values,
+                  errors,
+                  touched,
+                  isValid,
+                }) => (
                   <>
                     <ParentPaymentModal
                       loginObj={loginObj}
@@ -336,13 +314,10 @@ const SignInScreen = () => {
                         appearance="ghost"
                         status="basic"
                         size="small"
-                        onPress={onForgotPasswordButtonPress}>
+                        onPress={onForgotPasswordButtonPress}
+                      >
                         {() => (
-                          <Text
-                            style={[
-                              styles.buttonMessage,
-                              { textAlign: 'right' },
-                            ]}>
+                          <Text style={[styles.buttonMessage, { textAlign: 'right' }]}>
                             {' '}
                             Forgot Password{' '}
                           </Text>
@@ -354,7 +329,8 @@ const SignInScreen = () => {
                           style={styles.signInButton}
                           size="medium"
                           onPress={handleSubmit}
-                          disabled={!isValid}>
+                          disabled={!isValid}
+                        >
                           Login
                         </LinearGradientButton>
                       </Layout>
@@ -383,17 +359,13 @@ const SignInScreen = () => {
         <View
           style={{
             paddingBottom: 20,
-          }}>
-          <Button
-            appearance="ghost"
-            status="basic"
-            size="small"
-            onPress={OnRegisterButtonPress}>
+          }}
+        >
+          <Button appearance="ghost" status="basic" size="small" onPress={OnRegisterButtonPress}>
             {() => (
               <Text style={styles.buttonMessage}>
                 {' '}
-                Don't have an account?{' '}
-                <Text style={{ color: Colors.secondary }}>Sign up</Text>
+                Don't have an account? <Text style={{ color: Colors.secondary }}>Sign up</Text>
               </Text>
             )}
           </Button>

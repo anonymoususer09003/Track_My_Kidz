@@ -31,6 +31,7 @@ import {
   StudentPersonalProfileScreen,
   StudentSettingsScreen,
 } from '@/Screens';
+import Geolocation from '@react-native-community/geolocation';
 import { createStackNavigator } from '@react-navigation/stack';
 import { ParamListBase } from '@react-navigation/native';
 import InstructorApprovalNavigator from '@/Navigators/Main/InstructorApprovalNavigator';
@@ -50,77 +51,85 @@ import { loadToken } from '@/Storage/MainAppStorage';
 import SockJS from 'sockjs-client';
 import { Config } from '@/Config';
 import { getUniqueId } from 'react-native-device-info';
-// import Geolocation from '@react-native-community/geolocation';
+
 import { MessageBody, useTracker } from '@/Providers/TrackerProvider';
 import BackgroundTimer from 'react-native-background-timer';
-import BackgroundGeolocation from "react-native-background-geolocation";
-
+import BackgroundGeolocation from 'react-native-background-geolocation';
 
 type InstructorStack = {
-  InstructorPersonalProfileScreen: undefined
-  InstructorActivity?: undefined
-  OrganizationInfo: undefined
-  InstructorSettings: undefined
-  InstructorActivityNavigator: undefined
-  ActivityDetails: { activity?: any }
-  CreateActivity: { isEdit?: boolean, groupId?: string } | undefined
-  CreateGroup: { data: { groupId: number, groupName: string } } | undefined
-  InstructorApproval: { screen: string } | undefined
+  InstructorPersonalProfileScreen: undefined;
+  InstructorActivity?: undefined;
+  OrganizationInfo: undefined;
+  InstructorSettings: undefined;
+  InstructorActivityNavigator: undefined;
+  ActivityDetails: { activity?: any };
+  CreateActivity: { isEdit?: boolean; groupId?: string } | undefined;
+  CreateGroup: { data: { groupId: number; groupName: string } } | undefined;
+  InstructorApproval: { screen: string } | undefined;
   AddMembers: {
-    screen?: string,
-    isEdit: boolean
-    data: boolean,
-  }
-  InstructorGroupApprovalNavigator: undefined
-  InstructorList: { data: any }
-  BusInfo: { data: { buses: any, schoolId: number } }
-  InstructorHome: undefined
-  DragDropStudent: { students?: any[], attendanceMark?: any, activity: { activityId: any }, bus: { busId: any } }
-  InstructorActivityDetail: { data?: any, activitiesCount?: any } | undefined
-  InstructorChatNavigator: { title: string }
-}
+    screen?: string;
+    isEdit: boolean;
+    data: boolean;
+  };
+  InstructorGroupApprovalNavigator: undefined;
+  InstructorList: { data: any };
+  BusInfo: { data: { buses: any; schoolId: number } };
+  InstructorHome: undefined;
+  DragDropStudent: {
+    students?: any[];
+    attendanceMark?: any;
+    activity: { activityId: any };
+    bus: { busId: any };
+  };
+  InstructorActivityDetail: { data?: any; activitiesCount?: any } | undefined;
+  InstructorChatNavigator: { title: string };
+};
 
 type SettingsStack = {
-  Notifications: undefined
-  AppList: undefined
-  ChangePassword: undefined
-  ReportProblem: undefined
-  ContactUs: undefined
-}
+  Notifications: undefined;
+  AppList: undefined;
+  ChangePassword: undefined;
+  ReportProblem: undefined;
+  ContactUs: undefined;
+};
 
 type StudentStack = {
-  StudentActivity: undefined
-  StudentActivityDetails: undefined
-  StudentSettings: undefined
-  StudentPersonalProfile: undefined
-}
+  StudentActivity: undefined;
+  StudentActivityDetails: undefined;
+  StudentSettings: undefined;
+  StudentPersonalProfile: undefined;
+};
 
 type ParentStack = {
-  Home: undefined
-  Activity: undefined
-  ChatScreen: SingleChatScreenRouteParams
-  CreateParentActivity: undefined
-  Approval: {
-    screen: string,
-  } | undefined
-  ActivationCode: undefined
-  DependentInfo: undefined
+  Home: undefined;
+  Activity: undefined;
+  ChatScreen: SingleChatScreenRouteParams;
+  CreateParentActivity: undefined;
+  Approval:
+    | {
+        screen: string;
+      }
+    | undefined;
+  ActivationCode: undefined;
+  DependentInfo: undefined;
   ParentDeletePermission: {
-    dependentId?: any,
-    parentId?: any,
-  }
-  Settings: undefined
-  ImportParentDependentScreen: undefined
-  PersonalProfile: undefined
-  StudentLocation: { student: any, parent: any }
-}
+    dependentId?: any;
+    parentId?: any;
+  };
+  Settings: undefined;
+  ImportParentDependentScreen: undefined;
+  PersonalProfile: undefined;
+  StudentLocation: { student: any; parent: any };
+};
 
-export type MainStackNavigatorParamsList = InstructorStack & SettingsStack & StudentStack & ParentStack & ParamListBase;
+export type MainStackNavigatorParamsList = InstructorStack &
+  SettingsStack &
+  StudentStack &
+  ParentStack &
+  ParamListBase;
 
 const RightDrawerNavigator = () => {
-  const user_type = useSelector(
-    (state: { userType: UserTypeState }) => state.userType.userType,
-  );
+  const user_type = useSelector((state: { userType: UserTypeState }) => state.userType.userType);
 
   const { updateCoordinates } = useTracker();
 
@@ -136,15 +145,11 @@ const RightDrawerNavigator = () => {
       stompClient.current.connect({ token }, () => {
         trackDevicesById(stompClient.current, ['']);
 
-        if (user_type !== 'parent')
-          locationPermission();
+        if (user_type !== 'parent') locationPermission();
       });
     };
     setTimeout(connectToSocket, 3000);
-
-
   }, []);
-
 
   const locationPermission = async () => {
     if (Platform.OS === 'android') {
@@ -154,10 +159,14 @@ const RightDrawerNavigator = () => {
         PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
       ]);
 
-      if (granted['android.permission.ACCESS_BACKGROUND_LOCATION'] === PermissionsAndroid.RESULTS.GRANTED) {
+      if (
+        granted['android.permission.ACCESS_BACKGROUND_LOCATION'] ===
+        PermissionsAndroid.RESULTS.GRANTED
+      ) {
         backgroundCall();
       }
     } else {
+      backgroundCall();
       // todo: add logic for ios
       // backgroundCall();
     }
@@ -166,14 +175,13 @@ const RightDrawerNavigator = () => {
   const backgroundCall = async () => {
     let times = 1;
     BackgroundTimer.runBackgroundTimer(async () => {
-        try {
-          console.log('I am called for ' + ++times + ' times');
-          trackAndroidAnIos();
-        } catch (error) {
-          console.log(error);
-        }
-      },
-      2000);
+      try {
+        console.log('I am called for ' + ++times + ' times');
+        trackAndroidAnIos();
+      } catch (error) {
+        console.log(error);
+      }
+    }, 2000);
   };
 
   const trackAndroidAnIos = async () => {
@@ -185,9 +193,11 @@ const RightDrawerNavigator = () => {
       // }, console.log);
       BackgroundGeolocation.ready({}).then((state: any) => {
         // YES -- .ready() has now resolved.
-        setInterval(()=>{
-          BackgroundGeolocation.getCurrentPosition({  }).then(console.log).catch(console.log);
-        },2000)
+        setInterval(() => {
+          BackgroundGeolocation.getCurrentPosition({})
+            .then((res) => console.log('res', res))
+            .catch(console.log);
+        }, 2000);
         BackgroundGeolocation.start();
       });
     } catch (err) {
@@ -195,7 +205,6 @@ const RightDrawerNavigator = () => {
     }
   };
   const sendCoordinates = async (latitude: number, longitude: number) => {
-
     const token = await loadToken();
     const deviceId = await getUniqueId();
 
@@ -206,13 +215,12 @@ const RightDrawerNavigator = () => {
         latitude,
         longitude,
         deviceId,
-      }),
+      })
     );
   };
 
   const trackDevicesById = async (stompClient: any, deviceIds: string[]) => {
     try {
-
       deviceIds.map((item) => {
         stompClient.subscribe(`/device/${item}`, subscriptionCallback);
       });
@@ -221,14 +229,12 @@ const RightDrawerNavigator = () => {
     }
   };
 
-
   const subscriptionCallback = (subscriptionMessage: { body: string }) => {
     const messageBody: MessageBody = JSON.parse(subscriptionMessage.body);
     console.log('Update Received', messageBody);
 
     updateCoordinates(messageBody);
   };
-
 
   const Stack = createStackNavigator<MainStackNavigatorParamsList>();
 
@@ -260,120 +266,89 @@ const RightDrawerNavigator = () => {
     >
       <>
         {/*Instructor screens*/}
-        {user_type === 'instructor' && (
-          <Stack.Screen
-            name="InstructorActivity"
-            component={InstructorActivityNavigator}
-          />
-        )}
-        <Stack.Screen
-          name="InstructorSettings"
-          component={InstructorSettingsScreen}
-        />
-        <Stack.Screen
-          name="InstructorPersonalProfileScreen"
-          component={InstructorPersonalProfileScreen}
-        />
-        <Stack.Screen
-          name="OrganizationInfo"
-          component={OrganizationInfoScreen}
-        />
+        {/* {user_type === 'instructor' && ( */}
+        <>
+          <Stack.Screen name="InstructorActivity" component={InstructorActivityNavigator} />
 
-        <Stack.Screen
-          name="ActivityDetails"
-          component={ActivityDetailsScreen}
-        />
-        <Stack.Screen name="CreateActivity" component={CreateActivityScreen} />
-        <Stack.Screen name="CreateGroup" component={CreateGroupScreen} />
-        <Stack.Screen
-          name="InstructorApproval"
-          component={InstructorApprovalNavigator}
-        />
-        <Stack.Screen name="AddMembers" component={AddMembersNavigator} />
-        <Stack.Screen
-          name="InstructorGroupApproval"
-          component={InstructorGroupApprovalNavigator}
-        />
-        <Stack.Screen
-          name="InstructorList"
-          component={InstructorsListScreen}
-        />
-        <Stack.Screen name="BusInfo" component={OrganizationBusinformation} />
-        <Stack.Screen name="InstructorHome" component={InstructorHome} />
-        <Stack.Screen
-          name="DragDropStudent"
-          component={DragDropStudentScreen}
-        />
-        <Stack.Screen
-          name="InstructorActivityDetail"
-          component={InstructorActivityDetailScreen}
-        />
+          <Stack.Screen name="InstructorSettings" component={InstructorSettingsScreen} />
+          <Stack.Screen
+            name="InstructorPersonalProfileScreen"
+            component={InstructorPersonalProfileScreen}
+          />
+          <Stack.Screen name="InstructorChatNavigator" component={InstructorChatNavigator} />
+          <Stack.Screen name="OrganizationInfo" component={OrganizationInfoScreen} />
+
+          <Stack.Screen name="ActivityDetails" component={ActivityDetailsScreen} />
+          <Stack.Screen name="CreateActivity" component={CreateActivityScreen} />
+          <Stack.Screen name="CreateGroup" component={CreateGroupScreen} />
+          <Stack.Screen name="InstructorApproval" component={InstructorApprovalNavigator} />
+          <Stack.Screen name="AddMembers" component={AddMembersNavigator} />
+          <Stack.Screen
+            name="InstructorGroupApproval"
+            component={InstructorGroupApprovalNavigator}
+          />
+          <Stack.Screen name="InstructorList" component={InstructorsListScreen} />
+          <Stack.Screen name="BusInfo" component={OrganizationBusinformation} />
+          <Stack.Screen name="InstructorHome" component={InstructorHome} />
+          <Stack.Screen name="DragDropStudent" component={DragDropStudentScreen} />
+          <Stack.Screen
+            name="InstructorActivityDetail"
+            component={InstructorActivityDetailScreen}
+          />
+
+          {/* <Stack.Screen name="Notifications" component={NotificationsScreen} />
+            <Stack.Screen name="ReportProblem" component={ReportProblemScreen} />
+            <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+            <Stack.Screen name="AppList" component={AppListScreen} />
+            <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} /> */}
+        </>
+        {/* )} */}
         {/*////////////////////////////////////////////*/}
 
         {/*Settings*/}
-        <Stack.Screen name="Notifications" component={NotificationsScreen} />
-        <Stack.Screen name="ReportProblem" component={ReportProblemScreen} />
-        <Stack.Screen name="ContactUs" component={ContactUsScreen} />
-        <Stack.Screen name="AppList" component={AppListScreen} />
-        <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+
         {/*////////////////////////////////////////////*/}
 
         {/*student*/}
-        {user_type === 'student' && (
-          <Stack.Screen
-            name="StudentActivity"
-            component={StudentActivityNavigator}
-          />
-        )}
-        <Stack.Screen
-          name="StudentActivityDetails"
-          component={StudentActivityDetailsScreen}
-        />
-        <Stack.Screen
-          name="StudentSettings"
-          component={StudentSettingsScreen}
-        />
-        <Stack.Screen
-          name="StudentPersonalProfile"
-          component={StudentPersonalProfileScreen}
-        />
+        {/* {user_type === 'student' && ( */}
+        <>
+          <Stack.Screen name="StudentActivity" component={StudentActivityNavigator} />
 
+          <Stack.Screen name="StudentActivityDetails" component={StudentActivityDetailsScreen} />
+          <Stack.Screen name="StudentSettings" component={StudentSettingsScreen} />
+          <Stack.Screen name="StudentPersonalProfile" component={StudentPersonalProfileScreen} />
+          <Stack.Screen name="StudentLocation" component={StudentLocationScreen} />
 
+          {/* <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="ReportProblem" component={ReportProblemScreen} />
+          <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+          <Stack.Screen name="AppList" component={AppListScreen} />
+          <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} /> */}
+        </>
+        {/* )} */}
         {/*parent*/}
-        {user_type === 'parent' && (
+        {/* {user_type === 'parent' && ( */}
+        <>
           <Stack.Screen name="Home" component={HomeNavigator} />
-        )}
-        <Stack.Screen name="Activity" component={ActivityNavigator} />
-        <Stack.Screen
-          name="CreateParentActivity"
-          component={CreateParentActivityScreen}
-        />
-        <Stack.Screen name="Approval" component={ApprovalNavigator} />
-        <Stack.Screen name="ActivationCode" component={ActivationCodeScreen} />
-        <Stack.Screen name="DependentInfo" component={DependentInfoScreen} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-        <Stack.Screen
-          name="ParentDeletePermission"
-          component={ParentDeletePermission}
-        />
-        <Stack.Screen
-          name="PersonalProfile"
-          component={PersonalProfileScreen}
-        />
-        <Stack.Screen
-          name="ImportParentDependentScreen"
-          component={ImportDependentScreen}
-        />
-        <Stack.Screen
-          name="StudentLocation"
-          component={StudentLocationScreen}
-        />
+          <Stack.Screen name="Activity" component={ActivityNavigator} />
+          <Stack.Screen name="CreateParentActivity" component={CreateParentActivityScreen} />
+          <Stack.Screen name="Approval" component={ApprovalNavigator} />
+          <Stack.Screen name="ActivationCode" component={ActivationCodeScreen} />
+          <Stack.Screen name="DependentInfo" component={DependentInfoScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="ParentDeletePermission" component={ParentDeletePermission} />
+          <Stack.Screen name="PersonalProfile" component={PersonalProfileScreen} />
+          <Stack.Screen name="ImportParentDependentScreen" component={ImportDependentScreen} />
+          <Stack.Screen name="ChatScreen" component={SingleChatScreen} />
 
-        <Stack.Screen name="ChatScreen" component={SingleChatScreen} />
-        <Stack.Screen
-          name="InstructorChatNavigator"
-          component={InstructorChatNavigator}
-        />
+          <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="ReportProblem" component={ReportProblemScreen} />
+          <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+          <Stack.Screen name="AppList" component={AppListScreen} />
+          <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+        </>
+        {/* )} */}
+        {/* <Stack.Screen name="Loading" component={}/> */}
       </>
     </Stack.Navigator>
   );

@@ -1,88 +1,81 @@
-import { StartRegistration } from "@//Services/SignUpServices";
-import { LinearGradientButton } from "@/Components";
-import BackgroundLayout from "@/Components/BackgroundLayout";
-import CustomDropdown from "@/Components/CustomDropDown";
+import { StartRegistration } from '@//Services/SignUpServices';
+import { LinearGradientButton } from '@/Components';
+import BackgroundLayout from '@/Components/BackgroundLayout';
+import CustomDropdown from '@/Components/CustomDropDown';
+import { GetAuthStudentByActivationCode } from '@/Services/Student';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Colors from '@/Theme/Colors';
+import { ReferenceCodeRegex, ReferenceCodeStyle } from '@/Theme/Variables';
+import { Normalize } from '@/Utils/Shared/NormalizeDisplay';
+import { useIsFocused } from '@react-navigation/native';
 import {
-  GetAuthStudentByActivationCode
-} from "@/Services/Student";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Colors from "@/Theme/Colors";
-import { ReferenceCodeRegex, ReferenceCodeStyle } from "@/Theme/Variables";
-import { Normalize } from "@/Utils/Shared/NormalizeDisplay";
-import { useIsFocused } from "@react-navigation/native";
-import {
-  Button, CheckBox, Input,
+  Button,
+  CheckBox,
+  Input,
   Layout,
   StyleService,
   Text,
-  useStyleSheet
-} from "@ui-kitten/components";
-import { Formik } from "formik";
-import React, { useEffect, useState } from "react";
-import {
-  Dimensions, Image,
-  KeyboardAvoidingView,
-  View
-} from "react-native";
-import { RNCamera } from "react-native-camera";
-import MaskInput from "react-native-mask-input";
-import QRCodeScanner from "react-native-qrcode-scanner";
-import Toast from "react-native-toast-message";
-import Entypo from "react-native-vector-icons/Entypo";
-import { useDispatch } from "react-redux";
-import * as yup from "yup";
+  useStyleSheet,
+} from '@ui-kitten/components';
+import { Formik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Image, KeyboardAvoidingView, View } from 'react-native';
+import { RNCamera } from 'react-native-camera';
+import MaskInput from 'react-native-mask-input';
+import QRCodeScanner from 'react-native-qrcode-scanner';
+import Toast from 'react-native-toast-message';
+import Entypo from 'react-native-vector-icons/Entypo';
+import { useDispatch } from 'react-redux';
+import * as yup from 'yup';
 
 const user_type = [
-  { id: 1, label: "Parent", value: "Parent" },
-  { id: 2, label: "Instructor", value: "Instructor" },
-  { id: 3, label: "Student", value: "Student" },
+  { id: 1, label: 'Parent', value: 'Parent' },
+  { id: 2, label: 'Instructor', value: 'Instructor' },
+  { id: 3, label: 'Student', value: 'Student' },
 ];
 
 // @ts-ignore
-const screenHeight = Dimensions.get("screen").height;
-interface FirstSignUpScreenProps{
-  navigation:any
+const screenHeight = Dimensions.get('screen').height;
+interface FirstSignUpScreenProps {
+  navigation: any;
 }
 const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
   const styles = useStyleSheet(themedStyles);
   const dispatch = useDispatch();
   const isFocuesed = useIsFocused();
-  let values = { email: "", user_type: "" };
+  let values = { email: '', user_type: '' };
   const [initialValues, setInitialValues] = useState({ ...values });
   const [showQR, setShowQR] = useState(false);
-  const [selectedUserType, setSelectedUserType] = useState("");
+  const [selectedUserType, setSelectedUserType] = useState('');
   const [isDesignatedAdmin, setIsDesignatedAdmin] = useState(false);
 
   // @ts-ignore
 
   const emailValidationSchema = yup.object().shape({
-    email: yup
-      .string()
-      .email("Please enter valid email")
-      .required("Email is required"),
+    email: yup.string().email('Please enter valid email').required('Email is required'),
   });
   const activationCodeValidationSchema = yup.object().shape({
-    email: yup.string().min(12).required("Activation Code is required"),
+    email: yup.string().min(12).required('Activation Code is required'),
   });
   const getStudentQrApiCall = async (email: any, user_type: any) => {
     dispatch(ChangeModalState.action({ loading: true }));
     GetAuthStudentByActivationCode(email)
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         setShowQR(false);
         navigation &&
-          navigation.navigate("FinalRegistrationScreen", {
+          navigation.navigate('FinalRegistrationScreen', {
             student: res,
-            registrationId: "test",
+            registrationId: 'test',
             user_type,
             activation_code: email,
           });
       })
       .catch((err) => {
-        console.log("Student Error", err);
+        console.log('Student Error', err);
         Toast.show({
-          type: "info",
-          position: "top",
+          type: 'info',
+          position: 'top',
           text1: `Invalid Reference code`,
         });
       })
@@ -93,7 +86,7 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
 
   const renderPersonIcon = (props: any) => (
     <Image
-      source={require("@/Assets/Images/email.png")}
+      source={require('@/Assets/Images/email.png')}
       style={{ height: 20, width: 20 }}
       resizeMode="contain"
     />
@@ -105,7 +98,7 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
       setInitialValues(values);
     } else {
       setIsDesignatedAdmin(false);
-      setSelectedUserType("");
+      setSelectedUserType('');
     }
     // dispatch(FetchCountries.action());
     // console.log("alert");
@@ -120,12 +113,12 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
             <View style={styles.headerContainer}>
               <Image
                 style={{
-                  justifyContent: "center",
-                  alignItems: "center",
+                  justifyContent: 'center',
+                  alignItems: 'center',
                   maxHeight: Normalize(160),
                   maxWidth: Normalize(160),
                 }}
-                source={require("@/Assets/Images/logo1.png")}
+                source={require('@/Assets/Images/logo1.png')}
                 resizeMode="contain"
               />
 
@@ -134,7 +127,7 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
             {isFocuesed && (
               <Formik
                 validationSchema={
-                  selectedUserType === "Student"
+                  selectedUserType === 'Student'
                     ? activationCodeValidationSchema
                     : emailValidationSchema
                 }
@@ -146,7 +139,7 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                     email: values.email,
                     user_type: values.user_type,
                   };
-                  if (emailObject.user_type === "Student") {
+                  if (emailObject.user_type === 'Student') {
                     dispatch(ChangeModalState.action({ loading: true }));
 
                     getStudentQrApiCall(emailObject.email, values.user_type);
@@ -175,10 +168,10 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                     dispatch(ChangeModalState.action({ loading: true }));
                     StartRegistration(emailObject.email, emailObject.user_type)
                       .then((res) => {
-                        console.log("res", res.data);
+                        console.log('res', res.data);
                         if (isDesignatedAdmin) {
                           navigation &&
-                            navigation.navigate("EmailConfirmation", {
+                            navigation.navigate('EmailConfirmation', {
                               emailAddress: values.email,
                               user_type: values.user_type,
                               activation_code: res.data?.activation_code,
@@ -190,19 +183,17 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                           //     user_type: user_type,
                           //     activation_code: res.data?.activation_code
                           // })
-                        } else if (
-                          values.user_type.toLowerCase() === "student"
-                        ) {
+                        } else if (values.user_type.toLowerCase() === 'student') {
                           navigation &&
-                            navigation.navigate("FinalRegistrationScreen", {
-                              emailAddress: "",
-                              registrationId: "test",
+                            navigation.navigate('FinalRegistrationScreen', {
+                              emailAddress: '',
+                              registrationId: 'test',
                               user_type: values.user_type,
                               activation_code: values.email,
                             });
                         } else {
                           navigation &&
-                            navigation.navigate("EmailConfirmation", {
+                            navigation.navigate('EmailConfirmation', {
                               emailAddress: values.email,
                               user_type: values.user_type,
                               activation_code: res.data?.activation_code,
@@ -211,14 +202,12 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                         // resetForm();
                       })
                       .catch((err) => {
-                        console.log("err", err);
+                        console.log('err', err);
                         Toast.show({
-                          type: "info",
-                          position: "top",
+                          type: 'info',
+                          position: 'top',
 
-                          text1: err.data?.message
-                            ? err.data?.message
-                            : "Please try again later",
+                          text1: err.data?.message ? err.data?.message : 'Please try again later',
                           visibilityTime: 2000,
                           autoHide: true,
                           topOffset: 30,
@@ -252,80 +241,75 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                         placeholder="Select User"
                         value={values.user_type}
                         onSelect={(index: any) => {
-                          console.log("index", index);
-                          setFieldValue("user_type", user_type[index].value);
+                          console.log('index', index);
+                          setFieldValue('user_type', user_type[index].value);
                           setSelectedUserType(user_type[index].value);
                         }}
                         dropDownList={user_type}
                       />
                       <View style={{ height: 30 }} />
-                      {values.user_type === "Student" && (
+                      {values.user_type === 'Student' && (
                         <View style={{ marginVertical: 10, zIndex: -20 }}>
                           <Text
                             style={{
                               fontSize: 16,
-                              fontWeight: "600",
+                              fontWeight: '600',
                               marginTop: 10,
                               color: Colors.white,
                             }}
                           >
-                            Enter your 32-digit reference code from your
-                            parent's Dependent Information or scan the QR code
-                            corresponding to your name.
+                            Enter your 32-digit reference code from your parent's Dependent
+                            Information or scan the QR code corresponding to your name.
                           </Text>
                         </View>
                       )}
-                      {!(values.user_type.toLowerCase() === "student") && (
+                      {!(values.user_type.toLowerCase() === 'student') && (
                         <Input
                           selectionColor={Colors.white}
                           placeholderTextColor={Colors.white}
-                          placeholder={"Email"}
+                          placeholder={'Email'}
                           accessoryLeft={renderPersonIcon}
-                          onChangeText={handleChange("email")}
-                          onBlur={handleBlur("email")}
+                          onChangeText={handleChange('email')}
+                          onBlur={handleBlur('email')}
                           value={values.email}
-                          keyboardType={"email-address"}
+                          keyboardType={'email-address'}
                           autoCapitalize="none"
                           autoCorrect={false}
                           textStyle={{ color: Colors.white }}
                           style={styles.selectSettings}
                         />
                       )}
-                      {values.user_type.toLowerCase() === "student" && (
-                        <MaskInput
-                          selectionColor={Colors.white}
-                          value={values.email}
-                          placeholderTextColor={
-                            Colors.textInputPlaceholderColor
-                          }
-                          style={ReferenceCodeStyle}
-                          onChangeText={(masked, unmasked) => {
-                            setFieldValue("email", masked); // you can use the unmasked value as well
-                          }}
-                          mask={ReferenceCodeRegex}
-                        />
-                      )}
-                      {errors.email &&
-                        touched.email &&
-                        values.user_type === "Student" && (
+                      <View style={{ width: '100%', alignItems: 'center' }}>
+                        {values.user_type.toLowerCase() === 'student' && (
+                          <MaskInput
+                            selectionColor={Colors.white}
+                            value={values.email}
+                            placeholderTextColor={Colors.textInputPlaceholderColor}
+                            style={ReferenceCodeStyle}
+                            onChangeText={(masked, unmasked) => {
+                              setFieldValue('email', masked); // you can use the unmasked value as well
+                            }}
+                            mask={ReferenceCodeRegex}
+                          />
+                        )}
+                        {errors.email && touched.email && values.user_type === 'Student' && (
                           <Text style={[styles.errorText, { marginTop: 20 }]}>
                             Reference Code is required
                           </Text>
                         )}
-                      {errors.email &&
-                        touched.email &&
-                        values.user_type !== "Student" && (
+                        {errors.email && touched.email && values.user_type !== 'Student' && (
                           <Text style={styles.errorText}>{errors.email}</Text>
                         )}
+                      </View>
                       <View style={{ marginTop: 10, zIndex: -10 }}>
-                        {values.user_type === "Student" && (
+                        {values.user_type === 'Student' && (
                           <View
                             style={{
                               marginVertical: 5,
                               marginBottom: 20,
-                              width: "100%",
-                              alignItems: "flex-end",
-                              justifyContent: "flex-end",
+                              width: '100%',
+                              alignItems: 'flex-end',
+                              justifyContent: 'flex-end',
                             }}
                           >
                             <Entypo
@@ -336,26 +320,24 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                             />
                           </View>
                         )}
-                        {values.user_type === "Instructor" && (
+                        {values.user_type === 'Instructor' && (
                           <View
                             style={{
-                              flexDirection: "row",
-                              alignItems: "center",
+                              flexDirection: 'row',
+                              alignItems: 'center',
                               marginVertical: 20,
                             }}
                           >
                             <CheckBox
                               checked={isDesignatedAdmin}
-                              onChange={() =>
-                                setIsDesignatedAdmin(!isDesignatedAdmin)
-                              }
+                              onChange={() => setIsDesignatedAdmin(!isDesignatedAdmin)}
                             >
-                              {""}
+                              {''}
                             </CheckBox>
                             <Text
                               style={{
                                 marginLeft: 20,
-                                width: "90%",
+                                width: '90%',
                                 color: Colors.white,
                               }}
                             >
@@ -375,24 +357,22 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                         Sign Up
                       </LinearGradientButton>
                     </Layout>
-                    {values.user_type !== "Student" ? (
+                    {values.user_type !== 'Student' ? (
                       <View style={styles.bottomView}>
                         <Button
                           appearance="ghost"
                           status="basic"
                           size="medium"
                           onPress={
-                            () => navigation.navigate("Login")
+                            () => navigation.navigate('Login')
                             // openActivationCode(values.email, values.user_type)
                           }
                         >
                           {() => (
                             <Text style={styles.buttonMessage}>
-                              {" "}
-                              Alread have an aacount?{" "}
-                              <Text style={{ color: Colors.secondaryTint }}>
-                                Login
-                              </Text>
+                              {' '}
+                              Alread have an aacount?{' '}
+                              <Text style={{ color: Colors.secondaryTint }}>Login</Text>
                             </Text>
                           )}
                         </Button>
@@ -408,37 +388,34 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
         ) : (
           <QRCodeScanner
             onRead={(e) => {
-              console.log("edata", e);
+              console.log('edata', e);
               dispatch(ChangeModalState.action({ loading: true }));
-              getStudentQrApiCall(e.data, "Student");
+              getStudentQrApiCall(e.data, 'Student');
             }}
             flashMode={RNCamera.Constants.FlashMode.torch}
             bottomContent={
               <View
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "100%",
-                  paddingHorizontal: "5%",
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  paddingHorizontal: '5%',
                 }}
               >
-                <View style={{ width: "48%" }}>
-                  <LinearGradientButton
-                    style={styles.signUpButton}
-                    size="medium"
-                  >
+                <View style={{ width: '48%' }}>
+                  <LinearGradientButton style={styles.signUpButton} size="medium">
                     Rescan
                   </LinearGradientButton>
                 </View>
-                <View style={{ width: "48%", zIndex: -2 }}>
+                <View style={{ width: '48%', zIndex: -2 }}>
                   <LinearGradientButton
                     style={styles.signUpButton}
                     size="medium"
                     onPress={() => {
                       navigation &&
-                        navigation.navigate("EmailConfirmation", {
-                          emailAddress: "",
+                        navigation.navigate('EmailConfirmation', {
+                          emailAddress: '',
                           user_type: selectedUserType,
                         });
                       setShowQR(false);
@@ -459,23 +436,23 @@ export default FirstSignUpScreen;
 const themedStyles = StyleService.create({
   container: {
     flex: 1,
-    flexDirection: "column",
-    backgroundColor: "transparent",
+    flexDirection: 'column',
+    backgroundColor: 'transparent',
   },
   headerContainer: {
     // flex: 2,
     height: screenHeight * 0.25,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   formContainer: {
     // flex: 3,
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     paddingHorizontal: 20,
   },
   welcomeMessage: {
-    color: "color-primary-default",
+    color: 'color-primary-default',
   },
   signUpButton: {
     marginHorizontal: 2,
@@ -485,11 +462,11 @@ const themedStyles = StyleService.create({
   },
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
   },
   bottomView: {
     flex: 3.7,
-    justifyContent: "flex-end",
+    justifyContent: 'flex-end',
     paddingBottom: 15,
   },
   buttonMessage: {
@@ -500,15 +477,15 @@ const themedStyles = StyleService.create({
     flex: 1,
     fontSize: 18,
     padding: 32,
-    color: "#777",
+    color: '#777',
   },
   textBold: {
-    fontWeight: "500",
-    color: "#000",
+    fontWeight: '500',
+    color: '#000',
   },
   buttonText: {
     fontSize: 21,
-    color: "rgb(0,122,255)",
+    color: 'rgb(0,122,255)',
   },
   buttonTouchable: {
     padding: 16,
@@ -519,7 +496,7 @@ const themedStyles = StyleService.create({
   },
   selectSettings: {
     marginTop: 18,
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     borderWidth: 0,
     borderBottomWidth: 2,
     borderBottomColor: Colors.white,

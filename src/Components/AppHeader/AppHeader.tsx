@@ -27,36 +27,32 @@ const arrowLeftIcon = require('@/Assets/Images/arrow-left.png');
 type AppHeaderProps = {
   showGlobe?: boolean;
   hideCalendar?: boolean;
-  hideApproval?: boolean
-  goBack?: () => void
-  onAddPress?: () => void
-  hideCenterIcon?: boolean
-  setThumbnail?: (thumbnail: (boolean | undefined)) => void
-  thumbnail?: any
-  isStack?: boolean
-  isBack?: boolean
-  isCalendar?: boolean
-  simple?: boolean
-  title?: string
+  hideApproval?: boolean;
+  goBack?: () => void;
+  onAddPress?: () => void;
+  hideCenterIcon?: boolean;
+  setThumbnail?: (thumbnail: boolean | undefined) => void;
+  thumbnail?: any;
+  isStack?: boolean;
+  isBack?: boolean;
+  isCalendar?: boolean;
+  simple?: boolean;
+  title?: string;
 };
 
 const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
-  const user_type = useSelector(
-    (state: { userType: UserTypeState }) => state.userType.userType,
-  );
-  const isCalendarVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.showCalendar,
-  );
+  const user_type = useSelector((state: { userType: UserTypeState }) => state.userType.userType);
+  const isCalendarVisible = useSelector((state: { modal: ModalState }) => state.modal.showCalendar);
   // const hideCalendar = props?.hideCalendar || false;
   const hideApproval = props?.hideApproval || false;
   const goBack = props.goBack;
   const { showFamilyMap } = useSelector(
-    (state: { studentActivity: StudentState }) => state.studentActivity,
+    (state: { studentActivity: StudentState }) => state.studentActivity
   );
 
   const route = useRoute();
 
-  const renderSettingIcon = (props: { showGlobe?: boolean, } | any) => {
+  const renderSettingIcon = (props: { showGlobe?: boolean } | any) => {
     return (
       <>
         <View
@@ -64,7 +60,12 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: props.showGlobe ? 'space-between' : 'flex-end',
-            width: props.showGlobe || user_type != 'student' ? '85%' : '100%',
+            width:
+              props.showGlobe || user_type == 'student'
+                ? '100%'
+                : props.showGlobe || user_type != 'student'
+                ? '90%'
+                : '100%',
           }}
         >
           {props.showGlobe && user_type == 'student' && (
@@ -75,12 +76,12 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
                     showFamilyMap: !showFamilyMap,
                     hideCalendar: !showFamilyMap,
                     showParticipantMap: false,
-                  }),
+                  })
                 );
                 dispatch(
                   ChangeModalState.action({
                     showCalendar: false,
-                  }),
+                  })
                 );
               }}
               style={{ marginRight: 10 }}
@@ -106,19 +107,13 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
             //     color={showFamilyMap ? Colors.green : Colors.white}
             //   />
           )}
-          <Image
-            style={{ height: 22, width: 22, tintColor: Colors.white }}
-            source={settings}
-          />
+          <Image style={{ height: 22, width: 22, tintColor: Colors.white }} source={settings} />
         </View>
       </>
     );
   };
 
-  const renderHomeIcon = () => (
-    <Image style={{ height: 27, width: 27 }} source={homeIcon} />
-  );
-
+  const renderHomeIcon = () => <Image style={{ height: 27, width: 27 }} source={homeIcon} />;
 
   const renderListItem = () => {
     if (user_type === 'instructor') {
@@ -162,12 +157,10 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
   //   navigationLeftDrawer.toggleDrawer();
   // };
 
-
   // const LeftGoBack = () => {
   //   navigationRightDrawer.closeDrawer();
   //   navigateAndSimpleReset("Home");
   // };
-
 
   // const GoBackToChats = () => {
   //   navigateAndSimpleReset('Chats');
@@ -184,7 +177,7 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
     >
       {isStack ? (
         <TouchableOpacity onPress={() => navigation.goBack()}>
-           <Image style={{ height: 25, width: 25 }} source={arrowLeftIcon} />
+          <Image style={{ height: 25, width: 25 }} source={arrowLeftIcon} />
         </TouchableOpacity>
       ) : (
         <TopNavigationAction
@@ -206,12 +199,12 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
                   showFamilyMap: false,
                   hideCalendar: false,
                   showParticipantMap: false,
-                }),
+                })
               );
               dispatch(
                 ChangeModalState.action({
                   showCalendar: false,
-                }),
+                })
               );
             } else {
               // if(user_type === "parent"){
@@ -221,7 +214,7 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
                 dispatch(
                   ChangeModalState.action({
                     showCalendar: false,
-                  }),
+                  })
                 );
               }
               props?.setThumbnail && props?.setThumbnail(false);
@@ -239,13 +232,13 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
             dispatch(
               ChangeModalState.action({
                 showCalendar: false,
-              }),
+              })
             );
           } else {
             dispatch(
               ChangeModalState.action({
                 showCalendar: !isCalendarVisible,
-              }),
+              })
             );
           }
           props?.setThumbnail && props?.setThumbnail(true);
@@ -306,40 +299,33 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
     console.log('AppHeader.tsx line 306 isBack', isBack);
     console.log('AppHeader.tsx line 306 user_type', user_type);
     console.log('AppHeader.tsx line 306 hideApproval', hideApproval);
-    return isBack ?
+    return isBack ? (
       <></>
-      : (
-        <View
-          style={{
-            width: '60%',
+    ) : (
+      <View
+        style={{
+          width: '60%',
 
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}
-        >
-          {(user_type === 'parent' || user_type === 'instructor') &&
-
-          !hideApproval ? (
-            <TouchableOpacity
-              onPress={
-                user_type === 'parent'
-                  ? onApprovalPress
-                  : onInstructorApprovalPress
-              }
-            >
-              <Image
-                source={activitiesIcon}
-                style={{ width: 25, height: 25, marginRight: 10 }}
-              />
-            </TouchableOpacity>
-          ) : <></>}
-          <TopNavigationAction
-            // showGlobe={props.showGlobe}
-            icon={(props) => renderSettingIcon({ ...props, showGlobe })}
-            onPress={RightDrawerMenu}
-          />
-        </View>
-      );
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
+        {(user_type === 'parent' || user_type === 'instructor') && !hideApproval ? (
+          <TouchableOpacity
+            onPress={user_type === 'parent' ? onApprovalPress : onInstructorApprovalPress}
+          >
+            <Image source={activitiesIcon} style={{ width: 25, height: 25, marginRight: 10 }} />
+          </TouchableOpacity>
+        ) : (
+          <></>
+        )}
+        <TopNavigationAction
+          // showGlobe={props.showGlobe}
+          icon={(props) => renderSettingIcon({ ...props, showGlobe })}
+          onPress={RightDrawerMenu}
+        />
+      </View>
+    );
   };
 
   return (
@@ -363,12 +349,7 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
           </TouchableOpacity>
         )}
         {props.simple ? (
-          <TopNavigation
-            style={styles.topNav}
-            {...props}
-            appearance="control"
-            alignment="center"
-          />
+          <TopNavigation style={styles.topNav} {...props} appearance="control" alignment="center" />
         ) : (
           <TopNavigation
             style={styles.topNav}
@@ -412,8 +393,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
-  topNav: {
-  },
+  topNav: {},
   icon: {
     width: 32,
     height: 32,
