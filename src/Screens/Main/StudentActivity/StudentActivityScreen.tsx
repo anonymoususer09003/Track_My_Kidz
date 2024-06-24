@@ -173,8 +173,6 @@ const StudentActivityScreen: FC = () => {
     } catch (err) {
       console.log('er99999999999999', err);
     }
-
-    // }
   };
   const getCacheActivites = async () => {
     let activites = await getHomeScreenCacheInfo('student_activites');
@@ -228,9 +226,6 @@ const StudentActivityScreen: FC = () => {
           buttonPositive: 'OK',
         }
       );
-      // const granted = await PermissionsAndroid.request(
-      //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-      // );
 
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         backgroundCall();
@@ -370,12 +365,12 @@ const StudentActivityScreen: FC = () => {
     console.log('Update Received', messageBody);
   };
 
-  useEffect(() => {
-    if (currentUser?.childTrackHistory) {
-      locationPermission();
-    }
-    // return () => backgroundCall();
-  }, [currentUser]);
+  // useEffect(() => {
+  //   if (currentUser?.childTrackHistory) {
+  //     locationPermission();
+  //   }
+  //   // return () => backgroundCall();
+  // }, [currentUser]);
 
   // backgroundCall();
 
@@ -491,7 +486,7 @@ const StudentActivityScreen: FC = () => {
     stompClient = Stomp.over(socket);
     stompClient.connect({ token }, () => {
       console.log('Connected');
-      locationPermissionForTracking(true);
+      // locationPermissionForTracking(true);
       deviceIds.map((item) => {
         stompClient.subscribe(`/device/${item}`, subscriptionCallback);
       });

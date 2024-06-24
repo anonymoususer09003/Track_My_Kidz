@@ -199,7 +199,6 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                               activation_code: res.data?.activation_code,
                             });
                         }
-                        // resetForm();
                       })
                       .catch((err) => {
                         console.log('err', err);

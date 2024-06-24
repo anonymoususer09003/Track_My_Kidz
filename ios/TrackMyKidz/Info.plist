@@ -6,9 +6,6 @@
 	<array>
 		<string>com.transistorsoft.fetch</string>
 	</array>
-<key>IDEDidComputeMac32BitWarning</key>
-	<true/>
-
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -29,6 +26,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>IDEDidComputeMac32BitWarning</key>
+	<true/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -38,24 +37,19 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-	<!-- <key>NSLocationAlwaysUsageDescription</key>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Location required in background</string>
+	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Location is always required</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Location required when app is in use</string>
-	<key>NSMotionUsageDescription</key>
-	<string>Motion permission helps detect when device in in-motion</string>
-	<key>Privacy - Location Always and When in Use Usage Description</key>
-	<string>Location required in background</string> -->
+	<key>NSCameraUsageDescription</key>
+	<string>$(PRODUCT_NAME) requires access to camera for uploading Profile Picture of users.</string>
+		<key>NSMotionUsageDescription</key>
+	<string>$(PRODUCT_NAME) needs access to your activity data to for accurate location tracking.</string>
 
-	<key>NSLocationAlwaysUsageDescription</key>
-<string>Location is always required</string>
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>Location required when app is in use</string>
-<!-- <key>NSMotionUsageDescription</key>
-<string>Motion permission helps detect when device is in-motion</string> -->
-<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-<string>Location required in background</string>
-
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>$(PRODUCT_NAME) requires access to photo library for uploading photos for user profile picture.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

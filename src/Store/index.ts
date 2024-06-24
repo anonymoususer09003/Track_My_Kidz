@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {combineReducers} from 'redux';
+import { combineReducers } from 'redux';
 import {
   persistReducer,
   persistStore,
@@ -10,7 +10,7 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
-import {configureStore} from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 
 import startup from './Startup';
 import user from './User';
@@ -64,15 +64,15 @@ const persistedReducer = persistReducer(persistConfig, reducers);
 
 const store = configureStore({
   reducer: persistedReducer,
-  middleware: getDefaultMiddleware => {
+  middleware: (getDefaultMiddleware) => {
     const middlewares = getDefaultMiddleware({
       serializableCheck: false,
     });
 
-    if (__DEV__ && !process.env.JEST_WORKER_ID) {
-      const createDebugger = require('redux-flipper').default;
-      middlewares.push(createDebugger());
-    }
+    // if (__DEV__ && !process.env.JEST_WORKER_ID) {
+    //   const createDebugger = require('redux-flipper').default;
+    //   middlewares.push(createDebugger());
+    // }
 
     return middlewares;
   },
@@ -80,4 +80,4 @@ const store = configureStore({
 
 const persistor = persistStore(store);
 
-export {store, persistor};
+export { store, persistor };

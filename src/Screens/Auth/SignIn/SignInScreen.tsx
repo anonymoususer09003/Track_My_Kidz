@@ -38,9 +38,9 @@ const SignInScreen = () => {
   const countries = useSelector((state: { places: any }) => state?.places.countries);
   let values = { email: '', password: '', user_type: '', is_default: false };
   const [intitialValues, setInitialValues] = useState({
-    email: 'femibalogu.n@gmail.com',
+    email: 'f.emibalogun@gmail.com',
     password: 'TrackMyKidz',
-    user_type: 'student',
+    user_type: 'parent',
     is_default: false,
   });
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
@@ -54,7 +54,7 @@ const SignInScreen = () => {
       console.log('err fetch coutnries', err);
     }
   };
-  console.log('getniqueid', getDeviceId());
+
   useEffect(() => {
     fetchCountries();
     // return () => setInitialValues(intitialValues);
@@ -169,7 +169,6 @@ const SignInScreen = () => {
                 validateOnMount={true}
                 initialValues={intitialValues}
                 onSubmit={(values) => {
-                  console.log('values.user_type', values.user_type);
                   let objectToPass = {
                     email: values.email,
                     password: values.password,
@@ -179,7 +178,6 @@ const SignInScreen = () => {
                   dispatch(ChangeModalState.action({ loading: true }));
                   Login(objectToPass, values.user_type.toLowerCase())
                     .then((res) => {
-                      console.log('SignInScreen.tsx line 206 - res', res);
                       // console.log('res',res.data);
                       const obj: UserLoginResponse = {
                         token: res.data?.token,
@@ -197,7 +195,6 @@ const SignInScreen = () => {
                         // @ts-ignore
                         dispatch(LoginStore.action(obj));
                       } else {
-                        console.log(obj);
                         // todo not a priority
                         // @ts-ignore
                         dispatch(LoginStore.action(obj));
@@ -270,7 +267,6 @@ const SignInScreen = () => {
                         placeholder="Select User"
                         value={values.user_type}
                         onSelect={(index: any) => {
-                          console.log('index', index);
                           setFieldValue('user_type', user_type[index].value);
                         }}
                         dropDownList={user_type}

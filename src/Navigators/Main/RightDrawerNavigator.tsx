@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { UserTypeState } from '@/Store/UserType';
 import { PermissionsAndroid, Platform } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import {
   ActivationCodeScreen,
   ActivityDetailsScreen,
@@ -31,6 +32,7 @@ import {
   StudentPersonalProfileScreen,
   StudentSettingsScreen,
 } from '@/Screens';
+import { Alert } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import { createStackNavigator } from '@react-navigation/stack';
 import { ParamListBase } from '@react-navigation/native';
@@ -129,27 +131,36 @@ export type MainStackNavigatorParamsList = InstructorStack &
   ParamListBase;
 
 const RightDrawerNavigator = () => {
+  const intervalIdRef = useRef(null);
+  const isFocused = useIsFocused();
   const user_type = useSelector((state: { userType: UserTypeState }) => state.userType.userType);
-
+  console.log('user type', user_type);
   const { updateCoordinates } = useTracker();
 
   const stompClient = useRef<Stomp.Client | null>(null);
 
-  useEffect(() => {
-    const connectToSocket = async () => {
-      const token = await loadToken();
-      console.log('-------------------------------------------------------------------');
-      console.log(token);
-      const socket = new SockJS(Config.WS_URL);
-      stompClient.current = Stomp.over(socket);
-      stompClient.current.connect({ token }, () => {
-        trackDevicesById(stompClient.current, ['']);
+  // useEffect(() => {
+  //   const connectToSocket = async () => {
+  //     const token = await loadToken();
+  //     console.log('-------------------------------------------------------------------');
+  //     console.log(token);
+  //     const socket = new SockJS(Config.WS_URL);
+  //     stompClient.current = Stomp.over(socket);
+  //     stompClient.current.connect({ token }, () => {
+  //       trackDevicesById(stompClient.current, ['']);
 
-        if (user_type !== 'parent') locationPermission();
+  //       if (user_type !== 'parent') locationPermission();
+  //     });
+  //   };
+  //   setTimeout(connectToSocket, 3000);
+  // }, []);
+  const disconnectStompClient = () => {
+    if (stompClient.current && stompClient.current.connected) {
+      stompClient.current.disconnect(() => {
+        console.log('Disconnected from the WebSocket');
       });
-    };
-    setTimeout(connectToSocket, 3000);
-  }, []);
+    }
+  };
 
   const locationPermission = async () => {
     if (Platform.OS === 'android') {
@@ -171,17 +182,24 @@ const RightDrawerNavigator = () => {
       // backgroundCall();
     }
   };
-
+  let intervalId = null;
   const backgroundCall = async () => {
     let times = 1;
-    BackgroundTimer.runBackgroundTimer(async () => {
+
+    intervalId = BackgroundTimer.setInterval(async () => {
       try {
-        console.log('I am called for ' + ++times + ' times');
+        times = times + 1;
+        console.log('I am called for ' + times + ' times');
         trackAndroidAnIos();
       } catch (error) {
         console.log(error);
       }
     }, 2000);
+
+    // if (times > 4) {
+    //   disconnectStompClient();
+    //   BackgroundTimer.clearInterval(intervalId);
+    // }
   };
 
   const trackAndroidAnIos = async () => {
@@ -191,11 +209,16 @@ const RightDrawerNavigator = () => {
       //   console.log('coords', coords);
       //   sendCoordinates(coords.latitude, coords.longitude);
       // }, console.log);
+
+      // BackgroundTimer.clearInterval(intervalId);
+
       BackgroundGeolocation.ready({}).then((state: any) => {
         // YES -- .ready() has now resolved.
-        setInterval(() => {
+        intervalIdRef.current = setInterval(() => {
           BackgroundGeolocation.getCurrentPosition({})
-            .then((res) => console.log('res', res))
+            .then((res) => {
+              if (user_type) sendCoordinates(res.coords.latitude, res.coords.longitude);
+            })
             .catch(console.log);
         }, 2000);
         BackgroundGeolocation.start();
@@ -218,20 +241,27 @@ const RightDrawerNavigator = () => {
       })
     );
   };
-
+  const subscriptions = [];
   const trackDevicesById = async (stompClient: any, deviceIds: string[]) => {
     try {
       deviceIds.map((item) => {
-        stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+        const subscribe = stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+        subscriptions.push(subscribe);
       });
     } catch (err) {
       console.log('Error:', err);
     }
   };
-
+  const unsubscribeAll = () => {
+    subscriptions.forEach((subscription) => {
+      subscription.unsubscribe();
+    });
+    // Optionally, clear the subscriptions array if you're not going to reuse it
+    subscriptions.length = 0;
+  };
   const subscriptionCallback = (subscriptionMessage: { body: string }) => {
     const messageBody: MessageBody = JSON.parse(subscriptionMessage.body);
-    console.log('Update Received', messageBody);
+    // console.log('Update Received', messageBody);
 
     updateCoordinates(messageBody);
   };
@@ -243,7 +273,19 @@ const RightDrawerNavigator = () => {
     student: 'StudentActivity',
     parent: 'Home',
   };
+  useEffect(() => {
+    // if (!user_type) {
+    //   if (intervalIdRef.current !== null) {
+    //     clearInterval(intervalIdRef.current);
+    //     intervalIdRef.current = null;
+    //   }
+    //   disconnectStompClient();
+    //   unsubscribeAll();
+    //   BackgroundTimer.clearInterval(intervalId);
+    // }
+  }, [user_type, isFocused]);
 
+  if (!user_type) return <></>;
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
