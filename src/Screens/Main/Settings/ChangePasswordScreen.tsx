@@ -2,6 +2,7 @@ import React, { ReactElement, useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useTheme } from '@/Theme';
 import { Icon, Input, Text } from '@ui-kitten/components';
+import Entypo from 'react-native-vector-icons/Entypo';
 import { loadUserType } from '@/Storage/MainAppStorage';
 
 import { ChangePassword, ResetPasswordVerify } from '@/Services/LoginServices';
@@ -105,12 +106,12 @@ const ChangePasswordScreen = () => {
 
   const renderOldPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onOldPasswordIconPress}>
-      <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
+      <Entypo {...props} name={passwordVisible ? 'eye-with-line' : 'eye'} size={20} />
     </TouchableWithoutFeedback>
   );
   const renderPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onPasswordIconPress}>
-      <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
+      <Entypo {...props} name={passwordVisible ? 'eye-with-line' : 'eye'} size={20} />
     </TouchableWithoutFeedback>
   );
   const onNewPasswordIconPress = (): void => {
@@ -119,7 +120,7 @@ const ChangePasswordScreen = () => {
 
   const renderNewPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onNewPasswordIconPress}>
-      <Icon {...props} name={newPasswordVisible ? 'eye-off' : 'eye'} />
+      <Entypo {...props} name={newPasswordVisible ? 'eye-with-line' : 'eye'} size={20} />
     </TouchableWithoutFeedback>
   );
   const verifyActivationCode = async (resetPasswordObject: any) => {

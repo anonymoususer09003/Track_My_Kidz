@@ -48,6 +48,7 @@ import InstructorChatNavigator from '@/Navigators/Main/InstructorChatNavigator';
 import { SingleChatScreen } from '@/Screens/Chats';
 import { SingleChatScreenRouteParams } from '@/Screens/Chats/SingleChatScreen';
 // @ts-ignore
+import PaymentInformationScreen from '@/Screens/PaymentInfo/PaymentInfoScreen';
 import * as Stomp from 'react-native-stompjs';
 import { loadToken } from '@/Storage/MainAppStorage';
 import SockJS from 'sockjs-client';
@@ -139,21 +140,20 @@ const RightDrawerNavigator = () => {
 
   const stompClient = useRef<Stomp.Client | null>(null);
 
-  // useEffect(() => {
-  //   const connectToSocket = async () => {
-  //     const token = await loadToken();
-  //     console.log('-------------------------------------------------------------------');
-  //     console.log(token);
-  //     const socket = new SockJS(Config.WS_URL);
-  //     stompClient.current = Stomp.over(socket);
-  //     stompClient.current.connect({ token }, () => {
-  //       trackDevicesById(stompClient.current, ['']);
+  useEffect(() => {
+    const connectToSocket = async () => {
+      const token = await loadToken();
+    
+      const socket = new SockJS(Config.WS_URL);
+      stompClient.current = Stomp.over(socket);
+      stompClient.current.connect({ token }, () => {
+        trackDevicesById(stompClient.current, ['']);
 
-  //       if (user_type !== 'parent') locationPermission();
-  //     });
-  //   };
-  //   setTimeout(connectToSocket, 3000);
-  // }, []);
+        if (user_type !== 'parent') locationPermission();
+      });
+    };
+    setTimeout(connectToSocket, 15000);
+  }, []);
   const disconnectStompClient = () => {
     if (stompClient.current && stompClient.current.connected) {
       stompClient.current.disconnect(() => {
@@ -194,7 +194,7 @@ const RightDrawerNavigator = () => {
       } catch (error) {
         console.log(error);
       }
-    }, 2000);
+    }, 15000);
 
     // if (times > 4) {
     //   disconnectStompClient();
@@ -220,7 +220,7 @@ const RightDrawerNavigator = () => {
               if (user_type) sendCoordinates(res.coords.latitude, res.coords.longitude);
             })
             .catch(console.log);
-        }, 2000);
+        }, 15000);
         BackgroundGeolocation.start();
       });
     } catch (err) {
@@ -376,8 +376,10 @@ const RightDrawerNavigator = () => {
           <Stack.Screen name="CreateParentActivity" component={CreateParentActivityScreen} />
           <Stack.Screen name="Approval" component={ApprovalNavigator} />
           <Stack.Screen name="ActivationCode" component={ActivationCodeScreen} />
-          <Stack.Screen name="DependentInfo" component={DependentInfoScreen} />
+  
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="PaymentInfo" component={PaymentInformationScreen} />
+          <Stack.Screen name="DependentInfo" component={DependentInfoScreen} />
           <Stack.Screen name="ParentDeletePermission" component={ParentDeletePermission} />
           <Stack.Screen name="PersonalProfile" component={PersonalProfileScreen} />
           <Stack.Screen name="ImportParentDependentScreen" component={ImportDependentScreen} />

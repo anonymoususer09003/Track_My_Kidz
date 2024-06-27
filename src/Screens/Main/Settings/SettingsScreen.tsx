@@ -24,7 +24,7 @@ type SettingsScreenProps = {
   navigation: StackNavigationProp<MainStackNavigatorParamsList, 'Settings'>;
 };
 
-const SettingsScreen: FC<SettingsScreenProps> = ({ navigation }) => {
+const SettingsScreen = ({ navigation }) => {
   const isFocuesed = useIsFocused();
   const dispatch = useDispatch();
   const { Layout } = useTheme();
@@ -128,6 +128,7 @@ const SettingsScreen: FC<SettingsScreenProps> = ({ navigation }) => {
   };
 
   useEffect(() => {
+    if(false)
     getUserId();
   }, [isFocuesed]);
 

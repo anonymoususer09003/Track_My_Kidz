@@ -453,7 +453,9 @@ const HomeScreen = () => {
                 setChildren(res);
                 let studentsMarker = [...originalStudentsEmails];
                 let markers = studentsMarker[index.row - 1];
-                setStudentsEmail(markers);
+
+         
+                setStudentsEmail([markers]);
               }
               setSelectedChild(child);
             }}
@@ -556,7 +558,8 @@ const HomeScreen = () => {
           <MapView
             ref={ref}
             onLayout={() => {
-              let temp = studentsEmails.filter((item) => item.latitude != null);
+              console.log('studnet emails',studentsEmails)
+              let temp = studentsEmails?.filter((item) => item.latitude != null);
 
               ref?.current?.fitToCoordinates(temp, {
                 edgePadding: {
