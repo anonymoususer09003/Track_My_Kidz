@@ -22,7 +22,7 @@ import {
   View,
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { LatLng, Marker } from 'react-native-maps';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -41,7 +41,7 @@ const StudentGroupScreen = () => {
   const isFocused = useIsFocused();
   const [trackingList, setTrackingList] = useState<any>({});
   // const swipeableRef = useRef<any>(null);
-  const ref = useRef<any>();
+  const ref = useRef<MapView>();
   const [groupCount, setGroupCount] = useState<any>({});
   const dispatch = useDispatch();
   let prevOpenedRow: any;
@@ -57,7 +57,7 @@ const StudentGroupScreen = () => {
   const [selectedDependent, setSelectedDependent] = useState<any>(null);
   const [groups, setGroups] = useState<any[]>([]);
   const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
-
+  const [userLocation, setUserLocation] = useState<LatLng>({ longitude: 0, latitude: 0 });
   const currentUser: any = useSelector(
     (state: { user: UserState }) => state.user.item,
   );
@@ -274,6 +274,23 @@ const StudentGroupScreen = () => {
     );
   };
 
+
+function navigateToMyLocation() {
+  ref.current?.animateToRegion({
+    ...userLocation,
+    latitudeDelta: 0.896,
+    longitudeDelta: 0.896,
+  });
+}
+
+useEffect(() => {
+  if (userLocation.longitude !== 0 || userLocation.latitude !== 0) {
+    navigateToMyLocation();
+  }
+}, [userLocation]);
+
+
+
   return (
     <>
       {selectedInstructions && (
@@ -293,11 +310,9 @@ const StudentGroupScreen = () => {
               marginTop: 10,
               marginBottom: 20,
             }}
-            renderItem={({ item, index }: { item: any, index: number }) => {
+            renderItem={({ item, index }: { item: any; index: number }) => {
               let temp: any[] = [];
-              let instructor = item?.instructors?.map((item: any) =>
-                temp.push(item?.firstName),
-              );
+              let instructor = item?.instructors?.map((item: any) => temp.push(item?.firstName));
               return (
                 <Swipeable
                   ref={(ref) => (row[index] = ref)}
@@ -333,12 +348,9 @@ const StudentGroupScreen = () => {
                       <View style={{ alignItems: 'center' }}>
                         <Text style={styles.text}>{`Approval`}</Text>
                         <View style={{ flexDirection: 'row' }}>
-                          <TouchableOpacity
-                            style={styles.horizontal}
-                          >
+                          <TouchableOpacity style={styles.horizontal}>
                             <Text style={styles.footerText}>{`${
-                              groupCount[item.groupId]?.countApprovedStudents ||
-                              '0'
+                              groupCount[item.groupId]?.countApprovedStudents || '0'
                             }`}</Text>
                             <Entypo
                               name="book"
@@ -347,17 +359,11 @@ const StudentGroupScreen = () => {
                               style={{ marginHorizontal: 5 }}
                             />
                           </TouchableOpacity>
-                          <TouchableOpacity
-                            style={styles.horizontal}
-                          >
+                          <TouchableOpacity style={styles.horizontal}>
                             <Text style={styles.text}>
-                              {groupCount[item.groupId]
-                                ?.countApprovedInstructors || '0'}
+                              {groupCount[item.groupId]?.countApprovedInstructors || '0'}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -365,12 +371,9 @@ const StudentGroupScreen = () => {
                       <View style={{ alignItems: 'center' }}>
                         <Text style={styles.footerText}>{`Declined`}</Text>
                         <View style={{ flexDirection: 'row' }}>
-                          <TouchableOpacity
-                            style={styles.horizontal}
-                          >
+                          <TouchableOpacity style={styles.horizontal}>
                             <Text style={styles.text}>{`${
-                              groupCount[item.groupId]?.countDeclinedStudents ||
-                              '0'
+                              groupCount[item.groupId]?.countDeclinedStudents || '0'
                             }`}</Text>
                             <Entypo
                               name="book"
@@ -379,17 +382,11 @@ const StudentGroupScreen = () => {
                               style={{ marginHorizontal: 5 }}
                             />
                           </TouchableOpacity>
-                          <TouchableOpacity
-                            style={styles.horizontal}
-                          >
+                          <TouchableOpacity style={styles.horizontal}>
                             <Text style={styles.text}>
-                              {groupCount[item.groupId]
-                                ?.countDeclinedInstructors || '0'}
+                              {groupCount[item.groupId]?.countDeclinedInstructors || '0'}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -397,14 +394,9 @@ const StudentGroupScreen = () => {
                       <View style={{ alignItems: 'center' }}>
                         <Text style={styles.footerText}>{`Pending`}</Text>
                         <View style={{ flexDirection: 'row' }}>
-                          <TouchableOpacity
-                            style={styles.horizontal}
-                          >
+                          <TouchableOpacity style={styles.horizontal}>
                             <Text style={styles.text}>
-                              {`${
-                                groupCount[item.groupId]
-                                  ?.countPendingStudents || '0'
-                              }`}
+                              {`${groupCount[item.groupId]?.countPendingStudents || '0'}`}
                             </Text>
                             <Entypo
                               name="book"
@@ -413,18 +405,12 @@ const StudentGroupScreen = () => {
                               style={{ marginHorizontal: 5 }}
                             />
                           </TouchableOpacity>
-                          <TouchableOpacity
-                            style={styles.horizontal}
-                          >
+                          <TouchableOpacity style={styles.horizontal}>
                             <Text style={styles.text}>
-                              {groupCount[item.groupId]
-                                ?.countPendingInstructors || '0'}
+                              {groupCount[item.groupId]?.countPendingInstructors || '0'}
                               {/* {item.countPendingInstructors || `0`} */}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -436,7 +422,7 @@ const StudentGroupScreen = () => {
                         dispatch(
                           ChangeModalState.action({
                             instructionsModalVisibility: true,
-                          }),
+                          })
                         );
                       }}
                       style={{ width: '100%', alignItems: 'center' }}
@@ -459,146 +445,83 @@ const StudentGroupScreen = () => {
           />
         )}
         {showFamilyMap && (
-          <MapView
-            ref={ref}
-            // onRegionChange={(region) => setRegion(region)}
-            // zoomEnabled
-            // region={region}
-            // initialRegion={{
-            //   latitude: children[0]?.latitude
-            //     ? parseFloat(children[0]?.latitude)
-            //     : parseFloat(10),
-            //   longitude: children[0]?.longititude
-            //     ? parseFloat(children[0]?.longititude)
-            //     : parseFloat(10),
-            //   latitudeDelta: 0.0922 + width / height,
-            //   longitudeDelta: 0.0421,
-            // }}
-            onLayout={() => {
-              let temp = studentsEmails.filter(
-                (item) => trackingList[item.childDevice]?.lat != null,
-              );
-
-              ref?.current?.fitToCoordinates(temp, {
-                edgePadding: {
-                  top: 10,
-                  right: 10,
-                  bottom: 10,
-                  left: 10,
-                },
-                animated: true,
-              });
-            }}
-            style={{ flex: 1 }}
-          >
-            {children.map((item, index) => {
-              let latitude = trackingList[item.childDevice]?.lat;
-              let longititude = trackingList[item.childDevice]?.lang;
-
-              // console.log("item", item);
-              if (trackingList[item.childDevice]?.lat) {
-                return (
-                  <>
-                    <Marker
-                      onSelect={() => console.log('pressed')}
-                      onPress={() => {
-                        console.log('ref', ref);
-                        ref.current.fitToSuppliedMarkers(
-                          [
-                            {
-                              latitude: latitude
-                                ? parseFloat(latitude)
-                                : 10,
-                              longitude: longititude
-                                ? parseFloat(longititude)
-                                : 10,
-                            },
-                          ],
-                          // false, // not animated
-                        );
-                      }}
-                      identifier={item?.email}
-                      key={index}
-                      coordinate={{
-                        latitude: latitude
-                          ? parseFloat(latitude)
-                          : 10,
-                        longitude: longititude
-                          ? parseFloat(longititude)
-                          : 10,
-                      }}
-                    >
-                      <View style={{}}>
-                        <View
-                          style={{
-                            height: 30,
-                            width: 30,
-                            borderRadius: 80,
-                            overflow: 'hidden',
-                            // top: 33,
-                            // zIndex: 10,
-                          }}
-                        >
-                          {item?.studentImage == '' && (
-                            <View
-                              style={{
-                                // height: "100%",
-                                // width: "100%",
-                                borderRadius: 20,
-                                backgroundColor: Colors.primary,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <Text style={{ color: Colors.white }}>
-                                {item?.firstname
-                                  ?.substring(0, 1)
-                                  ?.toUpperCase() || ''}
-                                {item?.lastname
-                                  ?.substring(0, 1)
-                                  ?.toUpperCase() || ''}
-                              </Text>
-                            </View>
-                          )}
-                          {item?.studentImage != '' && (
-                            <Image
-                              source={{
-                                uri: item?.studentImage,
-                              }}
-                              style={{
-                                height: 40,
-                                width: 40,
-                                borderRadius: 30,
-                                aspectRatio: 2,
-                              }}
-                              resizeMode="contain"
-                            />
-                          )}
-                        </View>
-                        {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
-                      </View>
-                      {/* <TouchableOpacity
-                    onPress={() => console.log("pressed")}
-                    style={{ alignItems: "center" }}
-                  >
-                    <Text>{item?.firstname}</Text>
-                    <Text style={{ marginBottom: 2 }}>
-                      {item?.lastname}
-                    </Text>
-                    <Fontisto
-                      name="map-marker-alt"
-                      size={25}
-                      color="red"
-                    />
-                  </TouchableOpacity> */}
-                    </Marker>
-                  </>
-                  // </>
-                  // </Circle>
+          <View style={{flex:1}}>
+            <TouchableOpacity
+              onPress={navigateToMyLocation}
+              style={{
+                position: 'absolute',
+                bottom: 60,
+                right: 10,
+                zIndex: 222,
+                paddingHorizontal: 10,
+                paddingVertical: 9,
+                borderRadius: 20,
+                backgroundColor: '#fff8ff',
+              }}
+            >
+              <Ionicons name="accessibility" style={{ fontSize: 28 }} />
+            </TouchableOpacity>
+            <MapView
+              showsUserLocation
+              showsMyLocationButton
+              followsUserLocation
+              //METHOD TO FETCH USER LOCATION , USE ON YOUR OWN
+              onUserLocationChange={(e) => {
+                setUserLocation({
+                  latitude: e.nativeEvent.coordinate?.latitude || 0,
+                  longitude: e.nativeEvent.coordinate?.longitude || 0,
+                });
+              }}
+              ref={ref}
+              style={{ flex: 1 }}
+              onLayout={() => {
+                let temp = studentsEmails.filter(
+                  (item) => item.latitude != null && item.longitude != null
                 );
-              }
-            })}
-          </MapView>
+                ref.current.fitToCoordinates(temp, {
+                  edgePadding: {
+                    top: 10,
+                    right: 10,
+                    bottom: 10,
+                    left: 10,
+                  },
+                  animated: true,
+                });
+              }}
+            >
+              <Marker
+                coordinate={{...userLocation}}
+                title="Your Location"
+                description="This is where you are"
+              />
+              {children.map((child, index) => {
+                const latitude = parseFloat(child.latitude);
+                const longitude = parseFloat(child.longititude);
+
+                // Check if latitude and longitude are valid numbers
+                if (isNaN(latitude) || isNaN(longitude)) {
+                  console.log(
+                    `Invalid coordinates for child ${child.firstname}:`,
+                    child.latitude,
+                    child.longititude
+                  );
+                  return null; // Skip rendering this marker
+                }
+
+                return (
+                  <Marker
+                    key={index}
+                    coordinate={{
+                      latitude: latitude,
+                      longitude: longitude,
+                    }}
+                    title={child.firstname}
+                    description={child.lastname}
+                  />
+                );
+              })}
+            </MapView>
+          </View>
         )}
 
         {groups.length == 0 && (

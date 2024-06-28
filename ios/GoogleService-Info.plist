@@ -15,22 +15,18 @@
 	<key>STORAGE_BUCKET</key>
 	<string>trackmykidz-d5c0a.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<true/>
+	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<true/>
+	<false></false>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_GCM_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:95072749728:ios:807d66535ddd8a5d41a1c5</string>
 	<key>DATABASE_URL</key>
 	<string>https://trackmykidz-d5c0a-default-rtdb.firebaseio.com</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need your location to provide better services.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>We need your location to provide continuous tracking.</string>
 </dict>
 </plist>

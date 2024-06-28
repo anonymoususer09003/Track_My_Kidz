@@ -18,7 +18,7 @@ import { UserState } from '@/Store/User';
 import Colors from '@/Theme/Colors';
 import Geolocation from '@react-native-community/geolocation';
 import { RouteProp, useIsFocused, useNavigation } from '@react-navigation/native';
-import { Icon, Text } from '@ui-kitten/components';
+import { Icon, IconRegistry, Text } from '@ui-kitten/components';
 import axios from 'axios';
 import moment from 'moment';
 import React, { FC, useEffect, useRef, useState } from 'react';
@@ -33,7 +33,7 @@ import {
 } from 'react-native';
 import GeolocationAndroid from 'react-native-geolocation-service';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { LatLng, Marker } from 'react-native-maps';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -75,6 +75,7 @@ const StudentActivityScreen: FC = () => {
   const [studentsEmails, setStudentsEmail] = useState<any[]>([]);
   const [originalStudentsEmails, setOriginalStudentsEmail] = useState<any[]>([]);
   // const swipeableRef = useRef(null);
+  const [userLocation, setUserLocation] = useState<LatLng>({ longitude: 0, latitude: 0 });
   const dispatch = useDispatch();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [selectedInstructions, setSelectedInstructions] = useState<Optin>();
@@ -101,7 +102,7 @@ const StudentActivityScreen: FC = () => {
     (state: { instructorsActivity: InstructorState }) => state.instructorsActivity
   );
 
-  const ref = useRef<any>();
+  const ref = useRef<MapView>();
   let prevOpenedRow: any;
   let row: Array<any> = [];
   const getActivities = async () => {
@@ -116,25 +117,6 @@ const StudentActivityScreen: FC = () => {
       });
   };
 
-  // useEffect(() => {
-  //   try {
-  //     firestore()
-  //       .collection("Users")
-  //       .add({
-  //         name: "Ada Lovelace",
-  //         age: 30,
-  //       })
-  //       .then(() => {
-  //         console.log("User added!");
-  //       })
-  //       .catch((err) => {
-  //         console.log("err", err);
-  //       });
-  //   } catch (err) {
-  //     console.log("errr------", err);
-  //   }
-  // }, []);
-
   const handleTrackHistory = async (status: boolean, id: any, latitude: any, longitude: any) => {
     const _date = moment(new Date()).format();
 
@@ -143,7 +125,6 @@ const StudentActivityScreen: FC = () => {
   };
 
   const handleTrackHistorySchedule = async (tracking?: any) => {
-    // if (currentUser?.childTrackHistory) {
     try {
       if (Platform.OS == 'android') {
         GeolocationAndroid.getCurrentPosition(async (pos) => {
@@ -234,9 +215,7 @@ const StudentActivityScreen: FC = () => {
       }
     } else {
       backgroundCall();
-      // backgroundCall();
     }
-    // handleTrackHistorySchedule();
   };
   const locationPermissionForTracking = async (tracking: any) => {
     if (Platform.OS === 'android') {
@@ -373,6 +352,19 @@ const StudentActivityScreen: FC = () => {
   // }, [currentUser]);
 
   // backgroundCall();
+  function navigateToMyLocation() {
+    ref.current?.animateToRegion({
+      ...userLocation,
+      latitudeDelta: 0.896,
+      longitudeDelta: 0.896,
+    });
+  }
+
+  useEffect(() => {
+    if (userLocation.longitude !== 0 || userLocation.latitude !== 0) {
+      navigateToMyLocation();
+    }
+  }, [userLocation]);
 
   const RightActions = (dragX: any, item: any) => (
     <View
@@ -957,234 +949,221 @@ const StudentActivityScreen: FC = () => {
           <View style={{ marginBottom: 50 }} />
         </View>
       ) : showParticipantMap ? (
-        <MapView style={{ flex: 1 }}>
-          {partcipants.map((item, index) => {
-            // console.log("item", item);
-            let latitude = trackingList[item?.childDeviceId]?.lat;
-            let longititude = trackingList[item?.childDeviceId]?.lang;
+        <View>
+          <TouchableOpacity
+            onPress={navigateToMyLocation}
+            style={{
+              position: 'absolute',
+              bottom: 60,
+              right: 10,
+              zIndex: 222,
+              paddingHorizontal: 10,
+              paddingVertical: 9,
+              borderRadius: 20,
+              backgroundColor: '#fff8ff',
+            }}
+          >
+            <Ionicons name="accessibility" style={{ fontSize: 28 }} />
+          </TouchableOpacity>
+          <MapView
+            style={{ flex: 1 }}
+            showsUserLocation
+            showsMyLocationButton
+            initialRegion={{ ...userLocation, latitudeDelta: 0.896, longitudeDelta: 0.896 }}
+            onUserLocationChange={(e) => {
+              setUserLocation({
+                latitude: e.nativeEvent.coordinate?.latitude || 0,
+                longitude: e.nativeEvent.coordinate?.longitude || 0,
+              });
+            }}
+            ref={ref}
+          >
+            {partcipants.map((item, index) => {
+              // console.log("item", item);
+              let latitude = trackingList[item?.childDeviceId]?.lat;
+              let longititude = trackingList[item?.childDeviceId]?.lang;
 
-            return (
-              <View style={{ flex: 1 }}>
-                {latitude && longititude && (
-                  <Marker
-                    onSelect={() => console.log('pressed')}
-                    onPress={() => {
-                      if (item?.group) {
-                        setModal(true);
-                        setSelectedGroup(item?.groupName);
-                      }
-                    }}
-                    identifier={item?.email}
-                    key={index}
-                    coordinate={{
-                      latitude,
-                      longitude: longititude,
-                    }}
-                  >
-                    {!item?.group && (
-                      <View style={{}}>
-                        <View
-                          style={{
-                            height: 30,
-                            width: 30,
-                            borderRadius: 80,
-                            overflow: 'hidden',
-                            // top: 33,
-                            // zIndex: 10,
-                          }}
-                        >
-                          {item?.image == '' && (
-                            <View
-                              style={{
-                                // height: "100%",
-                                // width: "100%",
-                                borderRadius: 20,
-                                backgroundColor: Colors.primary,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <Text style={{ color: Colors.white }}>
-                                {item?.firstName?.substring(0, 1)?.toUpperCase() || ''}
-                                {item?.lastName?.substring(0, 1)?.toUpperCase() || ''}
-                              </Text>
-                            </View>
-                          )}
-                          {item?.image != '' && (
-                            <Image
-                              source={{
-                                uri: item?.image,
-                              }}
-                              style={{
-                                height: 40,
-                                width: 40,
-                                borderRadius: 30,
-                                aspectRatio: 1.5,
-                              }}
-                              resizeMode="contain"
-                            />
-                          )}
-                        </View>
-                        {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
-                      </View>
-                    )}
-
-                    {item?.group && (
-                      <TouchableOpacity
-                        style={{
-                          alignItems: 'center',
-                        }}
-                      >
-                        <View
-                          style={{
-                            // position: "absolute",
-                            zIndex: 10,
-                            bottom: 2,
-                            // height: 80,
-                            // width: 80,
-                            // backgroundColor: Colors.primary,
-                            // opacity: 0.7,
-                          }}
-                        >
-                          <Text style={{ fontWeight: 'bold' }}>
-                            {groups[item?.groupName]?.participants?.length}
-                          </Text>
-                        </View>
-
-                        <Fontisto name="map-marker-alt" size={25} color="red" />
-                      </TouchableOpacity>
-                    )}
-                  </Marker>
-                )}
-              </View>
-              // </>
-              // </Circle>
-            );
-          })}
-        </MapView>
-      ) : (
-        <MapView
-          ref={ref}
-          // onRegionChange={(region) => setRegion(region)}
-          // zoomEnabled
-          // region={region}
-          // initialRegion={{
-          //   latitude: children[0]?.latitude
-          //     ? parseFloat(children[0]?.latitude)
-          //     : parseFloat(10),
-          //   longitude: children[0]?.longititude
-          //     ? parseFloat(children[0]?.longititude)
-          //     : parseFloat(10),
-          //   latitudeDelta: 0.0922 + width / height,
-          //   longitudeDelta: 0.0421,
-          // }}
-          onLayout={() => {
-            let temp = studentsEmails.filter((item) => trackingList[item.childDevice]?.lat != null);
-
-            ref?.current?.fitToCoordinates(temp, {
-              edgePadding: {
-                top: 10,
-                right: 10,
-                bottom: 10,
-                left: 10,
-              },
-              animated: true,
-            });
-          }}
-          style={{ flex: 1 }}
-        >
-          {children.map((item, index) => {
-            let latitude = trackingList[item.childDevice]?.lat;
-            let longititude = trackingList[item.childDevice]?.lang;
-
-            // console.log("item", item);
-            if (trackingList[item.childDevice]?.lat) {
               return (
-                <>
-                  <Marker
-                    onSelect={() => console.log('pressed')}
-                    onPress={() => {
-                      console.log('ref', ref);
-                      ref.current.fitToSuppliedMarkers(
-                        [
-                          {
-                            latitude: latitude ? parseFloat(latitude) : 10,
-                            longitude: longititude ? parseFloat(longititude) : 10,
-                          },
-                        ]
-                        // false, // not animated
-                      );
-                    }}
-                    identifier={item?.email}
-                    key={index}
-                    coordinate={{
-                      latitude: latitude ? parseFloat(latitude) : 10,
-                      longitude: longititude ? parseFloat(longititude) : 10,
-                    }}
-                  >
-                    <View style={{}}>
-                      <View
-                        style={{
-                          // borderRadius: 30,
-                          overflow: 'hidden',
-                          // top: 33,
-                          // zIndex: 10,
-                        }}
-                      >
-                        {item?.studentImage == '' && (
+                <View style={{ flex: 1 }}>
+                  {latitude && longititude && (
+                    <Marker
+                      onSelect={() => console.log('pressed')}
+                      onPress={() => {
+                        if (item?.group) {
+                          setModal(true);
+                          setSelectedGroup(item?.groupName);
+                        }
+                      }}
+                      identifier={item?.email}
+                      title={item.name}
+                      description={item.description}
+                      key={index}
+                      coordinate={{
+                        latitude,
+                        longitude: longititude,
+                      }}
+                    >
+                      {!item?.group && (
+                        <View style={{}}>
                           <View
                             style={{
-                              // borderRadius: 20,
-                              backgroundColor: Colors.primary,
-                              justifyContent: 'center',
-                              alignItems: 'center',
+                              height: 30,
+                              width: 30,
+                              borderRadius: 80,
+                              overflow: 'hidden',
+                              // top: 33,
+                              // zIndex: 10,
                             }}
                           >
-                            <Text style={{ color: Colors.white }}>
-                              {item?.firstname?.substring(0, 1)?.toUpperCase() || ''}
-                              {item?.lastname?.substring(0, 1)?.toUpperCase() || ''}
+                            {item?.image == '' && (
+                              <View
+                                style={{
+                                  // height: "100%",
+                                  // width: "100%",
+                                  borderRadius: 20,
+                                  backgroundColor: Colors.primary,
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                }}
+                              >
+                                <Text style={{ color: Colors.white }}>
+                                  {item?.firstName?.substring(0, 1)?.toUpperCase() || ''}
+                                  {item?.lastName?.substring(0, 1)?.toUpperCase() || ''}
+                                </Text>
+                              </View>
+                            )}
+                            {item?.image != '' && (
+                              <Image
+                                source={{
+                                  uri: item?.image,
+                                }}
+                                style={{
+                                  height: 40,
+                                  width: 40,
+                                  borderRadius: 30,
+                                  aspectRatio: 1.5,
+                                }}
+                                resizeMode="contain"
+                              />
+                            )}
+                          </View>
+                          {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+                        </View>
+                      )}
+
+                      {item?.group && (
+                        <TouchableOpacity
+                          style={{
+                            alignItems: 'center',
+                          }}
+                        >
+                          <View
+                            style={{
+                              // position: "absolute",
+                              zIndex: 10,
+                              bottom: 2,
+                              // height: 80,
+                              // width: 80,
+                              // backgroundColor: Colors.primary,
+                              // opacity: 0.7,
+                            }}
+                          >
+                            <Text style={{ fontWeight: 'bold' }}>
+                              {groups[item?.groupName]?.participants?.length}
                             </Text>
                           </View>
-                        )}
-                        {item?.studentImage != '' && (
-                          <Image
-                            source={{
-                              uri: item?.studentImage,
-                            }}
-                            style={{
-                              height: 40,
-                              width: 40,
-                              borderRadius: 20,
-                              // aspectRatio: 2,
-                            }}
-                            resizeMode="contain"
-                          />
-                        )}
-                      </View>
-                      {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
-                    </View>
-                    {/* <TouchableOpacity
-                    onPress={() => console.log("pressed")}
-                    style={{ alignItems: "center" }}
-                  >
-                    <Text>{item?.firstname}</Text>
-                    <Text style={{ marginBottom: 2 }}>
-                      {item?.lastname}
-                    </Text>
-                    <Fontisto
-                      name="map-marker-alt"
-                      size={25}
-                      color="red"
-                    />
-                  </TouchableOpacity> */}
-                  </Marker>
-                </>
+
+                          <Fontisto name="map-marker-alt" size={25} color="red" />
+                        </TouchableOpacity>
+                      )}
+                    </Marker>
+                  )}
+                </View>
                 // </>
                 // </Circle>
               );
-            }
-          })}
-        </MapView>
+            })}
+          </MapView>
+        </View>
+      ) : (
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity
+            onPress={navigateToMyLocation}
+            style={{
+              position: 'absolute',
+              bottom: 60,
+              right: 10,
+              zIndex: 222,
+              paddingHorizontal: 10,
+              paddingVertical: 9,
+              borderRadius: 20,
+              backgroundColor: '#fff8ff',
+            }}
+          >
+            <Ionicons name="accessibility" style={{ fontSize: 28 }} />
+          </TouchableOpacity>
+          <MapView
+            initialRegion={{ ...userLocation, latitudeDelta: 0.896, longitudeDelta: 0.896 }}
+            showsUserLocation
+            followsUserLocation
+            //METHOD TO FETCH USER LOCATION , USE ON YOUR OWN
+            onUserLocationChange={(e) => {
+              setUserLocation({
+                latitude: e.nativeEvent.coordinate?.latitude || 0,
+                longitude: e.nativeEvent.coordinate?.longitude || 0,
+              });
+            }}
+            ref={ref}
+            style={{ flex: 1 }}
+            // initialRegion={position} // Set initial region to current position
+            onLayout={() => {
+              let temp = studentsEmails.filter(
+                (item) => item.latitude != null && item.longitude != null
+              );
+              ref.current.fitToCoordinates(temp, {
+                edgePadding: {
+                  top: 10,
+                  right: 10,
+                  bottom: 10,
+                  left: 10,
+                },
+                animated: true,
+              });
+            }}
+          >
+            <Marker
+              coordinate={{ ...userLocation }}
+              title="Your Location"
+              description="This is where you are"
+            />
+            {children.map((child, index) => {
+              const latitude = parseFloat(child.latitude);
+              const longitude = parseFloat(child.longititude);
+
+              // Check if latitude and longitude are valid numbers
+              if (isNaN(latitude) || isNaN(longitude)) {
+                console.log(
+                  `Invalid coordinates for child ${child.firstname}:`,
+                  child.latitude,
+                  child.longititude
+                );
+                return null; // Skip rendering this marker
+              }
+
+              return (
+                <Marker
+                  key={index}
+                  coordinate={{
+                    latitude: latitude,
+                    longitude: longitude,
+                  }}
+                  title={child.firstname}
+                  description={child.lastname}
+                />
+              );
+            })}
+          </MapView>
+        </View>
       )}
     </>
   );

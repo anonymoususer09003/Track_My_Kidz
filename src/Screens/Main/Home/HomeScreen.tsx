@@ -23,16 +23,17 @@ import Colors from '@/Theme/Colors';
 import Geolocation from '@react-native-community/geolocation';
 import moment from 'moment';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import MapView, { Circle, Marker } from 'react-native-maps';
+import MapView, { Circle, LatLng, Marker } from 'react-native-maps';
 import MaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 const window = Dimensions.get('window');
 const { width, height } = window;
 const HomeScreen = () => {
   const navigation = useNavigation();
   const focused = useIsFocused();
   const swipeableRef = useRef(null);
-  const ref = useRef();
+  const ref = useRef<MapView>();
   const [, _dispatch] = useStateValue();
   let row: Array<any> = [];
   let prevOpenedRow: any;
@@ -81,6 +82,7 @@ const HomeScreen = () => {
   const [activities, setActivities] = useState([]);
   const currentUser = useSelector((state: { user: UserState }) => state.user.item);
   const socketRef = useRef();
+  const [userLocation, setUserLocation] = useState<LatLng>({ longitude: 0, latitude: 0 });
 
   // console.log("currentUser", currentUser);
   const [isSubscribed, setIsSubscribed] = useState<boolean>();
@@ -375,6 +377,20 @@ const HomeScreen = () => {
     );
   };
 
+  function navigateToMyLocation() {
+    ref.current?.animateToRegion({
+      ...userLocation,
+      latitudeDelta: 0.896,
+      longitudeDelta: 0.896,
+    });
+  }
+
+  useEffect(() => {
+    if (userLocation.longitude !== 0 || userLocation.latitude !== 0) {
+      navigateToMyLocation();
+    }
+  }, [userLocation]);
+
   return (
     <>
       {/* <WelcomeMessageModal /> */}
@@ -553,121 +569,84 @@ const HomeScreen = () => {
             />
           </View>
         ) : (
-          <MapView
-            ref={ref}
-            onLayout={() => {
-              let temp = studentsEmails.filter((item) => item.latitude != null);
+          <View style={styles.container}>
+            <TouchableOpacity
+              onPress={navigateToMyLocation}
+              style={{
+                position: 'absolute',
+                bottom: 60,
+                right: 10,
+                zIndex: 222,
+                paddingHorizontal: 10,
+                paddingVertical: 9,
+                borderRadius: 20,
+                backgroundColor: '#fff8ff',
+              }}
+            >
+              <Ionicons name="accessibility" style={{ fontSize: 28 }} />
+            </TouchableOpacity>
+            <MapView
+              showsUserLocation
+              showsMyLocationButton
+              followsUserLocation
+              //METHOD TO FETCH USER LOCATION , USE ON YOUR OWN
+              onUserLocationChange={(e) => {
+                setUserLocation({
+                  latitude: e.nativeEvent.coordinate?.latitude || 0,
+                  longitude: e.nativeEvent.coordinate?.longitude || 0,
+                });
+              }}
+              ref={ref}
+              style={{ flex: 1 }}
+              initialRegion={position} // Set initial region to current position
+              onLayout={() => {
+                let temp = studentsEmails.filter(
+                  (item) => item.latitude != null && item.longitude != null
+                );
+                ref.current.fitToCoordinates(temp, {
+                  edgePadding: {
+                    top: 10,
+                    right: 10,
+                    bottom: 10,
+                    left: 10,
+                  },
+                  animated: true,
+                });
+              }}
+            >
+              <Marker
+                coordinate={position}
+                title="Your Location"
+                description="This is where you are"
+              />
+              {children.map((child, index) => {
+                const latitude = parseFloat(child.latitude);
+                const longitude = parseFloat(child.longititude);
 
-              ref?.current?.fitToCoordinates(temp, {
-                edgePadding: {
-                  top: 10,
-                  right: 10,
-                  bottom: 10,
-                  left: 10,
-                },
-                animated: true,
-              });
-            }}
-            style={{ flex: 1 }}
-          >
-            {children
-              .filter(
-                (item) =>
-                  trackingList[item.childDevice]?.lat != 'undefined' &&
-                  trackingList[item.childDevice]?.lat != null
-              )
-              .map((item, index) => {
-                let latitude = trackingList[item.childDevice]?.lat;
-                let longititude = trackingList[item.childDevice]?.lang;
+                // Check if latitude and longitude are valid numbers
+                if (isNaN(latitude) || isNaN(longitude)) {
+                  console.log(
+                    `Invalid coordinates for child ${child.firstname}:`,
+                    child.latitude,
+                    child.longititude
+                  );
+                  return null; // Skip rendering this marker
+                }
 
                 return (
-                  <>
-                    {item?.toggleAlert && (
-                      <Circle
-                        key={index}
-                        center={{
-                          latitude: latitude ? parseFloat(latitude) : parseFloat(10),
-                          longitude: longititude ? parseFloat(longititude) : parseFloat(10),
-                        }}
-                        radius={item?.allowedDistance || 50}
-                        strokeWidth={10}
-                        strokeColor={'red'}
-                        fillColor={'rgba(230,238,255,0.5)'}
-                      />
-                    )}
-
-                    <Marker
-                      onSelect={() => console.log('pressed')}
-                      onPress={() => {
-                        ref.current.fitToSuppliedMarkers(
-                          [
-                            {
-                              latitude: latitude ? parseFloat(latitude) : parseFloat(10),
-                              longitude: longititude ? parseFloat(longititude) : parseFloat(10),
-                            },
-                          ]
-                          // false, // not animated
-                        );
-                      }}
-                      identifier={item?.email}
-                      key={index}
-                      coordinate={{
-                        latitude: latitude ? parseFloat(latitude) : parseFloat(10),
-                        longitude: longititude ? parseFloat(longititude) : parseFloat(10),
-                      }}
-                    >
-                      <View style={{}}>
-                        <View
-                          style={{
-                            height: 30,
-                            width: 30,
-                            borderRadius: 80,
-                            overflow: 'hidden',
-                            // top: 33,
-                            // zIndex: 10,
-                          }}
-                        >
-                          {item?.studentImage == '' && (
-                            <View
-                              style={{
-                                height: '100%',
-                                width: '100%',
-                                borderRadius: 80,
-                                backgroundColor: Colors.primary,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <Text style={{ color: Colors.white }}>
-                                {item?.firstname?.substring(0, 1)?.toUpperCase() || ''}
-                                {item?.lastname?.substring(0, 1)?.toUpperCase() || ''}
-                              </Text>
-                            </View>
-                          )}
-                          {item?.studentImage != '' && (
-                            <Image
-                              source={{
-                                uri: item?.studentImage,
-                              }}
-                              style={{
-                                height: '100%',
-                                width: '100%',
-                                borderRadius: 80,
-                                aspectRatio: 1.5,
-                              }}
-                              resizeMode="contain"
-                            />
-                          )}
-                        </View>
-                        {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
-                      </View>
-                    </Marker>
-                  </>
-                  // </>
-                  // </Circle>
+                  <Marker
+                    key={index}
+                    coordinate={{
+                      latitude: latitude,
+                      longitude: longitude,
+                    }}
+                    title={child.firstname}
+                    description={child.lastname}
+                  />
                 );
               })}
-          </MapView>
+            </MapView>
+          </View>
         )}
       </View>
     </>
@@ -677,6 +656,7 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  container: { flex: 1 },
   layout: {
     flex: 1,
     flexDirection: 'column',

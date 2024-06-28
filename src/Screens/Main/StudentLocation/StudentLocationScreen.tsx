@@ -292,6 +292,8 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
           </View>
         ) : (
           <MapView
+          showsUserLocation
+          showsMyLocationButton
             initialRegion={{
               latitude: parseFloat(student?.latitude),
               longitude: parseFloat(student?.longititude),
@@ -372,11 +374,7 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
                   {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
                 </View>
 
-                {/* <View style={{ alignItems: "center" }}>
-                  <Text>{student.firstname}</Text>
-
-                  <Fontisto name="map-marker-alt" size={25} color="red" />
-                </View> */}
+         
               </Marker>
             </>
           </MapView>

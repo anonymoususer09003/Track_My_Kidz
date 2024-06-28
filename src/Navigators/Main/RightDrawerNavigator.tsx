@@ -57,6 +57,7 @@ import { getUniqueId } from 'react-native-device-info';
 import { MessageBody, useTracker } from '@/Providers/TrackerProvider';
 import BackgroundTimer from 'react-native-background-timer';
 import BackgroundGeolocation from 'react-native-background-geolocation';
+import { LogBox } from 'react-native';
 
 type InstructorStack = {
   InstructorPersonalProfileScreen: undefined;
@@ -130,6 +131,8 @@ export type MainStackNavigatorParamsList = InstructorStack &
   ParentStack &
   ParamListBase;
 
+LogBox.ignoreLogs(['WARN Sending `location` with no listeners registered.']);
+
 const RightDrawerNavigator = () => {
   const intervalIdRef = useRef(null);
   const isFocused = useIsFocused();
@@ -182,7 +185,7 @@ const RightDrawerNavigator = () => {
       // backgroundCall();
     }
   };
-  let intervalId = null;
+  let intervalId: number | null = null;
   const backgroundCall = async () => {
     let times = 1;
 
@@ -241,7 +244,7 @@ const RightDrawerNavigator = () => {
       })
     );
   };
-  const subscriptions = [];
+  const subscriptions: any[] = [];
   const trackDevicesById = async (stompClient: any, deviceIds: string[]) => {
     try {
       deviceIds.map((item) => {

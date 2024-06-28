@@ -507,20 +507,14 @@ const ActivityScreen = () => {
                         />
                         <View>
                           <Text style={styles.text}>{`${moment(
-                            item?.fromDate == 'string'
-                              ? new Date()
-                              : item?.fromDate,
-                          ).format('YYYY-MM-DD')} at ${moment.utc(
-                            item?.fromDate == 'string'
-                              ? new Date()
-                              : item?.fromDate,
-                          )
+                            item?.fromDate == 'string' ? new Date() : item?.fromDate
+                          ).format('YYYY-MM-DD')} at ${moment
+                            .utc(item?.fromDate == 'string' ? new Date() : item?.fromDate)
                             .format('hh:mm a')} `}</Text>
                           <Text style={styles.text}>{`${moment(
-                            item?.toDate == 'string' ? new Date() : item?.toDate,
-                          ).format('YYYY-MM-DD')} at ${moment.utc(
-                            item?.toDate == 'string' ? new Date() : item?.toDate,
-                          )
+                            item?.toDate == 'string' ? new Date() : item?.toDate
+                          ).format('YYYY-MM-DD')} at ${moment
+                            .utc(item?.toDate == 'string' ? new Date() : item?.toDate)
                             .format('hh:mm a')} `}</Text>
                         </View>
                       </View>
@@ -550,8 +544,7 @@ const ActivityScreen = () => {
                             }}
                           >
                             <Text style={styles.footerText}>{`${
-                              activitiesCount[item.activityId]
-                                ?.countApprovedStudents || '0'
+                              activitiesCount[item.activityId]?.countApprovedStudents || '0'
                             }`}</Text>
                             <Entypo
                               name="book"
@@ -575,13 +568,9 @@ const ActivityScreen = () => {
                             }}
                           >
                             <Text style={styles.text}>
-                              {activitiesCount[item.activityId]
-                                ?.countApprovedInstructors || '0'}
+                              {activitiesCount[item.activityId]?.countApprovedInstructors || '0'}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -604,8 +593,7 @@ const ActivityScreen = () => {
                             }}
                           >
                             <Text style={styles.text}>{`${
-                              activitiesCount[item.activityId]
-                                ?.countDeclinedStudents || '0'
+                              activitiesCount[item.activityId]?.countDeclinedStudents || '0'
                             }`}</Text>
                             <Entypo
                               name="book"
@@ -629,13 +617,9 @@ const ActivityScreen = () => {
                             }}
                           >
                             <Text style={styles.text}>
-                              {activitiesCount[item.activityId]
-                                ?.countDeclinedInstructors || '0'}
+                              {activitiesCount[item.activityId]?.countDeclinedInstructors || '0'}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -658,10 +642,7 @@ const ActivityScreen = () => {
                             style={styles.horizontal}
                           >
                             <Text style={styles.text}>
-                              {`${
-                                activitiesCount[item.activityId]
-                                  ?.countPendingStudents || '0'
-                              }`}
+                              {`${activitiesCount[item.activityId]?.countPendingStudents || '0'}`}
                             </Text>
                             <Entypo
                               name="book"
@@ -685,14 +666,10 @@ const ActivityScreen = () => {
                             }}
                           >
                             <Text style={styles.text}>
-                              {activitiesCount[item.activityId]
-                                ?.countPendingInstructors || '0'}
+                              {activitiesCount[item.activityId]?.countPendingInstructors || '0'}
                               {/* {item.countPendingInstructors || `0`} */}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -704,137 +681,74 @@ const ActivityScreen = () => {
           </>
         ) : (
           <MapView style={{ flex: 1 }} ref={ref}>
-            {partcipants.map((item, index) => {
+            {participants.map((item, index) => {
               let latitude = trackingList[item?.childDeviceId]?.lat;
-              let longititude = trackingList[item?.childDeviceId]?.lang;
-              // console.log("item", item);
-              return (
-                <View style={{ flex: 1 }}>
-                  {latitude && longititude && (
-                    <Marker
-                      onSelect={() => console.log('pressed')}
-                      onPress={() => {
-                        if (!item?.group) {
-                          ref.current.fitToSuppliedMarkers(
-                            [
-                              {
-                                latitude: latitude
-                                  ? parseFloat(latitude)
-                                  : 10,
-                                longitude: longititude
-                                  ? parseFloat(longititude)
-                                  : 10,
-                              },
-                            ],
-                            // false, // not animated
-                          );
-                        } else {
-                          setModal(true);
-                          setSelectedGroup(item?.groupName);
-                        }
-                      }}
-                      identifier={item?.email}
-                      key={index}
-                      coordinate={{
-                        latitude: latitude
-                          ? parseFloat(latitude)
-                          : 10,
-                        longitude: longititude
-                          ? parseFloat(longititude)
-                          : 10,
-                      }}
-                    >
-                      {!item?.group && (
-                        <View style={{}}>
-                          <View
-                            style={{
-                              // height: 30,
-                              // width: 30,
-                              borderRadius: 20,
-                              overflow: 'hidden',
-                              // top: 33,
-                              // zIndex: 10,
-                            }}
-                          >
-                            {item?.image == '' && (
-                              <View
-                                style={{
-                                  height: 40,
-                                  width: 40,
-                                  borderRadius: 30,
-                                  backgroundColor: Colors.primary,
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                }}
-                              >
-                                <Text style={{ color: Colors.white }}>
-                                  {item?.firstName
-                                    ?.substring(0, 1)
-                                    ?.toUpperCase() || ''}
-                                  {item?.lastName
-                                    ?.substring(0, 1)
-                                    ?.toUpperCase() || ''}
-                                </Text>
-                              </View>
-                            )}
-                            {item?.image != '' && (
-                              <Image
-                                source={{
-                                  uri: item?.image,
-                                }}
-                                style={{
-                                  height: '100%',
-                                  width: '100%',
-                                  borderRadius: 80,
-                                  aspectRatio: 1.5,
-                                }}
-                                resizeMode="contain"
-                              />
-                            )}
-                          </View>
-                          {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
-                        </View>
-                      )}
-                      {item?.group && (
-                        <TouchableOpacity
-                          style={{
-                            alignItems: 'center',
-                          }}
-                        >
-                          <View
-                            style={{
-                              // position: "absolute",
-                              zIndex: 10,
-                              bottom: 2,
-                              // height: 80,
-                              // width: 80,
-                              // backgroundColor: Colors.primary,
-                              // opacity: 0.7,
-                            }}
-                          >
-                            <Text style={{ fontWeight: 'bold' }}>
-                              {groups[item?.groupName]?.participants?.length}
+              let longitude = trackingList[item?.childDeviceId]?.lang;
+
+              if (latitude && longitude) {
+                return (
+                  <Marker
+                    key={index}
+                    coordinate={{
+                      latitude: parseFloat(latitude),
+                      longitude: parseFloat(longitude),
+                    }}
+                    onPress={() => {
+                      if (!item?.group) {
+                        ref.current.fitToCoordinates(
+                          [
+                            {
+                              latitude: parseFloat(latitude),
+                              longitude: parseFloat(longitude),
+                            },
+                          ],
+                          {
+                            animated: true,
+                          }
+                        );
+                      } else {
+                        setModal(true);
+                        setSelectedGroup(item?.groupName);
+                      }
+                    }}
+                  >
+                    {!item?.group && (
+                      <View style={styles.markerContainer}>
+                        {item?.image === '' ? (
+                          <View style={styles.markerInner}>
+                            <Text style={styles.markerText}>
+                              {item?.firstName?.substring(0, 1)?.toUpperCase()}
+                              {item?.lastName?.substring(0, 1)?.toUpperCase()}
                             </Text>
                           </View>
-
-                          <Fontisto
-                            name="map-marker-alt"
-                            size={25}
-                            color="red"
+                        ) : (
+                          <Image
+                            source={{ uri: item?.image }}
+                            style={styles.markerImage}
+                            resizeMode="contain"
                           />
-                        </TouchableOpacity>
-                      )}
-                    </Marker>
-                  )}
-                </View>
-                // </>
-                // </Circle>
-              );
+                        )}
+                      </View>
+                    )}
+
+                    {item?.group && (
+                      <TouchableOpacity style={styles.groupMarker} onPress={() => {}}>
+                        <Text style={styles.groupMarkerText}>
+                          {groups[item?.groupName]?.participants?.length}
+                        </Text>
+                        <Fontisto name="map-marker-alt" size={25} color="red" />
+                      </TouchableOpacity>
+                    )}
+                  </Marker>
+                );
+              } else {
+                return null; // Skip rendering if latitude or longitude is missing
+              }
             })}
           </MapView>
         )}
       </View>
-    </>
+    </> 
   );
 };
 

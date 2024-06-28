@@ -266,6 +266,8 @@ const ActivityDetailsScreen = () => {
           />
         ) : (
           <MapView
+          showsMyLocationButton
+          showsUserLocation
             ref={ref}
             // onRegionChange={(region) => setRegion(region)}
             // zoomEnabled

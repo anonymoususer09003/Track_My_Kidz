@@ -12,14 +12,15 @@ import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import MapView from 'react-native-maps';
+import MapView, { LatLng, Marker } from 'react-native-maps';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { TEST_CHILDREN } from '@/Constants';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { ref } from 'yup';
 
 const _children = TEST_CHILDREN;
 
@@ -36,21 +37,18 @@ const HomeScreen = () => {
   const [thumbnail, setThumbnail] = useState<boolean>(false);
   const [searchParam, setSearchParam] = useState<string>('');
   const [selectedDependent, setSelectedDependent] = useState<any>(null);
-  const [selectedMonth, setSelectedMonth] = useState<number>(
-    moment(new Date()).month(),
-  );
+  const [selectedMonth, setSelectedMonth] = useState<number>(moment(new Date()).month());
   const [selectedDay, setSelectedDay] = useState(moment(new Date()).date());
   // const currentUser = useSelector(
   //   (state: { user: UserState }) => state.user.item,
   // );
+  const [userLocation, setUserLocation] = useState<LatLng>({ longitude: 0, latitude: 0 });
 
   const loadUserDetails = async () => {
     FetchOne();
   };
 
-  const isCalendarVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.showCalendar,
-  );
+  const isCalendarVisible = useSelector((state: { modal: ModalState }) => state.modal.showCalendar);
 
   useEffect(() => {
     loadUserDetails();
@@ -68,6 +66,22 @@ const HomeScreen = () => {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
   }, [selectedDependent]);
+
+  const ref = useRef<MapView>();
+
+  function navigateToMyLocation() {
+    ref.current?.animateToRegion({
+      ...userLocation,
+      latitudeDelta: 0.896,
+      longitudeDelta: 0.896,
+    });
+  }
+
+  useEffect(() => {
+    if (userLocation.longitude !== 0 || userLocation.latitude !== 0) {
+      navigateToMyLocation();
+    }
+  }, [userLocation]);
 
   const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
@@ -115,11 +129,7 @@ const HomeScreen = () => {
             justifyContent: 'center',
           }}
         >
-          <Icon
-            style={{ width: 30, height: 30 }}
-            fill={Colors.primary}
-            name="edit-2"
-          />
+          <Icon style={{ width: 30, height: 30 }} fill={Colors.primary} name="edit-2" />
         </TouchableOpacity>
       </View>
     );
@@ -156,20 +166,13 @@ const HomeScreen = () => {
             data={children}
             style={{ padding: 10, width: '100%' }}
             renderItem={({ item, index }) => (
-              <Swipeable
-                ref={swipeableRef}
-                renderRightActions={(e) => RightActions(e, item)}
-              >
+              <Swipeable ref={swipeableRef} renderRightActions={(e) => RightActions(e, item)}>
                 <TouchableOpacity
                   style={[
                     styles.item,
                     {
                       backgroundColor:
-                        index % 3 === 0
-                          ? 'lightgreen'
-                          : index % 2 === 0
-                            ? '#F6DDCC'
-                            : '#fff',
+                        index % 3 === 0 ? 'lightgreen' : index % 2 === 0 ? '#F6DDCC' : '#fff',
                     },
                   ]}
                   onPress={() =>
@@ -190,15 +193,95 @@ const HomeScreen = () => {
             )}
           />
         ) : (
-          <MapView
-            initialRegion={{
-              latitude: 37.78825,
-              longitude: -122.4324,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-            style={{ width: '100%', height: '100%' }}
-          />
+          <View style={styles.container}>
+            <TouchableOpacity
+              onPress={navigateToMyLocation}
+              style={{
+                position: 'absolute',
+                bottom: 60,
+                right: 10,
+                zIndex: 222,
+                paddingHorizontal: 10,
+                paddingVertical: 9,
+                borderRadius: 20,
+                backgroundColor: '#fff8ff',
+              }}
+            >
+              <Ionicons name="accessibility" style={{ fontSize: 28 }} />
+            </TouchableOpacity>
+            <MapView
+              showsUserLocation
+              showsMyLocationButton
+              followsUserLocation
+              //METHOD TO FETCH USER LOCATION , USE ON YOUR OWN
+              onUserLocationChange={(e) => {
+                setUserLocation({
+                  latitude: e.nativeEvent.coordinate?.latitude || 0,
+                  longitude: e.nativeEvent.coordinate?.longitude || 0,
+                });
+              }}
+              ref={ref}
+              style={{ flex: 1 }}
+              initialRegion={position} // Set initial region to current position
+              onLayout={() => {
+                let temp = studentsEmails.filter(
+                  (item: { latitude: null; longitude: null }) =>
+                    item.latitude != null && item.longitude != null
+                );
+                ref.current.fitToCoordinates(temp, {
+                  edgePadding: {
+                    top: 10,
+                    right: 10,
+                    bottom: 10,
+                    left: 10,
+                  },
+                  animated: true,
+                });
+              }}
+            >
+              <Marker
+                coordinate={{ ...userLocation }}
+                title="Your Location"
+                description="This is where you are"
+              />
+              {children.map(
+                (
+                  child: {
+                    latitude: string;
+                    longititude: string;
+                    firstname: string | undefined;
+                    lastname: string | undefined;
+                  },
+                  index: React.Key | null | undefined
+                ) => {
+                  const latitude = parseFloat(child.latitude);
+                  const longitude = parseFloat(child.longititude);
+
+                  // Check if latitude and longitude are valid numbers
+                  if (isNaN(latitude) || isNaN(longitude)) {
+                    console.log(
+                      `Invalid coordinates for child ${child.firstname}:`,
+                      child.latitude,
+                      child.longititude
+                    );
+                    return null; // Skip rendering this marker
+                  }
+
+                  return (
+                    <Marker
+                      key={index}
+                      coordinate={{
+                        latitude: latitude,
+                        longitude: longitude,
+                      }}
+                      title={child.firstname}
+                      description={child.lastname}
+                    />
+                  );
+                }
+              )}
+            </MapView>
+          </View>
         )}
       </View>
     </>
