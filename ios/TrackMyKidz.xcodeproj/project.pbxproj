@@ -12,9 +12,9 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		355DF943ECA2DAECE8160A8B /* Pods_TrackMyKidz_TrackMyKidzTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 401FC59498E33EAF197E8D7D /* Pods_TrackMyKidz_TrackMyKidzTests.framework */; };
-		55E7FD652C2C6DD90019BA13 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 55E7FD642C2C6DD90019BA13 /* GoogleService-Info.plist */; };
 		7BA6F3E1DF6EDFDDD21C4F71 /* Pods_TrackMyKidz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5BE2E62DAF89E838C4ADF21 /* Pods_TrackMyKidz.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8C4580A52C2F14700032E74D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8C4580A42C2F14700032E74D /* GoogleService-Info.plist */; };
 		8C5E243E2BA5E49400BB4F5C /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E242A2BA5E49400BB4F5C /* AntDesign.ttf */; };
 		8C5E243F2BA5E49400BB4F5C /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E242B2BA5E49400BB4F5C /* Entypo.ttf */; };
 		8C5E24402BA5E49400BB4F5C /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E242C2BA5E49400BB4F5C /* EvilIcons.ttf */; };
@@ -59,9 +59,9 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = TrackMyKidz/main.m; sourceTree = "<group>"; };
 		401FC59498E33EAF197E8D7D /* Pods_TrackMyKidz_TrackMyKidzTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TrackMyKidz_TrackMyKidzTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		41836A7B909202937C267720 /* Pods-TrackMyKidz-TrackMyKidzTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TrackMyKidz-TrackMyKidzTests.release.xcconfig"; path = "Target Support Files/Pods-TrackMyKidz-TrackMyKidzTests/Pods-TrackMyKidz-TrackMyKidzTests.release.xcconfig"; sourceTree = "<group>"; };
-		55E7FD642C2C6DD90019BA13 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Library/Containers/net.whatsapp.WhatsApp/Data/tmp/documents/88E6F584-6AC2-422B-8DB9-A6FF5931C7F5/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		74F8F475DCA9EEE213D22A43 /* Pods-TrackMyKidz.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TrackMyKidz.debug.xcconfig"; path = "Target Support Files/Pods-TrackMyKidz/Pods-TrackMyKidz.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = TrackMyKidz/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8C4580A42C2F14700032E74D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8C5E242A2BA5E49400BB4F5C /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AntDesign.ttf; sourceTree = "<group>"; };
 		8C5E242B2BA5E49400BB4F5C /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
 		8C5E242C2BA5E49400BB4F5C /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
@@ -128,7 +128,7 @@
 		13B07FAE1A68108700A75B9A /* TrackMyKidz */ = {
 			isa = PBXGroup;
 			children = (
-				55E7FD642C2C6DD90019BA13 /* GoogleService-Info.plist */,
+				8C4580A42C2F14700032E74D /* GoogleService-Info.plist */,
 				8C5E243D2BA5E49400BB4F5C /* Fonts */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
@@ -333,7 +333,7 @@
 				8C5E244D2BA5E49400BB4F5C /* MaterialIcons.ttf in Resources */,
 				8C5E24462BA5E49400BB4F5C /* FontAwesome6_Brands.ttf in Resources */,
 				8C5E244E2BA5E49400BB4F5C /* Octicons.ttf in Resources */,
-				55E7FD652C2C6DD90019BA13 /* GoogleService-Info.plist in Resources */,
+				8C4580A52C2F14700032E74D /* GoogleService-Info.plist in Resources */,
 				8C5E244F2BA5E49400BB4F5C /* SimpleLineIcons.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				8C5E24472BA5E49400BB4F5C /* FontAwesome6_Regular.ttf in Resources */,

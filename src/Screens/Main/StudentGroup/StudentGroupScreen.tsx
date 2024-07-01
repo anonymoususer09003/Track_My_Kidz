@@ -32,6 +32,7 @@ import * as Stomp from 'react-native-stompjs';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
+import { AppHeader } from '@/Components';
 
 const StudentGroupScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
@@ -530,6 +531,7 @@ useEffect(() => {
           </Text>
         )}
       </View>
+      <AppHeader hideCenterIcon={showFamilyMap?false: true} hideCalendar={true} showGlobe={true} />
     </>
   );
 };

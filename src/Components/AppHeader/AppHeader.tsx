@@ -43,7 +43,7 @@ type AppHeaderProps = {
 const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
   const user_type = useSelector((state: { userType: UserTypeState }) => state.userType.userType);
   const isCalendarVisible = useSelector((state: { modal: ModalState }) => state.modal.showCalendar);
-  // const hideCalendar = props?.hideCalendar || false;
+  const hideCalendar = props?.hideCalendar || false;
   const hideApproval = props?.hideApproval || false;
   const goBack = props.goBack;
   const { showFamilyMap } = useSelector(
@@ -117,10 +117,13 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
 
   const renderListItem = () => {
     if (user_type === 'instructor') {
-      if (route.name === 'InstructorActivity') {
+     
         return <Image style={{ height: 27, width: 27 }} source={calendarIcon} />;
       }
-    } else if (user_type === 'parent') {
+     else if (user_type === 'parent') {
+      if (props.isCalendar) {
+        return <Image style={{ height: 27, width: 27 }} source={calendarIcon} />;
+      }
       if (props?.thumbnail) {
         return <></>;
       }
@@ -184,14 +187,15 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
           icon={renderHomeIcon}
           onPress={() => {
             if (user_type === 'instructor') {
-              navigation.reset({
-                index: 0,
-                routes: [
-                  {
-                    name: 'InstructorActivity',
-                  },
-                ],
-              });
+              navigation.replace('InstructorActivity')
+              // navigation.reset({
+              //   index: 0,
+              //   routes: [
+              //     {
+              //       name: 'InstructorActivity',
+              //     },
+              //   ],
+              // });
             } else if (user_type === 'student') {
               navigation.navigate('StudentActivity');
               dispatch(
@@ -207,7 +211,16 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
                 })
               );
             } else {
+              if(props.isCalendar)
+              {
+                dispatch(
+                  ChangeModalState.action({
+                    showCalendar: true,
+                  })
+                );
+              }
               // if(user_type === "parent"){
+             else{
               navigation.navigate('Home');
               // }
               if (props?.thumbnail) {
@@ -219,15 +232,16 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
               }
               props?.setThumbnail && props?.setThumbnail(false);
             }
+            }
           }}
         />
       )}
       {/*{!hideCalendar && (*/}
       <TopNavigationAction
-        icon={renderListItem}
+        icon={!hideCalendar?renderListItem:null}
         style={{ marginLeft: 10 }}
         onPress={() => {
-          console.log('props?.isCalendar', props?.isCalendar, props?.thumbnail);
+         
           if (route.name === 'HomeScreen') {
             dispatch(
               ChangeModalState.action({
@@ -296,9 +310,7 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
     );
 
   const AccessoryRight = () => {
-    console.log('AppHeader.tsx line 306 isBack', isBack);
-    console.log('AppHeader.tsx line 306 user_type', user_type);
-    console.log('AppHeader.tsx line 306 hideApproval', hideApproval);
+
     return isBack ? (
       <></>
     ) : (

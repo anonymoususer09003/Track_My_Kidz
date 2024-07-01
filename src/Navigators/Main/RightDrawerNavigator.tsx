@@ -48,6 +48,7 @@ import InstructorChatNavigator from '@/Navigators/Main/InstructorChatNavigator';
 import { SingleChatScreen } from '@/Screens/Chats';
 import { SingleChatScreenRouteParams } from '@/Screens/Chats/SingleChatScreen';
 // @ts-ignore
+import PaymentInformationScreen from '@/Screens/PaymentInfo/PaymentInfoScreen';
 import * as Stomp from 'react-native-stompjs';
 import { loadToken } from '@/Storage/MainAppStorage';
 import SockJS from 'sockjs-client';
@@ -145,8 +146,7 @@ const RightDrawerNavigator = () => {
   // useEffect(() => {
   //   const connectToSocket = async () => {
   //     const token = await loadToken();
-  //     console.log('-------------------------------------------------------------------');
-  //     console.log(token);
+    
   //     const socket = new SockJS(Config.WS_URL);
   //     stompClient.current = Stomp.over(socket);
   //     stompClient.current.connect({ token }, () => {
@@ -155,7 +155,7 @@ const RightDrawerNavigator = () => {
   //       if (user_type !== 'parent') locationPermission();
   //     });
   //   };
-  //   setTimeout(connectToSocket, 3000);
+  //   setTimeout(connectToSocket, 15000);
   // }, []);
   const disconnectStompClient = () => {
     if (stompClient.current && stompClient.current.connected) {
@@ -197,7 +197,7 @@ const RightDrawerNavigator = () => {
       } catch (error) {
         console.log(error);
       }
-    }, 2000);
+    }, 15000);
 
     // if (times > 4) {
     //   disconnectStompClient();
@@ -205,45 +205,45 @@ const RightDrawerNavigator = () => {
     // }
   };
 
-  const trackAndroidAnIos = async () => {
-    try {
-      // Geolocation.setRNConfiguration({ enableBackgroundLocationUpdates: true, skipPermissionRequests: true });
-      // Geolocation.getCurrentPosition(({ coords }) => {
-      //   console.log('coords', coords);
-      //   sendCoordinates(coords.latitude, coords.longitude);
-      // }, console.log);
+  // const trackAndroidAnIos = async () => {
+  //   try {
+  //     // Geolocation.setRNConfiguration({ enableBackgroundLocationUpdates: true, skipPermissionRequests: true });
+  //     // Geolocation.getCurrentPosition(({ coords }) => {
+  //     //   console.log('coords', coords);
+  //     //   sendCoordinates(coords.latitude, coords.longitude);
+  //     // }, console.log);
 
-      // BackgroundTimer.clearInterval(intervalId);
+  //     // BackgroundTimer.clearInterval(intervalId);
 
-      BackgroundGeolocation.ready({}).then((state: any) => {
-        // YES -- .ready() has now resolved.
-        intervalIdRef.current = setInterval(() => {
-          BackgroundGeolocation.getCurrentPosition({})
-            .then((res) => {
-              if (user_type) sendCoordinates(res.coords.latitude, res.coords.longitude);
-            })
-            .catch(console.log);
-        }, 2000);
-        BackgroundGeolocation.start();
-      });
-    } catch (err) {
-      console.log('trackAndroidAnIos error TrackerProvider.tsx line 139', err);
-    }
-  };
-  const sendCoordinates = async (latitude: number, longitude: number) => {
-    const token = await loadToken();
-    const deviceId = await getUniqueId();
+  //     BackgroundGeolocation.ready({}).then((state: any) => {
+  //       // YES -- .ready() has now resolved.
+  //       intervalIdRef.current = setInterval(() => {
+  //         BackgroundGeolocation.getCurrentPosition({})
+  //           .then((res) => {
+  //             if (user_type) sendCoordinates(res.coords.latitude, res.coords.longitude);
+  //           })
+  //           .catch(console.log);
+  //       }, 15000);
+  //       BackgroundGeolocation.start();
+  //     });
+  //   } catch (err) {
+  //     console.log('trackAndroidAnIos error TrackerProvider.tsx line 139', err);
+  //   }
+  // };
+  // const sendCoordinates = async (latitude: number, longitude: number) => {
+  //   const token = await loadToken();
+  //   const deviceId = await getUniqueId();
 
-    stompClient.current.send(
-      '/socket/ws-location',
-      { token },
-      JSON.stringify({
-        latitude,
-        longitude,
-        deviceId,
-      })
-    );
-  };
+  //   stompClient.current.send(
+  //     '/socket/ws-location',
+  //     { token },
+  //     JSON.stringify({
+  //       latitude,
+  //       longitude,
+  //       deviceId,
+  //     })
+  //   );
+  // };
   const subscriptions: any[] = [];
   const trackDevicesById = async (stompClient: any, deviceIds: string[]) => {
     try {
@@ -379,8 +379,10 @@ const RightDrawerNavigator = () => {
           <Stack.Screen name="CreateParentActivity" component={CreateParentActivityScreen} />
           <Stack.Screen name="Approval" component={ApprovalNavigator} />
           <Stack.Screen name="ActivationCode" component={ActivationCodeScreen} />
-          <Stack.Screen name="DependentInfo" component={DependentInfoScreen} />
+  
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="PaymentInfo" component={PaymentInformationScreen} />
+          <Stack.Screen name="DependentInfo" component={DependentInfoScreen} />
           <Stack.Screen name="ParentDeletePermission" component={ParentDeletePermission} />
           <Stack.Screen name="PersonalProfile" component={PersonalProfileScreen} />
           <Stack.Screen name="ImportParentDependentScreen" component={ImportDependentScreen} />

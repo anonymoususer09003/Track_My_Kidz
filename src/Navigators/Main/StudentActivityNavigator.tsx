@@ -8,10 +8,10 @@ import Colors from '@/Theme/Colors';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { TabBar } from '@ui-kitten/components';
 import moment from 'moment';
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
 type StudentActivityNavigatorProp = {
   StudentActivityInner: undefined;
   StudentGroup: undefined;
@@ -65,7 +65,13 @@ const StudentActivityNavigator: FC = () => {
       })}
     </TabBar>
   );
-
+useEffect(()=>{
+  dispatch(
+    ChangeModalState.action({
+      showCalendar: false,
+    })
+  );
+},[])
   return (
     <BackgroundLayout hideLeftIcon={true} title="Event Information" rightIcon={true}>
       {isCalendarVisible && (
@@ -107,7 +113,7 @@ const StudentActivityNavigator: FC = () => {
           component={StudentGroupScreen}
         />
       </TabNavigator.Navigator>
-      <AppHeader hideCenterIcon={true} hideCalendar={!!showFamilyMap} showGlobe={true} />
+      {/* <AppHeader hideCenterIcon={showFamilyMap?false: true} hideCalendar={showFamilyMap? true:false} showGlobe={true} /> */}
     </BackgroundLayout>
   );
 };

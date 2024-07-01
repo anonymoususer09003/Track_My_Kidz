@@ -414,7 +414,7 @@ const ActivityScreen = () => {
 
   return (
     <>
-      <AppHeader isCalendar={true} />
+      <AppHeader isCalendar={true} hideCalendar={false}/>
       {selectedGroup && showModal && (
         <GroupParticipantsModal
           isVisible={showModal}

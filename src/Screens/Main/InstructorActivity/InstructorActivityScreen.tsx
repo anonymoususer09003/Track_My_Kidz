@@ -1187,6 +1187,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
       </View>
 
       <AppHeader
+  
         onAddPress={() => {
           navigation.navigate('CreateActivity');
           _dispatch({

@@ -54,6 +54,7 @@ import BackgroundService from 'react-native-background-actions';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { calculateDistance } from '@/Utils/DistanceCalculator';
+import { AppHeader } from '@/Components';
 
 const StudentActivityScreen: FC = () => {
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
@@ -1165,6 +1166,7 @@ const StudentActivityScreen: FC = () => {
           </MapView>
         </View>
       )}
+      <AppHeader hideCenterIcon={showFamilyMap?false: true} hideCalendar={showFamilyMap? true:false} showGlobe={true} />
     </>
   );
 };

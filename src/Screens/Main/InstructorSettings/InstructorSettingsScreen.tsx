@@ -185,6 +185,26 @@ const InstructorSettingsScreen = ({navigation}: {navigation: any}) => {
               name="chevron-right-outline"
             />
           </TouchableOpacity>
+
+          <TouchableOpacity
+              onPress={() => navigation.navigate('Notifications')}
+              style={[
+                [
+                  Layout.row,
+                  Layout.justifyContentBetween,
+                  Layout.alignItemsCenter,
+                  styles.otherItems,
+                ],
+              ]}
+            >
+              <Text style={{ fontSize: 16 }}>Notifications</Text>
+              <Icon
+                style={styles.icon}
+                fill={Colors.gray}
+                name="chevron-right-outline"
+              />
+            </TouchableOpacity>
+
           <TouchableOpacity
             onPress={() => navigation.navigate('OrganizationInfo')}
             style={[

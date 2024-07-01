@@ -879,6 +879,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
       </View>
 
       <AppHeader
+      hideCalendar={true}
         onAddPress={() => {
           navigation.navigate('CreateGroup');
         }}

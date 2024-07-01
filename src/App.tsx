@@ -42,7 +42,7 @@ export default function App() {
         <StateProvider initialState={initialState} reducer={reducer}>
           <MenuProvider>
             <PersistGate loading={null} persistor={persistor}>
-              <IconRegistry icons={[EvaIconsPack]} />
+              <IconRegistry icons={EvaIconsPack} />
               <ApplicationNavigator />
             </PersistGate>
           </MenuProvider>

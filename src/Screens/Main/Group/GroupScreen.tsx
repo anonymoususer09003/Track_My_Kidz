@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Icon, Text } from '@ui-kitten/components';
-import { FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
@@ -18,7 +18,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 import { ModalState } from '@/Store/Modal';
 import { CHILDREN_FROM_PARENT_GROUP_SCREEN } from '@/Constants';
-
+import { AppHeader } from '@/Components';
 const children = CHILDREN_FROM_PARENT_GROUP_SCREEN;
 
 const GroupScreen = () => {
@@ -134,7 +134,12 @@ const GroupScreen = () => {
       outputRange: [1, 0],
       extrapolate: 'clamp',
     });
+    useEffect(()=>{
+
+    },[])
     return (
+      <>
+         <AppHeader isCalendar={true} />
       <View
         style={{
           flexDirection: 'column',
@@ -191,6 +196,7 @@ const GroupScreen = () => {
           </TouchableOpacity>
         )}
       </View>
+      </>
     );
   };
   const closeRow = (index: number) => {
@@ -208,6 +214,7 @@ const GroupScreen = () => {
 
   return (
     <>
+       <AppHeader hideCalendar={true} isCalendar={true} />
       {isVisible && (
         <InstructionsModal
           group={selectedInstructions}

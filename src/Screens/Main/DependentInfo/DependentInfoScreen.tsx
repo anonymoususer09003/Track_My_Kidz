@@ -49,6 +49,9 @@ const DependentInfoScreen = () => {
 
   useEffect(() => {
     console.log("-------00000");
+    if(focused)
+    {
+      try{
     Geolocation.getCurrentPosition((pos: any) => {
       console.log("-------00000", pos);
       const crd = pos?.coords;
@@ -58,7 +61,13 @@ const DependentInfoScreen = () => {
         latitudeDelta: 0.0421,
         longitudeDelta: 0.0421,
       });
-    }, ()=>{}, ()=>{});
+    }, );
+  }
+  catch(err)
+  {
+    console.log('err',err)
+  }
+  }
   }, [focused]);
 
   // };
@@ -303,7 +312,7 @@ const DependentInfoScreen = () => {
                   (item?.childSchool ? item.childSchool : "") || ""
                 }`}</Text>
 
-                <View
+                {/* <View
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
@@ -390,7 +399,7 @@ const DependentInfoScreen = () => {
                       }}
                     />
                   </View>
-                </View>
+                </View> */}
                 <View style={styles.cardFooter}>
                   <TouchableOpacity
                     onPress={() => {
@@ -459,7 +468,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     elevation: 2,
     overflow: "hidden",
-    height: 170,
+    height: 100,
   },
   cardFooter: {
     borderTopWidth: 1,

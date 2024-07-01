@@ -105,11 +105,12 @@ export default SearchBar;
 
 const styles = StyleSheet.create({
   background: {
-    flex: 0,
+
     color: Colors.white,
     zIndex: -1,
-    padding: 20,
+    padding: 25,
     width: '100%',
     backgroundColor: Colors.primary,
+    margin:0
   },
 });

@@ -407,9 +407,8 @@ const HomeScreen = () => {
       <AppHeader
         // title="Home"
         onAddPress={() => navigation.navigate('CreateParentActivity')}
-        thumbnail={thumbnail}
         setThumbnail={(value) => setThumbnail(value)}
-        hideCalendar={thumbnail ? false : true}
+        hideCalendar={false}
       />
       {isCalendarVisible && (
         <Calendar
@@ -424,7 +423,7 @@ const HomeScreen = () => {
       <SearchBar
         searchText={searchParam}
         onChangeText={(value) => setSearchParam(value)}
-        thumbnailView={thumbnail}
+        thumbnailView={false}
         onToggleChange={() => {
           setThumbnail(!thumbnail);
           dispatch(
@@ -433,8 +432,8 @@ const HomeScreen = () => {
             })
           );
         }}
-        thumbnail={thumbnail}
-        isThumbnail
+        thumbnail={false}
+        isThumbnail={false}
         showFilter
         showDropdown={showChildFilter}
         setShowDropdown={(value) => {
@@ -469,11 +468,13 @@ const HomeScreen = () => {
                 setChildren(res);
                 let studentsMarker = [...originalStudentsEmails];
                 let markers = studentsMarker[index.row - 1];
-                setStudentsEmail(markers);
+
+         
+                setStudentsEmail([markers]);
               }
               setSelectedChild(child);
             }}
-            label={(evaProps: any) => <Text {...evaProps}></Text>}
+            // label={(evaProps: any) => <Text {...evaProps}></Text>}
           >
             <SelectItem title="All" />
             {originalChildren &&
