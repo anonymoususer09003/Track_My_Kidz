@@ -2,12 +2,14 @@ import Colors from "@/Theme/Colors";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
+  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+
 const CustomDropdown: React.FC = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
@@ -19,22 +21,22 @@ const CustomDropdown: React.FC = (props) => {
   const handleOptionSelect = (value: string) => {
     setSelectedValue(value);
     setIsOpen(false);
+    props.onSelect(value);
   };
+
   useEffect(() => {
     if (props?.value) {
       setSelectedValue(props?.value);
     }
-    console.log("props", props);
   }, [props?.value]);
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
         disabled={props?.disable}
-        style={styles.dropdownHeader}
+        style={[styles.dropdownHeader,props?.style?.customDropDown&&props?.style?.customDropDown]}
         onPress={toggleDropdown}
       >
-        {/* <PersonIcon /> */}
         <Text
           style={[
             styles.selectedValue,
@@ -51,77 +53,56 @@ const CustomDropdown: React.FC = (props) => {
         />
       </TouchableOpacity>
 
-      {isOpen && (
-        <View style={[styles.dropdownContainer, { zIndex: 2 }]}>
-          <View style={styles.dropdownOptions}>
-            <FlatList
-              // nestedScrollEnabled={true}
-              data={props?.dropDownList}
-              keyExtractor={(item, index) => index}
-              renderItem={({ item, index }) => {
-                console.log("index", index);
-                return (
+      <Modal
+        visible={isOpen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsOpen(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPressOut={() => setIsOpen(false)}
+        >
+          <View style={styles.dropdownContainer}>
+            <View style={styles.dropdownOptions}>
+              <FlatList
+                data={props?.dropDownList}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
                   <TouchableOpacity
                     key={index}
                     style={styles.dropdownOption}
-                    onPress={() => {
-                      props.onSelect(index);
-                      setIsOpen(false);
-                    }}
+                    onPress={() => handleOptionSelect(item.name)}
                   >
                     <Text style={styles.optionText}>{item?.name}</Text>
                   </TouchableOpacity>
-                );
-              }}
-            />
-
-            {/* <ScrollView nestedScrollEnabled={true}>
-              {props?.dropDownList?.map((item, index) => {
-                console.log("itm", item);
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.dropdownOption}
-                    onPress={() => {
-                      props.onSelect(index);
-                      setIsOpen(false);
-                    }}
-                  >
-                    <Text style={styles.optionText}>{item?.name}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView> */}
+                )}
+              />
+            </View>
           </View>
-        </View>
-      )}
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
+    width: "100%",
     alignItems: "center",
-    zIndex: 1,
-    // position: "relative",
   },
   dropdownHeader: {
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
     backgroundColor: "#f7f9fc",
-
+    borderColor: Colors.textInputBorderColor,
+    elevation: 2,
     height: 40,
-    borderRadius: 10,
-    elevation: 5,
-    marginTop: 10,
-    alignSelf: "center",
-    width: "100%",
-  },
-  leftIcon: {
-    marginRight: 10,
+    borderRadius: 6,
+    borderWidth: 2,
+    width: "95%",
   },
   selectedValue: {
     flex: 1,
@@ -131,34 +112,29 @@ const styles = StyleSheet.create({
   rightIcon: {
     marginLeft: 10,
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
   dropdownContainer: {
-    position: "absolute",
-    top: "100%",
-    left: 10,
-    right: 0,
-    zIndex: 2,
-    borderWidth: 0,
     width: "95%",
+    backgroundColor: "white",
+    borderRadius: 5,
+    maxHeight: 200,
+    elevation: 2,
   },
   dropdownOptions: {
-    marginTop: 10,
     borderWidth: 0,
     borderColor: "#ccc",
     borderRadius: 5,
     backgroundColor: "white",
-    zIndex: 2,
-    maxHeight: 200,
-    // position: "absolute",
-    // overflow: "hidden",
   },
   dropdownOption: {
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
-    zIndex: 2,
-  },
-  optionIcon: {
-    marginRight: 10,
   },
   optionText: {
     fontSize: 16,

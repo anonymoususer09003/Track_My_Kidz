@@ -25,8 +25,9 @@ import { UserState } from '@/Store/User';
 import ChangeUserState from '@/Store/User/FetchOne';
 import Colors from '@/Theme/Colors';
 import { RouteProp, useIsFocused, useNavigation } from '@react-navigation/native';
+import Autocomplete from '@/Components/CustomAutocomplete';
 import {
-  Autocomplete,
+
   AutocompleteItem, CheckBox, Datepicker, Divider,
   Input,
   Radio,
@@ -52,7 +53,7 @@ import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavig
 import { StackNavigationProp } from '@react-navigation/stack';
 import { TimeStampSelect } from '@/Components/TimeStampSelect/TimeStampSelect';
 import { SubmitButton } from '@/Components/SubmitButton/SubmitButton';
-
+import { CustomTextDropDown } from '@/Components';
 const _days = WEEK_DAYS;
 
 const timeStamp = TIME_STAMP;
@@ -279,7 +280,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
   const getActivityDetail = () => {
     GetActivity(activity?.activityId)
       .then((res) => {
-        console.log('res099090900900909', res);
+        
 
         let students = res?.students?.map((item: any) => ({
           name: item?.firstName + ' ' + item.lastName,
@@ -295,7 +296,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
           isEdit: true,
           instructorId: item?.instructorActivityId,
         }));
-        console.log('instructors', instructors);
+      
         setInstructorList(instructors);
         setStudents(students);
         setInformation({ ...infomation, ...res });
@@ -400,7 +401,39 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
       getActivityDetail();
     }
   }, [isFocused]);
-
+  const fetchState=async()=>{
+    try{
+  let res=await    GetAllStates(
+        currentUser?.country)
+        setStates(res.data);
+        setStatesData(res.data);
+    }
+    catch(err)
+    {
+      console.log('err',err)
+    }
+  }
+  const fetchCity=async()=>{
+    try{
+  let res=await    GetAllCities( currentUser?.country,
+        currentUser?.state)
+        setCities(res.data);
+        setCitiesData(res.data);
+    }
+    catch(err)
+    {
+      console.log('err',err)
+    }
+  }
+    useEffect(()=>{
+    
+  
+      fetchState()
+      fetchCity()
+    
+  
+                          
+  },[])
   useEffect(() => {
     if (isFocused) {
       setInitialValues({
@@ -431,7 +464,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
             .format('hh:mm a')
           : timeStamp[3],
         // activity && activity?.date.split(" ")[2],
-        fromCountry: activity?.venueFromCountry || '',
+        fromCountry: activity?.venueFromCountry || currentUser?.country||  '',
         fromVenueName: activity?.venueFromName || '',
         fromAddress: activity?.venueFromAddress || '',
         fromCity: activity?.venueFromCity || currentUser?.city || '',
@@ -442,7 +475,9 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
         venueName: activity?.venueToName || '',
         address: activity?.venueToAddress || '',
         city: infomation?.venueToCity || '',
-        selectedCity: infomation?.venueToCity || '',
+        selectedCity: infomation?.venueToCity?infomation?.venueToCity  : currentUser?.state
+        ? currentUser?.state
+        : '',
         state: infomation?.venueToState
           ? infomation?.venueToState
           : currentUser?.state
@@ -493,7 +528,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
           }}
         />
 
-        <ScrollView style={styles.layout}>
+        <ScrollView style={styles.layout} keyboardShouldPersistTaps="handled">
           {/* <Text
           textBreakStrategy={"highQuality"}
           style={{
@@ -1050,7 +1085,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                               }}
                             />
                           </Datepicker>
-                          <Select
+                          {/* <Select
                             value={values.fromTime}
                             style={{
                               marginTop: 5,
@@ -1066,7 +1101,16 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                             )}
                           >
                             <TimeStampSelect timeStamp={timeStamp} />
-                          </Select>
+                          </Select> */}
+<View style={{width:'50%',marginTop:22,}}>
+<CustomTextDropDown   value={typeof values?.fromTime=='object'?values.fromTime?.name:values?.fromTime}   placeholder="Time" dropDownList={timeStamp} 
+onSelect={(name:any)=>    {  
+
+  setFieldValue('fromTime', name)
+
+}}/>
+</View>
+
                         </View>
                         <View
                           style={{
@@ -1087,7 +1131,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                             }}
                           />
                           {/* {console.log("values", values.toTime)} */}
-                          <Select
+                          {/* <Select
                             value={values.toTime}
                             style={{
                               marginTop: 5,
@@ -1103,7 +1147,16 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                             )}
                           >
                             <TimeStampSelect timeStamp={timeStamp} />
-                          </Select>
+                          </Select> */}
+<View style={{width:'50%',marginTop:22,}}>
+<CustomTextDropDown    value={typeof values?.toTime=='object'?values.toTime?.name:values?.toTime}  placeholder="Time" dropDownList={timeStamp} 
+onSelect={(name:any)=>    {  
+
+  setFieldValue('toTime', name)
+
+}}/>
+</View>
+
                         </View>
                       </>
                     )}
@@ -1181,7 +1234,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                                 }}
                               />
                             </Datepicker>
-                            <Select
+                            {/* <Select
                               value={values.fromTime}
                               style={{
                                 marginTop: 5,
@@ -1197,7 +1250,14 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                               )}
                             >
                               <TimeStampSelect timeStamp={timeStamp} />
-                            </Select>
+                            </Select> */}
+                         <View style={{width:'50%',marginTop:22,}}>
+                            <CustomTextDropDown    value={typeof values?.fromTime=='object'?values.fromTime?.name:values?.fromTime}   placeholder="Time" dropDownList={timeStamp} 
+onSelect={(name:any)=>    {  
+  setFieldValue('fromTime', name)
+
+}}/>
+</View>
                           </View>
                           <View
                             style={{
@@ -1221,7 +1281,9 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                               }}
                             />
                             {/* {console.log("values", values.toTime)} */}
-                            <Select
+                            
+                            
+                            {/* <Select
                               disabled={values?.noEnd}
                               value={values.toTime}
                               style={{
@@ -1238,7 +1300,14 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                               )}
                             >
                               <TimeStampSelect timeStamp={timeStamp} />
-                            </Select>
+                            </Select> */}
+                            <View style={{width:'50%',marginTop:22,}}>
+                            <CustomTextDropDown   value={typeof values?.toTime=='object'?values.toTime?.name:values?.toTime}  placeholder="Time" dropDownList={timeStamp} 
+onSelect={(name:any)=>    {  
+  setFieldValue('toTime', name)
+
+}}/>
+</View>
                           </View>
                         </>
 
@@ -1437,19 +1506,12 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                       <Autocomplete
                         placeholder="Country*"
                         value={values?.fromCountry}
-                        placement="bottom"
-                        style={styles.textInput}
+                     data={countriesData}
+                        style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
                         // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                        onChangeText={(query) => {
-                          setFieldValue('fromCountry', query);
-                          setCountriesData(
-                            countries.filter((item) =>
-                              filterCountries(item, query),
-                            ),
-                          );
-                        }}
+                       
                         onSelect={(query) => {
-                          const selectedCountry = countriesData[query];
+                          const selectedCountry = query;
                           console.log('000000', selectedCountry.name);
                           setFieldValue('fromCountry', selectedCountry.name);
                           setFieldValue(
@@ -1463,34 +1525,22 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                             selectedCountry.name.replace(/ /g, ''),
                           ).then((res) => {
                             setStates(res.data);
-                            setStatesData(states);
+                            setStatesData(res.data);
                           });
                         }}
-                      >
-                        {countriesData?.map((item, index) => {
-                          return (
-                            <AutocompleteItem
-                              style={styles.autoCompleteItem}
-                              key={index}
-                              title={item.name}
-                            />
-                          );
-                        })}
-                      </Autocomplete>
+                    />
+                       
+                    
                       <Autocomplete
                         placeholder="State"
                         value={values.fromState}
-                        placement="bottom"
-                        style={styles.textInput}
+                    
+                        style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
+                        data={statesData}
                         // label={evaProps => <Text {...evaProps}>State</Text>}
-                        onChangeText={(query) => {
-                          setFieldValue('fromState', query);
-                          setStatesData(
-                            states.filter((item) => filterStates(item, query)),
-                          );
-                        }}
+                   
                         onSelect={(query) => {
-                          const selectedState = statesData[query];
+                          const selectedState =query;
                           setFieldValue('fromState', selectedState);
                           setFieldValue('fromSelectedState', selectedState);
                           setFieldValue('fromSelectedCity', '');
@@ -1501,46 +1551,26 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                             selectedState,
                           ).then((res) => {
                             setCities(res.data);
+                            setCitiesData(res.data)
                           });
                         }}
-                      >
-                        {statesData.map((item, index) => {
-                          return (
-                            <AutocompleteItem
-                              style={styles.autoCompleteItem}
-                              key={index}
-                              title={item}
-                            />
-                          );
-                        })}
-                      </Autocomplete>
+                      />
+                       
                       <Autocomplete
+                      data={citiesData}
                         placeholder="City"
                         value={values.fromCity}
-                        placement="bottom"
-                        style={styles.textInput}
+                       
+                        style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
                         // label={evaProps => <Text {...evaProps}>City</Text>}
-                        onChangeText={(query) => {
-                          setFieldValue('fromCity', query);
-                          setCitiesData(
-                            cities?.filter((item) => filterCities(item, query)),
-                          );
-                        }}
+                       
                         onSelect={(query) => {
-                          setFieldValue('fromCity', citiesData[query]);
-                          setFieldValue('fromSelectedCity', citiesData[query]);
+                          setFieldValue('fromCity', query);
+                          setFieldValue('fromSelectedCity',query);
                         }}
-                      >
-                        {citiesData.map((item, index) => {
-                          return (
-                            <AutocompleteItem
-                              style={styles.autoCompleteItem}
-                              key={index}
-                              title={item}
-                            />
-                          );
-                        })}
-                      </Autocomplete>
+                    />
+                       
+                    
                       <Input
                         style={styles.textInput}
                         placeholder="Zip/Post Code"
@@ -1656,19 +1686,12 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                           <Autocomplete
                             placeholder="Country*"
                             value={values.country}
-                            placement="bottom"
-                            style={styles.textInput}
+                        data={countriesData}
+                            style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
                             // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                            onChangeText={(query) => {
-                              setFieldValue('country', query);
-                              setCountriesData(
-                                countries.filter((item) =>
-                                  filterCountries(item, query),
-                                ),
-                              );
-                            }}
+                          
                             onSelect={(query) => {
-                              const selectedCountry = countriesData[query];
+                              const selectedCountry = query;
                               console.log('000000', selectedCountry.name);
                               setFieldValue('country', selectedCountry.name);
                               setFieldValue(
@@ -1685,32 +1708,17 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                                 setStatesData(states);
                               });
                             }}
-                          >
-                            {countriesData?.map((item, index) => {
-                              return (
-                                <AutocompleteItem
-                                  key={index}
-                                  title={item.name}
-                                />
-                              );
-                            })}
-                          </Autocomplete>
+                          />
+                          
                           <Autocomplete
                             placeholder="State"
                             value={values.state}
-                            placement="bottom"
-                            style={styles.textInput}
+                       data={statesData}
+                            style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
                             // label={evaProps => <Text {...evaProps}>State</Text>}
-                            onChangeText={(query) => {
-                              setFieldValue('state', query);
-                              setStatesData(
-                                states.filter((item) =>
-                                  filterStates(item, query),
-                                ),
-                              );
-                            }}
+                         
                             onSelect={(query) => {
-                              const selectedState = statesData[query];
+                              const selectedState = query;
                               setFieldValue('state', selectedState);
                               setFieldValue('toSelectedState', selectedState);
                               setFieldValue('toSelectedCity', '');
@@ -1723,41 +1731,25 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                                 setCities(res.data);
                               });
                             }}
-                          >
-                            {statesData.map((item, index) => {
-                              return (
-                                <AutocompleteItem key={index} title={item} />
-                              );
-                            })}
-                          </Autocomplete>
+                          />
+                          
                           <Autocomplete
                             placeholder="City"
                             value={values.city}
-                            placement="bottom"
-                            style={{ marginVertical: 5 }}
+                         data={citiesData}
+
+                         style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
                             // label={evaProps => <Text {...evaProps}>City</Text>}
-                            onChangeText={(query) => {
-                              setFieldValue('city', query);
-                              setCitiesData(
-                                cities.filter((item) =>
-                                  filterCities(item, query),
-                                ),
-                              );
-                            }}
+                           
                             onSelect={(query) => {
-                              setFieldValue('city', citiesData[query]);
+                              setFieldValue('city', query);
                               setFieldValue(
                                 'toSelectedCity',
                                 citiesData[query],
                               );
                             }}
-                          >
-                            {citiesData.map((item, index) => {
-                              return (
-                                <AutocompleteItem key={index} title={item} />
-                              );
-                            })}
-                          </Autocomplete>
+                          />
+                           
 
                           <Input
                             style={styles.textInput}

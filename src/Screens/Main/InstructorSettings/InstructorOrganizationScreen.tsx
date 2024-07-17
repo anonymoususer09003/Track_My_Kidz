@@ -1,11 +1,11 @@
 import { Text } from '@ui-kitten/components';
 import React, { FC, useEffect, useState } from 'react';
-import { Dimensions, FlatList, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, ScrollView, StyleSheet, TouchableOpacity, View, Image } from 'react-native';
 import * as yup from 'yup';
 import Colors from '@/Theme/Colors';
 import Icon from 'react-native-vector-icons/Entypo';
 import { RouteProp, useIsFocused } from '@react-navigation/native';
-
+import moment from 'moment';
 // import { useTheme } from "@/Theme";
 import { Cell, Table, TableWrapper } from 'react-native-table-component';
 import { FindInstructorBySchoolOrg, GetInstructor } from '@/Services/Instructor';
@@ -225,123 +225,82 @@ const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route
           borderRadius: 20,
         }}
       >
-        <ScrollView
-          contentContainerStyle={{
-            height: height * 0.55,
-            overflow: 'hidden',
-            marginTop: 50,
-            marginLeft: 15,
+
+
+        <FlatList
+          data={
+           instructors
+          }
+          showsVerticalScrollIndicator={false}
+          style={{
+            padding: 10,
+            width: '100%',
+            marginTop: 10,
           }}
-          horizontal={true}
-        >
-          <View style={styles.container}>
-            <Table
-              borderStyle={{
-                borderWidth: 0,
-              }}
-            >
-              <TableWrapper style={styles.row}>
-                {tableData.tableHead.map((cellData: any, cellIndex: number) => (
-                  <Cell
-                    width={
-                      cellIndex == 0 || cellIndex == 1
-                        ? 60
-                        : cellIndex == 2
-                          ? 190
-                          : cellIndex == 3
-                            ? 80
-                            : cellIndex == 4
-                              ? 65
-                              : 45
-                    }
-                    // widthArr={[
-                    //   windowWidth / 4.0,
-                    //   windowWidth / 4.0,
-                    //   windowWidth / 2.0,
-                    //   windowWidth / 4.0,
-                    //   windowWidth / 4.0,
+          contentContainerStyle={{ paddingBottom: 100 }}
+          renderItem={({ item, index }) => {
+          
+            return (
+          
+                <View
+                  style={[
+                    styles.item,
+                    {
+                      backgroundColor: '#fff',
+                    },
+                  ]}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedInstructor(item);
+                      setVisible(true);
+                    }}
+                  >
+                   {item?.isAdmin&& <Text
+                      style={[
+                        styles.text,
+                      {fontWeight:800}
+                      ]}
+                    >
+                      Admin
+                    </Text>}
 
-                    // ]}
-                    key={cellIndex}
-                    data={cellData}
-                    style={[
-                      styles.head,
-                      {
-                        // borderTopLeftRadius:
-                        //   cellIndex == 0 ? 20 : 0,
-                        // borderTopRightRadius:
-                        //   cellIndex + 1 ==
-                        //   tableData.tableData.length
-                        //     ? 20
-                        //     : 0,
-                        backgroundColor: Colors.primary,
-                      },
-                    ]}
-                    textStyle={[
-                      styles.tableHeadertext,
-                    ]}
-                  />
-                ))}
-              </TableWrapper>
-            </Table>
-            <View style={styles.tableView}>
-              <Table>
-                <FlatList
-                  nestedScrollEnabled
-                  keyboardShouldPersistTaps="handled"
-                  data={tableData.tableData}
-                  renderItem={({ item, index }) => {
-                    return (
-                      <View key={index}>
-                        <TableWrapper
-                          key={index}
-                          style={{ flexDirection: 'row' }}
-                        >
-                          {item.map((cellData: any, cellIndex: any) => {
-                            return (
-                              <Cell
-                                style={{
-                                  marginLeft: cellIndex < 2 ? 5 : 0,
-                                  alignItems: 'center'
-                                }}
-                                width={
-                                  cellIndex == 0 || cellIndex == 1
-                                    ? 60
-                                    : cellIndex == 2
-                                      ? 190
-                                      : cellIndex == 3
-                                        ? 80
-                                        : cellIndex == 4
-                                          ? 65
-                                          : 45
-                                }
-                                key={cellIndex}
-                                data={
-                                  cellIndex > 3
-                                    ? elements(
-                                      cellIndex,
-                                      cellData,
-                                      tableData.item[index],
-                                    )
-                                    : cellData
-                                }
-                                textStyle={styles.text}
-                              />
-                            );
-                          })}
-                        </TableWrapper>
-                      </View>
-                    );
-                  }}
-                />
-              </Table>
-            </View>
-          </View>
-        </ScrollView>
+                  <Text
+                      style={[
+                        styles.text,
+                        {fontWeight:800}
+                      ]}
+                    >
+                      {item?.firstname+" "+ item?.lastname}
+                    </Text>
 
-        <Text style={[styles.errorText, { textAlign: 'center', fontSize: 18 }]}>
-          {'Scroll to the right'}
-        </Text>
+                    <Text
+                      style={[
+                        styles.text,
+                      
+                      ]}
+                    >
+                      {item?.email}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.text,
+                      
+                      ]}
+                    >
+                      {item?.phone||''}
+                    </Text>
+
+                
+                  </TouchableOpacity>
+
+                
+                </View>
+         
+            );
+          }}
+         
+        />
       </View>
     </BackgroundLayout>
   );
@@ -385,6 +344,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop:20,
+    borderRadius:10,
+    paddingHorizontal:10,
+    paddingTop:10
   },
   actions: {
     flexDirection: 'row',
@@ -574,5 +537,18 @@ const styles = StyleSheet.create({
     shadowRadius: 50,
     elevation: 5,
   },
-  text: {},
+  footerText: {
+    fontSize: 14,
+    marginVertical: 2,
+  },
+  horizontal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+
+  text: {
+    fontSize: 14,
+    marginVertical: 4,
+  },
 });

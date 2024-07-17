@@ -3017,6 +3017,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native/normalize-color@npm:*":
+  version: 2.1.0
+  resolution: "@react-native/normalize-color@npm:2.1.0"
+  checksum: 10c0/95814a1e2aac9c00dfc2c65f9e2caec07f70d3dba903b5640f5cf24605bf39863e572f2a5138a85d1c514fb3c33f6931595e0a9f738a58b5c220ee74f2bec13b
+  languageName: node
+  linkType: hard
+
 "@react-native/normalize-colors@npm:0.73.2, @react-native/normalize-colors@npm:^0.73.0":
   version: 0.73.2
   resolution: "@react-native/normalize-colors@npm:0.73.2"
@@ -3966,6 +3973,8 @@ __metadata:
     prettier: "npm:2.8.8"
     react: "npm:18.2.0"
     react-native: "npm:0.73.6"
+    react-native-autocomplete-dropdown: "npm:^4.0.0-rc.5"
+    react-native-autocomplete-input: "npm:^5.4.0"
     react-native-background-actions: "npm:^3.0.1"
     react-native-background-fetch: "npm:^4.2.4"
     react-native-background-geolocation: "npm:^4.16.0"
@@ -5538,6 +5547,17 @@ __metadata:
   version: 2.0.0
   resolution: "depd@npm:2.0.0"
   checksum: 10c0/58bd06ec20e19529b06f7ad07ddab60e504d9e0faca4bd23079fac2d279c3594334d736508dc350e06e510aba5e22e4594483b3a6562ce7c17dd797f4cc4ad2c
+  languageName: node
+  linkType: hard
+
+"deprecated-react-native-prop-types@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "deprecated-react-native-prop-types@npm:2.3.0"
+  dependencies:
+    "@react-native/normalize-color": "npm:*"
+    invariant: "npm:*"
+    prop-types: "npm:*"
+  checksum: 10c0/a4bf78dde109cd1a706206fa6e06f7c44e70bc327b990f0f7f936d5d0b8a2372bc78e09979fb2e84bbc5233774aca4165b3ecd17a74765ccc11cead4827380ca
   languageName: node
   linkType: hard
 
@@ -7316,7 +7336,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"invariant@npm:^2.2.4":
+"invariant@npm:*, invariant@npm:^2.2.4":
   version: 2.2.4
   resolution: "invariant@npm:2.2.4"
   dependencies:
@@ -10149,6 +10169,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prop-types@npm:*, prop-types@npm:^15.5.10, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.7.x, prop-types@npm:^15.8.0, prop-types@npm:^15.8.1":
+  version: 15.8.1
+  resolution: "prop-types@npm:15.8.1"
+  dependencies:
+    loose-envify: "npm:^1.4.0"
+    object-assign: "npm:^4.1.1"
+    react-is: "npm:^16.13.1"
+  checksum: 10c0/59ece7ca2fb9838031d73a48d4becb9a7cc1ed10e610517c7d8f19a1e02fa47f7c27d557d8a5702bec3cfeccddc853579832b43f449e54635803f277b1c78077
+  languageName: node
+  linkType: hard
+
 "prop-types@npm:15.7.2":
   version: 15.7.2
   resolution: "prop-types@npm:15.7.2"
@@ -10157,17 +10188,6 @@ __metadata:
     object-assign: "npm:^4.1.1"
     react-is: "npm:^16.8.1"
   checksum: 10c0/4eb527daec962acd789c621ce3234a6f077ce202049291642d8efd13b19805adf07227672c570531cdb56a357640ea27e336527682b7ed4be0c5b392a01662ab
-  languageName: node
-  linkType: hard
-
-"prop-types@npm:^15.5.10, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.7.x, prop-types@npm:^15.8.0, prop-types@npm:^15.8.1":
-  version: 15.8.1
-  resolution: "prop-types@npm:15.8.1"
-  dependencies:
-    loose-envify: "npm:^1.4.0"
-    object-assign: "npm:^4.1.1"
-    react-is: "npm:^16.13.1"
-  checksum: 10c0/59ece7ca2fb9838031d73a48d4becb9a7cc1ed10e610517c7d8f19a1e02fa47f7c27d557d8a5702bec3cfeccddc853579832b43f449e54635803f277b1c78077
   languageName: node
   linkType: hard
 
@@ -10349,6 +10369,40 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-animatable@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "react-native-animatable@npm:1.4.0"
+  dependencies:
+    prop-types: "npm:^15.8.1"
+  checksum: 10c0/658f15aa3744c3d6a22a44ab4609afc4335ff06d0a200a1fba513e470ebb4bd561ab709204b3777ee53cad526f695e2b4290e057a50fcd461aca337e407fe2b1
+  languageName: node
+  linkType: hard
+
+"react-native-autocomplete-dropdown@npm:^4.0.0-rc.5":
+  version: 4.0.0-rc.5
+  resolution: "react-native-autocomplete-dropdown@npm:4.0.0-rc.5"
+  dependencies:
+    lodash.debounce: "npm:^4.0.8"
+    react-native-animatable: "npm:^1.4.0"
+    react-native-feather: "npm:^1.1.2"
+    react-native-size-matters: "npm:^0.4.2"
+  peerDependencies:
+    react: ">=18.0.0"
+    react-native: ">=0.60.0"
+    react-native-svg: ">=13.0.0"
+  checksum: 10c0/fe19e4762cb11d6be2524e2c5c59c23c8a1184c28ef472b37d7fb56c3d88f6ccee769783e73d932f7d07a11fc68742bebe39190570a418d5338ee462de30d961
+  languageName: node
+  linkType: hard
+
+"react-native-autocomplete-input@npm:^5.4.0":
+  version: 5.4.0
+  resolution: "react-native-autocomplete-input@npm:5.4.0"
+  dependencies:
+    deprecated-react-native-prop-types: "npm:^2.3.0"
+  checksum: 10c0/14b59bcd908523a1741553f8d38961720f288180bfb8334d324c2c5a61c31013e4eb44c3653704a07ff68fd808ab4537bafe1bc3756706ab28b5394b98ab8099
+  languageName: node
+  linkType: hard
+
 "react-native-background-actions@npm:^3.0.1":
   version: 3.0.1
   resolution: "react-native-background-actions@npm:3.0.1"
@@ -10467,6 +10521,16 @@ __metadata:
     react: ^17 || ^18
     react-native: ">=0.60.0"
   checksum: 10c0/4ebeae53ffeadf1e7e5e133c1cfda81f9efe978f9ece10c732a0338149fe9104681bfdabc8427dad7c934b02bfcbd0e205bb6ca43e2844abc6054630ebe34454
+  languageName: node
+  linkType: hard
+
+"react-native-feather@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "react-native-feather@npm:1.1.2"
+  peerDependencies:
+    react-native: ">=0.46"
+    react-native-svg: ">=5.3"
+  checksum: 10c0/9c11866c6cc18fc7c0c563713fec74c8ad75a3519b7445b9ca49ae7f16c6e2a5fc6cc44f04bb0ecb406ac5b95e4845b43ac5e959c4be01ff7e2367b5de34d653
   languageName: node
   linkType: hard
 
@@ -10722,6 +10786,15 @@ __metadata:
   version: 10.2.1
   resolution: "react-native-share@npm:10.2.1"
   checksum: 10c0/534e6930d337d7e48de5572d8d6afac865bdad027a5d1c7fa843c7adba702d594b82cf2bb8124f82ffb1b4171f78754744c97a88b2fa5e5fda479f486768d42e
+  languageName: node
+  linkType: hard
+
+"react-native-size-matters@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "react-native-size-matters@npm:0.4.2"
+  peerDependencies:
+    react-native: "*"
+  checksum: 10c0/56715d33d02f10d4ca358761420cc9a971b3872c11b9fa403afd4f0b2bbf74148fd3c4c799959727fb61c576a474e3e1155ffadc247c12d70fadcb562b4a9f29
   languageName: node
   linkType: hard
 

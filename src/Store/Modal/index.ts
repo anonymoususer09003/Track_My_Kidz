@@ -34,6 +34,9 @@ export default buildSlice('modal', [ChangeModalState], {
   editInstructorFormModalVisibility: false,
   studentVisibilityPermissionModal: false,
   viewBusInformationModal: false,
+  showCreateScheduleModal:false,
+  showDeleteScheduleModal:false,
+  deleteAllSchedules:false
 }).reducer;
 
 export interface ModalState {
@@ -71,4 +74,7 @@ export interface ModalState {
   studentVisibilityPermissionModal: boolean;
   imagePickerModal: boolean;
   viewBusInformationModal: boolean;
+  showCreateScheduleModal:boolean;
+  showDeleteScheduleModal:boolean;
+  deleteAllSchedules:boolean;
 }

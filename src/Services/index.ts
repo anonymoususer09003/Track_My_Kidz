@@ -2,6 +2,7 @@ import axios from "axios";
 import handleError from "@/Services/utils/handleError";
 import { Config } from "@/Config";
 import { loadToken } from "@/Storage/MainAppStorage";
+import header from "@/Store/header";
 
 const instance = axios.create({
   baseURL: Config.API_URL,
@@ -33,8 +34,8 @@ instance.interceptors.request.use(async (request) => {
         request.headers.Authorization = "Bearer " + token;
     }
   }
-  console.log(request.headers);
-  console.log(request.data);
+
+console.log('request',request.headers)
   return request;
 });
 

@@ -77,7 +77,7 @@ const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = ({ navigation }) => 
               // activationNumber: values.activationCode,
               // password: values.password,
             };
-            dispatch(ChangeModalState.action({ loading: true }));
+            // dispatch(ChangeModalState.action({ loading: true }));
             ChangePassword(resetPasswordObject)
               .then((response) => {
                 console.log('response', response.data);
@@ -86,6 +86,7 @@ const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = ({ navigation }) => 
                   emailAddress: values.email,
                   user_type: values.user_type,
                 });
+                dispatch(ChangeModalState.action({ loading: false }));
               })
               .finally(() => {
                 dispatch(ChangeModalState.action({ loading: false }));

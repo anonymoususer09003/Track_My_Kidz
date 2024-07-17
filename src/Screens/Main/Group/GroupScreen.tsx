@@ -7,6 +7,7 @@ import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import Colors from '@/Theme/Colors';
 import Entypo from 'react-native-vector-icons/Entypo';
+import { actions } from '@/Context/state/Reducer';
 import { InstructionsModal, ShowStudentsInstructorsGroupModal } from '@/Modals';
 import { useStateValue } from '@/Context/state/State';
 import { FindGroupsByName, GetGroupByStudentId, GetGroupCount } from '@/Services/Group';
@@ -19,12 +20,13 @@ import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavig
 import { ModalState } from '@/Store/Modal';
 import { CHILDREN_FROM_PARENT_GROUP_SCREEN } from '@/Constants';
 import { AppHeader } from '@/Components';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 const children = CHILDREN_FROM_PARENT_GROUP_SCREEN;
 
 const GroupScreen = () => {
   const instructorImage = require('@/Assets/Images/approval_icon2.png');
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
-
+  const [, _dispatch]: any = useStateValue();
   const isFocused = useIsFocused();
   // const swipeableRef = useRef(null);
   const dispatch = useDispatch();
@@ -179,6 +181,25 @@ const GroupScreen = () => {
         >
           <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
         </TouchableOpacity>
+        <TouchableOpacity
+            style={{
+              padding: 5,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onPress={() => {
+              prevOpenedRow?.close();
+              _dispatch({
+                type: actions.SET_SELECTED_GROUP,
+                payload: item?.groupId,
+              });
+             navigation.navigate('GroupScehdule')
+
+            }}
+          >
+            <FontAwesome5 size={25} name="calendar" color={Colors.primary} />
+          </TouchableOpacity>
+
         {!item.status && (
           <TouchableOpacity
             onPress={() => setSelectedDependent(item)}
@@ -214,7 +235,7 @@ const GroupScreen = () => {
 
   return (
     <>
-       <AppHeader hideCalendar={true} isCalendar={true} />
+       <AppHeader hideCalendar={true} isCalendar={true} hideCenterIcon={true}/>
       {isVisible && (
         <InstructionsModal
           group={selectedInstructions}

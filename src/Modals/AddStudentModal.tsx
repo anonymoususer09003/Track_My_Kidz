@@ -13,8 +13,9 @@ import {PlaceState} from '@/Store/Places';
 import {UserState} from '@/Store/User';
 import Colors from '@/Theme/Colors';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
+import Autocomplete from '@/Components/CustomAutocomplete';
 import {
-  Autocomplete,
+
   AutocompleteItem,
   Button,
   CheckBox,
@@ -221,6 +222,7 @@ const AddStudentModal = () => {
           />
         )}
         <KeyboardAwareScrollView
+        keyboardShouldPersistTaps="handled"
           nestedScrollEnabled={true}
           style={{flex: 1, backgroundColor: Colors.newBackgroundColor}}>
           <View
@@ -484,19 +486,12 @@ const AddStudentModal = () => {
                       <Autocomplete
                         placeholder="Country*"
                         value={values.country}
-                        placement="bottom"
-                        style={styles.textInput}
+                     data={countriesData}
+                     style={{input:{...styles.textInput,marginTop:2},list:{marginHorizontal:10}}}
                         // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                        onChangeText={query => {
-                          setFieldValue('country', query);
-                          setCountriesData(
-                            countries.filter(item =>
-                              filterCountries(item, query),
-                            ),
-                          );
-                        }}
+                       
                         onSelect={query => {
-                          const selectedCountry = countriesData[query];
+                          const selectedCountry =query;
                           setFieldValue('country', selectedCountry.name);
                           setFieldValue(
                             'selectedCountry',
@@ -512,35 +507,21 @@ const AddStudentModal = () => {
                             setStatesData(states);
                           });
                           // getSchoolsByFilter(selectedCountry.name);
-                        }}>
-                        {countriesData.map((item, index) => {
-                          return (
-                            <AutocompleteItem
-                              style={styles.autoCompleteItem}
-                              key={index}
-                              title={item.name}
-                            />
-                          );
-                        })}
-                      </Autocomplete>
+                        }}/>
+                       
                       {errors.country && touched.country && (
                         <Text style={styles.errorText}>{errors.country}</Text>
                       )}
                       <Autocomplete
                         placeholder="State*"
                         value={values.state}
-                        placement="bottom"
-                        style={styles.textInput}
+                       data={statesData}
+                       style={{input:{...styles.textInput,marginTop:2},list:{marginHorizontal:10}}}
                         disabled={!values.selectedCountry}
                         // label={evaProps => <Text {...evaProps}>State</Text>}
-                        onChangeText={query => {
-                          setFieldValue('state', query);
-                          setStatesData(
-                            states.filter(item => filterStates(item, query)),
-                          );
-                        }}
+                       
                         onSelect={query => {
-                          const selectedState = statesData[query];
+                          const selectedState = query;
                           setFieldValue('state', selectedState);
                           setFieldValue('selectedState', selectedState);
                           setFieldValue('selectedCity', '');
@@ -556,33 +537,21 @@ const AddStudentModal = () => {
                           //   values.selectedCountry,
                           //   selectedState
                           // );
-                        }}>
-                        {statesData.map((item, index) => {
-                          return (
-                            <AutocompleteItem
-                              style={styles.autoCompleteItem}
-                              key={index}
-                              title={item}
-                            />
-                          );
-                        })}
-                      </Autocomplete>
+                        }}/>
+                       
+                      
                       {errors.state && touched.state && (
                         <Text style={styles.errorText}>{errors.state}</Text>
                       )}
                       <Autocomplete
                         placeholder="City*"
                         value={values.city}
-                        placement="bottom"
+                        data={cities}
+                       
                         disabled={!values.selectedState}
-                        style={styles.textInput}
+                        style={{input:{...styles.textInput,marginTop:2},list:{marginHorizontal:10}}}
                         // label={evaProps => <Text {...evaProps}>City</Text>}
-                        onChangeText={query => {
-                          setFieldValue('city', query);
-                          setCitiesData(
-                            cities.filter(item => filterCities(item, query)),
-                          );
-                        }}
+                        
                         onSelect={query => {
                           const selectedCity = citiesData[query];
                           setFieldValue('city', selectedCity);
@@ -592,18 +561,9 @@ const AddStudentModal = () => {
                             values.selectedState,
                             selectedCity,
                           );
-                        }}>
-                        {citiesData.map((item, index) => {
-                          return (
-                            <AutocompleteItem
-                              style={styles.autoCompleteItem}
-                              key={index}
-                              title={item}
-                            />
-                          );
-                        })}
-                      </Autocomplete>
-                      <View style={{width: '95%', marginLeft: 10, zIndex: 2}}>
+                        }}/>
+                       
+                      <View style={{width: '100%',  zIndex: 2,marginTop:10}}>
                         <CustomTextDropDown
                           disable={schoolsData?.length == 0 ? true : false}
                           placeholder="Select School"

@@ -160,7 +160,7 @@ const ViewBusInformation: FC<ViewBusInformationProps> = (
                               style={{
                                 borderWidth: 1,
                                 margin: 3,
-                                width: 10,
+                                width: 40,
                                 height: 40,
                                 borderRadius: 10,
                                 backgroundColor:

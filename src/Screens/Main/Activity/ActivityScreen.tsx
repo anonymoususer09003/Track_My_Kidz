@@ -92,8 +92,9 @@ const ActivityScreen = () => {
           style={{
             // flexDirection: "column",
             alignItems: 'center',
-            justifyContent: 'center',
-            height: '100%',
+           justifyContent:"space-evenly",
+            height: 200,
+            // backgroundColor:'red'
           }}
         >
           <TouchableOpacity
@@ -315,106 +316,102 @@ const ActivityScreen = () => {
     }
   }, [searchBarValue]);
 
-  useEffect(() => {
-    let temp: any[] = [];
-    let groups: any = {};
-    let trackingListKeys = Object.keys(trackingList);
-    trackingListKeys.map((item, index) => {
-      let latitude1 = trackingList[item]?.lat;
-      let longititude1 = trackingList[item]?.lang;
-      for (let j = index + 1; j < trackingListKeys.length - 1; j++) {
-        let nextParticipant = trackingList[trackingListKeys[j]];
-        let latitude2 = nextParticipant?.lat;
-        let longititude2 = nextParticipant?.lang;
-        let distance = calculateDistance(
-          latitude1,
-          longititude1,
-          latitude2,
-          longititude2,
-        );
-        const isUnderEqual100Meters = distance <= 100;
-        let participant = partcipants.find(
-          (pers) => pers?.childDeviceId == nextParticipant?.childDeviceId,
-        );
-        if (isUnderEqual100Meters) {
-          participant['group'] = true;
-          participant['groupName'] = index + 1;
-          temp.push(participant);
-          if (groups[index + 1]) {
-            let tempValue = { ...groups[index + 1] };
+  // useEffect(() => {
+  //   let temp: any[] = [];
+  //   let groups: any = {};
+  //   let trackingListKeys = Object.keys(trackingList);
+  //   trackingListKeys.map((item, index) => {
+  //     let latitude1 = trackingList[item]?.lat;
+  //     let longititude1 = trackingList[item]?.lang;
+  //     for (let j = index + 1; j < trackingListKeys.length - 1; j++) {
+  //       let nextParticipant = trackingList[trackingListKeys[j]];
+  //       let latitude2 = nextParticipant?.lat;
+  //       let longititude2 = nextParticipant?.lang;
+  //       let distance = calculateDistance(
+  //         latitude1,
+  //         longititude1,
+  //         latitude2,
+  //         longititude2,
+  //       );
+  //       const isUnderEqual100Meters = distance <= 100;
+  //       let participant = partcipants.find(
+  //         (pers) => pers?.childDeviceId == nextParticipant?.childDeviceId,
+  //       );
+  //       if (isUnderEqual100Meters) {
+  //         participant['group'] = true;
+  //         participant['groupName'] = index + 1;
+  //         temp.push(participant);
+  //         if (groups[index + 1]) {
+  //           let tempValue = { ...groups[index + 1] };
 
-            tempValue.participants = [...tempValue.participants, participant];
-            groups[index + 1] = tempValue;
-          } else {
-            groups[index + 1] = {
-              id: index + 1,
-              participants: [participant],
-            };
-          }
-        } else {
-          temp.push(participant);
-        }
-      }
+  //           tempValue.participants = [...tempValue.participants, participant];
+  //           groups[index + 1] = tempValue;
+  //         } else {
+  //           groups[index + 1] = {
+  //             id: index + 1,
+  //             participants: [participant],
+  //           };
+  //         }
+  //       } else {
+  //         temp.push(participant);
+  //       }
+  //     }
 
-      let firstPers = partcipants.find(
-        (firPer) => firPer?.childDeviceId == item,
-      );
+  //     let firstPers = partcipants.find(
+  //       (firPer) => firPer?.childDeviceId == item,
+  //     );
 
-      let isAnyParticipantExist = temp.find(
-        (temMember) => temMember?.groupName == index + 1,
-      );
-      if (isAnyParticipantExist) {
-        firstPers['group'] = true;
-        firstPers['groupName'] = index + 1;
-        temp.push(firstPers);
+  //     let isAnyParticipantExist = temp.find(
+  //       (temMember) => temMember?.groupName == index + 1,
+  //     );
+  //     if (isAnyParticipantExist) {
+  //       firstPers['group'] = true;
+  //       firstPers['groupName'] = index + 1;
+  //       temp.push(firstPers);
 
-        if (groups[index + 1]) {
-          let tempValue = { ...groups[index + 1] };
-          tempValue.participants = [...tempValue.participants, firstPers];
-          groups[index + 1] = tempValue;
-        }
+  //       if (groups[index + 1]) {
+  //         let tempValue = { ...groups[index + 1] };
+  //         tempValue.participants = [...tempValue.participants, firstPers];
+  //         groups[index + 1] = tempValue;
+  //       }
 
-        // }
-        else {
-          groups[index + 1] = {
-            id: index + 1,
-            participants: [firstPers],
-          };
-        }
-      } else {
-        temp.push(firstPers);
-      }
-    });
+  //       // }
+  //       else {
+  //         groups[index + 1] = {
+  //           id: index + 1,
+  //           participants: [firstPers],
+  //         };
+  //       }
+  //     } else {
+  //       temp.push(firstPers);
+  //     }
+  //   });
 
-    setGroups(groups);
-    let groupedArray: any[] = [];
-    let groupNames: any[] = [];
+  //   setGroups(groups);
+  //   let groupedArray: any[] = [];
+  //   let groupNames: any[] = [];
 
-    temp.forEach((item) => {
-      if (!item?.groupName || !groupNames.includes(item?.groupName)) {
-        groupedArray.push(item);
-        if (item?.groupName) {
-          groupNames.push(item?.groupName);
-        }
-      }
-    });
+  //   temp.forEach((item) => {
+  //     if (!item?.groupName || !groupNames.includes(item?.groupName)) {
+  //       groupedArray.push(item);
+  //       if (item?.groupName) {
+  //         groupNames.push(item?.groupName);
+  //       }
+  //     }
+  //   });
 
-    console.log('grouped', groupedArray);
-    setnewParticipnatsArr(groupedArray);
-    setParticipants(temp);
-  }, [trackingList]);
+  //   console.log('grouped', groupedArray);
+  //   setnewParticipnatsArr(groupedArray);
+  //   setParticipants(temp);
+  // }, [trackingList]);
 
 
-  useEffect(() => {
-    console.log('test');
-    setInterval(() => {
-      console.log('test');
-    }, 1000);
-  }, []);
 
+
+console.log('selected activity',activities)
   return (
     <>
-      <AppHeader isCalendar={true} hideCalendar={false}/>
+      <AppHeader isCalendar={true} hideCalendar={false} />
       {selectedGroup && showModal && (
         <GroupParticipantsModal
           isVisible={showModal}
@@ -681,7 +678,7 @@ const ActivityScreen = () => {
           </>
         ) : (
           <MapView style={{ flex: 1 }} ref={ref}>
-            {participants.map((item, index) => {
+            {groups[item?.groupName]?.participants?.map((item, index) => {
               let latitude = trackingList[item?.childDeviceId]?.lat;
               let longitude = trackingList[item?.childDeviceId]?.lang;
 

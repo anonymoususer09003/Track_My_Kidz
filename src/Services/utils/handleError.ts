@@ -10,7 +10,7 @@ export interface Error {
 }
 
 export default function ({ message, data, status }: Error) {
-  console.log("status", status);
+
 
   const { dispatch } = store;
   if (status == 401) {

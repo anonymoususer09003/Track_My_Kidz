@@ -6,9 +6,10 @@ import {
   RadioGroup,
   Text,
   AutocompleteItem,
-  Autocomplete,
+  // Autocomplete,
   Input,
 } from "@ui-kitten/components";
+import Autocomplete from "@/Components/CustomAutocomplete";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -24,7 +25,7 @@ import { LinearGradientButton } from "@/Components";
 import { GetActivity } from "@/Services/Activity";
 import { GetEtaGoogle } from "@/Services/JoruneyTracker";
 import ChangeSelectedState from "@/Store/Selected/ChangeSelectedState";
-import { DeclineToGift } from "@/Services/GiftService";
+
 import Colors from "@/Theme/Colors";
 import EvilIcons from "react-native-vector-icons/EvilIcons";
 import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
@@ -193,7 +194,7 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
       });
   };
   const getActivityDetail = () => {
-    console.log("seectedActivity", selectedActivity);
+
     GetActivity(selectedActivity?.activityId)
       .then((res) => {
         setActivityDetail(res);
@@ -208,14 +209,11 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
     console.log("userId", userId);
     GetInstructor(userId).then((res) => {
       if (res.schoolId) {
-        console.log(
-          "res----------------------------------------------------------------",
-          res.schoolId + " " + userId
-        );
+       
         GetSchool(res.schoolId)
           .then((org) => {
             setOrgInfo(org);
-            console.log("org", org);
+          
           })
           .catch((err) => console.log(err));
       }
@@ -331,7 +329,7 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
         );
       }}
     >
-      <KeyboardAwareScrollView style={{ height: 300 }}>
+      <KeyboardAwareScrollView style={{ height: 300 }} keyboardShouldPersistTaps="handled">
         <Card style={[styles.modal]} disabled={true}>
           <View style={styles.body}>
             <View style={{ paddingBottom: 10, paddingTop: 30 }}>
@@ -372,57 +370,38 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
               <Autocomplete
                 placeholder="Country*"
                 value={fromOthersLocation.country}
-                placement="bottom"
-                style={{ marginVertical: 5 }}
+  data={countriesFromData}
+  style={{input:styles.textInput,list:{...styles.textInput}}}
                 // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                onChangeText={(query) => {
-                  setFromOthersLocation({
-                    ...fromOthersLocation,
-                    country: query,
-                  });
-                  setCountriesFromData(
-                    countries.filter((item) => filterCountries(item, query))
-                  );
-                }}
+              
                 onSelect={(query) => {
-                  const selectedCountry = countriesFromData[query];
+                  const selectedCountry = query;
 
                   setFromOthersLocation({
                     ...fromOthersLocation,
                     state: "",
                     country: selectedCountry.name,
                   });
-                  setFromStates([]);
+            
                   GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
                     (res) => {
-                      console.log("res", res);
+                      console.log("res000", res.data);
                       setFromStates(res.data);
-                      setStatesFromData(tostates);
+                      setStatesFromData(res.data);
                     }
                   );
                 }}
-              >
-                {countriesFromData.map((item, index) => {
-                  return <AutocompleteItem key={index} title={item.name} />;
-                })}
-              </Autocomplete>
+              />
+             
               <Autocomplete
                 placeholder="State"
                 value={fromOthersLocation.state}
-                placement="bottom"
-                style={{ marginVertical: 5 }}
+            data={statesFromData}
+                style={{input:styles.textInput,list:{...styles.textInput}}}
                 // label={evaProps => <Text {...evaProps}>State</Text>}
-                onChangeText={(query) => {
-                  setFromOthersLocation({
-                    ...fromOthersLocation,
-                    state: query,
-                  });
-                  setStatesFromData(
-                    fromStates.filter((item) => filterStates(item, query))
-                  );
-                }}
+             
                 onSelect={(query) => {
-                  const selectedState = statesFromData[query];
+                  const selectedState = query;
                   // setFromOthersLocation({
                   //   ...toOthersLocation,
                   //   state: selectedState,
@@ -434,47 +413,34 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
                   });
 
                   setFromCities([]);
+                  setCitiesFromData([])
                   GetAllCities(fromOthersLocation.country, selectedState)
                     .then((res) => {
                       console.log("res----", res);
                       setFromCities(res.data);
+                      setCitiesFromData(res.data)
                     })
                     .catch((err) => console.log("err", err));
                 }}
-              >
-                {statesFromData.map((item, index) => {
-                  return <AutocompleteItem key={index} title={item} />;
-                })}
-              </Autocomplete>
+              />
+               
               <Autocomplete
                 placeholder="City"
                 value={fromOthersLocation.city}
-                placement="bottom"
-                style={{ marginVertical: 5 }}
+                data={citiesFromData}
+                style={{input:styles.textInput,list:{...styles.textInput}}}
                 // label={evaProps => <Text {...evaProps}>City</Text>}
-                onChangeText={(query) => {
+            
+                onSelect={(query) => {
                   setFromOthersLocation({
                     ...fromOthersLocation,
                     city: query,
                   });
-                  // setFieldValue("fromCity", query);
-                  setCitiesFromData(
-                    toCities.filter((item) => filterCities(item, query))
-                  );
-                }}
-                onSelect={(query) => {
-                  setFromOthersLocation({
-                    ...fromOthersLocation,
-                    city: citiesFromData[query],
-                  });
                   // setFieldValue("fromCity", citiesData[query]);
                   // setFieldValue("fromSelectedCity", citiesData[query]);
                 }}
-              >
-                {citiesFromData.map((item, index) => {
-                  return <AutocompleteItem key={index} title={item} />;
-                })}
-              </Autocomplete>
+              />
+                
               <Input
                 style={{ width: "100%" }}
                 placeholder="Address"
@@ -536,20 +502,12 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
               <Autocomplete
                 placeholder="Country*"
                 value={toOthersLocation.country}
-                placement="bottom"
-                style={{ marginVertical: 5 }}
+     
+                style={{input:styles.textInput,list:{...styles.textInput}}}
                 // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                onChangeText={(query) => {
-                  setToOthersLocation({
-                    ...toOthersLocation,
-                    country: query,
-                  });
-                  setCountriesToData(
-                    countries.filter((item) => filterCountries(item, query))
-                  );
-                }}
+              data={countriesToData}
                 onSelect={(query) => {
-                  const selectedCountry = countriesToData[query];
+                  const selectedCountry = query;
 
                   setToOthersLocation({
                     ...toOthersLocation,
@@ -560,29 +518,22 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
                   GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
                     (res) => {
                       setToStates(res.data);
-                      setStatesToData(tostates);
+                      setStatesToData(res.data);
                     }
                   );
                 }}
-              >
-                {countriesToData.map((item, index) => {
-                  return <AutocompleteItem key={index} title={item.name} />;
-                })}
-              </Autocomplete>
+              />
+               
               <Autocomplete
                 placeholder="State"
                 value={toOthersLocation.state}
-                placement="bottom"
-                style={{ marginVertical: 5 }}
+             
+                style={{input:styles.textInput,list:{...styles.textInput}}}
+                data={statesToData}
                 // label={evaProps => <Text {...evaProps}>State</Text>}
-                onChangeText={(query) => {
-                  setToOthersLocation({ ...toOthersLocation, state: query });
-                  setStatesToData(
-                    tostates.filter((item) => filterStates(item, query))
-                  );
-                }}
+               
                 onSelect={(query) => {
-                  const selectedState = statesToData[query];
+                  const selectedState = query;
                   // setToOthersLocation({
                   //   ...toOthersLocation,
                   //   state: selectedState,
@@ -596,29 +547,22 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
                   setToCities([]);
                   GetAllCities(toOthersLocation.country, selectedState).then(
                     (res) => {
+                      console.log('res,city',res.data)
                       setToCities(res.data);
+                      
                     }
                   );
                 }}
-              >
-                {statesToData.map((item, index) => {
-                  return <AutocompleteItem key={index} title={item} />;
-                })}
-              </Autocomplete>
+              />
+          
               <Autocomplete
                 placeholder="City"
                 value={toOthersLocation.city}
-                placement="bottom"
-                style={{ marginVertical: 5 }}
+               data={toCities}
+
+               style={{input:styles.textInput,list:{...styles.textInput}}}
                 // label={evaProps => <Text {...evaProps}>City</Text>}
-                onChangeText={(query) => {
-                  console.log("query", query);
-                  setToOthersLocation({ ...toOthersLocation, city: query });
-                  // setFieldValue("fromCity", query);
-                  setCitiesToData(
-                    toCities.filter((item) => filterCities(item, query))
-                  );
-                }}
+                
                 onSelect={(query) => {
                   const selectedCity = toCities[query];
                   setToOthersLocation({
@@ -628,11 +572,8 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
                   // setFieldValue("fromCity", citiesData[query]);
                   // setFieldValue("fromSelectedCity", citiesData[query]);
                 }}
-              >
-                {citiesToData.map((item, index) => {
-                  return <AutocompleteItem key={index} title={item} />;
-                })}
-              </Autocomplete>
+              />
+               
               <Input
                 style={{ width: "100%" }}
                 placeholder="Address"
@@ -770,6 +711,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     alignItems: "center",
     flexDirection: "row",
+  },
+  textInput: {
+    // marginTop: 2,
+    marginBottom:10,
+    alignSelf: 'center',
+    width: '100%',
+borderWidth:0.9,
+borderColor:Colors.borderColor,
+    borderRadius: 6,
+    elevation: 2,
+    backgroundColor:Colors.textInputBackgroundColor
   },
   backdrop: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",

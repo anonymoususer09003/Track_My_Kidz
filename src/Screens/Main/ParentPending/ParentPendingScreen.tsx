@@ -336,7 +336,10 @@ const ParentPendingScreen = () => {
                       <Text style={[styles.text, { fontSize: 25 }]}>
                         {`${item?.activity?.activityName}`}
                       </Text>
-
+                      <View style={{flexDirection:'row',alignItems:'center'}}>
+<Image source={instructorImage} style={styles.iconImages} />
+<Text>{item?.firstName+' '+ item?.lastName}</Text>
+</View>
                       <View
                         style={{
                           flexDirection: 'row',
@@ -496,6 +499,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 10,
     overflow: 'hidden',
+  },
+  iconImages: {
+    height: 14,
+    width: 14,
+    resizeMode: 'contain',
+
+    marginRight: 8,
   },
   row: {
     flexDirection: 'row',

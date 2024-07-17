@@ -6,8 +6,9 @@ import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
 import { GetAllStudents } from '@/Services/Student';
 import Colors from '@/Theme/Colors';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
+import Autocomplete from '@/Components/CustomAutocomplete';
 import {
-  Autocomplete,
+
   AutocompleteItem,
   CheckBox,
   Datepicker,
@@ -31,7 +32,7 @@ import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavig
 import { TIME_STAMP, WEEK_DAYS } from '@/Constants';
 import { CountryDTO } from '@/Models/CountryDTOs';
 import { TimeStampSelect } from '@/Components/TimeStampSelect/TimeStampSelect';
-
+import { CustomTextDropDown } from '@/Components';
 
 const _days = WEEK_DAYS;
 const filterCountries = (item: CountryDTO, query: string) => {
@@ -104,7 +105,7 @@ const CreateParentActivityScreen = () => {
     }
   }, [isFocused]);
 
-  console.log('currentUser29992929292929', currentUser);
+
   return (
     <BackgroundLayout title="Create Event">
       <GroupSelectionModal individuals={groups} setIndividuals={setGroups} />
@@ -113,7 +114,7 @@ const CreateParentActivityScreen = () => {
         setIndividuals={setStudents}
       />
 
-      <ScrollView style={styles.layout}>
+      <ScrollView style={styles.layout} keyboardShouldPersistTaps="handled">
         <Formik
           validateOnMount={true}
           initialValues={{
@@ -284,7 +285,7 @@ const CreateParentActivityScreen = () => {
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
-                      width: 50,
+                      width: '50%',
                     }}
                     onChange={(index) => {
                       setSelectedIndex(index);
@@ -469,7 +470,7 @@ const CreateParentActivityScreen = () => {
                           setFieldValue('to', date);
                         }}
                       />
-                      <Select
+                      {/* <Select
                         value={values.fromTime}
                         style={{ marginTop: 5, marginLeft: 5, width: '45%' }}
                         placeholder="From"
@@ -479,7 +480,14 @@ const CreateParentActivityScreen = () => {
                         label={(evaProps: any) => <Text {...evaProps}></Text>}
                       >
                         <TimeStampSelect timeStamp={timeStamp} />
-                      </Select>
+                      </Select> */}
+                            <View style={{width:'50%',marginTop:22,}}>
+                            <CustomTextDropDown   value={typeof values?.fromTime=='object'?values.fromTime?.name:values?.fromTime}  placeholder="Time" dropDownList={timeStamp} 
+onSelect={(name:any)=>    {  
+  setFieldValue('fromTime', name)
+
+}}/>
+</View>
                     </View>
                     <View
                       style={{
@@ -500,7 +508,7 @@ const CreateParentActivityScreen = () => {
                         }}
                       />
                       {/* {console.log("values", values.toTime)} */}
-                      <Select
+                      {/* <Select
                         value={values.toTime}
                         style={{ marginTop: 5, marginLeft: 5, width: '45%' }}
                         placeholder="To"
@@ -510,7 +518,14 @@ const CreateParentActivityScreen = () => {
                         label={(evaProps: any) => <Text {...evaProps}></Text>}
                       >
                         <TimeStampSelect timeStamp={timeStamp} />
-                      </Select>
+                      </Select> */}
+                            <View style={{width:'50%',marginTop:22,}}>
+                            <CustomTextDropDown   value={typeof values?.toTime=='object'?values.toTime?.name:values?.toTime}  placeholder="Time" dropDownList={timeStamp} 
+onSelect={(name:any)=>    {  
+  setFieldValue('toTime', name)
+
+}}/>
+</View>
                     </View>
                   </>
                 )}
@@ -536,7 +551,7 @@ const CreateParentActivityScreen = () => {
                             setFieldValue('to', date);
                           }}
                         />
-                        <Select
+                        {/* <Select
                           value={values.fromTime}
                           style={{
                             marginTop: 5,
@@ -550,7 +565,14 @@ const CreateParentActivityScreen = () => {
                           label={(evaProps: any) => <Text {...evaProps}></Text>}
                         >
                           <TimeStampSelect timeStamp={timeStamp} />
-                        </Select>
+                        </Select> */}
+                              <View style={{width:'50%',marginTop:22,}}>
+                            <CustomTextDropDown   value={typeof values?.fromTime=='object'?values.fromTime?.name:values?.fromTime}  placeholder="Time" dropDownList={timeStamp} 
+onSelect={(name:any)=>    {  
+  setFieldValue('fromTime', name)
+
+}}/>
+</View>
                       </View>
                       <View
                         style={{
@@ -572,7 +594,7 @@ const CreateParentActivityScreen = () => {
                           }}
                         />
                         {/* {console.log("values", values.toTime)} */}
-                        <Select
+                        {/* <Select
                           disabled={values?.noEnd}
                           value={values.toTime}
                           style={{
@@ -587,7 +609,14 @@ const CreateParentActivityScreen = () => {
                           label={(evaProps: any) => <Text {...evaProps}></Text>}
                         >
                           <TimeStampSelect timeStamp={timeStamp} />
-                        </Select>
+                        </Select> */}
+                              <View style={{width:'50%',marginTop:22,}}>
+                            <CustomTextDropDown   value={typeof values?.toTime=='object'?values.toTime?.name:values?.toTime}  placeholder="Time" dropDownList={timeStamp} 
+onSelect={(name:any)=>    {  
+  setFieldValue('toTime', name)
+
+}}/>
+</View>
                       </View>
                     </>
 
@@ -775,17 +804,13 @@ const CreateParentActivityScreen = () => {
                   <Autocomplete
                     placeholder="Country*"
                     value={(values as any)?.fromCountry}
-                    placement="bottom"
-                    style={styles.textInput}
+              
+                    style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
+                  
                     // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                    onChangeText={(query) => {
-                      setFieldValue('fromCountry', query);
-                      setCountriesData(
-                        countries.filter((item) => filterCountries(item, query)),
-                      );
-                    }}
+                 data={countriesData}
                     onSelect={(query) => {
-                      const selectedCountry = countriesData[query];
+                      const selectedCountry = query;
                       console.log('000000', selectedCountry.name);
                       setFieldValue('fromCountry', selectedCountry.name);
                       setFieldValue('selectedCountry', selectedCountry.name);
@@ -795,29 +820,20 @@ const CreateParentActivityScreen = () => {
                       GetAllStates(selectedCountry.name.replace(/ /g, '')).then(
                         (res) => {
                           setStates(res.data);
-                          setStatesData(states);
+                          setStatesData(res.data);
                         },
                       );
                     }}
-                  >
-                    {countriesData?.map((item, index) => {
-                      return <AutocompleteItem key={index} title={item.name} />;
-                    })}
-                  </Autocomplete>
+                  />
+                  
                   <Autocomplete
                     placeholder="State"
                     value={values.fromState}
-                    placement="bottom"
-                    style={styles.textInput}
+                    style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
                     // label={evaProps => <Text {...evaProps}>State</Text>}
-                    onChangeText={(query) => {
-                      setFieldValue('fromState', query);
-                      setStatesData(
-                        states.filter((item) => filterStates(item, query)),
-                      );
-                    }}
+                  data={statesData}
                     onSelect={(query) => {
-                      const selectedState = statesData[query];
+                      const selectedState = query;
                       setFieldValue('fromState', selectedState);
                       setFieldValue('fromSelectedState', selectedState);
                       setFieldValue('fromSelectedCity', '');
@@ -829,32 +845,22 @@ const CreateParentActivityScreen = () => {
                         },
                       );
                     }}
-                  >
-                    {statesData.map((item, index) => {
-                      return <AutocompleteItem key={index} title={item} />;
-                    })}
-                  </Autocomplete>
+                  />
+                    
                   <Autocomplete
                     placeholder="City"
                     value={values.fromCity}
-                    placement="bottom"
-                    style={styles.textInput}
+                   data={cities}
+                   style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
+                  
                     // label={evaProps => <Text {...evaProps}>City</Text>}
-                    onChangeText={(query) => {
-                      setFieldValue('fromCity', query);
-                      setCitiesData(
-                        cities.filter((item) => filterCities(item, query)),
-                      );
-                    }}
+                   
                     onSelect={(query) => {
-                      setFieldValue('fromCity', citiesData[query]);
-                      setFieldValue('fromSelectedCity', citiesData[query]);
+                      setFieldValue('fromCity', query);
+                      setFieldValue('fromSelectedCity', query);
                     }}
-                  >
-                    {citiesData.map((item, index) => {
-                      return <AutocompleteItem key={index} title={item} />;
-                    })}
-                  </Autocomplete>
+                  />
+                   
                   <Input
                     style={styles.textInput}
                     placeholder="Zip/Post Code"
@@ -958,19 +964,12 @@ const CreateParentActivityScreen = () => {
                       <Autocomplete
                         placeholder="Country*"
                         value={(values as any).country}
-                        placement="bottom"
-                        style={styles.textInput}
+                        data={countriesData}
+                        style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
                         // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                        onChangeText={(query) => {
-                          setFieldValue('country', query);
-                          setCountriesData(
-                            countries.filter((item) =>
-                              filterCountries(item, query),
-                            ),
-                          );
-                        }}
+                       
                         onSelect={(query) => {
-                          const selectedCountry = countriesData[query];
+                          const selectedCountry =query;
 
                           setFieldValue('country', selectedCountry.name);
                           setFieldValue(
@@ -984,30 +983,20 @@ const CreateParentActivityScreen = () => {
                             selectedCountry.name.replace(/ /g, ''),
                           ).then((res) => {
                             setStates(res.data);
-                            setStatesData(states);
+                            setStatesData(res.data);
                           });
                         }}
-                      >
-                        {countriesData?.map((item, index) => {
-                          return (
-                            <AutocompleteItem key={index} title={item.name} />
-                          );
-                        })}
-                      </Autocomplete>
+                      />
+                       
                       <Autocomplete
                         placeholder="State"
                         value={values.state}
-                        placement="bottom"
-                        style={styles.textInput}
+                 data={statesData}
+                        style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
                         // label={evaProps => <Text {...evaProps}>State</Text>}
-                        onChangeText={(query) => {
-                          setFieldValue('state', query);
-                          setStatesData(
-                            states.filter((item) => filterStates(item, query)),
-                          );
-                        }}
+                      
                         onSelect={(query) => {
-                          const selectedState = statesData[query];
+                          const selectedState = query;
                           setFieldValue('state', selectedState);
                           setFieldValue('toSelectedState', selectedState);
                           setFieldValue('toSelectedCity', '');
@@ -1020,32 +1009,21 @@ const CreateParentActivityScreen = () => {
                             setCities(res.data);
                           });
                         }}
-                      >
-                        {statesData.map((item, index) => {
-                          return <AutocompleteItem key={index} title={item} />;
-                        })}
-                      </Autocomplete>
+                      />
+                      
                       <Autocomplete
                         placeholder="City"
                         value={values.city}
-                        placement="bottom"
-                        style={styles.textInput}
+                  data={cities}
+                        style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
                         // label={evaProps => <Text {...evaProps}>City</Text>}
-                        onChangeText={(query) => {
-                          setFieldValue('city', query);
-                          setCitiesData(
-                            cities.filter((item) => filterCities(item, query)),
-                          );
-                        }}
+                       
                         onSelect={(query) => {
-                          setFieldValue('city', citiesData[query]);
-                          setFieldValue('toSelectedCity', citiesData[query]);
+                          setFieldValue('city', query);
+                          setFieldValue('toSelectedCity', query);
                         }}
-                      >
-                        {citiesData.map((item, index) => {
-                          return <AutocompleteItem key={index} title={item} />;
-                        })}
-                      </Autocomplete>
+                      />
+                       
 
                       <Input
                         style={styles.textInput}

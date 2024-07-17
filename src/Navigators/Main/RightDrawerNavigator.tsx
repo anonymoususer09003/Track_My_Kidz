@@ -31,7 +31,11 @@ import {
   StudentLocationScreen,
   StudentPersonalProfileScreen,
   StudentSettingsScreen,
+GroupScheduleNavigator,
+PracticesScreen,
+CompetitionScreen
 } from '@/Screens';
+
 import { Alert } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -393,6 +397,10 @@ const RightDrawerNavigator = () => {
           <Stack.Screen name="ContactUs" component={ContactUsScreen} />
           <Stack.Screen name="AppList" component={AppListScreen} />
           <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+
+          <Stack.Screen name="GroupScehdule" component={GroupScheduleNavigator}/>
+          <Stack.Screen name="PracticesScreen" component={PracticesScreen} />
+          <Stack.Screen name="CompetitionScreen" component={CompetitionScreen} />
         </>
         {/* )} */}
         {/* <Stack.Screen name="Loading" component={}/> */}

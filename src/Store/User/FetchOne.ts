@@ -22,9 +22,10 @@ interface PayloadInterface {
 }
 
 export default {
-  initialState: {},
+  initialState: {item:null},
   action: createAction<Partial<any>>("user/fetchOne"),
   reducers(state: any, { payload }: any) {
+    console.log('0000000000payload',payload)
     state.item = payload?.item;
   },
 };

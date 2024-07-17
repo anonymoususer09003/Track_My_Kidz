@@ -43,7 +43,7 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
   const onShare = async () => {
     Share.open({
       message: `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`,
-      url: 'https://trackmykidz.com/apps/',
+      url: 'https://trackmykidz.com/app',
 
       activityItemSources: [
         {
@@ -162,7 +162,7 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
                 styles.firstItem,
               ],
             ]}>
-            <Text style={{ fontSize: 16 }}>Your Profile</Text>
+            <Text style={{ fontSize: 16 }}>Profile</Text>
             <Icon
               style={styles.icon}
               fill={Colors.gray}

@@ -29,11 +29,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import SockJS from 'sockjs-client';
 // @ts-ignore
 import * as Stomp from 'react-native-stompjs';
+import { actions } from '@/Context/state/Reducer';
+import { useStateValue } from '@/Context/state/State';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
 import { AppHeader } from '@/Components';
-
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 const StudentGroupScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const [children, setChildren] = useState<any[]>([]);
@@ -46,6 +48,7 @@ const StudentGroupScreen = () => {
   const [groupCount, setGroupCount] = useState<any>({});
   const dispatch = useDispatch();
   let prevOpenedRow: any;
+  const [, _dispatch]: any = useStateValue();
   let row: any[] = [];
   const searchBarValue = useSelector(
     (state: any) => state.header.searchBarValue,
@@ -215,6 +218,9 @@ const StudentGroupScreen = () => {
           justifyContent: 'center',
         }}
       >
+
+
+
         <TouchableOpacity
           onPress={() => {
             dispatch(
@@ -247,6 +253,26 @@ const StudentGroupScreen = () => {
         >
           <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
         </TouchableOpacity>
+
+        <TouchableOpacity
+            style={{
+              padding: 5,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onPress={() => {
+              prevOpenedRow?.close();
+              _dispatch({
+                type: actions.SET_SELECTED_GROUP,
+                payload: item?.groupId,
+              });
+             navigation.navigate('GroupScehdule')
+
+            }}
+          >
+            <FontAwesome5 size={25} name="calendar" color={Colors.primary} />
+          </TouchableOpacity>
+
         {!item.status && (
           <TouchableOpacity
             style={{

@@ -31,8 +31,8 @@ export default {
     if (typeof payload.editDependentModalVisibility !== 'undefined') {
       state.editDependentModalVisibility = payload.editDependentModalVisibility;
     }
-    if (typeof payload.instructionsModalVisibility !== 'undefined') {
-      state.instructionsModalVisibility = payload.instructionsModalVisibility;
+    if (typeof payload?.instructionsModalVisibility !== 'undefined') {
+      state.instructionsModalVisibility = payload?.instructionsModalVisibility;
     }
     if (typeof payload.childrenSelectionModalVisibility !== 'undefined') {
       state.childrenSelectionModalVisibility =
@@ -125,5 +125,16 @@ export default {
     if (typeof payload.viewBusInformationModal !== 'undefined') {
       state.viewBusInformationModal = payload.viewBusInformationModal;
     }
+ 
+    if (typeof payload.showCreateScheduleModal !== 'undefined') {
+      state.showCreateScheduleModal = payload.showCreateScheduleModal;
+    }
+    if (typeof payload.showDeleteScheduleModal !== 'undefined') {
+      state.showDeleteScheduleModal = payload.showDeleteScheduleModal;
+    }
+    if (typeof payload.deleteAllSchedules !== 'undefined') {
+      state.deleteAllSchedules = payload.deleteAllSchedules;
+    }
+    
   },
 };

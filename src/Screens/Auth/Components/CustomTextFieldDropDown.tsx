@@ -105,6 +105,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1,
+    width:'90%',
+  
     // position: "relative",
   },
   dropdownHeader: {
@@ -118,7 +120,8 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginTop: 10,
     alignSelf: "center",
-    width: "100%",
+    width: '90%',
+
   },
   leftIcon: {
     marginRight: 10,

@@ -16,8 +16,9 @@ import {PlaceState} from '@/Store/Places';
 import {UserState} from '@/Store/User';
 import Colors from '@/Theme/Colors';
 import {useIsFocused} from '@react-navigation/native';
+import Autocomplete from '@/Components/CustomAutocomplete';
 import {
-  Autocomplete,
+
   AutocompleteItem,
   Button,
   Card,
@@ -29,7 +30,7 @@ import {
 } from '@ui-kitten/components';
 import {Formik} from 'formik';
 import React, {useEffect, useState} from 'react';
-import {Dimensions, ScrollView, StyleSheet, View} from 'react-native';
+import {Alert, Dimensions, ScrollView, StyleSheet, View} from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
@@ -97,7 +98,39 @@ const EditDependentModal = ({
     school: yup.string().required('Please select school'),
   });
   const dispatch = useDispatch();
+const fetchState=async()=>{
+  try{
+let res=await    GetAllStates(
+      selectedDependent?.country)
+      setStates(res.data);
+      setStatesData(res.data);
+  }
+  catch(err)
+  {
+    console.log('err',err)
+  }
+}
+const fetchCity=async()=>{
+  try{
+let res=await    GetAllCities( selectedDependent?.country,
+      selectedDependent?.state)
+      setCities(res.data);
+      setCitiesData(res.data);
+  }
+  catch(err)
+  {
+    console.log('err',err)
+  }
+}
+  useEffect(()=>{
+  if(selectedDependent)
+  {
+    fetchState()
+    fetchCity()
+  }
 
+                        
+},[selectedDependent])
   const getSchools = () => {
     GetAllSchools(0, 30)
       .then(res => {
@@ -242,10 +275,11 @@ const EditDependentModal = ({
         />
       )}
       <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="handled"
         style={{flex: 1}}
         contentContainerStyle={{flex: 1}}>
         {isFocused && (
-          <ScrollView style={{flex: 1}}>
+         
             <Card style={styles.modal} disabled={true}>
               <View style={styles.body}>
                 <View style={{paddingBottom: 10, paddingTop: 10}}>
@@ -335,6 +369,7 @@ const EditDependentModal = ({
                   selectedSchool: '',
                 }}
                 onSubmit={async (values, {resetForm}) => {
+     
                   const userId = await loadUserId();
 
                   setLoading(true);
@@ -522,6 +557,7 @@ const EditDependentModal = ({
                         <Text style={styles.errorText}>{errors.lastName}</Text>
                       )}
                       <Input
+                      disabled={true}
                         style={styles.textInput}
                         autoCapitalize="none"
                         autoCorrect={false}
@@ -561,18 +597,11 @@ const EditDependentModal = ({
                       <Autocomplete
                         placeholder="Country*"
                         value={values?.country}
-                        placement="bottom"
+               data={countriesData}
                         style={styles.textInput}
-                        onChangeText={query => {
-                          setFieldValue('country', query);
-                          setCountriesData(
-                            countries.filter(item =>
-                              filterCountries(item, query),
-                            ),
-                          );
-                        }}
+                       
                         onSelect={query => {
-                          const selectedCountry = countriesData[query];
+                          const selectedCountry = query;
                           setFieldValue('country', selectedCountry.name);
                           setFieldValue(
                             'selectedCountry',
@@ -581,70 +610,54 @@ const EditDependentModal = ({
                           setFieldValue('selectedState', '');
                           setFieldValue('state', '');
                           setStates([]);
+                          console.log("country", selectedCountry.name.replace(/ /g, ''))
                           GetAllStates(
                             selectedCountry.name.replace(/ /g, ''),
                           ).then(res => {
+                            console.log('res states999992992929929289',res.data)
                             setStates(res.data);
-                            setStatesData(states);
+                            setStatesData(res.data);
                           });
-                          getSchoolsByFilter(selectedCountry);
+                          getSchoolsByFilter(selectedCountry,);
                           // getSchoolsByFilter(selectedCountry.name);
-                        }}>
-                        {countriesData.map((item, index) => {
-                          return (
-                            <AutocompleteItem
-                              style={styles.autoCompleteItem}
-                              key={index}
-                              title={item.name}
-                            />
-                          );
-                        })}
-                      </Autocomplete>
+                        }}/>
+                       
                       {errors.country && touched.country && (
                         <Text style={styles.errorText}>{errors.country}</Text>
                       )}
                       <Autocomplete
                         placeholder="State*"
                         value={values.state}
+                        data={statesData}
                         // value={student?.state}
-                        placement="bottom"
+         
                         style={styles.textInput}
                         disabled={!values.selectedCountry}
-                        onChangeText={query => {
-                          setFieldValue('state', query);
-                          setStatesData(
-                            states.filter(item => filterStates(item, query)),
-                          );
-                        }}
+                       
                         onSelect={query => {
-                          const selectedState = statesData[query];
+                          const selectedState = query;
                           setFieldValue('state', selectedState);
                           setFieldValue('selectedState', selectedState);
                           setFieldValue('selectedCity', '');
                           setFieldValue('city', '');
                           setCities([]);
+                          console.log('payload93939939393939399393',      values.selectedCountry,
+                          selectedState,)
                           GetAllCities(
                             values.selectedCountry,
                             selectedState,
                           ).then(res => {
+                            console.log('cities------99',res.data)
                             setCities(res.data);
+                            setCitiesData(res.data)
                           });
                           getSchoolsByFilter(
                             values.selectedCountry,
                             selectedState,
                           );
                           // getSchoolsByFilter(values.selectedCountry, selectedState);
-                        }}>
-                        {statesData.map((item, index) => {
-                          return (
-                            <AutocompleteItem
-                              style={styles.autoCompleteItem}
-                              key={index}
-                              title={item}
-                            />
-                          );
-                        })}
-                      </Autocomplete>
+                        }}/>
+                        
 
                       {errors.state && touched.state && (
                         <Text style={styles.errorText}>{errors.state}</Text>
@@ -652,19 +665,13 @@ const EditDependentModal = ({
                       <Autocomplete
                         placeholder="City"
                         value={values?.city}
-                        placement="bottom"
+                      data={citiesData}
                         disabled={!values.selectedState}
                         // disabled={!student?.selectedState}
                         style={styles.textInput}
-                        onChangeText={query => {
-                          setFieldValue('city', query);
-                          // setFieldValue("selectedCity", query);
-                          setCitiesData(
-                            cities.filter(item => filterCities(item, query)),
-                          );
-                        }}
+                      
                         onSelect={query => {
-                          const selectedCity = citiesData[query];
+                          const selectedCity = query;
                           setFieldValue('city', selectedCity);
                           setFieldValue('selectedCity', selectedCity);
                           getSchoolsByFilter(
@@ -673,33 +680,30 @@ const EditDependentModal = ({
                             selectedCity,
                           );
                           // getSchoolsByFilter("", "", selectedCity);
-                        }}>
-                        {citiesData.map((item, index) => {
-                          return (
-                            <AutocompleteItem
-                              style={styles.autoCompleteItem}
-                              key={index}
-                              title={item}
-                            />
-                          );
-                        })}
-                      </Autocomplete>
+                        }}/>
+                       
                       {/* {console.log("values", values)} */}
                       <CustomTextDropDown
+                    style={{
+                      customDropDown:{
+                        width:'100%',
+                        marginTop:10
+                      }
+                    }}
                         placeholder="Select School"
                         value={values.school}
                         onSelect={(index: any) => {
                           console.log('index', index);
 
                           let school = schoolsData[index];
-                          setFieldValue('school', school.name);
+                          setFieldValue('school', school?.name||'Other');
                           setFieldValue('selectedSchool', '');
-                          if (school.name != 'Other') {
-                            setFieldValue('schoolName', school.name);
-                            setFieldValue('schoolAddress', school.address);
+                          if (school?.name != 'Other') {
+                            setFieldValue('schoolName', school?.name||'Other');
+                            setFieldValue('schoolAddress', school?.address||'Other');
                           } else {
-                            setFieldValue('schoolName', '');
-                            setFieldValue('schoolAdress', '');
+                            setFieldValue('schoolName', 'Other');
+                            setFieldValue('schoolAdress', 'Other');
                           }
                         }}
                         dropDownList={schoolsData}
@@ -804,7 +808,7 @@ const EditDependentModal = ({
                 )}
               </Formik>
             </Card>
-          </ScrollView>
+     
         )}
       </KeyboardAwareScrollView>
     </Modal>
@@ -916,7 +920,7 @@ const styles = StyleSheet.create({
   autoCompleteItem: {
     // elevation: 2,
     backgroundColor: 'transparent',
-    width: '100%',
+    width: Dimensions.get('screen').width*0.72
   },
   inputLabels: {
     color: Colors.black,

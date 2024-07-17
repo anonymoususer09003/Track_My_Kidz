@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { RouteProp, useIsFocused, useNavigation } from '@react-navigation/native';
 import { Icon, Text } from '@ui-kitten/components';
-import { ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import setHeaderParams from '@/Store/header/setHeaderParams';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useStateValue } from '@/Context/state/State';
@@ -310,6 +310,25 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
             }}
           >
             <FontAwesome5 size={25} name="reply-all" color={Colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              padding: 5,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onPress={() => {
+              // Alert.alert(JSON.stringify( item.groupId))
+              prevOpenedRow?.close();
+              _dispatch({
+                type: actions.SET_SELECTED_GROUP,
+                payload: item?.groupId,
+              });
+             navigation.navigate('GroupScehdule',{  groupId: item?.groupId,})
+
+            }}
+          >
+            <FontAwesome5 size={25} name="calendar" color={Colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity
             style={{

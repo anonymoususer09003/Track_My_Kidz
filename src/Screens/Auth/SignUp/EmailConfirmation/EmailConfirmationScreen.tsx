@@ -11,7 +11,7 @@ import Colors from '@/Theme/Colors';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 import CustomDropdown from '@/Components/CustomDropDown';
 import { VerifyCode } from '@/Services/LoginServices';
-
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 const user_types = [
   { id: 1, label: 'Parent', value: 'Parent' },
   { id: 2, label: 'Instructor', value: 'Instructor' },
@@ -81,7 +81,10 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
 
   return (
     <BackgroundLayout>
-      <KeyboardAvoidingView style={styles.container}>
+      <KeyboardAwareScrollView             
+            enableOnAndroid={true}
+            keyboardShouldPersistTaps="handled"
+    style={styles.container}>
         <View style={styles.headerContainer}>
           <Image
             style={{
@@ -237,7 +240,7 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
             </Button>
           )}
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </BackgroundLayout>
   );
 };

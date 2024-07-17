@@ -456,56 +456,56 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   //   [searchParam, user],
   //   300
   // );
-  let stompClient: any = React.createRef<Stomp.Client>();
-  const connectSockets = async () => {
-    const token = await loadToken();
-    const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
-    stompClient = Stomp.over(socket);
-    stompClient.connect({ token }, () => {
-      console.log("Connected");
-      locationPermission();
-    });
-  };
-  const locationPermission = async () => {
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-        {
-          title: 'Background Location Permission',
-          message: 'TrackMyKidz App needs access to your location',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      // const granted = await PermissionsAndroid.request(
-      //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-      // );
+  // let stompClient: any = React.createRef<Stomp.Client>();
+  // const connectSockets = async () => {
+  //   const token = await loadToken();
+  //   const socket = new SockJS("https://live-api.trackmykidz.com/ws-location");
+  //   stompClient = Stomp.over(socket);
+  //   stompClient.connect({ token }, () => {
+  //     console.log("Connected");
+  //     locationPermission();
+  //   });
+  // };
+  // const locationPermission = async () => {
+  //   if (Platform.OS === 'android') {
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+  //       {
+  //         title: 'Background Location Permission',
+  //         message: 'TrackMyKidz App needs access to your location',
+  //         buttonNeutral: 'Ask Me Later',
+  //         buttonNegative: 'Cancel',
+  //         buttonPositive: 'OK',
+  //       },
+  //     );
+  //     // const granted = await PermissionsAndroid.request(
+  //     //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+  //     // );
 
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        backgroundCall();
-      } else {
-        backgroundCall();
-      }
-    } else {
-      backgroundCall();
-      // backgroundCall();
-    }
-    // handleTrackHistorySchedule();
-  };
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       backgroundCall();
+  //     } else {
+  //       backgroundCall();
+  //     }
+  //   } else {
+  //     backgroundCall();
+  //     // backgroundCall();
+  //   }
+  //   // handleTrackHistorySchedule();
+  // };
 
-  const sendCoordinates = async (lat: any, lang: any) => {
-    const token = await loadToken();
-    stompClient.send(
-      "/socket/ws-location",
-      { token },
-      JSON.stringify({
-        latitude: lat,
-        longitude: lang,
-        deviceId: currentUser?.deviceId,
-      })
-    );
-  };
+  // const sendCoordinates = async (lat: any, lang: any) => {
+  //   const token = await loadToken();
+  //   stompClient.send(
+  //     "/socket/ws-location",
+  //     { token },
+  //     JSON.stringify({
+  //       latitude: lat,
+  //       longitude: lang,
+  //       deviceId: currentUser?.deviceId,
+  //     })
+  //   );
+  // };
 
   const handleHistorySchedule = async () => {
     // if (currentUser?.childTrackHistory) {
@@ -587,7 +587,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
 
   useEffect(() => {
     if (isFocused) {
-      connectSockets();
+      // connectSockets();
 
       // if (countries) {
       // fetchCountries();

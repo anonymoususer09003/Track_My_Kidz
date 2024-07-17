@@ -1,6 +1,6 @@
 import React, { FC, ReactElement, useState } from 'react';
 import { Image, KeyboardAvoidingView, TouchableWithoutFeedback, View } from 'react-native';
-import { Icon, Input, Layout, StyleService, Text, useStyleSheet } from '@ui-kitten/components';
+import { Icon, Input, Layout,StyleService, Text, useStyleSheet } from '@ui-kitten/components';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -13,7 +13,7 @@ import Colors from '@/Theme/Colors';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackNavigatorParamsList } from '@/Navigators/Auth/AuthNavigator';
 import { RouteProp } from '@react-navigation/native';
-
+import {  TouchableOpacity,  } from 'react-native'
 type ReportProblemScreenProps = {
   navigation: StackNavigationProp<AuthStackNavigatorParamsList, 'ResetPassword'>;
   route: RouteProp<AuthStackNavigatorParamsList, 'ResetPassword'>;
@@ -24,6 +24,7 @@ const ResetPasswordScreen: FC<ReportProblemScreenProps> = ({ route, navigation }
   const styles = useStyleSheet(themedStyles);
   const [code, setCode] = useState('');
   const [isValidCode, setIsValid] = useState(false);
+  const arrowBackIcon = require('@/Assets/Images/arrow_back.png');
   const [inValidCode, setInvalidCode] = useState(false);
   const { emailAddress, user_type } = route.params;
   const [confirmPasswordVisible, setConfirmPasswordVisible] =
@@ -90,6 +91,18 @@ const ResetPasswordScreen: FC<ReportProblemScreenProps> = ({ route, navigation }
 
   return (
     <KeyboardAvoidingView style={styles.container}>
+         <TouchableOpacity onPress={() => {
+
+navigation.goBack();
+
+}}>
+
+  <Image
+    source={arrowBackIcon}
+    style={{ height: 25, width: 25 }}
+  />
+
+</TouchableOpacity>
       <View style={styles.headerContainer}>
         <Image
           style={{
@@ -164,7 +177,11 @@ const ResetPasswordScreen: FC<ReportProblemScreenProps> = ({ route, navigation }
             {console.log('error', errors)}
             <Layout style={styles.formContainer}>
               <Input
+
+                style={[styles.inputSettings,{borderColor:Colors.white,borderWidth:0.9,color:Colors.white}]} 
                 placeholder="Activation Code"
+                placeholderTextColor={Colors.white}
+                textStyle={{color:Colors.white}}
                 // accessoryRight={renderPersonIcon}
                 value={values.activationCode}
                 onChangeText={(text) => {
@@ -180,13 +197,15 @@ const ResetPasswordScreen: FC<ReportProblemScreenProps> = ({ route, navigation }
               )}
 
               <Input
+                  placeholderTextColor={Colors.white}
                 disabled={values.activationCode.length < 6 ? true : false}
                 style={styles.inputSettings}
                 autoCapitalize="none"
                 secureTextEntry={!passwordVisible}
                 placeholder="New Password"
-                accessoryRight={renderPasswordIcon}
+                // accessoryRight={renderPasswordIcon}
                 value={values.password}
+                textStyle={{color:Colors.white}}
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
               />
@@ -194,12 +213,14 @@ const ResetPasswordScreen: FC<ReportProblemScreenProps> = ({ route, navigation }
                 <Text style={styles.errorText}>{errors.password}</Text>
               )}
               <Input
+                  placeholderTextColor={Colors.white}
                 disabled={values.activationCode.length < 6 ? true : false}
                 style={styles.inputSettings}
                 autoCapitalize="none"
+                textStyle={{color:Colors.white}}
                 secureTextEntry={!confirmPasswordVisible}
                 placeholder="Confirm New Password"
-                accessoryRight={renderConfirmPasswordIcon}
+                // accessoryRight={renderConfirmPasswordIcon}
                 value={values.confirmPassword}
                 onChangeText={handleChange('confirmPassword')}
                 onBlur={handleBlur('confirmPassword')}
@@ -280,10 +301,14 @@ const themedStyles = StyleService.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: 'background-basic-color-1',
+    backgroundColor: Colors.primary,
+    padding:20
   },
   inputSettings: {
     marginTop: 7,
+    backgroundColor: Colors.primary,
+    color:'white',
+    marginBottom:10
     // maxHeight: 35
   },
   headerContainer: {
@@ -291,10 +316,12 @@ const themedStyles = StyleService.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.primary,
   },
   formContainer: {
     flex: 3,
+    backgroundColor: Colors.primary,
+    
   },
   welcomeMessage: {
     marginTop: 16,

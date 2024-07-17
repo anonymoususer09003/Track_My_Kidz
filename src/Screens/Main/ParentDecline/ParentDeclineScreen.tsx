@@ -265,7 +265,10 @@ const ParentDeclineScreen = () => {
                     <Text style={[styles.text, { fontSize: 25 }]}>
                       {`${item?.activity?.activityName}`}
                     </Text>
-
+                    <View style={{flexDirection:'row',alignItems:'center'}}>
+<Image source={instructorImage} style={styles.iconImages} />
+<Text>{item?.firstName+' '+ item?.lastName}</Text>
+</View>
                     <View
                       style={{
                         flexDirection: 'row',
@@ -461,6 +464,13 @@ const styles = StyleSheet.create({
     marginRight: 10,
     resizeMode: 'contain',
     tintColor: Colors.secondary,
+  },
+  iconImages: {
+    height: 14,
+    width: 14,
+    resizeMode: 'contain',
+
+    marginRight: 8,
   },
   horizontal: {
     flexDirection: 'row',

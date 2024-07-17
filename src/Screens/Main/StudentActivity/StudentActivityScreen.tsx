@@ -1166,7 +1166,7 @@ const StudentActivityScreen: FC = () => {
           </MapView>
         </View>
       )}
-      <AppHeader hideCenterIcon={showFamilyMap?false: true} hideCalendar={showFamilyMap? true:false} showGlobe={true} />
+      <AppHeader hideCenterIcon={true} hideCalendar={showFamilyMap? true:false} showGlobe={true}/>
     </>
   );
 };

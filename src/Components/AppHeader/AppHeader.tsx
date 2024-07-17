@@ -38,6 +38,7 @@ type AppHeaderProps = {
   isCalendar?: boolean;
   simple?: boolean;
   title?: string;
+  scehdule?:boolean
 };
 
 const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
@@ -322,15 +323,33 @@ const AppHeader: FC<AppHeaderProps> = ({ showGlobe, ...props }) => {
           justifyContent: 'space-between',
         }}
       >
+
         {(user_type === 'parent' || user_type === 'instructor') && !hideApproval ? (
           <TouchableOpacity
             onPress={user_type === 'parent' ? onApprovalPress : onInstructorApprovalPress}
           >
             <Image source={activitiesIcon} style={{ width: 25, height: 25, marginRight: 10 }} />
           </TouchableOpacity>
-        ) : (
-          <></>
-        )}
+        ) : user_type === 'instructor' && hideApproval && props.scehdule ? (
+          <TouchableOpacity
+          style={{
+         
+          }}
+          onPress={() =>
+            {
+              dispatch(ChangeModalState.action({showDeleteScheduleModal: true,deleteAllSchedules:true }));}
+          
+          }
+        >
+          <Icon
+          size={25}
+          
+            color={Colors.white}
+            name="trash"
+          />
+        </TouchableOpacity>
+        ):
+        <></>}
         <TopNavigationAction
           // showGlobe={props.showGlobe}
           icon={(props) => renderSettingIcon({ ...props, showGlobe })}

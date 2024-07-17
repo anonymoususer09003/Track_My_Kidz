@@ -1,7 +1,7 @@
 import { RouteProp, useIsFocused } from '@react-navigation/native';
 
 import {
-  Autocomplete,
+
   AutocompleteItem,
   Button,
   ButtonElement,
@@ -16,7 +16,9 @@ import {
   Text,
   useStyleSheet,
 } from '@ui-kitten/components';
+import Autocomplete from '@/Components/CustomAutocomplete';
 import React, { FC, ReactElement, useContext, useEffect, useState } from 'react';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -33,7 +35,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import ImagePicker from 'react-native-image-crop-picker';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
-
+import { Dimensions } from 'react-native'
 import { CompleteRegistration, Register } from '@//Services/SignUpServices';
 import { LocationIcon, PersonIcon, PhoneIcon } from '@/Components/SignUp/icons';
 import { RegisterDTO } from '@/Models/UserDTOs';
@@ -439,10 +441,11 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
         </View>
       )}
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -150}
+      <KeyboardAwareScrollView
+            extraHeight={10}
+            enableOnAndroid={true}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ flex: 1 }}
       >
         {visibleImagePicker && (
           <ImagePickerModal
@@ -452,7 +455,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
           />
         )}
 
-        <ScrollView style={styles.container}>
+        <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
           {_user_type?.id === 1 ? (
             <Formik
               validationSchema={signUpValidationSchema}
@@ -587,7 +590,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                     <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={'Email: ' + emailAddress}
                       disabled={true}
                     />
@@ -596,7 +599,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="words"
                       autoCorrect={false}
                       placeholder={`Parent's First Name*`}
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={values.firstName}
                       onChangeText={handleChange('firstName')}
                       onBlur={handleBlur('firstName')}
@@ -609,7 +612,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="words"
                       autoCorrect={false}
                       placeholder={`Parent's Last Name*`}
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={values.lastName}
                       onChangeText={handleChange('lastName')}
                       onBlur={handleBlur('lastName')}
@@ -618,7 +621,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       <Text style={styles.errorText}>{errors.lastName}</Text>
                     )}
                     <Input
-                      accessoryRight={LocationIcon}
+                      // accessoryRight={LocationIcon}
                       style={styles.inputSettings}
                       autoCapitalize="words"
                       autoCorrect={false}
@@ -631,7 +634,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       <Text style={styles.errorText}>{errors.address}</Text>
                     )}
                     <Input
-                      accessoryRight={LocationIcon}
+                      // accessoryRight={LocationIcon}
                       style={styles.inputSettings}
                       autoCapitalize="words"
                       autoCorrect={false}
@@ -644,21 +647,16 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       <Text style={styles.errorText}>{errors.apartment}</Text>
                     )}
                     <Autocomplete
-                      accessoryRight={LocationIcon}
+                    data={countriesData}
+                      icon={LocationIcon}
                       placeholder="Country*"
                       value={values.country}
-                      placement={placement}
-                      style={styles.inputSettings}
-                      onChangeText={(query) => {
-                        setFieldValue('country', query);
-                        setCountriesData(
-                          countries.filter((item) =>
-                            filterCountries(item, query),
-                          ),
-                        );
-                      }}
+                     
+                      style={{input:{ 
+                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
+                     
                       onSelect={(query) => {
-                        const selectedCountry = countriesData[query];
+                        const selectedCountry = query;
                         setFieldValue('country', selectedCountry.name);
                         setFieldValue('selectedCountry', selectedCountry.name);
                         setFieldValue('selectedState', '');
@@ -673,27 +671,19 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                           ? setPhoneCode(selectedCountry.phone_code.toString())
                           : setPhoneCode('+' + selectedCountry.phone_code);
                       }}
-                    >
-                      {countriesData.map((item, index) => {
-                        return (
-                          <AutocompleteItem key={index} title={item.name} />
-                        );
-                      })}
-                    </Autocomplete>
+                    />
+                    
                     <Autocomplete
-                      accessoryRight={LocationIcon}
+                    data={dropdownStates}
+                      icon={LocationIcon}
                       placeholder="State*"
                       value={values.state}
-                      placement={placement}
-                      style={styles.inputSettings}
-                      onChangeText={(query) => {
-                        setFieldValue('state', query);
-                        setDropdownStates(
-                          states.filter((item) => isItemMatchQuery(item, query)),
-                        );
-                      }}
+                  
+                      style={{input:{ 
+                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
+                     
                       onSelect={(query) => {
-                        const selectedState = states[query];
+                        const selectedState = query;
                         setFieldValue('state', selectedState);
                         setFieldValue('selectedState', selectedState);
                         setFieldValue('selectedCity', '');
@@ -708,40 +698,32 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                           setDropdownCities(res.data);
                         });
                       }}
-                    >
-                      {dropdownStates.map((item, index) => {
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
+                   />
+                     
+                 
                     {errors.state && touched.state && (
                       <Text style={styles.errorText}>{errors.state}</Text>
                     )}
                     <Autocomplete
-                      accessoryRight={LocationIcon}
+                      icon={LocationIcon}
                       placeholder="City*"
                       value={values.city}
-                      placement={placement}
-                      style={styles.inputSettings}
-                      onChangeText={(query) => {
-                        setFieldValue('city', query);
-                        setDropdownCities(
-                          cities.filter((item) => isItemMatchQuery(item, query)),
-                        );
-                      }}
+                     data={dropdownCities}
+                     style={{input:{ 
+                      borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
+                     
                       onSelect={(query) => {
-                        setFieldValue('city', cities[query]);
-                        setFieldValue('selectedCity', cities[query]);
+                        setFieldValue('city', query);
+                        setFieldValue('selectedCity', query);
                       }}
-                    >
-                      {dropdownCities.map((item, index) => {
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
+                    />
+                      
+                    
                     {errors.city && touched.city && (
                       <Text style={styles.errorText}>{errors.city}</Text>
                     )}
                     <Input
-                      accessoryRight={LocationIcon}
+                      // accessoryRight={LocationIcon}
                       style={styles.inputSettings}
                       autoCapitalize="none"
                       autoCorrect={false}
@@ -767,7 +749,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                         autoCapitalize="none"
                         autoCorrect={false}
                         placeholder="Phone Number"
-                        accessoryRight={PhoneIcon}
+                        // accessoryRight={PhoneIcon}
                         value={values.phoneNumber}
                         keyboardType="number-pad"
                         onChangeText={handleChange('phoneNumber')}
@@ -779,7 +761,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCorrect={false}
                       secureTextEntry={!passwordVisible}
                       placeholder="Password*"
-                      accessoryRight={renderPasswordIcon}
+                      // accessoryRight={renderPasswordIcon}
                       value={values.password}
                       onChangeText={handleChange('password')}
                       onBlur={handleBlur('password')}
@@ -792,7 +774,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="none"
                       secureTextEntry={!confirmPasswordVisible}
                       placeholder="Confirm Password*"
-                      accessoryRight={renderConfirmPasswordIcon}
+                      // accessoryRight={renderConfirmPasswordIcon}
                       value={values.confirmPassword}
                       onChangeText={handleChange('confirmPassword')}
                       onBlur={handleBlur('confirmPassword')}
@@ -1005,7 +987,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                     <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={'Email: ' + emailAddress}
                       disabled={true}
                     />
@@ -1014,7 +996,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="words"
                       autoCorrect={false}
                       placeholder={`Instructor's First Name*`}
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={values.firstName}
                       onChangeText={handleChange('firstName')}
                       onBlur={handleBlur('firstName')}
@@ -1027,7 +1009,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="words"
                       autoCorrect={false}
                       placeholder={`Instructor's Last Name*`}
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={values.lastName}
                       onChangeText={handleChange('lastName')}
                       onBlur={handleBlur('lastName')}
@@ -1038,18 +1020,12 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                     <Autocomplete
                       placeholder="Country*"
                       value={values.country}
-                      placement={placement}
-                      style={styles.inputSettings}
-                      onChangeText={(query) => {
-                        setFieldValue('country', query);
-                        setCountriesData(
-                          countries.filter((item) =>
-                            filterCountries(item, query),
-                          ),
-                        );
-                      }}
+                    data={countriesData}  
+                    style={{input:{ 
+                      borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
+                    
                       onSelect={(query) => {
-                        const selectedCountry = countriesData[query];
+                        const selectedCountry = query;
                         setFieldValue('country', selectedCountry.name);
                         setFieldValue('selectedCountry', selectedCountry.name);
                         setFieldValue('selectedState', '');
@@ -1066,27 +1042,18 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                         getSchoolsByFilter(selectedCountry.name);
                         getOrgByFilter(selectedCountry.name);
                       }}
-                    >
-                      {countriesData.map((item, index) => {
-                        return (
-                          <AutocompleteItem key={index} title={item.name} />
-                        );
-                      })}
-                    </Autocomplete>
+                    />
+                     
                     <Autocomplete
                       placeholder="State*"
                       value={values.state}
-                      placement={placement}
+                data={dropdownStates}
                       disabled={!values.selectedCountry}
-                      style={styles.inputSettings}
-                      onChangeText={(query) => {
-                        setFieldValue('state', query);
-                        setDropdownStates(
-                          states.filter((item) => isItemMatchQuery(item, query)),
-                        );
-                      }}
+                      style={{input:{ 
+                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
+                     
                       onSelect={(query) => {
-                        const selectedState = states[query];
+                        const selectedState = query;
                         setFieldValue('state', selectedState);
                         setFieldValue('selectedState', selectedState);
                         setFieldValue('selectedCity', '');
@@ -1103,25 +1070,18 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                         getSchoolsByFilter(values.country, selectedState);
                         getOrgByFilter(values.country, selectedState);
                       }}
-                    >
-                      {dropdownStates.map((item, index) => {
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
+                    />
+                     
                     <Autocomplete
                       placeholder="City*"
                       value={values.city}
-                      placement={placement}
+                
                       disabled={!values.selectedState}
-                      style={styles.inputSettings}
-                      onChangeText={(query) => {
-                        setFieldValue('city', query);
-                        setDropdownCities(
-                          cities.filter((item) => isItemMatchQuery(item, query)),
-                        );
-                      }}
+                      style={{input:{ 
+                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
+                    data={dropdownCities}
                       onSelect={(query) => {
-                        const selectedCity = cities[query];
+                        const selectedCity = query;
                         setFieldValue('city', selectedCity);
                         setFieldValue('selectedCity', selectedCity);
                         getSchoolsByFilter(
@@ -1135,11 +1095,8 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                           selectedCity,
                         );
                       }}
-                    >
-                      {dropdownCities.map((item, index) => {
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
+                    />
+                    
                     <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"
@@ -1151,21 +1108,15 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                     />
                     {values.selected_entity === 'School' ? (
                       <Autocomplete
+                      data={schoolsData}
                         placeholder="School Name"
                         value={values.school}
-                        placement={placement}
-                        style={styles.inputSettings}
-                        onChangeText={(query) => {
-                          console.log('schools', schools);
-                          setFieldValue('school', query);
-                          setSchoolsData(
-                            schools.filter((item) =>
-                              isItemMatchQuery(item.name, query),
-                            ),
-                          );
-                        }}
+                       
+                        style={{input:{ 
+                          borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
+                        
                         onSelect={(query) => {
-                          const selectedSchool = schoolsData[query];
+                          const selectedSchool = query;
                           setFieldValue('school', selectedSchool.name);
                           setFieldValue('schoolId', selectedSchool.schoolId);
                           setFieldValue('schoolName', selectedSchool.name);
@@ -1174,41 +1125,31 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                           setSelectedGrades(['1st']);
                           setSelectedSubjects(['Maths']);
                         }}
-                      >
-                        {schoolsData.map((item, index) => {
-                          return (
-                            <AutocompleteItem key={index} title={item?.name} />
-                          );
-                        })}
-                      </Autocomplete>
+                      />
+                       
                     ) : (
                       <Autocomplete
+                      data={orgData}
                         placeholder="Select Organization"
                         value={values.organization}
-                        placement={placement}
-                        style={styles.inputSettings}
-                        label={(evaProps) => (
-                          <Text {...evaProps}>Organization*</Text>
+                      
+                        style={{input:{ 
+                          borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
+                        label={() => (
+                          <Text >Organization*</Text>
                         )}
-                        onChangeText={(query) => {
-                          setFieldValue('organization', query);
-                          setOrgData(
-                            org.filter((item) =>
-                              isItemMatchQuery(item.label, query),
-                            ),
-                          );
-                        }}
+                       
                         onSelect={(query) => {
-                          const selectedOrg = orgData[query];
+                          const selectedOrg = query;
 
                           setFieldValue(
                             'organizationId',
-                            schoolsData[query].organizationId,
+                            selectedOrg?.organizationId,
                           );
                           setFieldValue('organization', selectedOrg.name);
                           setFieldValue('organizationName', selectedOrg.name);
                         }}
-                      ></Autocomplete>
+                      />
                     )}
                     <View
                       style={{
@@ -1268,7 +1209,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="none"
                       autoCorrect={false}
                       placeholder="Phone Number"
-                      accessoryRight={PhoneIcon}
+                      // accessoryRight={PhoneIcon}
                       value={values.phoneNumber}
                       keyboardType="number-pad"
                       onChangeText={handleChange('phoneNumber')}
@@ -1279,7 +1220,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCorrect={false}
                       secureTextEntry={!passwordVisible}
                       placeholder="Password*"
-                      accessoryRight={renderPasswordIcon}
+                      // accessoryRight={renderPasswordIcon}
                       value={values.password}
                       onChangeText={handleChange('password')}
                       onBlur={handleBlur('password')}
@@ -1292,7 +1233,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="none"
                       secureTextEntry={!confirmPasswordVisible}
                       placeholder="Confirm Password*"
-                      accessoryRight={renderConfirmPasswordIcon}
+                      // accessoryRight={renderConfirmPasswordIcon}
                       value={values.confirmPassword}
                       onChangeText={handleChange('confirmPassword')}
                       onBlur={handleBlur('confirmPassword')}
@@ -1422,7 +1363,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       textStyle={{ color: Colors.gray }}
                       style={styles.inputSettings}
                       autoCapitalize="none"
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={'Email: ' + (student?.email || '')}
                       disabled={true}
                     />
@@ -1432,7 +1373,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="none"
                       autoCorrect={false}
                       placeholder={`Student's First Name*`}
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={values.firstName}
                       onChangeText={handleChange('firstName')}
                       onBlur={handleBlur('firstName')}
@@ -1448,7 +1389,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="none"
                       autoCorrect={false}
                       placeholder={`Student's Last Name*`}
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={values.lastName}
                       onChangeText={handleChange('lastName')}
                       onBlur={handleBlur('lastName')}
@@ -1492,7 +1433,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="none"
                       autoCorrect={false}
                       placeholder={`Parent1/Guardian1 Name*`}
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={values.parentName}
                       onChangeText={handleChange('parentName')}
                       placeholderTextColor={Colors.gray}
@@ -1508,7 +1449,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="none"
                       autoCorrect={false}
                       placeholder={`Parent2/Guardian2 Email`}
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={values.parentName2}
                       onChangeText={handleChange('parentName2')}
                       placeholderTextColor={Colors.gray}
@@ -1537,7 +1478,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                         disabled={true}
                         placeholder="Phone Number"
                         placeholderTextColor={Colors.gray}
-                        accessoryRight={PhoneIcon}
+                        // accessoryRight={PhoneIcon}
                         value={values.phoneNumber}
                         keyboardType="number-pad"
                         onChangeText={handleChange('phoneNumber')}
@@ -1563,7 +1504,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCorrect={false}
                       secureTextEntry={!passwordVisible}
                       placeholder="Password*"
-                      accessoryRight={renderPasswordIcon}
+                      // accessoryRight={renderPasswordIcon}
                       value={values.password}
                       onChangeText={handleChange('password')}
                       onBlur={handleBlur('password')}
@@ -1578,7 +1519,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       autoCapitalize="none"
                       secureTextEntry={!confirmPasswordVisible}
                       placeholder="Confirm Password*"
-                      accessoryRight={renderConfirmPasswordIcon}
+                      // accessoryRight={renderConfirmPasswordIcon}
                       value={values.confirmPassword}
                       onChangeText={handleChange('confirmPassword')}
                       onBlur={handleBlur('confirmPassword')}
@@ -1620,7 +1561,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
             </Formik>
           )}
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </BackgroundLayout>
   );
 };
@@ -1758,4 +1699,9 @@ const themedStyles = StyleService.create({
     borderRadius: 10,
   },
   editButton: {},
+  autoCompleteItem: {
+    // elevation: 2,
+
+    width: Dimensions.get('screen').width*0.82
+  },
 });

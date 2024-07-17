@@ -1,5 +1,6 @@
 export const actions = {
   SET_GROUP: "SET_GROUP",
+  SET_SELECTED_GROUP: "SET_SELECTED_GROUP",
   SET_SELECTED_ACTIVITY: "SET_SELECTED_ACTIVITY",
   SET_SELECTED_DEPENDENT_ACTIVITY: "SET_SELECTED_DEPENDENT_ACTIVITY",
   SET_CHILD_NAME: "SET_CHILD_NAME",
@@ -7,6 +8,9 @@ export const actions = {
   INSTRUCTOR_DETAIL: "INSTRUCTOR_DETAIL",
   ORG_INSTRUCTORS: "ORG_INSTRUCTORS",
   SET_TOGGLE: "SET_TOGGLE",
+  SET_SELECTED_SCHEDULE:"SET_SELECTED_SCHEDULE",
+  SET_THUMBNAIL:'SET_THUMBNAIL',
+  SET_USER:'SET_USER'
 };
 
 export const reducer = (state, action) => {
@@ -16,11 +20,36 @@ export const reducer = (state, action) => {
         ...state,
         group: action.payload,
       };
+      case actions.SET_USER:
+        return {
+          ...state,
+          user: action.payload,
+        };
+      case actions.SET_GROUP:
+        return {
+          ...state,
+          group: action.payload,
+        };
+      case actions.SET_THUMBNAIL:
+        return {
+          ...state,
+          thumbnail: action.payload,
+        };
     case actions.SET_SELECTED_ACTIVITY:
       return {
         ...state,
         selectedActivity: action.payload,
       };
+      case actions.SET_SELECTED_SCHEDULE:
+        return {
+          ...state,
+          selectedSchedule: action.payload,
+        };
+      case actions.SET_SELECTED_GROUP:
+        return {
+          ...state,
+          selectedGroup: action.payload,
+        };
     case actions.SET_SELECTED_DEPENDENT_ACTIVITY:
       return {
         ...state,

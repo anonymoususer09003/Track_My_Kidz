@@ -11,6 +11,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { AppHeader, ProfileAvatarPicker } from '@/Components';
 import { loadUserId } from '@/Storage/MainAppStorage';
 import { UpdateUser } from '../../../Services/SettingsServies';
+import { UpdateStudent } from '@/Services/Student';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
@@ -57,6 +58,7 @@ const PersonalProfileScreen = () => {
   //     resizeMode="contain"
   //   />
   // );
+
   const renderEmailIcon = () => (
     <Image
       source={email}
@@ -118,24 +120,23 @@ const PersonalProfileScreen = () => {
   //     <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
   //   </TouchableWithoutFeedback>
   // );
-  const updateProfilePic = async () => {
+  const updateProfilePic = async (image:any) => {
     let formData = new FormData();
     formData.append(
       'image',
-      uploadedImage
-        ? {
-          uri: uploadedImage?.path,
-          name: uploadedImage.mime,
-          type: uploadedImage.mime,
-        }
-        : '',
+       {
+            uri: image?.path,
+            name: image.mime+new Date(),
+            type: image.mime,
+          }
+       
     );
     formData.append('id', user?.studentId);
 
-    formData.append('parentId', user?.parentId);
+    formData.append('parentId', parseInt(user?.parentId));
     formData.append('firstname', user?.firstname);
     formData.append('lastname', user?.lastname);
-    formData.append('phone', user?.phoneNumber);
+    formData.append('phone', user?.phoneNumber||'00');
     formData.append('email', user?.email);
     formData.append('school', user?.school);
     formData.append('country', user.country);
@@ -154,25 +155,19 @@ const PersonalProfileScreen = () => {
     //   state: values.state,
     //   city: values.city,
     // };
-    UpdateUser(formData, 'student')
+    UpdateStudent(formData)
       .then(async (response: any) => {
-        console.log('res', response);
-        if (response.status == 200) {
-          setisEditMode(false);
-          setisSending(false);
-          let res = await fetchOneUserService();
-          console.log('res', res);
-          // if (!res?.childTrackHistory) {
-          //   // await BackgroundService.stop();
-          // }
-          // await BackgroundService.stop();
+     
           dispatch(
             ChangeUserState.action({
-              item: res,
+              item: response,
               fetchOne: { loading: false, error: null },
             }),
           );
-        }
+     
+          setisEditMode(false);
+          setisSending(false);
+        
       })
       .catch((error: any) => {
         console.log('err', error);
@@ -184,11 +179,11 @@ const PersonalProfileScreen = () => {
       });
   };
 
-  useEffect(() => {
-    if (selectedImage) {
-      updateProfilePic();
-    }
-  }, [selectedImage]);
+  // useEffect(() => {
+  //   if (selectedImage) {
+  //     updateProfilePic();
+  //   }
+  // }, [selectedImage]);
   const renderEditAvatarButton = (): React.ReactElement => (
     <Button
       style={styles.editAvatarButton}
@@ -209,7 +204,9 @@ const PersonalProfileScreen = () => {
     }).then(image => {
       if (image != null) {
         const source = { uri: image?.path };
+        setUploadedImage(image);
         setSelectedImage(source.uri);
+        updateProfilePic(image);
       }
     });
   };
@@ -306,62 +303,7 @@ const PersonalProfileScreen = () => {
                     parentemail2: user?.parentemail2 || '',
                   }}
                   onSubmit={(values: any) => {
-                    let formData = new FormData();
-                    formData.append(
-                      'image',
-                      uploadedImage
-                        ? {
-                          uri: uploadedImage?.path,
-                          name: uploadedImage.mime,
-                          type: uploadedImage.mime,
-                        }
-                        : {
-                          uri:
-                            user?.studentPhoto ||
-                            'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
-                          name: 'avatar',
-                          type: 'image/png',
-                        },
-                    );
-                    formData.append('id', user.studentId);
-                    formData.append('parentId', user?.parentId);
-                    formData.append('firstname', values?.firstname);
-                    formData.append('lastname', values?.lastname);
-                    formData.append('phone', values?.phoneNumber);
-                    formData.append('email', values?.email);
-                    formData.append('school', values?.school);
-                    formData.append('country', values.country);
-                    formData.append('state', values.state);
-                    formData.append('city', values.city);
-                    formData.append('parentemail1', user?.parentemail1);
-                    formData.append('parentemail2', user?.parentemail2);
-
-                    setisSending(true);
-                    // let objectToPass = {
-                    //   firstName: values.firstName,
-                    //   lastName: values.lastName,
-                    //   id: userId,
-                    //   country: values.country,
-                    //   state: values.state,
-                    //   city: values.city,
-                    // };
-                    UpdateUser(formData, 'student')
-                      .then((response: any) => {
-                        if (response.status == 200) {
-                          setisEditMode(false);
-                          setisSending(false);
-                          getUserId();
-                        }
-                      })
-                      .catch((error: any) => {
-                        Alert.alert(
-                          error.response.data.title,
-                          error.response.data.detail,
-                          [{ text: 'OK', style: 'cancel' }],
-                        );
-                        setisSending(false);
-                        setisEditMode(!isEditMode);
-                      });
+                    updateProfilePic()
                   }}>
                   {({
                       handleChange,

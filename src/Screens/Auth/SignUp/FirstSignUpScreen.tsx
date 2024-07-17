@@ -7,6 +7,7 @@ import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import Colors from '@/Theme/Colors';
 import { ReferenceCodeRegex, ReferenceCodeStyle } from '@/Theme/Variables';
 import { Normalize } from '@/Utils/Shared/NormalizeDisplay';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useIsFocused } from '@react-navigation/native';
 import {
   Button,
@@ -107,7 +108,11 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
   }, [isFocuesed]);
   return (
     <BackgroundLayout>
-      <KeyboardAvoidingView style={styles.container}>
+          <KeyboardAwareScrollView
+            extraHeight={10}
+            enableOnAndroid={true}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ flex: 1 }} style={styles.container}>
         {!showQR ? (
           <>
             <View style={styles.headerContainer}>
@@ -427,7 +432,7 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
             }
           />
         )}
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </BackgroundLayout>
   );
 };

@@ -16,8 +16,9 @@ import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import { PlaceState } from '@/Store/Places';
 import Colors from '@/Theme/Colors';
 import { RouteProp, useIsFocused } from '@react-navigation/native';
+import Autocomplete from '@/Components/CustomAutocomplete';
 import {
-  Autocomplete,
+  
   AutocompleteItem,
   Button,
   ButtonElement,
@@ -36,14 +37,16 @@ import { Props } from '@ui-kitten/components/devsupport/services/props/props.ser
 import { Formik } from 'formik';
 import React, { FC, ReactElement, useContext, useEffect, useState } from 'react';
 import {
-  KeyboardAvoidingView,
+ 
   Linking,
   Platform,
   ScrollView,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  Dimensions
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { getDeviceId } from 'react-native-device-info';
 import ImagePicker from 'react-native-image-crop-picker';
 import Toast from 'react-native-toast-message';
@@ -179,6 +182,8 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
       <Icon {...props} name={confirmPasswordVisible ? 'eye-off' : 'eye'} />
     </TouchableWithoutFeedback>
   );
+ 
+
   const renderEditAvatarButton = (): React.ReactElement => (
     <Button
       style={styles.editAvatarButton}
@@ -404,11 +409,11 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
   };
   return (
     <BackgroundLayout title="Registration">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -150}
-      >
+      <KeyboardAwareScrollView
+            extraHeight={10}
+            enableOnAndroid={true}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ flex: 1 }}>
         {visibleImagePicker && (
           <ImagePickerModal
             openCamera={imageCameraLaunch}
@@ -446,7 +451,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                   }
                   : { uri: selectedImage }
               }
-              editButton={null}
+              editButton={ renderEditAvatarButton }
             />
           )}
           {selectedImage == '' && (
@@ -471,7 +476,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
           )}
         </View>
 
-        <ScrollView style={styles.container}>
+        <ScrollView keyboardShouldPersistTaps="handled"  style={styles.container}>
           {reRender && (
             <Formik
               validationSchema={signUpValidationSchema}
@@ -980,7 +985,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                     <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={'Email: ' + emailAddress}
                       disabled={true}
                     />
@@ -989,7 +994,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                       autoCapitalize="words"
                       autoCorrect={false}
                       placeholder={`Instructor's First Name*`}
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={values.firstName}
                       onChangeText={handleChange('firstName')}
                       onBlur={handleBlur('firstName')}
@@ -1002,7 +1007,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                       autoCapitalize="words"
                       autoCorrect={false}
                       placeholder={`Instructor's Last Name*`}
-                      accessoryRight={PersonIcon}
+                      // accessoryRight={PersonIcon}
                       value={values.lastName}
                       onChangeText={handleChange('lastName')}
                       onBlur={handleBlur('lastName')}
@@ -1035,19 +1040,14 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                     )}
                     <Autocomplete
                       placeholder="Country*"
+                      data={countriesData}
                       value={values.country}
-                      placement={placement}
-                      style={styles.inputSettings}
-                      onChangeText={(query) => {
-                        setFieldValue('country', query);
-                        setCountriesData(
-                          countries.filter((item) =>
-                            filterCountries(item, query),
-                          ),
-                        );
-                      }}
+                 
+                      style={{input:{ 
+                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
+                     
                       onSelect={(query) => {
-                        const selectedCountry = countriesData[query];
+                        const selectedCountry = query;
                         setFieldValue('country', selectedCountry.name);
                         setFieldValue('selectedCountry', selectedCountry.name);
                         setFieldValue('selectedState', '');
@@ -1067,29 +1067,21 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                         getSchoolsByFilter(selectedCountry.name);
                         getOrgByFilter(selectedCountry.name);
                       }}
-                    >
-                      {countriesData.map((item, index) => {
-                        return (
-                          <AutocompleteItem key={index} title={item.name} />
-                        );
-                      })}
-                    </Autocomplete>
+                    />
+                      
+                    
                     <Autocomplete
                       placeholder="State*"
                       value={values.state}
-                      placement={placement}
-                      style={styles.inputSettings}
+              
+                      style={{input:{ 
+                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
+                     
                       disabled={!values.selectedCountry}
                       // label={evaProps => <Text {...evaProps}>State</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue('state', query);
-                        setDropdownStates(
-                          states.filter((item) => isItemMatchQuery(item, query)),
-                        );
-                        console.log(states);
-                      }}
+                     data={dropdownStates}
                       onSelect={(query) => {
-                        const selectedState = states[query];
+                        const selectedState = query;
                         setFieldValue('state', selectedState);
                         setFieldValue('selectedState', selectedState);
                         setFieldValue('selectedCity', '');
@@ -1101,6 +1093,8 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                           selectedState,
                         ).then((res) => {
                           setCities(res.data);
+                          setDropdownCities(res.data)
+                          
                           console.log(cities);
                         });
                         getSchoolsByFilter(
@@ -1109,26 +1103,19 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                         );
                         getOrgByFilter(values.selectedCountry, selectedState);
                       }}
-                    >
-                      {dropdownStates.map((item, index) => {
-                        console.log(item);
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
+                    />
+                     
                     <Autocomplete
+                    data={dropdownCities}
                       placeholder="City*"
                       value={values.city}
-                      placement={placement}
+            
                       disabled={!values.selectedState}
-                      style={styles.inputSettings}
+                      style={{input:{ 
+                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
+                     
                       // label={evaProps => <Text {...evaProps}>City</Text>}
-                      onChangeText={(query) => {
-                        setFieldValue('city', query);
-                        setDropdownCities(
-                          cities.filter((item) => isItemMatchQuery(item, query)),
-                        );
-                        console.log(cities);
-                      }}
+                      
                       onSelect={(query) => {
                         const selectedCity = cities[query];
                         setFieldValue('city', selectedCity);
@@ -1136,11 +1123,8 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                         // getSchoolsByFilter('', '', selectedCity)
                         // getOrgByFilter('', '', selectedCity)
                       }}
-                    >
-                      {dropdownCities.map((item, index) => {
-                        return <AutocompleteItem key={index} title={item} />;
-                      })}
-                    </Autocomplete>
+                    />
+                    
                     <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"
@@ -1523,7 +1507,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                       autoCapitalize="none"
                       autoCorrect={false}
                       placeholder="Phone Number"
-                      accessoryRight={PhoneIcon}
+                      // accessoryRight={PhoneIcon}
                       value={values.phoneNumber}
                       keyboardType="number-pad"
                       onChangeText={handleChange('phoneNumber')}
@@ -1534,7 +1518,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                       autoCorrect={false}
                       secureTextEntry={!passwordVisible}
                       placeholder="Password*"
-                      accessoryRight={renderPasswordIcon}
+                      // accessoryRight={renderPasswordIcon}
                       value={values.password}
                       onChangeText={handleChange('password')}
                       onBlur={handleBlur('password')}
@@ -1547,7 +1531,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                       autoCapitalize="none"
                       secureTextEntry={!confirmPasswordVisible}
                       placeholder="Confirm Password*"
-                      accessoryRight={renderConfirmPasswordIcon}
+                      // accessoryRight={renderConfirmPasswordIcon}
                       value={values.confirmPassword}
                       onChangeText={handleChange('confirmPassword')}
                       onBlur={handleBlur('confirmPassword')}
@@ -1591,7 +1575,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
             </Formik>
           )}
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </BackgroundLayout>
   );
 };
@@ -1722,4 +1706,9 @@ const themedStyles = StyleService.create({
     borderRadius: 10,
   },
   editButton: {},
+  autoCompleteItem: {
+    // elevation: 2,
+
+    width: Dimensions.get('screen').width*0.82
+  },
 });

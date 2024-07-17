@@ -1,12 +1,15 @@
 import React, { FC, useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
-
+import { useStateValue } from '@/Context/state/State';
 import { useTheme } from '@/Theme';
-import { Autocomplete, AutocompleteItem, Input, Text } from '@ui-kitten/components';
+import { AutocompleteItem, Input, Text } from '@ui-kitten/components';
 import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
 import { useDispatch, useSelector } from 'react-redux';
 import { PlaceState } from '@/Store/Places';
+import ChangeUserState from '@/Store/User/FetchOne';
+import fetchOneUserService from '@/Services/User/FetchOne';
 import * as yup from 'yup';
+import { actions } from '@/Context/state/Reducer';
 import { Formik } from 'formik';
 import { ScrollView } from 'react-native-gesture-handler';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -19,7 +22,7 @@ import { GetSchool, UpdateSchool } from '@/Services/School';
 import { loadUserId } from '@/Storage/MainAppStorage';
 import { useIsFocused } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Entypo';
-
+import Autocomplete from '@/Components/CustomAutocomplete';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -51,6 +54,7 @@ type OrganizationInfoScreenProps = {
 };
 
 const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation }) => {
+  const [, _dispatch]: any = useStateValue();
   const { Layout } = useTheme();
   const windowWidth = Dimensions.get("window").width;
   const height = Dimensions.get("screen").height;
@@ -111,7 +115,7 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
   const currentUser = useSelector(
     (state: { user: UserState }) => state.user.item
   );
-  console.log("current user", currentUser);
+
   const [countriesData, setCountriesData] = React.useState(countries);
   const [statesData, setStatesData] = React.useState<any[]>([]);
   const [citiesData, setCitiesData] = React.useState<any[]>([]);
@@ -140,6 +144,40 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
         .catch((err) => console.log(err));
     }
   };
+
+  const fetchState=async()=>{
+    try{
+  let res=await    GetAllStates(
+        currentUser?.country)
+        setStates(res.data);
+        setStatesData(res.data);
+    }
+    catch(err)
+    {
+      console.log('err',err)
+    }
+  }
+  const fetchCity=async()=>{
+    try{
+  let res=await    GetAllCities( orgInfo?.country,
+        orgInfo?.state)
+        setCities(res.data);
+        setCitiesData(res.data);
+    }
+    catch(err)
+    {
+      console.log('err',err)
+    }
+  }
+    useEffect(()=>{
+    if(orgInfo&& isEditMode)
+    {
+      fetchState()
+      fetchCity()
+    }
+  
+                          
+  },[orgInfo && isEditMode])
 
   useEffect(() => {
     // getInstructors();
@@ -184,7 +222,7 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ flex: 1 }}
           >
-            <ScrollView style={{ flex: 1 }}>
+           
               <View style={styles.layout}>
                 <View style={[styles.mainLayout, { paddingLeft: 20 }]}>
                   <>
@@ -247,12 +285,26 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
                             ],
                           };
                           UpdateSchool(data)
-                            .then((res) => {
-                              console.log("res", res);
+                            .then(async(res) => {
+                  
                               setisEditMode(false);
                               dispatch(
                                 ChangeModalState.action({ loading: false })
                               );
+                              const user = await fetchOneUserService();
+
+
+
+                              dispatch(
+                                ChangeUserState.action({
+                                  item: {...user,schoolName:res?.name},
+                                  fetchOne: { loading: false, error: null },
+                                }),
+                              )
+                              _dispatch({
+                                type: actions.INSTRUCTOR_DETAIL,
+                                payload: res,
+                              });
                             })
                             .catch((err) => {
                               console.log(err);
@@ -298,21 +350,17 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
                               disabled={!isEditMode}
                             />
                             <Autocomplete
+                            style={{container:{
+                              width:'95%'
+                            }}}
                               placeholder="Select your country"
                               value={values.country}
-                              style={styles.textInput}
-                              placement={placement}
+                             
+                            data={countriesData}
                               disabled={!isEditMode}
-                              onChangeText={(query) => {
-                                setFieldValue("country", query);
-                                setCountriesData(
-                                  countries.filter((item) =>
-                                    filterCountries(item, query)
-                                  )
-                                );
-                              }}
+                             
                               onSelect={(query) => {
-                                const selectedCountry = countriesData[query];
+                                const selectedCountry = query
                                 setFieldValue("country", selectedCountry.name);
                                 setFieldValue(
                                   "selectedCountry",
@@ -325,34 +373,23 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
                                   selectedCountry.name.replace(/ /g, "")
                                 ).then((res) => {
                                   setStates(res.data);
-                                  setStatesData(states);
+                                  setStatesData(res.data);
                                 });
                               }}
-                            >
-                              {countriesData.map((item, index) => {
-                                return (
-                                  <AutocompleteItem
-                                    style={styles.autoCompleteItem}
-                                    key={index}
-                                    title={item.name}
-                                  />
-                                );
-                              })}
-                            </Autocomplete>
+                            />
+                           
+          
                             <Autocomplete
-                              style={styles.textInput}
+                             data={statesData}
+                             style={{container:{
+                              width:'95%'
+                            }}}
                               value={values.state}
                               disabled={!isEditMode}
-                              onChangeText={(query) => {
-                                setFieldValue("state", query);
-                                setStatesData(
-                                  states.filter((item) =>
-                                    filterStates(item, query)
-                                  )
-                                );
-                              }}
+                              placeholder='Select City'
                               onSelect={(query) => {
-                                const selectedState = states[(query as any).row];
+                                const selectedState= query;
+                                // const selectedState = states[(query as any).row];
                                 setFieldValue("state", selectedState);
                                 setFieldValue("selectedState", selectedState);
                                 setFieldValue("selectedCity", "");
@@ -363,52 +400,32 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
                                   selectedState
                                 ).then((res) => {
                                   setCities(res.data);
+                                  setCitiesData(res.data)
                                 });
                               }}
-                            >
-                              {states?.map((state, index) => {
-                                return (
-                                  <AutocompleteItem
-                                    style={styles.autoCompleteItem}
-                                    key={index}
-                                    title={state}
-                                  />
-                                );
-                              })}
-                            </Autocomplete>
+                            />
+                             
 
                             <Autocomplete
-                              style={styles.textInput}
+                             data={citiesData}
+                             style={{container:{
+                              width:'95%'
+                            }}}
                               value={values.city}
                               disabled={!isEditMode}
-                              onChangeText={(query) => {
-                                setFieldValue("city", query);
-                                setCitiesData(
-                                  cities.filter((item) =>
-                                    filterCities(item, query)
-                                  )
-                                );
-                              }}
-                              onSelect={(index: any) => {
-                                setFieldValue("city", cities[index.row]);
+                             placeholder='Select City'
+                              onSelect={(query: any) => {
+                                const selectedCity= query;
                                 setFieldValue(
                                   "selectedCity",
-                                  cities[index.row]
+                                 selectedCity
+                                );
+                                setFieldValue(
+                                  "city",
+                                 selectedCity
                                 );
                               }}
-                            >
-                              {cities.length > 0
-                                ? cities?.map((city, index) => {
-                                    return (
-                                      <AutocompleteItem
-                                        style={styles.autoCompleteItem}
-                                        key={index}
-                                        title={city}
-                                      />
-                                    );
-                                  })
-                                : []}
-                            </Autocomplete>
+                            />
                             {(currentUser as any)?.isAdmin ? (
                               <>
                                 <TouchableOpacity
@@ -470,7 +487,7 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
                 </View>
               </View>
               <View style={{ height: 80 }} />
-            </ScrollView>
+      
           </KeyboardAwareScrollView>
         </>
       )}
@@ -660,7 +677,7 @@ const styles = StyleSheet.create({
   autoCompleteItem: {
     // elevation: 2,
     backgroundColor: "transparent",
-    width: "90%",
+    width: Dimensions.get('screen').width*0.9
   },
   bottomButtons: {
     justifyContent: "space-between",

@@ -1,12 +1,12 @@
-import { Autocomplete, AutocompleteItem, Input, Text } from '@ui-kitten/components';
+import {  AutocompleteItem, Input, Text } from '@ui-kitten/components';
 import { Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet,Dimensions, TouchableOpacity, View } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as yup from 'yup';
 import { useSelector } from 'react-redux';
-
+import Autocomplete from '@/Components/CustomAutocomplete';
 import { AppHeader, LinearGradientButton } from '@/Components';
 import { loadUserId } from '@/Storage/MainAppStorage';
 import { useTheme } from '@/Theme';
@@ -133,7 +133,39 @@ const PersonalProfileScreen = () => {
       .min(4, ({ min }) => `Username is not up to ${min} characters`)
       .required('Username is required'),
   });
-
+  const fetchState=async()=>{
+    try{
+  let res=await    GetAllStates(
+        user?.country)
+        setStates(res.data);
+        setStatesData(res.data);
+    }
+    catch(err)
+    {
+      console.log('err',err)
+    }
+  }
+  const fetchCity=async()=>{
+    try{
+  let res=await    GetAllCities( user?.country,
+        user?.state)
+        setCities(res.data);
+        setCitiesData(res.data);
+    }
+    catch(err)
+    {
+      console.log('err',err)
+    }
+  }
+    useEffect(()=>{
+    
+    
+      fetchState()
+      fetchCity()
+    
+  
+                          
+  },[])
   return (
     <>
       <AppHeader hideCenterIcon hideCalendar={true} />
@@ -145,8 +177,8 @@ const PersonalProfileScreen = () => {
         </View>
       ) : (
         <BackgroundLayout title="Profile">
-          <KeyboardAwareScrollView style={{ flex: 1 }} extraScrollHeight={150}>
-            <ScrollView style={styles.container}>
+          <KeyboardAwareScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" extraScrollHeight={150}>
+            <ScrollView keyboardShouldPersistTaps="handled" style={styles.container}>
               <View style={[[Layout.column, Layout.justifyContentCenter]]}>
                 <Formik
                   validateOnMount={true}
@@ -298,6 +330,7 @@ const PersonalProfileScreen = () => {
                             </View>
                           ) : (
                             <Input
+
                               keyboardType="number-pad"
                               style={styles.inputSettings}
                               autoCapitalize="none"
@@ -364,15 +397,17 @@ const PersonalProfileScreen = () => {
                           )}
                           {!isEditMode && (
                             <Autocomplete
-                              label={evaProps => (
-                                <Text {...evaProps} style={styles.editLabel}>
+                            disabled={true}
+                              label={()=> (
+                                <Text  style={styles.editLabel}>
                                   City
                                 </Text>
                               )}
-                              accessoryLeft={RenderLocationIcon}
+                              data={[]}
+                             icon={RenderLocationIcon}
                               placeholder="Enter City"
                               value={values.city}
-                              placement={placement}
+                          
                               style={{
                                 // marginBottom: 5,
                                 backgroundColor: Colors.white,
@@ -380,59 +415,42 @@ const PersonalProfileScreen = () => {
                                 elevation: 1,
                               }}
                               // label={evaProps => <Text {...evaProps}>City</Text>}
-                              onChangeText={query => {
-                                setFieldValue('city', query);
-                                setCitiesData(
-                                  cities.filter(item =>
-                                    filterCities(item, query),
-                                  ),
-                                );
-                              }}
+                          
                               onSelect={query => {
-                                setFieldValue('city', citiesData[query]);
+                                setFieldValue('city', query);
                                 setFieldValue(
                                   'selectedCity',
-                                  citiesData[query],
+                                 query,
                                 );
-                              }}>
-                              {citiesData.map((item, index) => {
-                                return (
-                                  <AutocompleteItem key={index} title={item} />
-                                );
-                              })}
-                            </Autocomplete>
+                              }}/>
+                             
                           )}
 
                           {isEditMode && (
                             <Autocomplete
-                              label={evaProps => (
+                            data={countriesData}
+                              label={() => (
                                 <Text
-                                  {...evaProps}
+                           
                                   style={[styles.editLabel, { marginTop: 4 }]}>
                                   Country
                                 </Text>
                               )}
                               placeholder="Enter Country*"
                               value={values.country}
-                              accessoryLeft={RenderLocationIcon}
-                              placement={placement}
+                              icon={RenderLocationIcon}
+                              // placement={placement}
                               style={{
+                     
                                 // marginTop: 10,
                                 // marginBottom: 5,
                                 backgroundColor: Colors.white,
                                 borderRadius: 10,
                                 elevation: 1,
                               }}
-                              onChangeText={query => {
-                                setFieldValue('country', query);
-                                setCountriesData(
-                                  countries.filter(item =>
-                                    filterCountries(item, query),
-                                  ),
-                                );
-                              }}
+                              
                               onSelect={query => {
-                                const selectedCountry = countriesData[query];
+                                const selectedCountry = query;
                                 setFieldValue('country', selectedCountry.name);
                                 setFieldValue(
                                   'selectedCountry',
@@ -447,27 +465,21 @@ const PersonalProfileScreen = () => {
                                   setStates(res.data);
                                   setStatesData(states);
                                 });
-                              }}>
-                              {countriesData.map((item, index) => {
-                                return (
-                                  <AutocompleteItem
-                                    key={index}
-                                    title={item.name}
-                                  />
-                                );
-                              })}
-                            </Autocomplete>
+                              }}/>
+                             
                           )}
                           <Autocomplete
-                            label={evaProps => (
-                              <Text {...evaProps} style={styles.editLabel}>
+                          disabled={isEditMode?false:true}
+                            label={() => (
+                              <Text  style={styles.editLabel}>
                                 State
                               </Text>
                             )}
-                            accessoryLeft={RenderLocationIcon}
+                            icon={RenderLocationIcon}
                             placeholder="Enter State*"
                             value={values.state}
-                            placement={placement}
+                           data={statesData}
+
                             style={{
                               // marginBottom: 5,
                               backgroundColor: Colors.white,
@@ -475,16 +487,9 @@ const PersonalProfileScreen = () => {
                               elevation: 1,
                             }}
                             // label={evaProps => <Text {...evaProps}>State</Text>}
-                            onChangeText={query => {
-                              setFieldValue('state', query);
-                              setStatesData(
-                                states.filter(item =>
-                                  filterStates(item, query),
-                                ),
-                              );
-                            }}
+                            
                             onSelect={query => {
-                              const selectedState = statesData[query];
+                              const selectedState = query;
                               setFieldValue('state', selectedState);
                               setFieldValue('selectedState', selectedState);
                               setFieldValue('selectedCity', '');
@@ -495,25 +500,21 @@ const PersonalProfileScreen = () => {
                                 selectedState,
                               ).then(res => {
                                 setCities(res.data);
+                                setCitiesData(res.data)
                               });
-                            }}>
-                            {statesData.map((item, index) => {
-                              return (
-                                <AutocompleteItem key={index} title={item} />
-                              );
-                            })}
-                          </Autocomplete>
+                            }}/>
+                            
                           {isEditMode && (
                             <Autocomplete
-                              label={evaProps => (
-                                <Text {...evaProps} style={styles.editLabel}>
+                              label={() => (
+                                <Text style={styles.editLabel}>
                                   City
                                 </Text>
                               )}
-                              accessoryLeft={RenderLocationIcon}
+                             icon={RenderLocationIcon}
                               placeholder="Enter City"
                               value={values.city}
-                              placement={placement}
+                            
                               style={{
                                 // marginBottom: 5,
                                 backgroundColor: Colors.white,
@@ -521,28 +522,17 @@ const PersonalProfileScreen = () => {
                                 elevation: 1,
                               }}
                               // label={evaProps => <Text {...evaProps}>City</Text>}
-                              onChangeText={query => {
-                                setFieldValue('city', query);
-                                setCitiesData(
-                                  cities.filter(item =>
-                                    filterCities(item, query),
-                                  ),
-                                );
-                              }}
+                             data={citiesData}
                               onSelect={query => {
-                                setFieldValue('city', citiesData[query]);
+                                setFieldValue('city', query);
                                 setFieldValue(
                                   'selectedCity',
-                                  citiesData[query],
+                                  query,
                                 );
-                              }}>
-                              {citiesData.map((item, index) => {
-                                return (
-                                  <AutocompleteItem key={index} title={item} />
-                                );
-                              })}
-                            </Autocomplete>
+                              }}/>
+                              
                           )}
+                         
                           {!isEditMode ? (
                             <View style={{ flexDirection: 'column' }}>
                               <Text style={styles.editLabel}>
@@ -570,15 +560,17 @@ const PersonalProfileScreen = () => {
                           )}
                           {!isEditMode && (
                             <Autocomplete
-                              label={evaProps => (
-                                <Text {...evaProps} style={styles.editLabel}>
+                              label={() => (
+                                <Text  style={styles.editLabel}>
                                   Country
                                 </Text>
                               )}
+                              disabled={true}
+                              data={[]}
                               placeholder="Enter Country*"
                               value={values.country}
-                              accessoryLeft={RenderLocationIcon}
-                              placement={placement}
+                              icon={RenderLocationIcon}
+                            
                               style={{
                                 // marginTop: 10,
                                 marginBottom: 5,
@@ -586,14 +578,7 @@ const PersonalProfileScreen = () => {
                                 borderRadius: 10,
                                 elevation: 1,
                               }}
-                              onChangeText={query => {
-                                setFieldValue('country', query);
-                                setCountriesData(
-                                  countries.filter(item =>
-                                    filterCountries(item, query),
-                                  ),
-                                );
-                              }}
+                              
                               onSelect={query => {
                                 const selectedCountry = countriesData[query];
                                 setFieldValue('country', selectedCountry.name);
@@ -610,16 +595,8 @@ const PersonalProfileScreen = () => {
                                   setStates(res.data);
                                   setStatesData(states);
                                 });
-                              }}>
-                              {countriesData.map((item, index) => {
-                                return (
-                                  <AutocompleteItem
-                                    key={index}
-                                    title={item.name}
-                                  />
-                                );
-                              })}
-                            </Autocomplete>
+                              }}/>
+                              
                           )}
 
                           {isEditMode ? (
@@ -785,5 +762,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: Colors.fieldLabel,
+  },
+  autoCompleteItem: {
+    // elevation: 2,
+    backgroundColor: 'transparent',
+    width: Dimensions.get('screen').width*0.9
   },
 });

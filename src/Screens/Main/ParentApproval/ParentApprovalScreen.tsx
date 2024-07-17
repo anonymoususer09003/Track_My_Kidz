@@ -17,6 +17,7 @@ import { UserState } from '@/Store/User';
 import Colors from '@/Theme/Colors';
 
 const ParentApprovalScreen = () => {
+  const instructorImage = require('@/Assets/Images/approval_icon2.png');
   // const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
   const marker = require('@/Assets/Images/marker.png');
 
@@ -68,6 +69,7 @@ const ParentApprovalScreen = () => {
       pageSizeActivity,
     )
       .then((res) => {
+
         setTotalRecordsActivity(res.totalRecords);
         setRefreshing(false);
         setPageSizeActivity(10);
@@ -194,7 +196,7 @@ const ParentApprovalScreen = () => {
       </View>
     );
   };
-  console.log('aaaaaaa', activities);
+
 
   return (
     <>
@@ -323,7 +325,11 @@ const ParentApprovalScreen = () => {
                       <Text style={[styles.text, { fontSize: 25 }]}>
                         {`${item?.activity?.activityName}`}
                       </Text>
-
+                   
+<View style={{flexDirection:'row',alignItems:'center'}}>
+<Image source={instructorImage} style={styles.iconImages} />
+<Text>{item?.firstName+' '+ item?.lastName}</Text>
+</View>
                       <View
                         style={{
                           flexDirection: 'row',
@@ -514,6 +520,13 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  iconImages: {
+    height: 14,
+    width: 14,
+    resizeMode: 'contain',
+
+    marginRight: 8,
   },
   text: {
     fontSize: 16,

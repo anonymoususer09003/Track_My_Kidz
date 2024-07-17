@@ -57,13 +57,19 @@ const HomeScreen = () => {
     });
   }, []);
   useEffect(() => {
-    setThumbnail(false);
-  }, [focused]);
+    _dispatch({
+      type: actions.SET_THUMBNAIL,
+      payload: false,
+    });
+  }, []);
+
+  const [{ thumbnail, any }]: any = useStateValue();
   const [children, setChildren] = useState([]);
   const [trackingList, setTrackingList] = useState({});
   const [getChildrendeviceIds, setChildrensDeviceIds] = useState([]);
   const [originalChildren, setOriginalChildren] = useState([]);
-  const [thumbnail, setThumbnail] = useState(false);
+
+  // const [thumbnail, setThumbnail] = useState(false);
   const [searchParam, setSearchParam] = useState('');
   const [selectedDependent, setSelectedDependent] = useState(null);
   const [parentLatLong, setparentLatLong] = useState();
@@ -407,7 +413,12 @@ const HomeScreen = () => {
       <AppHeader
         // title="Home"
         onAddPress={() => navigation.navigate('CreateParentActivity')}
-        setThumbnail={(value) => setThumbnail(value)}
+        setThumbnail={(value) => {
+          _dispatch({
+            type: actions.SET_THUMBNAIL,
+            payload: value,
+          });
+        }}
         hideCalendar={false}
       />
       {isCalendarVisible && (
@@ -425,7 +436,13 @@ const HomeScreen = () => {
         onChangeText={(value) => setSearchParam(value)}
         thumbnailView={false}
         onToggleChange={() => {
-          setThumbnail(!thumbnail);
+       
+          _dispatch({
+            type: actions.SET_THUMBNAIL,
+            payload:!thumbnail
+          });
+        
+         
           dispatch(
             ChangeModalState.action({
               showCalendar: false,

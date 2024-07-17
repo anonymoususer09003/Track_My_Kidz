@@ -69,3 +69,8 @@ export { default as ChangePasswordScreen } from "./Main/Settings/ChangePasswordS
 export { default as NotificationsScreen } from "./Main/Settings/NotificationsScreen";
 export { default as ReportProblemScreen } from "./Main/Settings/ReportProblemScreen";
 export { default as ContactUsScreen } from "./Main/Settings/ContactUsScreen";
+
+// Schedule
+export { default as GroupScheduleNavigator } from "./GroupsScehdule/GroupsScehduleNavigator";
+export { default as CompetitionScreen } from "./GroupsScehdule/Competition";
+export { default as PracticesScreen } from "./GroupsScehdule/Practices";
