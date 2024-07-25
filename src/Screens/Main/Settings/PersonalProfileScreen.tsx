@@ -5,7 +5,7 @@ import { Alert, Image, ScrollView, StyleSheet,Dimensions, TouchableOpacity, View
 import ImagePicker from 'react-native-image-crop-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as yup from 'yup';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Autocomplete from '@/Components/CustomAutocomplete';
 import { AppHeader, LinearGradientButton } from '@/Components';
 import { loadUserId } from '@/Storage/MainAppStorage';
@@ -17,6 +17,9 @@ import { PlaceState } from '@/Store/Places';
 import { UserState } from '@/Store/User';
 import Colors from '@/Theme/Colors';
 import { CountryDTO } from '@/Models/CountryDTOs';
+import fetchOneUserService from '@/Services/User/FetchOne';
+import ChangeUserState from '@/Store/User/FetchOne';
+import ChangeLoginState from '@/Store/Authentication/ChangeLoginState';
 
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
@@ -29,6 +32,7 @@ const filterCities = (item: string, query: string) => {
 };
 
 const PersonalProfileScreen = () => {
+  const dispatch=useDispatch()
   const userIcon = require('@/Assets/Images/approval_icon2.png');
   const phone = require('@/Assets/Images/phone.png');
   const marker = require('@/Assets/Images/marker.png');
@@ -215,12 +219,26 @@ const PersonalProfileScreen = () => {
                       apt: values?.apt,
                     };
                     UpdateUser(objectToPass, 'parent')
-                      .then((response: any) => {
+                      .then(async(response: any) => {
                         if (response.status == 200) {
+                          console.log('response',response)
                           setisEditMode(false);
                           setisSending(false);
                           getUserId();
                         }
+                        const user = await fetchOneUserService();
+                        console.log('LoginStore.ts line 49 user -', user);
+                        // if (!res?.childTrackHistory) {
+                        //   // await BackgroundService.stop();
+                        // }
+                        // await BackgroundService.stop();
+                         dispatch(
+                          ChangeUserState.action({
+                            item: response?.data,
+                            fetchOne: { loading: false, error: null },
+                          }),
+                        );
+
                       })
                       .catch((error: any) => {
                         console.log('Error', error);
@@ -250,7 +268,7 @@ const PersonalProfileScreen = () => {
                             <Text style={styles.editLabel}>Email</Text>
                             <View style={styles.editField}>
                               {renderEmailIcon()}
-                              <Text style={{ fontSize: 15 }}>{values.email}</Text>
+                              <Text style={{ fontSize: 15,opacity:0.2 }}>{values.email}</Text>
                             </View>
                           </View>
                           <View

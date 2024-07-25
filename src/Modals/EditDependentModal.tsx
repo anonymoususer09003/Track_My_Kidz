@@ -198,7 +198,7 @@ let res=await    GetAllCities( selectedDependent?.country,
     setSelectedDependent(null);
     setStudent(null);
   };
-  const validations = (name, value) => {};
+
   const getSchoolsByFilter = (
     country = '',
     state = '',

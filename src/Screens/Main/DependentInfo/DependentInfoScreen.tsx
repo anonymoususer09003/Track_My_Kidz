@@ -74,6 +74,7 @@ const DependentInfoScreen = () => {
   const getChildrens = async (referCode: string) => {
     try {
       let res = await GetParentChildrens(referCode);
+      
       setChildren(res);
     } catch (err) {
       console.log("err in children", err);

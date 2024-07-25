@@ -21,12 +21,13 @@ interface AutocompleteProps {
   disabled?: boolean; // Optional prop for disabled
   placeholder?: string; // Optional prop for placeholder
   style?:any
+  disableColor?:any
 }
 
-const Autocomplete: React.FC<AutocompleteProps> = ({ data, onSelect, icon, value = '', disabled = false, placeholder = 'Type to search...' ,label,style}) => {
+const Autocomplete: React.FC<AutocompleteProps> = ({ data, onSelect, icon, value = '', disabled = false, placeholder = 'Type to search...' ,label,style,disableColor}) => {
   const textInputRef = useRef<TextInput>(null);
   const [query, setQuery] = useState<string>(value);
-  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [filteredData, setFilteredData] = useState<any>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
   useEffect(() => {
@@ -75,9 +76,9 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ data, onSelect, icon, value
   };
 
   return (
-    <TouchableWithoutFeedback style={{opacity:0.2}} disabled={disabled} onPress={handleTouchOutside}>
+    <TouchableWithoutFeedback style={{opacity:0.1}} disabled={disabled} onPress={handleTouchOutside}>
         
-      <View style={[styles.container,style?.container&&style?.container,
+      <View style={[styles.container,style?.container&&style?.container
     //   disabled&&{  opacity:0.35,
     // borderWidth:0.195,
     // elevation:1,
@@ -90,8 +91,9 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ data, onSelect, icon, value
           {icon && icon()}
           {/* TextInput */}
           <TextInput
+
             ref={textInputRef}
-            style={[styles.input, disabled && { backgroundColor: Colors.grey }]}
+            style={[styles.input, disabled && { backgroundColor: 'transparent',opacity:0.2 }]}
             value={query}
             onChangeText={handleInputChange}
             placeholder={placeholder}

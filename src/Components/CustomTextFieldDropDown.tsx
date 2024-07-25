@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
-const CustomDropdown: React.FC = (props) => {
+const CustomDropdown = (props:any) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
@@ -99,8 +99,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#f7f9fc",
     borderColor: Colors.textInputBorderColor,
     elevation: 2,
-    height: 40,
-    borderRadius: 6,
+    minHeight: 40,
+    borderRadius: 8,
     borderWidth: 2,
     width: "95%",
   },

@@ -16,6 +16,9 @@ import {
   Text,
   useStyleSheet,
 } from '@ui-kitten/components';
+import {ThunkDispatch} from "@reduxjs/toolkit";
+import {  storeIsSubscribed } from '@/Storage/MainAppStorage';
+import { UpdateUser } from '@/Services/SettingsServies';
 import Autocomplete from '@/Components/CustomAutocomplete';
 import React, { FC, ReactElement, useContext, useEffect, useState } from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -114,7 +117,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
   const [, setSelectedGrades] = useState<string[]>([]);
   const [, setSelectedSubjects] = useState<any[]>([]);
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
   const [loginObj, setLoginObj] = useState<any>(null);
   const _user_type = user_types.find((u) => u.label === user_type);
 
@@ -359,7 +362,20 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
       setRerender(true);
     }
   }, [isFocuesed]);
+  const updateUser = async () => {
+    try {
+      console.log('userrrrr', loginObj);
 
+      let res = await UpdateUser(
+        { ...loginObj, isSubscribed: true },
+        'parent',
+      );
+      console.log('res', res);
+      await storeIsSubscribed(true);
+    } catch (err) {
+      console.log('err', err);
+    }
+  };
   return (
     <BackgroundLayout title="Registration">
       {_user_type?.id == 2 && (
@@ -498,36 +514,60 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                   term: true,
                   apt: values?.apartment,
                   deviceId: getDeviceId(),
+                  "id": null
                 };
 
                 dispatch(ChangeModalState.action({ loading: true }));
 
                 Register(registerObject, 'parent')
                   .then(async (res) => {
+                  
                     const _token = res.data.token;
                     await storeToken(_token);
                     await storeUserType('parent');
                     CompleteRegistration(userObject, 'parent')
-                      .then((response: any) => {
+                      .then(async(response: any) => {
                         const obj = {
-                          token: _token,
+                          token: _token||'',
                           userType: 'parent',
-                          id: response.data.parentId,
-                          mainId: res.data.userId,
+                          id: response?.data?.parentId,
+                          mainId: res.data?.userId,
+                          isSubscribed: true,
                         };
                         console.log(obj);
                         console.log('==============');
-                        setLoginObj(obj);
+                        // setLoginObj(obj);
                         if (response.status == 201) {
                           console.log(emailAddress);
                           console.log(values.password);
+await updateUser();
+let res=await Login({
+  email: emailAddress,
+  password: values.password,
+},'parent')
+const obj: UserLoginResponse = {
+  token: res?.data?.token,
+  userType: 'parent',
+  id: res?.data?.userTypeId,
+  mainId: res?.data?.userId,
+  ...((res?.data?.isSubscribed || res?.data?.isSubscribed == false) && {
+    isSubscribed: res?.data?.isSubscribed,
+  }),
+};
+                        dispatch(LoginStore.action(obj));
+                        dispatch(ChangeModalState.action({ loading: false }));
 
+                      dispatch(
+                        ChangeModalState.action({
+                          welcomeMessageModal: true,
+                        }),
+                      );
 
-                          dispatch(
-                            ChangeModalState.action({
-                              parentPaymentModalVisibility: true,
-                            }),
-                          );
+                          // dispatch(
+                          //   ChangeModalState.action({
+                          //     parentPaymentModalVisibility: true,
+                          //   }),
+                          // );
                         }
                       })
                       .catch((error: any) => {
@@ -571,17 +611,20 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                   isValid,
                 }) => (
                 <>
+              
                   <ParentPaymentModal
+                  userEmail={emailAddress}
                     loginObj={loginObj}
                     onPay={() => {
                       // todo not a priority
                       // @ts-ignore
-                      dispatch(LoginStore.action(loginObj));
-                      dispatch(
-                        ChangeModalState.action({
-                          welcomeMessageModal: true,
-                        }),
-                      );
+                      handleSubmit()
+                      // dispatch(LoginStore.action(loginObj));
+                      // dispatch(
+                      //   ChangeModalState.action({
+                      //     welcomeMessageModal: true,
+                      //   }),
+                      // );
                     }}
                     onCancel={() => {
                     }}
@@ -713,13 +756,15 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
                      
                       onSelect={(query) => {
-                        setFieldValue('city', query);
-                        setFieldValue('selectedCity', query);
+                  let city=query
+    
+                        setFieldValue('city', city);
+                        // setFieldValue('selectedCity', query);
                       }}
                     />
                       
                     
-                    {errors.city && touched.city && (
+                    {errors.city && (
                       <Text style={styles.errorText}>{errors.city}</Text>
                     )}
                     <Input
@@ -799,11 +844,19 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       </View>
                     </View>
                   </Layout>
+                  {console.log('errors',errors)}
                   <View style={{ marginTop: 18, marginBottom: 20 }}>
                     <LinearGradientButton
                       style={styles.signUpButton}
                       size="medium"
-                      onPress={handleSubmit}
+                      onPress={()=>{
+                        
+                        dispatch(
+                          ChangeModalState.action({
+                            parentPaymentModalVisibility: true,
+                          }),
+                        );
+                      }}
                       disabled={!isValid || !values.termsAccepted}
                     >
                       Sign Up
@@ -1083,7 +1136,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       onSelect={(query) => {
                         const selectedCity = query;
                         setFieldValue('city', selectedCity);
-                        setFieldValue('selectedCity', selectedCity);
+                        // setFieldValue('selectedCity', selectedCity);
                         getSchoolsByFilter(
                           values.country,
                           values.state,

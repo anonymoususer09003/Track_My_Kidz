@@ -162,7 +162,8 @@ const[showResult,setShowResult]=useState(false)
   const renderSchoolIcon = () => (
     <FA5
       name="school"
-      size={20}
+      size={15}
+
       style={{height: 20, width: 20, marginRight: 10}}
       color={Colors.secondaryDark}
       adjustsFontSizeToFit
@@ -298,6 +299,9 @@ const[showResult,setShowResult]=useState(false)
             // extraScrollHeight={10}
           
           >
+            {
+              console.log('current user',currentUser)
+            }
             <View style={[[Layout.column, Layout.justifyContentCenter]]}>
               {isFocused && (
                 <Formik
@@ -341,8 +345,9 @@ const[showResult,setShowResult]=useState(false)
                     );
                     formData.append('firstname', values.firstName);
                     formData.append('lastname', values.lastName);
-
-                    formData.append('address', values?.schoolName || '');
+formData.append('phone',values.phone);
+formData.append('school',values?.schoolName);
+                    formData.append('address', values?.address || '');
                     formData.append('email', currentUser?.email || '');
                     formData.append('state', values.state);
                     formData.append('city', values.city);
@@ -355,8 +360,10 @@ const[showResult,setShowResult]=useState(false)
                     formData.append('schoolId', currentUser?.schoolId || '');
                     formData.append('orgId', currentUser?.orgId || '');
                     console.log('form data', JSON.stringify(formData));
+
                     UpdateUser(formData, 'instructor')
                       .then(async (response: any) => {
+              
                         if (response.status == 200) {
                           // setisSent(true)
                           setisEditMode(false);
@@ -364,7 +371,7 @@ const[showResult,setShowResult]=useState(false)
                           getUserId();
                         }
                         let res = await fetchOneUserService();
-                        console.log('res', res);
+                   
                         // if (!res?.childTrackHistory) {
                         //   // await BackgroundService.stop();
                         // }
@@ -405,9 +412,9 @@ const[showResult,setShowResult]=useState(false)
                         <>
                           <View style={{flexDirection: 'column'}}>
                             <Text style={styles.editLabel}>Email</Text>
-                            <View style={styles.editField}>
+                            <View style={[styles.editField]}>
                               {renderEmailIcon()}
-                              <Text style={{fontSize: 15}}>{values.email}</Text>
+                              <Text style={{fontSize: 15,opacity:0.2}}>{values.email}</Text>
                             </View>
                           </View>
                           <View
@@ -488,6 +495,7 @@ const[showResult,setShowResult]=useState(false)
                             <Input
                               keyboardType="number-pad"
                               style={styles.inputSettings}
+                              accessoryLeft={renderPhoneIcon}
                               autoCapitalize="none"
                               label={evaProps => (
                                 <Text {...evaProps}>Phone Number</Text>
@@ -497,7 +505,7 @@ const[showResult,setShowResult]=useState(false)
                             />
                           )}
 
-                          {!isEditMode && (
+                          {false &&!isEditMode && (
                             <>
                               <View style={{flexDirection: 'column'}}>
                                 <Text style={styles.editLabel}>
@@ -506,7 +514,7 @@ const[showResult,setShowResult]=useState(false)
                                 <View style={styles.editField}>
                                   {renderSchoolIcon()}
                                   <Text style={{fontSize: 15}}>
-                                    {values.schoolName}
+                                    {values?.schoolName}
                                   </Text>
                                 </View>
                               </View>
@@ -651,38 +659,37 @@ const[showResult,setShowResult]=useState(false)
                             </>
                           )}
 
-                          {isEditMode && (
+                          {false && isEditMode && (
                             <>
-                              <Input
-                                disabled={!currentUser?.isAdmin}
+                                <Input
+                                 disabled={true}
+                                accessoryLeft={renderSchoolIcon()}
+                                style={styles.inputSettings}
+                                autoCapitalize="none"
+                                label={evaProps => (
+                                  <Text {...evaProps}>School Information</Text>
+                                )}
+                                value={values?.schoolName}
+                                onChangeText={handleChange('schoolName')}
+                              />
+                              {/* <Input
+                                disabled={true}
                                 style={[
                                   styles.inputSettings,
                                   {marginBottom: 5},
                                 ]}
                                 accessoryLeft={renderLocationIcon}
                                 autoCapitalize="none"
-                                label={evaProps => (
-                                  <Text {...evaProps}>Street Address</Text>
-                                )}
+                         
                                 value={values.address}
                                 onChangeText={handleChange('address')}
-                              />
+                              /> */}
 
-                              <Input
-                                disabled={!currentUser?.isAdmin}
-                                accessoryLeft={renderSchoolIcon()}
-                                style={styles.inputSettings}
-                                autoCapitalize="none"
-                                label={evaProps => (
-                                  <Text {...evaProps}>School Name</Text>
-                                )}
-                                value={values.schoolName}
-                                onChangeText={handleChange('schoolName')}
-                              />
+                          
                             </>
                           )}
 
-                          {isEditMode && (
+                          {false &&isEditMode && (
                             <>
                               {/* <Autocomplete
                                 disabled={!currentUser?.isAdmin}
@@ -739,7 +746,7 @@ const[showResult,setShowResult]=useState(false)
                                   );
                                 })}
                               </Autocomplete> */}
-                               <Autocomplete disabled={!currentUser?.isAdmin}  placeholder="Enter Country*" data={countriesData} onSelect={(item)=>{
+                               <Autocomplete     disabled={true}  placeholder="Enter Country*" data={countriesData} onSelect={(item)=>{
                                 const selectedCountry = item;
                                 setFieldValue(
                                   'country',
@@ -757,7 +764,7 @@ const[showResult,setShowResult]=useState(false)
                                   selectedCountry.name.trim(),
                                 ).then(res => {
                                   setStates(res.data);
-                                  setStatesData(states);
+                                  setStatesData(res.data);
                                 });
                                }} icon={()=> renderLocationIcon()} value={values.country}/>
                               {/* <AutocompleteInput
@@ -783,9 +790,9 @@ const[showResult,setShowResult]=useState(false)
       hideResults={showResult}
     /> */}
 
-<Autocomplete data={statesData}    disabled={!currentUser?.isAdmin}  placeholder="Enter State*" onSelect={(item)=>{
+<Autocomplete data={statesData}        disabled={true} placeholder="Enter State*" onSelect={(item)=>{
                                  const selectedState = item;
-                               
+                             
                                 setFieldValue('state', selectedState);
                                 setFieldValue('selectedState', selectedState);
                                 setFieldValue('selectedCity', '');
@@ -795,7 +802,9 @@ const[showResult,setShowResult]=useState(false)
                                   values.selectedCountry.trim(),
                                   selectedState.trim(),
                                 ).then(res => {
-                                  setCities(res.data);
+
+
+                                  setCitiesData(res.data);
                                 });
                                }} icon={()=> renderLocationIcon()} value={values.state}/>
 
@@ -902,13 +911,13 @@ const[showResult,setShowResult]=useState(false)
                               </Autocomplete> */}
 
 
-<Autocomplete data={citiesData} disabled={!currentUser?.isAdmin}  placeholder="Enter City*" onSelect={(item)=>{
-                                  setFieldValue('city', item.name);
+<Autocomplete data={citiesData} disableColor="transparent"     disabled={true} placeholder="Enter City*" onSelect={(item)=>{
+                                  setFieldValue('city', item);
                                   setFieldValue(
                                     'selectedCity',
                                     item.name,
                                   );
-                               }} icon={()=> renderLocationIcon()} value={values.state}/>
+                               }} icon={()=> renderLocationIcon()} value={values.city}/>
 
   {/* <AutocompleteInput
       data={countriesData.filter((item)=>item?.name?.startsWith(values.city))}
@@ -923,13 +932,11 @@ const[showResult,setShowResult]=useState(false)
       hideResults={showResult}
     /> */}
                               <Input
-                                disabled={!currentUser?.isAdmin}
+                                disabled={true}
                                 accessoryLeft={renderLocationIcon}
                                 style={styles.inputSettings}
                                 autoCapitalize="none"
-                                label={evaProps => (
-                                  <Text {...evaProps}>Zip/Post code</Text>
-                                )}
+                             
                                 value={values.zipcode}
                                 onChangeText={handleChange('zipcode')}
                               />

@@ -51,7 +51,7 @@ const dependents = [
 ];
 const windowHeight = Dimensions.get("window").height;
 const JourneyTrackerModal = ({ selectedActivity }: any) => {
-  const [orgInfo, setOrgInfo] = useState({});
+  const [orgInfo, setOrgInfo] = useState<any>({});
   const user = useSelector((state: { user: UserState }) => state.user.item);
   const amountValues = [
     { id: 0, amount: 500, label: "$5" },
@@ -98,7 +98,7 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
   const [fromStates, setFromStates] = useState<Array<any>>([]);
   const [fromCities, setFromCities] = useState<Array<any>>([]);
   const [selectedToLocation, setSelectedToLocation] = useState(0);
-  const [activityDetail, setActivityDetail] = useState({});
+  const [activityDetail, setActivityDetail] = useState<any>({});
   const [toOthersLocation, setToOthersLocation] = useState({
     country: "",
     state: "",
@@ -152,7 +152,7 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
     (state: { modal: ModalState }) => state.modal.journeyTrackerModalVisibility
   );
   const dispatch = useDispatch();
-  const getEta = async (origin, destination) => {
+  const getEta = async (origin:any, destination:any) => {
     try {
       let res = await axios.get(
         `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&units=imperial&key=AIzaSyBBDJwlh5Mnc6Aa1l371eEOZ9G6Uc0ByWA`
@@ -207,7 +207,7 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
   const handleGetOrganizationInfo = async () => {
     const userId = await loadUserId();
     console.log("userId", userId);
-    GetInstructor(userId).then((res) => {
+    GetInstructor(userId?userId:'').then((res) => {
       if (res.schoolId) {
        
         GetSchool(res.schoolId)
@@ -232,9 +232,7 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
       setSelectedAmountIndex(null);
     }
   }, [isVisible]);
-  const filterCountries = (item: CountryDTO, query: string) => {
-    return item.name.toLowerCase().includes(query.toLowerCase());
-  };
+
   const handleSubmit = async () => {
     let address1 = "";
     let address2 = "";

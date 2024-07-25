@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-message';
 import { GetParent } from '@/Services/Parent';
 import { ModalState } from '@/Store/Modal';
 import { LinearGradientButton } from '@/Components';
-import { CreateSinglePaymentIntent } from '@/Services/Payments';
+import { CreateSinglePaymentIntent,CreateSingleEmailPaymentIntent } from '@/Services/Payments';
 import { UpdateUser } from '@/Services/SettingsServies';
 import { loadUserId, storeIsSubscribed } from '@/Storage/MainAppStorage';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
@@ -19,9 +19,10 @@ interface ParentPaymentModalProps {
   onPay?: any,
   onCancel?: any,
   loginObj?: any
+  userEmail?:string
 }
 
-const ParentPaymentModal = ({ onCancel, loginObj }: ParentPaymentModalProps) => {
+const ParentPaymentModal = ({ onCancel, loginObj,userEmail }: ParentPaymentModalProps) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);
   console.log(user);
   // const {createToken} = useStripe();
@@ -102,11 +103,18 @@ const ParentPaymentModal = ({ onCancel, loginObj }: ParentPaymentModalProps) => 
     });
   };
   const fetchPaymentIntentClientSecret = async (data: any) => {
-    console.log(data);
-
+   
+if(userEmail)
+{
+  return await CreateSingleEmailPaymentIntent({
+   amountToPay: selectedIndex == 0 ? 50 : 4.99,email:userEmail}
+  );
+}
+else{
     return await CreateSinglePaymentIntent(
       selectedIndex == 0 ? 50 : 4.99,
     );
+}
   };
 
   const activateSubscription = async () => {
@@ -121,7 +129,7 @@ const ParentPaymentModal = ({ onCancel, loginObj }: ParentPaymentModalProps) => 
     const { clientSecret } = await fetchPaymentIntentClientSecret(int);
 
     const billingDetails = {
-      email: user?.email,
+      email: userEmail||user?.email,
     };
 
     const { paymentIntent, error } = await confirmPayment(clientSecret, {
@@ -130,6 +138,14 @@ const ParentPaymentModal = ({ onCancel, loginObj }: ParentPaymentModalProps) => 
         billingDetails,
       },
     });
+
+    console.log('method',
+      clientSecret, {
+        paymentMethodType: 'Card',
+        paymentMethodData: {
+          billingDetails,
+        },
+    })
     console.log('paymentIntent', paymentIntent);
     if (error) {
       console.log('err', error);
@@ -139,7 +155,7 @@ const ParentPaymentModal = ({ onCancel, loginObj }: ParentPaymentModalProps) => 
       ]);
     } else if (paymentIntent) {
       setIsLoading(false);
-      await updateUser();
+      // await updateUser();
 
       Toast.show({
         type: 'success',
@@ -227,6 +243,7 @@ const ParentPaymentModal = ({ onCancel, loginObj }: ParentPaymentModalProps) => 
             // onFocus={focusedField => {
             // }}
           />
+          <Text style={{color:'red'}}>{selectedIndex==0?'First payment is prorated. Subsequent payment is made on first of every year. ':'First payment is prorated. Subsequent payment is made on first of every month.'}</Text>
         </View>
         <View style={styles.bottom}>
           {!isLoading ? (

@@ -6,7 +6,7 @@ import {
 
 export default async (id: number | string) => {
   let instructorDetail = await getInstructorDetail();
-  if (instructorDetail) {
+  if (false && instructorDetail) {
     return JSON.parse(instructorDetail);
   } else {
     if (!id ||(typeof id === 'number'&& isNaN(id))) return

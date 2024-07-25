@@ -27,7 +27,7 @@ import {
 } from '@ui-kitten/components';
 import {Formik} from 'formik';
 import React, {useEffect, useState} from 'react';
-import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Alert, Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
@@ -208,7 +208,7 @@ const AddStudentModal = () => {
         width: '100%',
         height: '100%',
         backgroundColor: Colors.newBackgroundColor,
-        // marginTop: 50,
+        marginTop: 50,
       }}
       onBackdropPress={() => {
         dispatch(ChangeModalState.action({addStudentModal: false}));
@@ -292,7 +292,7 @@ const AddStudentModal = () => {
                   formData.append('state', values.state);
                   formData.append('city', values.city);
                   formData.append('parentemail1', currentUser.email);
-
+console.log('form data',formData)
                   CreateStudent(formData)
                     .then(response => {
                       console.log('response', response);
@@ -504,7 +504,7 @@ const AddStudentModal = () => {
                             selectedCountry.name.replace(/ /g, ''),
                           ).then(res => {
                             setStates(res.data);
-                            setStatesData(states);
+                            setStatesData(res.data);
                           });
                           // getSchoolsByFilter(selectedCountry.name);
                         }}/>
@@ -553,7 +553,7 @@ const AddStudentModal = () => {
                         // label={evaProps => <Text {...evaProps}>City</Text>}
                         
                         onSelect={query => {
-                          const selectedCity = citiesData[query];
+                          const selectedCity = query;
                           setFieldValue('city', selectedCity);
                           setFieldValue('selectedCity', selectedCity);
                           getSchoolsByFilter(
@@ -569,16 +569,19 @@ const AddStudentModal = () => {
                           placeholder="Select School"
                           value={values.school}
                           onSelect={(index: any) => {
-                            console.log('index', index);
 
-                            let school = schoolsData[index];
-                            setFieldValue('school', school.name);
+let school=schoolsData.find((item:any)=>item?.name==index)
+                          
+                    
+                            setFieldValue('school', school?.name);
                             setFieldValue('selectedSchool', '');
-                            if (school.name != 'Other') {
-                              setFieldValue('schoolName', school.name);
-                              setFieldValue('schoolAddress', school.address);
+                            if (school?.name != 'Other') {
+                       
+                              setFieldValue('schoolName', school?.name);
+                              setFieldValue('schoolAddress', school?.address);
                             } else {
-                              setFieldValue('schoolName', '');
+                          
+                              setFieldValue('schoolName', 'Other');
                               setFieldValue('schoolAdress', '');
                             }
                           }}

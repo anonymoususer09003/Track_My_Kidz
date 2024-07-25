@@ -208,7 +208,7 @@ const ViewBusInformation: FC<ViewBusInformationProps> = (
                   <Text style={styles.label}>Number of Kids per seat:</Text>
                   <Text style={styles.textLabel}>{numberOfKidsInRow}</Text>
                 </View>
-                <View style={styles.horizonatal}>
+                {/* <View style={styles.horizonatal}>
                   <Text style={{ marginRight: 10, fontWeight: 'bold' }}>
                     Do you have a rear long seats?
                   </Text>
@@ -219,11 +219,11 @@ const ViewBusInformation: FC<ViewBusInformationProps> = (
                   >
                     {''}
                   </CheckBox>
-                </View>
-                <View style={styles.horizonatal}>
+                </View> */}
+               {numberOfKidsLongSeat&& <View style={styles.horizonatal}>
                   <Text style={styles.label}>Number of kids long seat:</Text>
                   <Text style={styles.textLabel}>{numberOfKidsLongSeat}</Text>
-                </View>
+                </View>}
               </View>
               <View style={{ height: 70 }} />
             </ScrollView>

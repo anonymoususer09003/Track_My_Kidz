@@ -1,5 +1,5 @@
 import { CompleteRegistration, Register } from '@//Services/SignUpServices';
-import { LinearGradientButton, ProfileAvatarPicker } from '@/Components';
+import { CustomTextDropDown, LinearGradientButton, ProfileAvatarPicker } from '@/Components';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 import { PersonIcon, PhoneIcon } from '@/Components/SignUp/icons';
 import { AddInstructorsModal, EditInstructorsModal, ImagePickerModal } from '@/Modals';
@@ -1117,9 +1117,9 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                       // label={evaProps => <Text {...evaProps}>City</Text>}
                       
                       onSelect={(query) => {
-                        const selectedCity = cities[query];
+                        const selectedCity = query;
                         setFieldValue('city', selectedCity);
-                        setFieldValue('selectedCity', selectedCity);
+                     
                         // getSchoolsByFilter('', '', selectedCity)
                         // getOrgByFilter('', '', selectedCity)
                       }}
@@ -1178,28 +1178,30 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                           })}
                       </Autocomplete> */}
 
-                        <Select
-                          style={styles.inputSettings}
-                          value={values.school}
+                       
+                        <CustomTextDropDown
+                        style={{customDropDown:{width:'100%',marginTop:10,backgroundColor:'white'}}}
+             disable={false}
                           placeholder="Select School*"
+                          value={values.school}
                           onSelect={(index: any) => {
-                            let school = schoolsData[index.row];
-                            setFieldValue('school', school.name);
-                            setFieldValue('selectedSchool', school.name);
-                            if (school.name != 'Other') {
-                              setFieldValue('schoolName', school.name);
-                              setFieldValue('schoolAddress', school.address);
-                            } else {
-                              setFieldValue('schoolName', '');
-                              setFieldValue('schoolAdress', '');
-                            }
+
+let school=schoolsData.find((item:any)=>item?.name==index)
+                          
+                    
+setFieldValue('school', school.name);
+setFieldValue('selectedSchool', school.name);
+if (school.name != 'Other') {
+  setFieldValue('schoolName', school.name);
+  setFieldValue('schoolAddress', school.address);
+} else {
+  setFieldValue('schoolName', '');
+  setFieldValue('schoolAdress', '');
+}
                           }}
-                          label={(evaProps: any) => <Text {...evaProps}></Text>}
-                        >
-                          {schoolsData?.map((org, index) => {
-                            return <SelectItem key={index} title={org?.name} />;
-                          })}
-                        </Select>
+                          dropDownList={schoolsData}
+                        />
+
 
                         {(values.schoolName === 'Other' ||
                           values.school === 'Other') && (
@@ -1309,6 +1311,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                         )}
                       </>
                     )}
+                    {console.log('errors',errors)}
                     {/* <View
                       style={{
                         // marginVertical: 10,
