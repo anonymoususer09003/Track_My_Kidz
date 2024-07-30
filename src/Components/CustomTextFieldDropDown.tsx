@@ -1,16 +1,9 @@
-import Colors from "@/Theme/Colors";
-import React, { useEffect, useState } from "react";
-import {
-  FlatList,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+import Colors from '@/Theme/Colors';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-const CustomDropdown = (props:any) => {
+const CustomDropdown = (props: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
@@ -25,16 +18,17 @@ const CustomDropdown = (props:any) => {
   };
 
   useEffect(() => {
-    if (props?.value) {
-      setSelectedValue(props?.value);
-    }
+    setSelectedValue(props?.value);
   }, [props?.value]);
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
         disabled={props?.disable}
-        style={[styles.dropdownHeader,props?.style?.customDropDown&&props?.style?.customDropDown]}
+        style={[
+          styles.dropdownHeader,
+          props?.style?.customDropDown && props?.style?.customDropDown,
+        ]}
         onPress={toggleDropdown}
       >
         <Text
@@ -46,7 +40,7 @@ const CustomDropdown = (props:any) => {
           {selectedValue || props.placeholder}
         </Text>
         <Icon
-          name={isOpen ? "chevron-up" : "chevron-down"}
+          name={isOpen ? 'chevron-up' : 'chevron-down'}
           size={18}
           color={Colors.black}
           style={styles.rightIcon}
@@ -89,20 +83,20 @@ const CustomDropdown = (props:any) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    alignItems: "center",
+    width: '100%',
+    alignItems: 'center',
   },
   dropdownHeader: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 10,
-    backgroundColor: "#f7f9fc",
+    backgroundColor: '#f7f9fc',
     borderColor: Colors.textInputBorderColor,
     elevation: 2,
     minHeight: 40,
     borderRadius: 8,
     borderWidth: 2,
-    width: "95%",
+    width: '95%',
   },
   selectedValue: {
     flex: 1,
@@ -114,26 +108,26 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   dropdownContainer: {
-    width: "95%",
-    backgroundColor: "white",
+    width: '95%',
+    backgroundColor: 'white',
     borderRadius: 5,
     maxHeight: 200,
     elevation: 2,
   },
   dropdownOptions: {
     borderWidth: 0,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 5,
-    backgroundColor: "white",
+    backgroundColor: 'white',
   },
   dropdownOption: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 10,
   },
   optionText: {

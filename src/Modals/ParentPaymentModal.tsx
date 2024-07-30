@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-message';
 import { GetParent } from '@/Services/Parent';
 import { ModalState } from '@/Store/Modal';
 import { LinearGradientButton } from '@/Components';
-import { CreateSinglePaymentIntent,CreateSingleEmailPaymentIntent } from '@/Services/Payments';
+import { CreateSinglePaymentIntent, CreateSingleEmailPaymentIntent } from '@/Services/Payments';
 import { UpdateUser } from '@/Services/SettingsServies';
 import { loadUserId, storeIsSubscribed } from '@/Storage/MainAppStorage';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
@@ -16,13 +16,13 @@ import { UserState } from '@/Store/User';
 import Colors from '@/Theme/Colors';
 
 interface ParentPaymentModalProps {
-  onPay?: any,
-  onCancel?: any,
-  loginObj?: any
-  userEmail?:string
+  onPay?: any;
+  onCancel?: any;
+  loginObj?: any;
+  userEmail?: string;
 }
 
-const ParentPaymentModal = ({ onCancel, loginObj,userEmail }: ParentPaymentModalProps) => {
+const ParentPaymentModal = ({ onCancel, loginObj, userEmail, onPay }: ParentPaymentModalProps) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);
   console.log(user);
   // const {createToken} = useStripe();
@@ -31,8 +31,7 @@ const ParentPaymentModal = ({ onCancel, loginObj,userEmail }: ParentPaymentModal
   // const [, setIntervalOption] = useState(0);
   // const {Layout} = useTheme();
 
-  const [, setSelectedAmountIndex] =
-    useState<IndexPath | null>(null);
+  const [, setSelectedAmountIndex] = useState<IndexPath | null>(null);
   const [cardData, setCardData] = useState<any>({});
   const [, setIsValid] = useState<boolean>(false);
   const [isCardCompleted, setIsCardCompleted] = useState<boolean>(false);
@@ -52,7 +51,7 @@ const ParentPaymentModal = ({ onCancel, loginObj,userEmail }: ParentPaymentModal
   ];
   const intervals = ['YEAR', 'MONTH'];
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.parentPaymentModalVisibility,
+    (state: { modal: ModalState }) => state.modal.parentPaymentModalVisibility
   );
   console.log('isVisible', isVisible);
   const dispatch = useDispatch();
@@ -66,23 +65,19 @@ const ParentPaymentModal = ({ onCancel, loginObj,userEmail }: ParentPaymentModal
   }, [isVisible]);
 
   const RadioOptions = ({
-                          selectedIndex,
-                          setSelectedIndex,
-                        }: {
+    selectedIndex,
+    setSelectedIndex,
+  }: {
     selectedIndex: any;
     setSelectedIndex: any;
   }) => {
     return (
       <React.Fragment>
-        <RadioGroup
-          selectedIndex={selectedIndex}
-          onChange={index => setSelectedIndex(index)}>
-          {availableAmounts.map(it => {
+        <RadioGroup selectedIndex={selectedIndex} onChange={(index) => setSelectedIndex(index)}>
+          {availableAmounts.map((it) => {
             return (
-              <Radio
-                key={it.amount}
-                style={{ paddingLeft: 20, marginVertical: 15 }}>
-                {evaProps => (
+              <Radio key={it.amount} style={{ paddingLeft: 20, marginVertical: 15 }}>
+                {(evaProps) => (
                   <Text {...evaProps} style={{ fontSize: 20, paddingLeft: 15 }}>
                     {it.label}
                   </Text>
@@ -96,25 +91,21 @@ const ParentPaymentModal = ({ onCancel, loginObj,userEmail }: ParentPaymentModal
   };
 
   const getUser = async () => {
-    const id = await loadUserId() || '';
-    GetParent(parseInt(id, 0)).then(response => {
+    const id = (await loadUserId()) || '';
+    GetParent(parseInt(id, 0)).then((response) => {
       console.log('ParentPaymentModal.tsx line 104', response);
       setParent(response);
     });
   };
   const fetchPaymentIntentClientSecret = async (data: any) => {
-   
-if(userEmail)
-{
-  return await CreateSingleEmailPaymentIntent({
-   amountToPay: selectedIndex == 0 ? 50 : 4.99,email:userEmail}
-  );
-}
-else{
-    return await CreateSinglePaymentIntent(
-      selectedIndex == 0 ? 50 : 4.99,
-    );
-}
+    if (userEmail) {
+      return await CreateSingleEmailPaymentIntent({
+        amountToPay: selectedIndex == 0 ? 50 : 4.99,
+        email: userEmail,
+      });
+    } else {
+      return await CreateSinglePaymentIntent(selectedIndex == 0 ? 50 : 4.99);
+    }
   };
 
   const activateSubscription = async () => {
@@ -129,7 +120,7 @@ else{
     const { clientSecret } = await fetchPaymentIntentClientSecret(int);
 
     const billingDetails = {
-      email: userEmail||user?.email,
+      email: userEmail || user?.email,
     };
 
     const { paymentIntent, error } = await confirmPayment(clientSecret, {
@@ -139,20 +130,17 @@ else{
       },
     });
 
-    console.log('method',
-      clientSecret, {
-        paymentMethodType: 'Card',
-        paymentMethodData: {
-          billingDetails,
-        },
-    })
+    console.log('method', clientSecret, {
+      paymentMethodType: 'Card',
+      paymentMethodData: {
+        billingDetails,
+      },
+    });
     console.log('paymentIntent', paymentIntent);
     if (error) {
       console.log('err', error);
       setIsLoading(false);
-      Alert.alert('Payment confirmation error.', error.message, [
-        { text: 'OK', style: 'cancel' },
-      ]);
+      Alert.alert('Payment confirmation error.', error.message, [{ text: 'OK', style: 'cancel' }]);
     } else if (paymentIntent) {
       setIsLoading(false);
       // await updateUser();
@@ -162,10 +150,12 @@ else{
         position: 'top',
         text1: 'Payment Successfull',
       });
+      onPay();
+
       dispatch(
         ChangeModalState.action({
           parentPaymentModalVisibility: false,
-        }),
+        })
       );
     }
   };
@@ -173,10 +163,7 @@ else{
     try {
       console.log('userrrrr', loginObj);
 
-      let res = await UpdateUser(
-        { ...loginObj, isSubscribed: true },
-        'parent',
-      );
+      let res = await UpdateUser({ ...loginObj, isSubscribed: true }, 'parent');
       console.log('res', res);
       await storeIsSubscribed(true);
     } catch (err) {
@@ -197,7 +184,8 @@ else{
         // dispatch(
         //     ChangeModalState.action({ parentPaymentModalVisibility: false }),
         // )
-      }}>
+      }}
+    >
       <Card style={styles.modal} disabled={true}>
         <View style={styles.body}>
           <View style={{ paddingBottom: 10, paddingTop: 10 }}>
@@ -207,14 +195,12 @@ else{
                 textAlign: 'center',
                 color: '#606060',
                 fontSize: 18,
-              }}>
+              }}
+            >
               Payment Info
             </Text>
           </View>
-          <RadioOptions
-            selectedIndex={selectedIndex}
-            setSelectedIndex={setSelectedIndex}
-          />
+          <RadioOptions selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} />
         </View>
         <View style={{ marginTop: 30 }}>
           <CardField
@@ -231,7 +217,7 @@ else{
               height: 50,
               marginVertical: 30,
             }}
-            onCardChange={cardDetails => {
+            onCardChange={(cardDetails) => {
               setIsCardCompleted(cardDetails?.complete);
               setCardData(cardDetails);
               if (cardDetails.complete) {
@@ -243,7 +229,11 @@ else{
             // onFocus={focusedField => {
             // }}
           />
-          <Text style={{color:'red'}}>{selectedIndex==0?'First payment is prorated. Subsequent payment is made on first of every year. ':'First payment is prorated. Subsequent payment is made on first of every month.'}</Text>
+          <Text style={{ color: 'red' }}>
+            {selectedIndex == 0
+              ? 'First payment is prorated. Subsequent payment is made on first of every year. '
+              : 'First payment is prorated. Subsequent payment is made on first of every month.'}
+          </Text>
         </View>
         <View style={styles.bottom}>
           {!isLoading ? (
@@ -259,7 +249,8 @@ else{
                 status="control"
                 onPress={() => {
                   activateSubscription().catch(console.error);
-                }}>
+                }}
+              >
                 Pay
               </LinearGradientButton>
             </View>
@@ -282,10 +273,11 @@ else{
                   dispatch(
                     ChangeModalState.action({
                       parentPaymentModalVisibility: false,
-                    }),
+                    })
                   );
                   onCancel();
-                }}>
+                }}
+              >
                 Cancel
               </LinearGradientButton>
             </View>

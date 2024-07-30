@@ -17,8 +17,8 @@ import { PlaceState } from '@/Store/Places';
 import Colors from '@/Theme/Colors';
 import { RouteProp, useIsFocused } from '@react-navigation/native';
 import Autocomplete from '@/Components/CustomAutocomplete';
+import { ThunkDispatch } from '@reduxjs/toolkit';
 import {
-  
   AutocompleteItem,
   Button,
   ButtonElement,
@@ -37,14 +37,14 @@ import { Props } from '@ui-kitten/components/devsupport/services/props/props.ser
 import { Formik } from 'formik';
 import React, { FC, ReactElement, useContext, useEffect, useState } from 'react';
 import {
- 
   Linking,
   Platform,
   ScrollView,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  Dimensions
+  Dimensions,
+  Alert,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { getDeviceId } from 'react-native-device-info';
@@ -83,18 +83,14 @@ type FinalOrgRegistrationScreenProps = {
 const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route }: Props) => {
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const [loading, setLoading] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] =
-    React.useState<boolean>(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = React.useState<boolean>(false);
   const isFocuesed = useIsFocused();
-  const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries,
-  );
+  const countries = useSelector((state: { places: PlaceState }) => state.places.countries);
   const isVisibleAddInstructor = useSelector(
-    (state: { modal: ModalState }) => state.modal.addInstructorModalVisibility,
+    (state: { modal: ModalState }) => state.modal.addInstructorModalVisibility
   );
   const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.addButInformationModalVisibility,
+    (state: { modal: ModalState }) => state.modal.addButInformationModalVisibility
   );
   const [countriesData, setCountriesData] = React.useState<any[]>(countries);
   const [states, setStates] = useState<string[]>([]);
@@ -112,16 +108,17 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
   const [placement] = React.useState('bottom');
   const [instructors, setInstructors] = useState<any[]>(_instructors);
   const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
-    route.params?.details?.photo || '',
+    route.params?.details?.photo || ''
   );
-  console.log('route.params?.details?.photo', route.params?.details?.photo);
+
   const [visibleImagePicker, setVisibleImagePicker] = useState<boolean>(false);
   const [buses, setBuses] = useState<any[]>([]);
   const [uploadedImage, setUploadedImage] = React.useState<any>(null);
   const [selectedInstructor, setSelectedInstructor] = useState<any>({});
 
   const styles = useStyleSheet(themedStyles);
-  const { emailAddress, user_type, details } = route.params;
+  const { user_type, details, emailAddress } = route.params;
+
   const { activation_code } = route.params;
 
   const country = details?.country;
@@ -130,10 +127,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
   const zipcode = details?.zipcode;
   const selected_entity = details?.selected_entity;
 
-  console.log('country', country);
-  console.log('details', details);
-  const dispatch = useDispatch();
-
+  const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
 
   const signUpValidationSchema = yup.object().shape({
     firstName: yup.string().required('First name is required'),
@@ -155,11 +149,14 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
       .required('Password is required'),
     confirmPassword: yup
       .string()
-      .test('password-match', 'Password & Confirm Password do not match', function(value) {
+      .test('password-match', 'Password & Confirm Password do not match', function (value) {
         const password = this.resolve(yup.ref('password'));
         return value === password;
       })
-      .when('password', (password, schema) => password && schema.required('Re-Password is required')),
+      .when(
+        'password',
+        (password, schema) => password && schema.required('Re-Password is required')
+      ),
     termsAccepted: yup.boolean().required(),
   });
 
@@ -182,7 +179,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
       <Icon {...props} name={confirmPasswordVisible ? 'eye-off' : 'eye'} />
     </TouchableWithoutFeedback>
   );
- 
 
   const renderEditAvatarButton = (): React.ReactElement => (
     <Button
@@ -193,8 +189,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
     />
   );
   const renderEditButtonElement = (): ButtonElement => {
-    const buttonElement: React.ReactElement<ButtonProps> =
-      renderEditAvatarButton();
+    const buttonElement: React.ReactElement<ButtonProps> = renderEditAvatarButton();
 
     return React.cloneElement(buttonElement, {
       style: [buttonElement.props.style, styles.editButton],
@@ -217,8 +212,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
         <Text
           style={{ color: Colors.primary }}
           onPress={() => {
-            Linking.openURL('https://trackmykidz.com/terms/').then(() => {
-            });
+            Linking.openURL('https://trackmykidz.com/terms/').then(() => {});
           }}
         >
           {' '}
@@ -228,10 +222,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
         <Text
           style={{ color: Colors.primary }}
           onPress={() => {
-            Linking.openURL('https://trackmykidz.com/privacy-policy').then(
-              () => {
-              },
-            );
+            Linking.openURL('https://trackmykidz.com/privacy-policy').then(() => {});
           }}
         >
           {' '}
@@ -307,12 +298,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
     getOrgs();
   }, []);
 
-  const getSchoolsByFilter = (
-    country = '',
-    state = '',
-    city = '',
-    schoolName = '',
-  ) => {
+  const getSchoolsByFilter = (country = '', state = '', city = '', schoolName = '') => {
     const query = {
       country: country,
       state: state,
@@ -338,12 +324,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
         console.log('GetSchoolByFilters', err);
       });
   };
-  const getOrgByFilter = (
-    country = '',
-    state = '',
-    city = '',
-    orgName = '',
-  ) => {
+  const getOrgByFilter = (country = '', state = '', city = '', orgName = '') => {
     const query = {
       country: country,
       state: state,
@@ -370,7 +351,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
     dispatch(
       ChangeModalState.action({
         editInstructorFormModalVisibility: true,
-      }),
+      })
     );
   };
 
@@ -410,10 +391,11 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
   return (
     <BackgroundLayout title="Registration">
       <KeyboardAwareScrollView
-            extraHeight={10}
-            enableOnAndroid={true}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ flex: 1 }}>
+        extraHeight={10}
+        enableOnAndroid={true}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ flex: 1 }}
+      >
         {visibleImagePicker && (
           <ImagePickerModal
             openCamera={imageCameraLaunch}
@@ -432,10 +414,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
           />
         )}
         {isVisibleAddInstructor && (
-          <AddInstructorsModal
-            instructors={instructors}
-            setInstructors={setInstructors}
-          />
+          <AddInstructorsModal instructors={instructors} setInstructors={setInstructors} />
         )}
         {isVisible && <AddBusInformation buses={buses} setBuses={setBuses} />}
 
@@ -446,12 +425,12 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
               source={
                 Platform.OS == 'android'
                   ? {
-                    uri: selectedImage + '?time' + new Date().getTime(),
-                    headers: { Pragma: 'no-cache' },
-                  }
+                      uri: selectedImage + '?time' + new Date().getTime(),
+                      headers: { Pragma: 'no-cache' },
+                    }
                   : { uri: selectedImage }
               }
-              editButton={ renderEditAvatarButton }
+              editButton={renderEditAvatarButton}
             />
           )}
           {selectedImage == '' && (
@@ -476,28 +455,26 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
           )}
         </View>
 
-        <ScrollView keyboardShouldPersistTaps="handled"  style={styles.container}>
+        <ScrollView keyboardShouldPersistTaps="handled" style={styles.container}>
           {reRender && (
             <Formik
               validationSchema={signUpValidationSchema}
               validateOnMount={true}
               initialValues={{
-                firstName:
-                  details && details.firstname ? details.firstname : '',
+                firstName: details && details.firstname ? details.firstname : '',
                 lastName: details && details.lastname ? details.lastname : '',
                 schoolName: '',
                 school_name: '',
                 schoolAddress: '',
-                country: details && country ? country : '',
+                country: '',
                 selectedCountry: '',
                 selectedState: '',
                 selectedCity: '',
-                city: details && city ? city : '',
-                state: details && state ? state : '',
-                zipcode: details && zipcode ? zipcode : '',
+                city: '',
+                state: '',
+                zipcode: '',
 
-                phoneNumber:
-                  details && details.phoneNumber ? details.phoneNumber : '',
+                phoneNumber: details && details.phoneNumber ? details.phoneNumber : '',
                 password: '',
                 confirmPassword: '',
                 termsAccepted: false,
@@ -507,20 +484,16 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                 organizationName: '',
               }}
               onSubmit={(values, {}) => {
-                dispatch(ChangeModalState.action({ loading: true }));
+                // dispatch(ChangeModalState.action({ loading: true }));
                 const school_name =
-                  values.schoolName === 'Other'
-                    ? values.school_name
-                    : values.schoolName;
+                  values.schoolName === 'Other' ? values.school_name : values.schoolName;
                 console.log('schooldata', school_name);
                 let schoolId =
                   values.schoolName === 'Other'
                     ? { schoolId: 0 }
                     : schoolsData.find((s) => s.name === school_name);
                 console.log('----school', schoolId);
-                schoolId = Array.isArray(schoolId)
-                  ? schoolId[0].schoolId
-                  : schoolId?.schoolId;
+                schoolId = Array.isArray(schoolId) ? schoolId[0].schoolId : schoolId?.schoolId;
 
                 let schoolAddress = Array.isArray(schoolId)
                   ? schoolId[0]?.address
@@ -541,15 +514,15 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                   'image',
                   uploadedImage
                     ? {
-                      uri: uploadedImage?.path,
-                      name: uploadedImage.mime,
-                      type: uploadedImage.mime,
-                    }
+                        uri: uploadedImage?.path,
+                        name: uploadedImage.mime,
+                        type: uploadedImage.mime,
+                      }
                     : {
-                      uri: 'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
-                      name: 'avatar',
-                      type: 'image/png',
-                    },
+                        uri: 'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
+                        name: 'avatar',
+                        type: 'image/png',
+                      }
                 );
                 formData.append('firstname', values.firstName);
                 formData.append('lastname', values.lastName);
@@ -567,8 +540,8 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                 formData.append('deviceId', getDeviceId());
 
                 // TODO check how it works
-                formData.append('schoolId', schoolId || '');
-                formData.append('orgId', orgId || '');
+                // formData.append('schoolId', schoolId || '');
+                // formData.append('orgId', orgId || '');
                 // values.schoolId
                 //   ? formData.append('schoolId', values.schoolId)
                 //   : formData.append('schoolId', '');
@@ -576,15 +549,10 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                 //   ? formData.append('orgId', values.orgId)
                 //   : formData.append('orgId', '');
 
-                console.log('formData0202002020200202', formData);
-
                 const userObject: UserRegistrationDTO = {
                   firstname: values.firstName,
                   lastname: values.lastName,
-                  address:
-                    schoolId != 0 && schoolId
-                      ? schoolAddress
-                      : values?.schoolAddress,
+                  address: schoolId != 0 && schoolId ? schoolAddress : values?.schoolAddress,
                   email: emailAddress,
                   state: values.state,
                   city: values.city,
@@ -609,17 +577,10 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                   schoolId: schoolId,
                   orgId: orgId,
                 };
-                console.log('values', values.schoolName);
 
                 const schoolObject: UserRegistrationDTO | any = {
-                  name:
-                    values.school === 'Other'
-                      ? values.school_name
-                      : values.schoolName,
-                  address:
-                    schoolId != 0 && schoolId
-                      ? schoolAddress
-                      : values?.schoolAddress,
+                  name: values.school === 'Other' ? values.school_name : values.schoolName,
+                  address: schoolId != 0 && schoolId ? schoolAddress : values?.schoolAddress,
                   country: values.country,
                   zipcode: values.zipcode,
                   city: values.city,
@@ -631,16 +592,13 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                   email: emailAddress,
                   password: values.password,
                 };
-
+                // console.log('formdata', formData);
                 Register(registerObject, 'instructor')
                   .then(async (response) => {
                     console.log('response1111111', response.data);
                     await storeToken(response.data.token);
                     console.log('schoolId', schoolId);
-                    if (
-                      values.selected_entity == 'School' &&
-                      (schoolId == 0 || !schoolId)
-                    ) {
+                    if (values.selected_entity == 'School' && (schoolId == 0 || !schoolId)) {
                       CompleteRegistration(schoolObject, 'school')
                         .then((_res) => {
                           console.log('response1.1', {
@@ -649,7 +607,8 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                           });
 
                           formData.append('schoolId', _res?.data?.schoolId);
-
+                          // formData.append('schoolId', schoolId || '');
+                          formData.append('orgId', orgId || '');
                           console.log('formdata---------------', formData);
                           // {
                           //   ...userObject,
@@ -672,18 +631,13 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                                 isAdmin: item?.isAdmin || false,
                               }));
                               await Login(loginObject, user_type.toLowerCase());
-                              await storeInstructors(
-                                JSON.stringify(_instructors),
-                              );
-                              // todo not a priority
-                              // @ts-ignore
+                              await storeInstructors(JSON.stringify(_instructors));
+                              // // todo not a priority
+                              // // @ts-ignore
                               dispatch(LoginStore.action(obj));
 
                               console.log('_instructors', _instructors);
-                              console.log(
-                                '_instructors',
-                                response.data.instructorId,
-                              );
+                              console.log('_instructors', response.data.instructorId);
 
                               if (response.status == 201) {
                                 // dispatch(
@@ -704,27 +658,19 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                                 autoHide: true,
                                 topOffset: 30,
                                 bottomOffset: 40,
-                                onShow: () => {
-                                },
-                                onHide: () => {
-                                },
-                                onPress: () => {
-                                },
+                                onShow: () => {},
+                                onHide: () => {},
+                                onPress: () => {},
                               });
                             })
                             .finally(() => {
-                              dispatch(
-                                ChangeModalState.action({ loading: false }),
-                              );
+                              dispatch(ChangeModalState.action({ loading: false }));
                             });
                         })
                         .catch((err) => {
                           console.log('err1111', err);
                         });
-                    } else if (
-                      values.selected_entity == 'School' &&
-                      schoolId != 0
-                    ) {
+                    } else if (values.selected_entity == 'School' && schoolId != 0) {
                       formData.append('schoolId', schoolId);
 
                       CompleteRegistration(formData, 'instructor')
@@ -769,18 +715,16 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                             autoHide: true,
                             topOffset: 30,
                             bottomOffset: 40,
-                            onShow: () => {
-                            },
-                            onHide: () => {
-                            },
-                            onPress: () => {
-                            },
+                            onShow: () => {},
+                            onHide: () => {},
+                            onPress: () => {},
                           });
                         })
                         .finally(() => {
                           dispatch(ChangeModalState.action({ loading: false }));
                         });
                     } else if (values.selected_entity != 'School' && !orgId) {
+                      console.log('schoolobj------------', schoolObject);
                       CompleteRegistration(schoolObject, 'org')
                         .then((_res) => {
                           console.log({
@@ -789,12 +733,13 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                           });
                           console.log('response3');
                           formData.append('orgId', _res.data.orgId);
-                          formData.append('schoolId', null);
+                          formData.append('schoolId', '');
                           // {
                           //   ...userObject,
                           //   orgId: _res.data.orgId,
                           //   schoolId: null,
                           // },
+
                           CompleteRegistration(formData, 'instructor')
                             .then(async (response: any) => {
                               let obj = {
@@ -811,22 +756,12 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                                 isAdmin: item?.isAdmin || false,
                               }));
                               await Login(loginObject, user_type.toLowerCase());
-                              await storeInstructors(
-                                JSON.stringify(_instructors),
-                              );
+                              await storeInstructors(JSON.stringify(_instructors));
                               // todo not a priority
                               // @ts-ignore
                               dispatch(LoginStore.action(obj));
 
-                              console.log('_instructors', _instructors);
-                              console.log(
-                                '_instructors',
-                                response.data.instructorId,
-                              );
-                              console.log('response4', response.status);
-
                               if (response.status == 201) {
-                                console.log('response4.1');
                                 // dispatch(
                                 //   ChangeModalState.action({
                                 //     welcomeMessageModal: true,
@@ -835,7 +770,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                               }
                             })
                             .catch((error: any) => {
-                              console.log('error333', error);
                               Toast.show({
                                 type: 'info',
                                 position: 'top',
@@ -845,37 +779,31 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                                 autoHide: true,
                                 topOffset: 30,
                                 bottomOffset: 40,
-                                onShow: () => {
-                                },
-                                onHide: () => {
-                                },
-                                onPress: () => {
-                                },
+                                onShow: () => {},
+                                onHide: () => {},
+                                onPress: () => {},
                               });
                             })
                             .finally(() => {
-                              dispatch(
-                                ChangeModalState.action({ loading: false }),
-                              );
+                              dispatch(ChangeModalState.action({ loading: false }));
                             });
                         })
                         .catch((err) => {
                           console.log('err444', err);
                         });
                     } else if (values.selected_entity != 'School' && orgId) {
-                      formData.append('schoolId', null);
+                      formData.append('schoolId', '');
                       formData.append('orgId', orgId);
-                      console.log('response5', formData);
+
                       CompleteRegistration(formData, 'instructor')
                         .then(async (res: any) => {
-                          console.log('response5.1', res);
                           let obj = {
                             token: res.data.token,
                             userType: 'instructor',
                             id: res.data.instructorId,
                             mainId: response.data?.userId,
                           };
-                          console.log('obj', obj);
+
                           let _instructors = instructors.map((item) => ({
                             firstName: item?.firstName || '',
                             lastName: item?.lastName || '',
@@ -888,12 +816,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                           // todo not a priority
                           // @ts-ignore
                           dispatch(LoginStore.action(obj));
-
-                          console.log('_instructors', _instructors);
-                          console.log(
-                            '_instructors',
-                            response.data.instructorId,
-                          );
 
                           if (response.status == 201) {
                             // dispatch(
@@ -914,12 +836,9 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                             autoHide: true,
                             topOffset: 30,
                             bottomOffset: 40,
-                            onShow: () => {
-                            },
-                            onHide: () => {
-                            },
-                            onPress: () => {
-                            },
+                            onShow: () => {},
+                            onHide: () => {},
+                            onPress: () => {},
                           });
                         })
                         .finally(() => {
@@ -939,12 +858,9 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                       autoHide: true,
                       topOffset: 30,
                       bottomOffset: 40,
-                      onShow: () => {
-                      },
-                      onHide: () => {
-                      },
-                      onPress: () => {
-                      },
+                      onShow: () => {},
+                      onHide: () => {},
+                      onPress: () => {},
                     });
                   })
                   .finally(() => {
@@ -953,16 +869,16 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
               }}
             >
               {({
-                  handleChange,
-                  setFieldValue,
-                  handleBlur,
-                  handleSubmit,
-                  resetForm,
-                  values,
-                  errors,
-                  touched,
-                  isValid,
-                }) => (
+                handleChange,
+                setFieldValue,
+                handleBlur,
+                handleSubmit,
+                resetForm,
+                values,
+                errors,
+                touched,
+                isValid,
+              }) => (
                 <>
                   <Layout style={styles.formContainer} level="1">
                     <Select
@@ -972,10 +888,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                       //label={(evaProps: any) => <Text {...evaProps}>Entity</Text>}
                       onSelect={(index: any) => {
                         resetForm();
-                        setFieldValue(
-                          'selected_entity',
-                          organisations[index.row].value,
-                        );
+                        setFieldValue('selected_entity', organisations[index.row].value);
                       }}
                     >
                       {organisations.map((item) => {
@@ -1042,10 +955,13 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                       placeholder="Country*"
                       data={countriesData}
                       value={values.country}
-                 
-                      style={{input:{ 
-                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
-                     
+                      style={{
+                        input: {
+                          borderRadius: 10,
+                          borderWidth: 0.3,
+                          borderColor: Colors.borderGrey,
+                        },
+                      }}
                       onSelect={(query) => {
                         const selectedCountry = query;
                         setFieldValue('country', selectedCountry.name);
@@ -1054,13 +970,15 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                         setFieldValue('state', '');
                         setStates([]);
                         setDropdownStates([]);
-                        console.log();
+
                         const countryId = selectedCountry.name.replace(/ /g, '');
-                        console.log('FinalOrgRegistrationScreen.tsx line 1058 - countryId', countryId);
-                        GetAllStates(countryId).then((res) => {
-                          setStates(res.data);
-                          setDropdownStates(res.data);
-                        }).catch(console.error);
+
+                        GetAllStates(countryId)
+                          .then((res) => {
+                            setStates(res.data);
+                            setDropdownStates(res.data);
+                          })
+                          .catch(console.error);
                         selectedCountry.phone_code.toString().startsWith('+')
                           ? setPhoneCode(selectedCountry.phone_code.toString())
                           : setPhoneCode('+' + selectedCountry.phone_code);
@@ -1068,18 +986,20 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                         getOrgByFilter(selectedCountry.name);
                       }}
                     />
-                      
-                    
+
                     <Autocomplete
                       placeholder="State*"
                       value={values.state}
-              
-                      style={{input:{ 
-                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
-                     
+                      style={{
+                        input: {
+                          borderRadius: 10,
+                          borderWidth: 0.3,
+                          borderColor: Colors.borderGrey,
+                        },
+                      }}
                       disabled={!values.selectedCountry}
                       // label={evaProps => <Text {...evaProps}>State</Text>}
-                     data={dropdownStates}
+                      data={dropdownStates}
                       onSelect={(query) => {
                         const selectedState = query;
                         setFieldValue('state', selectedState);
@@ -1088,43 +1008,40 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                         setFieldValue('city', '');
                         setCities([]);
                         setDropdownCities([]);
-                        GetAllCities(
-                          values.selectedCountry,
-                          selectedState,
-                        ).then((res) => {
+                        GetAllCities(values.selectedCountry, selectedState).then((res) => {
                           setCities(res.data);
-                          setDropdownCities(res.data)
-                          
+                          setDropdownCities(res.data);
+
                           console.log(cities);
                         });
-                        getSchoolsByFilter(
-                          values.selectedCountry,
-                          selectedState,
-                        );
+                        getSchoolsByFilter(values.selectedCountry, selectedState);
                         getOrgByFilter(values.selectedCountry, selectedState);
                       }}
                     />
-                     
+
                     <Autocomplete
-                    data={dropdownCities}
+                      data={dropdownCities}
                       placeholder="City*"
                       value={values.city}
-            
                       disabled={!values.selectedState}
-                      style={{input:{ 
-                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
-                     
+                      style={{
+                        input: {
+                          borderRadius: 10,
+                          borderWidth: 0.3,
+                          borderColor: Colors.borderGrey,
+                        },
+                      }}
                       // label={evaProps => <Text {...evaProps}>City</Text>}
-                      
+
                       onSelect={(query) => {
                         const selectedCity = query;
                         setFieldValue('city', selectedCity);
-                     
+
                         // getSchoolsByFilter('', '', selectedCity)
                         // getOrgByFilter('', '', selectedCity)
                       }}
                     />
-                    
+
                     <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"
@@ -1178,33 +1095,34 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                           })}
                       </Autocomplete> */}
 
-                       
                         <CustomTextDropDown
-                        style={{customDropDown:{width:'100%',marginTop:10,backgroundColor:'white'}}}
-             disable={false}
+                          style={{
+                            customDropDown: {
+                              width: '100%',
+                              marginTop: 10,
+                              backgroundColor: 'white',
+                            },
+                          }}
+                          disable={false}
                           placeholder="Select School*"
                           value={values.school}
                           onSelect={(index: any) => {
+                            let school = schoolsData.find((item: any) => item?.name == index);
 
-let school=schoolsData.find((item:any)=>item?.name==index)
-                          
-                    
-setFieldValue('school', school.name);
-setFieldValue('selectedSchool', school.name);
-if (school.name != 'Other') {
-  setFieldValue('schoolName', school.name);
-  setFieldValue('schoolAddress', school.address);
-} else {
-  setFieldValue('schoolName', '');
-  setFieldValue('schoolAdress', '');
-}
+                            setFieldValue('school', school.name);
+                            setFieldValue('selectedSchool', school.name);
+                            if (school.name != 'Other') {
+                              setFieldValue('schoolName', school.name);
+                              setFieldValue('schoolAddress', school.address);
+                            } else {
+                              setFieldValue('schoolName', '');
+                              setFieldValue('schoolAdress', '');
+                            }
                           }}
                           dropDownList={schoolsData}
                         />
 
-
-                        {(values.schoolName === 'Other' ||
-                          values.school === 'Other') && (
+                        {(values.schoolName === 'Other' || values.school === 'Other') && (
                           <>
                             <Input
                               style={styles.inputSettings}
@@ -1216,9 +1134,7 @@ if (school.name != 'Other') {
                               onBlur={handleBlur('school_name')}
                             />
                             {errors.school_name && touched.school_name && (
-                              <Text style={styles.errorText}>
-                                {errors.school_name}
-                              </Text>
+                              <Text style={styles.errorText}>{errors.school_name}</Text>
                             )}
 
                             <Input
@@ -1231,9 +1147,7 @@ if (school.name != 'Other') {
                               onBlur={handleBlur('schoolAddress')}
                             />
                             {errors.schoolAddress && touched.schoolAddress && (
-                              <Text style={styles.errorText}>
-                                {errors.schoolAddress}
-                              </Text>
+                              <Text style={styles.errorText}>{errors.schoolAddress}</Text>
                             )}
                           </>
                         )}
@@ -1289,9 +1203,7 @@ if (school.name != 'Other') {
                               onBlur={handleBlur('schoolName')}
                             />
                             {errors.schoolName && touched.schoolName && (
-                              <Text style={styles.errorText}>
-                                {errors.schoolName}
-                              </Text>
+                              <Text style={styles.errorText}>{errors.schoolName}</Text>
                             )}
                             <Input
                               style={styles.inputSettings}
@@ -1303,15 +1215,13 @@ if (school.name != 'Other') {
                               onBlur={handleBlur('schoolAddress')}
                             />
                             {errors.schoolAddress && touched.schoolAddress && (
-                              <Text style={styles.errorText}>
-                                {errors.schoolAddress}
-                              </Text>
+                              <Text style={styles.errorText}>{errors.schoolAddress}</Text>
                             )}
                           </>
                         )}
                       </>
                     )}
-                    {console.log('errors',errors)}
+
                     {/* <View
                       style={{
                         // marginVertical: 10,
@@ -1391,15 +1301,9 @@ if (school.name != 'Other') {
                                 }}
                               >
                                 <TouchableOpacity
-                                  onPress={() =>
-                                    handleInstructorEdit(instructor, index)
-                                  }
+                                  onPress={() => handleInstructorEdit(instructor, index)}
                                 >
-                                  <Feather
-                                    name="edit"
-                                    color={Colors.primary}
-                                    size={20}
-                                  />
+                                  <Feather name="edit" color={Colors.primary} size={20} />
                                 </TouchableOpacity>
                                 <AntDesign
                                   name="delete"
@@ -1409,9 +1313,7 @@ if (school.name != 'Other') {
                                     marginHorizontal: 10,
                                     marginLeft: 20,
                                   }}
-                                  onPress={() =>
-                                    handleDeleteInstructor(instructor)
-                                  }
+                                  onPress={() => handleDeleteInstructor(instructor)}
                                 />
                               </View>
                             </View>
@@ -1540,17 +1442,13 @@ if (school.name != 'Other') {
                       onBlur={handleBlur('confirmPassword')}
                     />
                     {errors.confirmPassword && touched.confirmPassword && (
-                      <Text style={styles.errorText}>
-                        {errors.confirmPassword}
-                      </Text>
+                      <Text style={styles.errorText}>{errors.confirmPassword}</Text>
                     )}
                     <View style={{ flexDirection: 'row' }}>
                       <CheckBox
                         style={[styles.termsCheckBox, { flex: 1 }]}
                         checked={values.termsAccepted}
-                        onChange={() =>
-                          setFieldValue('termsAccepted', !values.termsAccepted)
-                        }
+                        onChange={() => setFieldValue('termsAccepted', !values.termsAccepted)}
                       >
                         {''}
                       </CheckBox>
@@ -1712,6 +1610,6 @@ const themedStyles = StyleService.create({
   autoCompleteItem: {
     // elevation: 2,
 
-    width: Dimensions.get('screen').width*0.82
+    width: Dimensions.get('screen').width * 0.82,
   },
 });

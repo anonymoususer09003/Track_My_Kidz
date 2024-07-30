@@ -1,5 +1,7 @@
 import {
-  EmailConfirmationScreen, FinalOrgRegistrationScreen, FinalRegistrationScreen,
+  EmailConfirmationScreen,
+  FinalOrgRegistrationScreen,
+  FinalRegistrationScreen,
   FirstSignUpScreen,
   ForgotPasswordScreen,
   ReactivateAccountScreen,
@@ -13,45 +15,52 @@ import React from 'react';
 export type AuthStackNavigatorParamsList = {
   Login: undefined;
   SignUp1: undefined;
-  EmailConfirmation: {
-    emailAddress?: string,
-    user_type?: string,
-    isDesignatedAdmin?: boolean,
-    reactivate?: boolean
-  } | undefined;
-  FinalRegistrationScreen: { emailAddress: string, user_type: string, student: any, activation_code: string };
-  FinalOrgRegistrationScreen: {
-    emailAddress: any,
-    registrationId: any,
-    user_type: any,
-    activation_code: any,
-    details: {
-      email: any,
-      firstname: any,
-      lastname: any,
-      phoneNumber: any,
-      state: any,
-      country: any,
-      city: any,
-      zipcode: any,
-      selected_entity: any,
-      photo?: any,
-    },
-  } | undefined;
+  EmailConfirmation:
+    | {
+        emailAddress?: string;
+        user_type?: string;
+        isDesignatedAdmin?: boolean;
+        reactivate?: boolean;
+      }
+    | undefined;
+  FinalRegistrationScreen: {
+    emailAddress: string;
+    user_type: string;
+    student: any;
+    activation_code: string;
+  };
+  FinalOrgRegistrationScreen:
+    | {
+        emailAddress: any;
+        registrationId: any;
+        user_type: any;
+        activation_code: any;
+        schoolData: any;
+        orgData: any;
+        details: {
+          email: any;
+          firstname: any;
+          lastname: any;
+          phoneNumber: any;
+          state: any;
+          country: any;
+          city: any;
+          zipcode: any;
+          selected_entity: any;
+          photo?: any;
+        };
+      }
+    | undefined;
   ForgotPassword: undefined;
   ResendConfirmation: { resendCode: any };
   ReactivateAccount: undefined;
-  ResetPassword: { emailAddress?: string, user_type?: string, code?: string };
+  ResetPassword: { emailAddress?: string; user_type?: string; code?: string };
 };
 
 const AuthNavigator = createStackNavigator<AuthStackNavigatorParamsList>();
 const AuthStack = () => (
   <AuthNavigator.Navigator initialRouteName="Login">
-    <AuthNavigator.Screen
-      name="Login"
-      component={SignInScreen}
-      options={{ headerShown: false }}
-    />
+    <AuthNavigator.Screen name="Login" component={SignInScreen} options={{ headerShown: false }} />
     <AuthNavigator.Screen
       name="SignUp1"
       component={FirstSignUpScreen}

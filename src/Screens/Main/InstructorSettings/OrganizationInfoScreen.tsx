@@ -19,6 +19,7 @@ import { GetAllInstructors, GetInstructor } from '@/Services/Instructor';
 import { AppHeader, LinearGradientButton } from '@/Components';
 import { UserState } from '@/Store/User';
 import { GetSchool, UpdateSchool } from '@/Services/School';
+import { GetOrg } from '@/Services/Org';
 import { loadUserId } from '@/Storage/MainAppStorage';
 import { useIsFocused } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Entypo';
@@ -42,13 +43,13 @@ const filterCities = (item: string, query: string) => {
 const Divider = () => (
   <View
     style={{
-      borderBottomColor: "#E0E0E0",
+      borderBottomColor: '#E0E0E0',
       borderBottomWidth: 1,
     }}
   />
 );
 
-const grades = ["ECP", "Transition", "Kindergander", "1st Grade", "2nd Grade"];
+const grades = ['ECP', 'Transition', 'Kindergander', '1st Grade', '2nd Grade'];
 type OrganizationInfoScreenProps = {
   navigation: StackNavigationProp<MainStackNavigatorParamsList, 'OrganizationInfo'>;
 };
@@ -56,19 +57,19 @@ type OrganizationInfoScreenProps = {
 const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation }) => {
   const [, _dispatch]: any = useStateValue();
   const { Layout } = useTheme();
-  const windowWidth = Dimensions.get("window").width;
-  const height = Dimensions.get("screen").height;
+  const windowWidth = Dimensions.get('window').width;
+  const height = Dimensions.get('screen').height;
   const [instructors, setInstructors] = useState<any>([]);
   const dispatch = useDispatch();
   const reportAProblemValidationSchema = yup.object().shape({
     message: yup
       .string()
-      .max(20, "Name can not be more than 20 characters")
+      .max(20, 'Name can not be more than 20 characters')
       .min(3, ({ min }) => `Name needs to be at least ${min} characters`)
-      .required("Name is required"),
+      .required('Name is required'),
   });
   const [tableData, setTableData] = useState({
-    tableHead: ["First Name", "Last Name", "Email", "Phone", "Admin", " "],
+    tableHead: ['First Name', 'Last Name', 'Email', 'Phone', 'Admin', ' '],
     tableData: [],
     item: [],
   });
@@ -82,20 +83,13 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
   const formatTableData = (data: any) => {
     let temp: any = { ...tableData };
     let row: any[] = [];
-    let rowItem: any[]  = [];
+    let rowItem: any[] = [];
     data.result.map((item: any, index: number) => {
       let { firstname, lastname, email, phone, isAdmin, state } = item;
-      row.push([
-        firstname,
-        lastname,
-        email,
-        phone ? phone : "",
-        isAdmin,
-        state,
-      ]);
+      row.push([firstname, lastname, email, phone ? phone : '', isAdmin, state]);
       rowItem.push(item);
     });
-    console.log("row", row);
+    console.log('row', row);
     temp.tableData = row;
     temp.item = rowItem;
     setTableData(temp);
@@ -109,17 +103,13 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
   const [isSending, setisSending] = useState(false);
   const [isSent, setisSent] = useState(false);
 
-  const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries
-  );
-  const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
-  );
+  const countries = useSelector((state: { places: PlaceState }) => state.places.countries);
+  const currentUser = useSelector((state: { user: UserState }) => state.user.item);
 
   const [countriesData, setCountriesData] = React.useState(countries);
   const [statesData, setStatesData] = React.useState<any[]>([]);
   const [citiesData, setCitiesData] = React.useState<any[]>([]);
-  const [placement, setPlacement] = React.useState<string>("bottom");
+  const [placement, setPlacement] = React.useState<string>('bottom');
   const [isEditMode, setisEditMode] = useState<boolean>(false);
   const [visible, setVisible] = useState<boolean>(false);
   const [addEditVisible, setaddEditVisible] = useState<boolean>(false);
@@ -129,55 +119,49 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
   const [orgInfo, setOrgInfo] = useState<any>(null);
 
   const handleGetOrganizationInfo = async () => {
-    const userId = await loadUserId();
+    try {
+      const userId = await loadUserId();
 
-    if (!userId) return
+      if (!userId) return;
 
-    let res = await GetInstructor(userId);
-    if (res.schoolId || res.orgId) {
-      GetSchool(res.schoolId)
-        .then((org) => {
-          setOrgInfo(org);
+      let res = await GetInstructor(userId);
+      console.log('res', res);
 
-          setInstructors({ result: org?.instructors });
-        })
-        .catch((err) => console.log(err));
+      if (res.schoolId || res.orgId) {
+        let response = res.schoolId ? await GetSchool(res?.schoolId) : await GetOrg(res?.orgId);
+        setOrgInfo(response);
+
+        setInstructors({ result: response?.instructors });
+      }
+    } catch (err) {
+      console.log('err', err);
     }
   };
 
-  const fetchState=async()=>{
-    try{
-  let res=await    GetAllStates(
-        currentUser?.country)
-        setStates(res.data);
-        setStatesData(res.data);
+  const fetchState = async () => {
+    try {
+      let res = await GetAllStates(currentUser?.country);
+      setStates(res.data);
+      setStatesData(res.data);
+    } catch (err) {
+      console.log('err', err);
     }
-    catch(err)
-    {
-      console.log('err',err)
+  };
+  const fetchCity = async () => {
+    try {
+      let res = await GetAllCities(orgInfo?.country, orgInfo?.state);
+      setCities(res.data);
+      setCitiesData(res.data);
+    } catch (err) {
+      console.log('err', err);
     }
-  }
-  const fetchCity=async()=>{
-    try{
-  let res=await    GetAllCities( orgInfo?.country,
-        orgInfo?.state)
-        setCities(res.data);
-        setCitiesData(res.data);
+  };
+  useEffect(() => {
+    if (orgInfo && isEditMode) {
+      fetchState();
+      fetchCity();
     }
-    catch(err)
-    {
-      console.log('err',err)
-    }
-  }
-    useEffect(()=>{
-    if(orgInfo&& isEditMode)
-    {
-      fetchState()
-      fetchCity()
-    }
-  
-                          
-  },[orgInfo && isEditMode])
+  }, [orgInfo && isEditMode]);
 
   useEffect(() => {
     // getInstructors();
@@ -189,13 +173,9 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
   }, [isFocused]);
 
   const admin1 =
-    orgInfo && orgInfo.instructors && orgInfo.instructors.length > 0
-      ? orgInfo.instructors[0]
-      : {};
+    orgInfo && orgInfo.instructors && orgInfo.instructors.length > 0 ? orgInfo.instructors[0] : {};
   const admin2 =
-    orgInfo && orgInfo.instructors && orgInfo.instructors.length > 1
-      ? orgInfo.instructors[1]
-      : {};
+    orgInfo && orgInfo.instructors && orgInfo.instructors.length > 1 ? orgInfo.instructors[1] : {};
 
   return (
     <BackgroundLayout title="Organization Information">
@@ -222,272 +202,240 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ flex: 1 }}
           >
-           
-              <View style={styles.layout}>
-                <View style={[styles.mainLayout, { paddingLeft: 20 }]}>
-                  <>
-                    <Formik
-                      validateOnMount={true}
-                      initialValues={{
-                        name: orgInfo ? orgInfo.name : "",
-                        address: orgInfo ? orgInfo.address : "",
-                        country: orgInfo ? orgInfo.country : "",
-                        selectedCountry: "",
-                        selectedState: "",
-                        selectedCity: "",
-                        city: orgInfo ? orgInfo.city : "",
-                        state: orgInfo ? orgInfo.state : "",
-                        zipcode: orgInfo ? orgInfo.zipcode : "",
-                        newRepresentative1: false,
-                        newRepresentative2: false,
-                        email1: admin1 ? admin1.email : "",
-                        firstName1: admin1 ? admin1.firstname : "",
-                        lastName1: admin1 ? admin1.lastname : "",
-                        email2: admin2 ? admin2.email : "",
-                        firstName2: admin2 ? admin2.firstname : "",
-                        lastName2: admin2 ? admin2.lastname : "",
+            <View style={styles.layout}>
+              <View style={[styles.mainLayout, { paddingLeft: 20 }]}>
+                <>
+                  <Formik
+                    validateOnMount={true}
+                    initialValues={{
+                      name: orgInfo ? orgInfo.name : '',
+                      address: orgInfo ? orgInfo.address : '',
+                      country: orgInfo ? orgInfo.country : '',
+                      selectedCountry: '',
+                      selectedState: '',
+                      selectedCity: '',
+                      city: orgInfo ? orgInfo.city : '',
+                      state: orgInfo ? orgInfo.state : '',
+                      zipcode: orgInfo ? orgInfo.zipcode : '',
+                      newRepresentative1: false,
+                      newRepresentative2: false,
+                      email1: admin1 ? admin1.email : '',
+                      firstName1: admin1 ? admin1.firstname : '',
+                      lastName1: admin1 ? admin1.lastname : '',
+                      email2: admin2 ? admin2.email : '',
+                      firstName2: admin2 ? admin2.firstname : '',
+                      lastName2: admin2 ? admin2.lastname : '',
 
-                        phone1: admin1?.phone ? admin1.phone : "",
+                      phone1: admin1?.phone ? admin1.phone : '',
 
-                        phone2: admin2.phone ? admin2.phone : "",
-                      }}
-                      enableReinitialize
-                      onSubmit={(values, { resetForm }) => {
-                        dispatch(ChangeModalState.action({ loading: true }));
-                        if (isEditMode) {
-                          const data = {
-                            id: orgInfo.schoolId,
-                            name: values.name,
-                            address: values.address,
-                            country: values.country,
-                            zipcode: values.zipcode,
-                            city: values.city,
-                            state: values.state,
-                            grades: [],
-                            representatives: [
-                              {
-                                id: admin1.instructorId,
-                                email: values.email1,
-                                firstname: values.firstName1,
-                                lastname: values.lastName1,
-                                type: "school",
+                      phone2: admin2.phone ? admin2.phone : '',
+                    }}
+                    enableReinitialize
+                    onSubmit={(values, { resetForm }) => {
+                      dispatch(ChangeModalState.action({ loading: true }));
+                      if (isEditMode) {
+                        const data = {
+                          id: orgInfo.schoolId,
+                          name: values.name,
+                          address: values.address,
+                          country: values.country,
+                          zipcode: values.zipcode,
+                          city: values.city,
+                          state: values.state,
+                          grades: [],
+                          representatives: [
+                            {
+                              id: admin1.instructorId,
+                              email: values.email1,
+                              firstname: values.firstName1,
+                              lastname: values.lastName1,
+                              type: 'school',
 
-                                phone: values.phone1,
-                              },
-                              {
-                                id: admin2.instructorId,
-                                email: values.email2,
-                                firstname: values.firstName2,
-                                lastname: values.lastName2,
-                                type: "school",
-                                phone: values.phone2,
-                              },
-                            ],
-                          };
-                          UpdateSchool(data)
-                            .then(async(res) => {
-                  
-                              setisEditMode(false);
-                              dispatch(
-                                ChangeModalState.action({ loading: false })
-                              );
-                              const user = await fetchOneUserService();
+                              phone: values.phone1,
+                            },
+                            {
+                              id: admin2.instructorId,
+                              email: values.email2,
+                              firstname: values.firstName2,
+                              lastname: values.lastName2,
+                              type: 'school',
+                              phone: values.phone2,
+                            },
+                          ],
+                        };
+                        UpdateSchool(data)
+                          .then(async (res) => {
+                            setisEditMode(false);
+                            dispatch(ChangeModalState.action({ loading: false }));
+                            const user = await fetchOneUserService();
 
-
-
-                              dispatch(
-                                ChangeUserState.action({
-                                  item: {...user,schoolName:res?.name},
-                                  fetchOne: { loading: false, error: null },
-                                }),
-                              )
-                              _dispatch({
-                                type: actions.INSTRUCTOR_DETAIL,
-                                payload: res,
-                              });
-                            })
-                            .catch((err) => {
-                              console.log(err);
-                              dispatch(
-                                ChangeModalState.action({ loading: false })
-                              );
+                            dispatch(
+                              ChangeUserState.action({
+                                item: { ...user, schoolName: res?.name },
+                                fetchOne: { loading: false, error: null },
+                              })
+                            );
+                            _dispatch({
+                              type: actions.INSTRUCTOR_DETAIL,
+                              payload: res,
                             });
-                        } else {
-                          setisEditMode(true);
-                          dispatch(ChangeModalState.action({ loading: false }));
-                        }
-                      }}
-                    >
-                      {({
-                        handleChange,
-                        handleSubmit,
-                        values,
-                        errors,
-                        isValid,
-                        setFieldValue,
-                      }) => (
-                        <>
-                          <View style={styles.formContainer}>
-                            <Input
-                              style={styles.textInput}
-                              placeholder="School Name"
-                              onChangeText={handleChange("name")}
-                              value={values.name}
-                              disabled={!isEditMode}
-                            />
-                            <Input
-                              style={styles.textInput}
-                              placeholder="School Address"
-                              onChangeText={handleChange("address")}
-                              value={values.address}
-                              disabled={!isEditMode}
-                            />
-                            <Input
-                              style={styles.textInput}
-                              placeholder="Zip/Post Code"
-                              onChangeText={handleChange("zipcode")}
-                              value={values.zipcode}
-                              disabled={!isEditMode}
-                            />
-                            <Autocomplete
-                            style={{container:{
-                              width:'95%'
-                            }}}
-                              placeholder="Select your country"
-                              value={values.country}
-                             
+                          })
+                          .catch((err) => {
+                            console.log(err);
+                            dispatch(ChangeModalState.action({ loading: false }));
+                          });
+                      } else {
+                        setisEditMode(true);
+                        dispatch(ChangeModalState.action({ loading: false }));
+                      }
+                    }}
+                  >
+                    {({ handleChange, handleSubmit, values, errors, isValid, setFieldValue }) => (
+                      <>
+                        <View style={styles.formContainer}>
+                          <Input
+                            style={styles.textInput}
+                            placeholder="School Name"
+                            onChangeText={handleChange('name')}
+                            value={values.name}
+                            disabled={!isEditMode}
+                          />
+                          <Input
+                            style={styles.textInput}
+                            placeholder="School Address"
+                            onChangeText={handleChange('address')}
+                            value={values.address}
+                            disabled={!isEditMode}
+                          />
+                          <Input
+                            style={styles.textInput}
+                            placeholder="Zip/Post Code"
+                            onChangeText={handleChange('zipcode')}
+                            value={values.zipcode}
+                            disabled={!isEditMode}
+                          />
+                          <Autocomplete
+                            style={{
+                              container: {
+                                width: '95%',
+                              },
+                            }}
+                            placeholder="Select your country"
+                            value={values.country}
                             data={countriesData}
-                              disabled={!isEditMode}
-                             
-                              onSelect={(query) => {
-                                const selectedCountry = query
-                                setFieldValue("country", selectedCountry.name);
-                                setFieldValue(
-                                  "selectedCountry",
-                                  selectedCountry.name
-                                );
-                                setFieldValue("selectedState", "");
-                                setFieldValue("state", "");
-                                setStates([]);
-                                GetAllStates(
-                                  selectedCountry.name.replace(/ /g, "")
-                                ).then((res) => {
-                                  setStates(res.data);
-                                  setStatesData(res.data);
-                                });
-                              }}
-                            />
-                           
-          
-                            <Autocomplete
-                             data={statesData}
-                             style={{container:{
-                              width:'95%'
-                            }}}
-                              value={values.state}
-                              disabled={!isEditMode}
-                              placeholder='Select City'
-                              onSelect={(query) => {
-                                const selectedState= query;
-                                // const selectedState = states[(query as any).row];
-                                setFieldValue("state", selectedState);
-                                setFieldValue("selectedState", selectedState);
-                                setFieldValue("selectedCity", "");
-                                setFieldValue("city", "");
-                                setCities([]);
-                                GetAllCities(
-                                  values.selectedCountry,
-                                  selectedState
-                                ).then((res) => {
-                                  setCities(res.data);
-                                  setCitiesData(res.data)
-                                });
-                              }}
-                            />
-                             
+                            disabled={!isEditMode}
+                            onSelect={(query) => {
+                              const selectedCountry = query;
+                              setFieldValue('country', selectedCountry.name);
+                              setFieldValue('selectedCountry', selectedCountry.name);
+                              setFieldValue('selectedState', '');
+                              setFieldValue('state', '');
+                              setStates([]);
+                              GetAllStates(selectedCountry.name.replace(/ /g, '')).then((res) => {
+                                setStates(res.data);
+                                setStatesData(res.data);
+                              });
+                            }}
+                          />
 
-                            <Autocomplete
-                             data={citiesData}
-                             style={{container:{
-                              width:'95%'
-                            }}}
-                              value={values.city}
-                              disabled={!isEditMode}
-                             placeholder='Select City'
-                              onSelect={(query: any) => {
-                                const selectedCity= query;
-                                setFieldValue(
-                                  "selectedCity",
-                                 selectedCity
-                                );
-                                setFieldValue(
-                                  "city",
-                                 selectedCity
-                                );
-                              }}
-                            />
-                            {(currentUser as any)?.isAdmin ? (
-                              <>
-                                <TouchableOpacity
-                                  onPress={() =>
-                                    navigation.navigate("InstructorList", {
-                                      data: orgInfo,
-                                    })
-                                  }
-                                  style={styles.bottomButtons}
-                                >
-                                  <Text style={styles.bottomButtonsText}>
-                                    Instructor List
-                                  </Text>
-                                  <Icon
-                                    // style={styles.icon}
-                                    size={22}
-                                    // fill={Colors.gray}
-                                    name="chevron-right"
-                                  />
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                  onPress={() =>
-                                    navigation.navigate("BusInfo", {
-                                      data: orgInfo,
-                                    })
-                                  }
-                                  style={styles.bottomButtons}
-                                >
-                                  <Text style={styles.bottomButtonsText}>
-                                    Bus Information
-                                  </Text>
-                                  <Icon
-                                    // style={styles.icon}
-                                    size={22}
-                                    // fill={Colors.gray}
-                                    name="chevron-right"
-                                  />
-                                </TouchableOpacity>
+                          <Autocomplete
+                            data={statesData}
+                            style={{
+                              container: {
+                                width: '95%',
+                              },
+                            }}
+                            value={values.state}
+                            disabled={!isEditMode}
+                            placeholder="Select City"
+                            onSelect={(query) => {
+                              const selectedState = query;
+                              // const selectedState = states[(query as any).row];
+                              setFieldValue('state', selectedState);
+                              setFieldValue('selectedState', selectedState);
+                              setFieldValue('selectedCity', '');
+                              setFieldValue('city', '');
+                              setCities([]);
+                              GetAllCities(values.selectedCountry, selectedState).then((res) => {
+                                setCities(res.data);
+                                setCitiesData(res.data);
+                              });
+                            }}
+                          />
 
-                                <View
-                                  style={{
-                                    marginVertical: 30,
-                                    marginRight: 20,
-                                  }}
-                                >
-                                  <LinearGradientButton onPress={handleSubmit}>
-                                    {isEditMode ? "Submit" : "Edit"}
-                                  </LinearGradientButton>
-                                </View>
-                              </>
-                            ) : (
-                              <View style={{ marginBottom: 100 }}></View>
-                            )}
-                          </View>
-                        </>
-                      )}
-                    </Formik>
-                  </>
-                </View>
+                          <Autocomplete
+                            data={citiesData}
+                            style={{
+                              container: {
+                                width: '95%',
+                              },
+                            }}
+                            value={values.city}
+                            disabled={!isEditMode}
+                            placeholder="Select City"
+                            onSelect={(query: any) => {
+                              const selectedCity = query;
+                              setFieldValue('selectedCity', selectedCity);
+                              setFieldValue('city', selectedCity);
+                            }}
+                          />
+                          {(currentUser as any)?.isAdmin ? (
+                            <>
+                              <TouchableOpacity
+                                onPress={() =>
+                                  navigation.navigate('InstructorList', {
+                                    data: orgInfo,
+                                  })
+                                }
+                                style={styles.bottomButtons}
+                              >
+                                <Text style={styles.bottomButtonsText}>Instructor List</Text>
+                                <Icon
+                                  // style={styles.icon}
+                                  size={22}
+                                  // fill={Colors.gray}
+                                  name="chevron-right"
+                                />
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                onPress={() =>
+                                  navigation.navigate('BusInfo', {
+                                    data: orgInfo,
+                                  })
+                                }
+                                style={styles.bottomButtons}
+                              >
+                                <Text style={styles.bottomButtonsText}>Bus Information</Text>
+                                <Icon
+                                  // style={styles.icon}
+                                  size={22}
+                                  // fill={Colors.gray}
+                                  name="chevron-right"
+                                />
+                              </TouchableOpacity>
+
+                              <View
+                                style={{
+                                  marginVertical: 30,
+                                  marginRight: 20,
+                                }}
+                              >
+                                <LinearGradientButton onPress={handleSubmit}>
+                                  {isEditMode ? 'Submit' : 'Edit'}
+                                </LinearGradientButton>
+                              </View>
+                            </>
+                          ) : (
+                            <View style={{ marginBottom: 100 }}></View>
+                          )}
+                        </View>
+                      </>
+                    )}
+                  </Formik>
+                </>
               </View>
-              <View style={{ height: 80 }} />
-      
+            </View>
+            <View style={{ height: 80 }} />
           </KeyboardAwareScrollView>
         </>
       )}
@@ -500,7 +448,7 @@ export default OrganizationInfoScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    justifyContent: "space-around",
+    justifyContent: 'space-around',
     backgroundColor: Colors.newBackgroundColor,
     borderRadius: 25,
   },
@@ -510,22 +458,22 @@ const styles = StyleSheet.create({
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "left",
+    fontWeight: 'bold',
+    textAlign: 'left',
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -540,9 +488,9 @@ const styles = StyleSheet.create({
   },
   buttonSettings: {
     marginTop: 20,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     marginLeft: -20,
     marginBottom: 60,
   },
@@ -550,18 +498,18 @@ const styles = StyleSheet.create({
     marginTop: 18,
   },
   errorText: {
-    color: "red",
+    color: 'red',
 
     fontSize: 12,
     marginLeft: 10,
     marginTop: 5,
   },
   terms: {
-    color: "text-hint-color",
+    color: 'text-hint-color',
     marginLeft: 10,
   },
   floatButton: {
-    alignSelf: "flex-end",
+    alignSelf: 'flex-end',
     marginRight: 10,
     // position: "absolute",
     // bottom: 20,
@@ -577,7 +525,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     backgroundColor: Colors.white,
     // marginBottom: 10,
     // borderRadius: 20,
@@ -597,7 +545,7 @@ const styles = StyleSheet.create({
     borderTopEndRadius: 5,
     borderBottomEndRadius: 5,
 
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 1,
     shadowRadius: 5,
@@ -606,12 +554,12 @@ const styles = StyleSheet.create({
   tableView: {
     marginTop: 70,
     marginBottom: 10,
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
   },
   row: {
-    display: "flex",
-    flexDirection: "row",
+    display: 'flex',
+    flexDirection: 'row',
     // justifyContent: 'space-between',
     flex: 1,
     backgroundColor: Colors.primary,
@@ -626,67 +574,67 @@ const styles = StyleSheet.create({
     // width: 50,
     // marginHorizontal: 2,
     color: Colors.black,
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 12,
   },
   tableHeadertext: {
-    textAlign: "center",
+    textAlign: 'center',
     margin: 6,
     color: Colors.white,
   },
   tableHeadertext0: {
-    textAlign: "center",
+    textAlign: 'center',
     margin: 6,
     color: Colors.black,
   },
   regularButton: {
     marginTop: 20,
-    alignSelf: "flex-end",
-    width: "40%",
+    alignSelf: 'flex-end',
+    width: '40%',
     borderRadius: 10,
     backgroundColor: Colors.primary,
   },
 
   textDecoration: {
-    textDecorationLine: "line-through",
-    textDecorationStyle: "solid",
+    textDecorationLine: 'line-through',
+    textDecorationStyle: 'solid',
   },
   touchableRow: {
-    position: "absolute",
+    position: 'absolute',
     height: 29,
 
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     zIndex: 1,
     bottom: 15,
   },
   cellView: {
     backgroundColor: Colors.white,
 
-    alignItems: "center",
+    alignItems: 'center',
   },
   textInput: {
     marginTop: 10,
-    alignSelf: "center",
-    width: "95%",
+    alignSelf: 'center',
+    width: '95%',
 
     borderRadius: 8,
     elevation: 2,
-    marginLeft: "-5%",
+    marginLeft: '-5%',
     color: Colors.black,
   },
   autoCompleteItem: {
     // elevation: 2,
-    backgroundColor: "transparent",
-    width: Dimensions.get('screen').width*0.9
+    backgroundColor: 'transparent',
+    width: Dimensions.get('screen').width * 0.9,
   },
   bottomButtons: {
-    justifyContent: "space-between",
-    flexDirection: "row",
+    justifyContent: 'space-between',
+    flexDirection: 'row',
     paddingRight: 15,
     marginTop: 20,
   },
   bottomButtonsText: {
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });

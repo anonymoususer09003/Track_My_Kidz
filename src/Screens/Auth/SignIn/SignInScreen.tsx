@@ -177,7 +177,7 @@ const SignInScreen = () => {
 
                   dispatch(ChangeModalState.action({ loading: true }));
                   Login(objectToPass, values.user_type.toLowerCase())
-                    .then((res:any) => {
+                    .then((res: any) => {
                       // console.log('res',res.data);
                       const obj: UserLoginResponse = {
                         token: res.data?.token,

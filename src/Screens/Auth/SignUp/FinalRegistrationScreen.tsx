@@ -1,7 +1,6 @@
 import { RouteProp, useIsFocused } from '@react-navigation/native';
 
 import {
-
   AutocompleteItem,
   Button,
   ButtonElement,
@@ -16,8 +15,8 @@ import {
   Text,
   useStyleSheet,
 } from '@ui-kitten/components';
-import {ThunkDispatch} from "@reduxjs/toolkit";
-import {  storeIsSubscribed } from '@/Storage/MainAppStorage';
+import { ThunkDispatch } from '@reduxjs/toolkit';
+import { storeIsSubscribed } from '@/Storage/MainAppStorage';
 import { UpdateUser } from '@/Services/SettingsServies';
 import Autocomplete from '@/Components/CustomAutocomplete';
 import React, { FC, ReactElement, useContext, useEffect, useState } from 'react';
@@ -31,6 +30,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import { CustomTextDropDown } from '@/Components';
 import { getDeviceId } from 'react-native-device-info';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -38,7 +38,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import ImagePicker from 'react-native-image-crop-picker';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
-import { Dimensions } from 'react-native'
+import { Dimensions } from 'react-native';
 import { CompleteRegistration, Register } from '@//Services/SignUpServices';
 import { LocationIcon, PersonIcon, PhoneIcon } from '@/Components/SignUp/icons';
 import { RegisterDTO } from '@/Models/UserDTOs';
@@ -81,11 +81,8 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
   const [, setRerender] = useState(false);
   const isFocuesed = useIsFocused();
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] =
-    React.useState<boolean>(false);
-  const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries,
-  );
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = React.useState<boolean>(false);
+  const countries = useSelector((state: { places: PlaceState }) => state.places.countries);
 
   const [countriesData, setCountriesData] = React.useState<CountryDTO[]>(countries);
   const [states, setStates] = useState<string[]>([]);
@@ -103,15 +100,10 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
   const [placement] = React.useState('bottom');
   const [phoneCodeNumber, setPhoneCodeNumber] = useState<string>('');
 
-
   const styles = useStyleSheet(themedStyles);
   const { emailAddress, user_type, student, activation_code } = route.params; //correct here
 
-  console.log('student', student);
-
-  const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
-    '',
-  );
+  const [selectedImage, setSelectedImage] = React.useState<string | undefined>('');
 
   const [uploadedImage, setUploadedImage] = React.useState<any>(null);
   const [, setSelectedGrades] = useState<string[]>([]);
@@ -120,7 +112,6 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
   const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
   const [loginObj, setLoginObj] = useState<any>(null);
   const _user_type = user_types.find((u) => u.label === user_type);
-
 
   const signUpValidationSchema = yup.object().shape({
     firstName: yup.string().required('First name is required'),
@@ -141,11 +132,14 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
       .required('Password is required'),
     confirmPassword: yup
       .string()
-      .test('password-match', 'Password & Confirm Password do not match', function(value) {
+      .test('password-match', 'Password & Confirm Password do not match', function (value) {
         const password = this.resolve(yup.ref('password'));
         return value === password;
       })
-      .when('password', (password, schema) => password && schema.required('Re-Password is required')),
+      .when(
+        'password',
+        (password, schema) => password && schema.required('Re-Password is required')
+      ),
     termsAccepted: yup.boolean().required(),
   });
 
@@ -164,11 +158,14 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
       .required('Password is required'),
     confirmPassword: yup
       .string()
-      .test('password-match', 'Password & Confirm Password do not match', function(value) {
+      .test('password-match', 'Password & Confirm Password do not match', function (value) {
         const password = this.resolve(yup.ref('password'));
         return value === password;
       })
-      .when('password', (password, schema) => password && schema.required('Re-Password is required')),
+      .when(
+        'password',
+        (password, schema) => password && schema.required('Re-Password is required')
+      ),
     termsAccepted: yup.boolean().required(),
   });
 
@@ -182,34 +179,22 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
 
   const renderPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onPasswordIconPress}>
-      <Icon
-        {...props}
-        name={passwordVisible ? 'eye-off' : 'eye'}
-        color={Colors.secondary}
-      />
+      <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} color={Colors.secondary} />
     </TouchableWithoutFeedback>
   );
 
   const renderConfirmPasswordIcon = (props: any): ReactElement => (
     <TouchableWithoutFeedback onPress={onConfirmPasswordIconPress}>
-      <Icon
-        {...props}
-        name={confirmPasswordVisible ? 'eye-off' : 'eye'}
-        color={Colors.secondary}
-      />
+      <Icon {...props} name={confirmPasswordVisible ? 'eye-off' : 'eye'} color={Colors.secondary} />
     </TouchableWithoutFeedback>
   );
 
   const studentCountryName = student?.parents[0].country;
-  const codeNumber = countries?.find(
-    (item) => item.name === studentCountryName,
-  );
+  const codeNumber = countries?.find((item) => item.name === studentCountryName);
 
   useEffect(() => {
     if (codeNumber) {
-      const formattedPhoneCode = codeNumber.phone_code
-        .toString()
-        .startsWith('+')
+      const formattedPhoneCode = codeNumber.phone_code.toString().startsWith('+')
         ? codeNumber.phone_code.toString()
         : '+' + codeNumber.phone_code;
       setPhoneCodeNumber(formattedPhoneCode);
@@ -225,8 +210,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
         <Text
           style={{ color: Colors.primary, fontSize: 13 }}
           onPress={() => {
-            Linking.openURL('https://trackmykidz.com/terms/').then(() => {
-            });
+            Linking.openURL('https://trackmykidz.com/terms/').then(() => {});
           }}
         >
           {' '}
@@ -236,10 +220,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
         <Text
           style={{ color: Colors.primary, fontSize: 13 }}
           onPress={() => {
-            Linking.openURL('https://trackmykidz.com/privacy-policy').then(
-              () => {
-              },
-            );
+            Linking.openURL('https://trackmykidz.com/privacy-policy').then(() => {});
           }}
         >
           {' '}
@@ -250,12 +231,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
     );
   };
 
-  const getSchoolsByFilter = (
-    country = '',
-    state = '',
-    city = '',
-    schoolName = '',
-  ) => {
+  const getSchoolsByFilter = (country = '', state = '', city = '', schoolName = '') => {
     const query = {
       country: country,
       state: state,
@@ -264,12 +240,8 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
     };
     GetSchoolByFilters(query)
       .then((res) => {
-        const _data = {
-          schoolId: 0,
-          name: 'Other',
-        };
         const _schools = [...res];
-        _schools.unshift(_data);
+
         setSchools(_schools);
         setSchoolsData(_schools);
       })
@@ -278,12 +250,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
       });
   };
 
-  const getOrgByFilter = (
-    country = '',
-    state = '',
-    city = '',
-    schoolName = '',
-  ) => {
+  const getOrgByFilter = (country = '', state = '', city = '', schoolName = '') => {
     const query = {
       country: country,
       state: state,
@@ -292,12 +259,12 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
     };
     GetOrgByFilters(query)
       .then((res) => {
-        const _data = {
-          schoolId: 0,
-          name: 'Other',
-        };
+        // const _data = {
+        //   schoolId: 0,
+        //   name: 'Other',
+        // };
         const _org = [...res];
-        _org.unshift(_data);
+        // _org.unshift(_data);
         setOrg(_org);
         setOrgData(_org);
       })
@@ -347,8 +314,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
     />
   );
   const renderEditButtonElement = (): ButtonElement => {
-    const buttonElement: React.ReactElement<ButtonProps> =
-      renderEditAvatarButton();
+    const buttonElement: React.ReactElement<ButtonProps> = renderEditAvatarButton();
 
     return React.cloneElement(buttonElement, {
       style: [buttonElement.props.style, styles.editButton],
@@ -366,10 +332,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
     try {
       console.log('userrrrr', loginObj);
 
-      let res = await UpdateUser(
-        { ...loginObj, isSubscribed: true },
-        'parent',
-      );
+      let res = await UpdateUser({ ...loginObj, isSubscribed: true }, 'parent');
       console.log('res', res);
       await storeIsSubscribed(true);
     } catch (err) {
@@ -386,9 +349,9 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
               source={
                 Platform.OS == 'android'
                   ? {
-                    uri: selectedImage + '?time' + new Date().getTime(),
-                    headers: { Pragma: 'no-cache' },
-                  }
+                      uri: selectedImage + '?time' + new Date().getTime(),
+                      headers: { Pragma: 'no-cache' },
+                    }
                   : { uri: selectedImage }
               }
               editButton={renderEditAvatarButton}
@@ -418,7 +381,6 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
       )}
 
       {_user_type?.id == 3 && (
-
         <View style={{ width: '100%' }}>
           {selectedImage != '' && (
             <ProfileAvatarPicker
@@ -426,9 +388,9 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
               source={
                 Platform.OS == 'android'
                   ? {
-                    uri: selectedImage + '?time' + new Date().getTime(),
-                    headers: { Pragma: 'no-cache' },
-                  }
+                      uri: selectedImage + '?time' + new Date().getTime(),
+                      headers: { Pragma: 'no-cache' },
+                    }
                   : { uri: selectedImage }
               }
               editButton={renderEditAvatarButton}
@@ -458,10 +420,10 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
       )}
 
       <KeyboardAwareScrollView
-            extraHeight={10}
-            enableOnAndroid={true}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ flex: 1 }}
+        extraHeight={10}
+        enableOnAndroid={true}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ flex: 1 }}
       >
         {visibleImagePicker && (
           <ImagePickerModal
@@ -514,21 +476,20 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                   term: true,
                   apt: values?.apartment,
                   deviceId: getDeviceId(),
-                  "id": null
+                  id: null,
                 };
 
                 dispatch(ChangeModalState.action({ loading: true }));
-
+                // Alert.alert('call');
                 Register(registerObject, 'parent')
                   .then(async (res) => {
-                  
                     const _token = res.data.token;
                     await storeToken(_token);
                     await storeUserType('parent');
                     CompleteRegistration(userObject, 'parent')
-                      .then(async(response: any) => {
+                      .then(async (response: any) => {
                         const obj = {
-                          token: _token||'',
+                          token: _token || '',
                           userType: 'parent',
                           id: response?.data?.parentId,
                           mainId: res.data?.userId,
@@ -540,28 +501,31 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                         if (response.status == 201) {
                           console.log(emailAddress);
                           console.log(values.password);
-await updateUser();
-let res=await Login({
-  email: emailAddress,
-  password: values.password,
-},'parent')
-const obj: UserLoginResponse = {
-  token: res?.data?.token,
-  userType: 'parent',
-  id: res?.data?.userTypeId,
-  mainId: res?.data?.userId,
-  ...((res?.data?.isSubscribed || res?.data?.isSubscribed == false) && {
-    isSubscribed: res?.data?.isSubscribed,
-  }),
-};
-                        dispatch(LoginStore.action(obj));
-                        dispatch(ChangeModalState.action({ loading: false }));
+                          await updateUser();
+                          let res = await Login(
+                            {
+                              email: emailAddress,
+                              password: values.password,
+                            },
+                            'parent'
+                          );
+                          const obj: UserLoginResponse = {
+                            token: res?.data?.token,
+                            userType: 'parent',
+                            id: res?.data?.userTypeId,
+                            mainId: res?.data?.userId,
+                            ...((res?.data?.isSubscribed || res?.data?.isSubscribed == false) && {
+                              isSubscribed: res?.data?.isSubscribed,
+                            }),
+                          };
+                          dispatch(LoginStore.action(obj));
+                          dispatch(ChangeModalState.action({ loading: false }));
 
-                      dispatch(
-                        ChangeModalState.action({
-                          welcomeMessageModal: true,
-                        }),
-                      );
+                          dispatch(
+                            ChangeModalState.action({
+                              welcomeMessageModal: true,
+                            })
+                          );
 
                           // dispatch(
                           //   ChangeModalState.action({
@@ -581,12 +545,9 @@ const obj: UserLoginResponse = {
                           autoHide: true,
                           topOffset: 30,
                           bottomOffset: 40,
-                          onShow: () => {
-                          },
-                          onHide: () => {
-                          },
-                          onPress: () => {
-                          },
+                          onShow: () => {},
+                          onHide: () => {},
+                          onPress: () => {},
                         });
                       })
                       .finally(() => {
@@ -601,24 +562,24 @@ const obj: UserLoginResponse = {
               }}
             >
               {({
-                  handleChange,
-                  setFieldValue,
-                  handleBlur,
-                  handleSubmit,
-                  values,
-                  errors,
-                  touched,
-                  isValid,
-                }) => (
+                handleChange,
+                setFieldValue,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+                isValid,
+              }) => (
                 <>
-              
                   <ParentPaymentModal
-                  userEmail={emailAddress}
+                    userEmail={emailAddress}
                     loginObj={loginObj}
                     onPay={() => {
                       // todo not a priority
                       // @ts-ignore
-                      handleSubmit()
+
+                      handleSubmit();
                       // dispatch(LoginStore.action(loginObj));
                       // dispatch(
                       //   ChangeModalState.action({
@@ -626,8 +587,7 @@ const obj: UserLoginResponse = {
                       //   }),
                       // );
                     }}
-                    onCancel={() => {
-                    }}
+                    onCancel={() => {}}
                   />
                   <Layout style={styles.formContainer} level="1">
                     <Input
@@ -690,23 +650,24 @@ const obj: UserLoginResponse = {
                       <Text style={styles.errorText}>{errors.apartment}</Text>
                     )}
                     <Autocomplete
-                    data={countriesData}
+                      data={countriesData}
                       icon={LocationIcon}
                       placeholder="Country*"
                       value={values.country}
-                     
-                      style={{input:{ 
-                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
-                     
+                      style={{
+                        input: {
+                          borderRadius: 10,
+                          borderWidth: 0.3,
+                          borderColor: Colors.borderGrey,
+                        },
+                      }}
                       onSelect={(query) => {
                         const selectedCountry = query;
                         setFieldValue('country', selectedCountry.name);
                         setFieldValue('selectedCountry', selectedCountry.name);
                         setFieldValue('selectedState', '');
                         setFieldValue('state', '');
-                        GetAllStates(
-                          selectedCountry.name.replace(/ /g, ''),
-                        ).then((res) => {
+                        GetAllStates(selectedCountry.name.replace(/ /g, '')).then((res) => {
                           setStates(res.data);
                           setDropdownStates(res.data);
                         });
@@ -715,16 +676,19 @@ const obj: UserLoginResponse = {
                           : setPhoneCode('+' + selectedCountry.phone_code);
                       }}
                     />
-                    
+
                     <Autocomplete
-                    data={dropdownStates}
+                      data={dropdownStates}
                       icon={LocationIcon}
                       placeholder="State*"
                       value={values.state}
-                  
-                      style={{input:{ 
-                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
-                     
+                      style={{
+                        input: {
+                          borderRadius: 10,
+                          borderWidth: 0.3,
+                          borderColor: Colors.borderGrey,
+                        },
+                      }}
                       onSelect={(query) => {
                         const selectedState = query;
                         setFieldValue('state', selectedState);
@@ -733,17 +697,13 @@ const obj: UserLoginResponse = {
                         setFieldValue('city', '');
                         setCities([]);
                         setDropdownCities([]);
-                        GetAllCities(
-                          values.selectedCountry,
-                          selectedState,
-                        ).then((res) => {
+                        GetAllCities(values.selectedCountry, selectedState).then((res) => {
                           setCities(res.data);
                           setDropdownCities(res.data);
                         });
                       }}
-                   />
-                     
-                 
+                    />
+
                     {errors.state && touched.state && (
                       <Text style={styles.errorText}>{errors.state}</Text>
                     )}
@@ -751,22 +711,25 @@ const obj: UserLoginResponse = {
                       icon={LocationIcon}
                       placeholder="City*"
                       value={values.city}
-                     data={dropdownCities}
-                     style={{input:{ 
-                      borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
-                     
+                      data={dropdownCities}
+                      style={{
+                        input: {
+                          borderRadius: 10,
+                          borderWidth: 0.3,
+                          borderColor: Colors.borderGrey,
+                        },
+                      }}
                       onSelect={(query) => {
-                  let city=query
-    
+                        let city = query;
+
                         setFieldValue('city', city);
+                        setOrgData([]);
+                        setSchoolsData([]);
                         // setFieldValue('selectedCity', query);
                       }}
                     />
-                      
-                    
-                    {errors.city && (
-                      <Text style={styles.errorText}>{errors.city}</Text>
-                    )}
+
+                    {errors.city && <Text style={styles.errorText}>{errors.city}</Text>}
                     <Input
                       // accessoryRight={LocationIcon}
                       style={styles.inputSettings}
@@ -825,17 +788,13 @@ const obj: UserLoginResponse = {
                       onBlur={handleBlur('confirmPassword')}
                     />
                     {errors.confirmPassword && touched.confirmPassword && (
-                      <Text style={styles.errorText}>
-                        {errors.confirmPassword}
-                      </Text>
+                      <Text style={styles.errorText}>{errors.confirmPassword}</Text>
                     )}
                     <View style={{ flexDirection: 'row' }}>
                       <CheckBox
                         style={[styles.termsCheckBox, { flex: 1 }]}
                         checked={values.termsAccepted}
-                        onChange={() =>
-                          setFieldValue('termsAccepted', !values.termsAccepted)
-                        }
+                        onChange={() => setFieldValue('termsAccepted', !values.termsAccepted)}
                       >
                         {''}
                       </CheckBox>
@@ -844,17 +803,16 @@ const obj: UserLoginResponse = {
                       </View>
                     </View>
                   </Layout>
-                  {console.log('errors',errors)}
+                  {console.log('errors', errors)}
                   <View style={{ marginTop: 18, marginBottom: 20 }}>
                     <LinearGradientButton
                       style={styles.signUpButton}
                       size="medium"
-                      onPress={()=>{
-                        
+                      onPress={() => {
                         dispatch(
                           ChangeModalState.action({
                             parentPaymentModalVisibility: true,
-                          }),
+                          })
                         );
                       }}
                       disabled={!isValid || !values.termsAccepted}
@@ -912,15 +870,15 @@ const obj: UserLoginResponse = {
                   'image',
                   uploadedImage
                     ? {
-                      uri: uploadedImage?.path,
-                      name: uploadedImage.mime,
-                      type: uploadedImage.mime,
-                    }
+                        uri: uploadedImage?.path,
+                        name: uploadedImage.mime,
+                        type: uploadedImage.mime,
+                      }
                     : {
-                      uri: 'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
-                      name: 'avatar',
-                      type: 'image/png',
-                    },
+                        uri: 'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
+                        name: 'avatar',
+                        type: 'image/png',
+                      }
                 );
                 formData.append('firstname', values.firstName);
                 formData.append('lastname', values.lastName);
@@ -943,12 +901,17 @@ const obj: UserLoginResponse = {
                   ? formData.append('orgId', values.orgId)
                   : formData.append('orgId', '');
 
-
                 Register(registerObject, 'instructor')
                   .then(async (res) => {
-                    console.log('FinalRegistrationScreen.tsx line 916 Register(registerObject, instructor) res?.data ---', res?.data);
+                    console.log(
+                      'FinalRegistrationScreen.tsx line 916 Register(registerObject, instructor) res?.data ---',
+                      res?.data
+                    );
                     await storeToken(res?.data?.token);
-                    console.log('FinalRegistrationScreen.tsx line 918  formData', JSON.stringify(formData));
+                    console.log(
+                      'FinalRegistrationScreen.tsx line 918  formData',
+                      JSON.stringify(formData)
+                    );
                     CompleteRegistration(formData, 'instructor')
                       .then(async (response: any) => {
                         console.log('responsefromback', response);
@@ -961,7 +924,7 @@ const obj: UserLoginResponse = {
                             userType: 'instructor',
                             id: response?.data.instructorId,
                             mainId: res?.data?.userId,
-                          }),
+                          })
                         );
                         if (response.status == 201) {
                         }
@@ -977,12 +940,9 @@ const obj: UserLoginResponse = {
                           autoHide: true,
                           topOffset: 30,
                           bottomOffset: 40,
-                          onShow: () => {
-                          },
-                          onHide: () => {
-                          },
-                          onPress: () => {
-                          },
+                          onShow: () => {},
+                          onHide: () => {},
+                          onPress: () => {},
                         });
                       })
                       .finally(() => {
@@ -999,27 +959,24 @@ const obj: UserLoginResponse = {
                       autoHide: true,
                       topOffset: 30,
                       bottomOffset: 40,
-                      onShow: () => {
-                      },
-                      onHide: () => {
-                      },
-                      onPress: () => {
-                      },
+                      onShow: () => {},
+                      onHide: () => {},
+                      onPress: () => {},
                     });
                     dispatch(ChangeModalState.action({ loading: false }));
                   });
               }}
             >
               {({
-                  handleChange,
-                  setFieldValue,
-                  handleBlur,
-                  handleSubmit,
-                  values,
-                  errors,
-                  touched,
-                  isValid,
-                }) => (
+                handleChange,
+                setFieldValue,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+                isValid,
+              }) => (
                 <>
                   <Layout style={styles.formContainer} level="1">
                     <Select
@@ -1027,10 +984,19 @@ const obj: UserLoginResponse = {
                       placeholder="Select Entity"
                       value={values.selected_entity || ''}
                       onSelect={(index: any) => {
-                        setFieldValue(
-                          'selected_entity',
-                          organisations[index.row].value,
-                        );
+                        // Alert.alert(JSON.stringify(organisations[index.row].value));
+                        setFieldValue('selected_entity', organisations[index.row].value);
+                        if (organisations[index.row].value === 'School') {
+                          setFieldValue('organizationId', '');
+                          setFieldValue('organization', '');
+                          setFieldValue('organizationName', '');
+                        } else {
+                          setFieldValue('school', '');
+                          setFieldValue('selectedSchool', '');
+
+                          setFieldValue('schoolName', '');
+                          setFieldValue('schoolAddress', '');
+                        }
                       }}
                     >
                       {organisations.map((item) => {
@@ -1073,19 +1039,21 @@ const obj: UserLoginResponse = {
                     <Autocomplete
                       placeholder="Country*"
                       value={values.country}
-                    data={countriesData}  
-                    style={{input:{ 
-                      borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
-                    
+                      data={countriesData}
+                      style={{
+                        input: {
+                          borderRadius: 10,
+                          borderWidth: 0.3,
+                          borderColor: Colors.borderGrey,
+                        },
+                      }}
                       onSelect={(query) => {
                         const selectedCountry = query;
                         setFieldValue('country', selectedCountry.name);
                         setFieldValue('selectedCountry', selectedCountry.name);
                         setFieldValue('selectedState', '');
                         setFieldValue('state', '');
-                        GetAllStates(
-                          selectedCountry.name.replace(/ /g, ''),
-                        ).then((res) => {
+                        GetAllStates(selectedCountry.name.replace(/ /g, '')).then((res) => {
                           setStates(res.data);
                           setDropdownStates(res.data);
                         });
@@ -1096,15 +1064,19 @@ const obj: UserLoginResponse = {
                         getOrgByFilter(selectedCountry.name);
                       }}
                     />
-                     
+
                     <Autocomplete
                       placeholder="State*"
                       value={values.state}
-                data={dropdownStates}
+                      data={dropdownStates}
                       disabled={!values.selectedCountry}
-                      style={{input:{ 
-                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
-                     
+                      style={{
+                        input: {
+                          borderRadius: 10,
+                          borderWidth: 0.3,
+                          borderColor: Colors.borderGrey,
+                        },
+                      }}
                       onSelect={(query) => {
                         const selectedState = query;
                         setFieldValue('state', selectedState);
@@ -1113,10 +1085,7 @@ const obj: UserLoginResponse = {
                         setFieldValue('city', '');
                         setCities([]);
                         setDropdownCities([]);
-                        GetAllCities(
-                          values.selectedCountry,
-                          selectedState,
-                        ).then((res) => {
+                        GetAllCities(values.selectedCountry, selectedState).then((res) => {
                           setCities(res.data);
                           setDropdownCities(res.data);
                         });
@@ -1124,32 +1093,28 @@ const obj: UserLoginResponse = {
                         getOrgByFilter(values.country, selectedState);
                       }}
                     />
-                     
+
                     <Autocomplete
                       placeholder="City*"
                       value={values.city}
-                
                       disabled={!values.selectedState}
-                      style={{input:{ 
-                        borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
-                    data={dropdownCities}
+                      style={{
+                        input: {
+                          borderRadius: 10,
+                          borderWidth: 0.3,
+                          borderColor: Colors.borderGrey,
+                        },
+                      }}
+                      data={dropdownCities}
                       onSelect={(query) => {
                         const selectedCity = query;
                         setFieldValue('city', selectedCity);
                         // setFieldValue('selectedCity', selectedCity);
-                        getSchoolsByFilter(
-                          values.country,
-                          values.state,
-                          selectedCity,
-                        );
-                        getOrgByFilter(
-                          values.country,
-                          values.state,
-                          selectedCity,
-                        );
+                        getSchoolsByFilter(values.country, values.state, selectedCity);
+                        getOrgByFilter(values.country, values.state, selectedCity);
                       }}
                     />
-                    
+
                     <Input
                       style={styles.inputSettings}
                       autoCapitalize="none"
@@ -1160,49 +1125,92 @@ const obj: UserLoginResponse = {
                       onBlur={handleBlur('zipcode')}
                     />
                     {values.selected_entity === 'School' ? (
-                      <Autocomplete
-                      data={schoolsData}
-                        placeholder="School Name"
-                        value={values.school}
-                       
-                        style={{input:{ 
-                          borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
-                        
-                        onSelect={(query) => {
-                          const selectedSchool = query;
-                          setFieldValue('school', selectedSchool.name);
-                          setFieldValue('schoolId', selectedSchool.schoolId);
-                          setFieldValue('schoolName', selectedSchool.name);
-                          setFieldValue('schoolAddress', 'School Address');
-                          setFieldValue('schoolAddress', 'School Address');
-                          setSelectedGrades(['1st']);
-                          setSelectedSubjects(['Maths']);
+                      // <Autocomplete
+                      //   data={schoolsData}
+                      //   placeholder="School Name"
+                      //   value={values.school}
+                      //   style={{
+                      //     input: {
+                      //       borderRadius: 10,
+                      //       borderWidth: 0.3,
+                      //       borderColor: Colors.borderGrey,
+                      //     },
+                      //   }}
+                      //   onSelect={(query) => {
+                      //     const selectedSchool = query;
+                      //     setFieldValue('school', selectedSchool.name);
+                      //     setFieldValue('schoolId', selectedSchool.schoolId);
+                      //     setFieldValue('schoolName', selectedSchool.name);
+                      //     setFieldValue('schoolAddress', 'School Address');
+                      //     setFieldValue('schoolAddress', 'School Address');
+                      //     setSelectedGrades(['1st']);
+                      //     setSelectedSubjects(['Maths']);
+                      //   }}
+                      // />
+                      <CustomTextDropDown
+                        style={{
+                          customDropDown: {
+                            width: '100%',
+                            marginTop: 10,
+                            backgroundColor: 'white',
+                          },
                         }}
+                        disable={false}
+                        placeholder="Select School*"
+                        value={values.school}
+                        onSelect={(index: any) => {
+                          let school = schoolsData.find((item: any) => item?.name == index);
+
+                          setFieldValue('school', school.name);
+                          setFieldValue('selectedSchool', school.name);
+
+                          setFieldValue('schoolName', school.name);
+                          setFieldValue('schoolAddress', school.address);
+                        }}
+                        dropDownList={schoolsData}
                       />
-                       
                     ) : (
-                      <Autocomplete
-                      data={orgData}
+                      <CustomTextDropDown
+                        style={{
+                          customDropDown: {
+                            width: '100%',
+                            marginTop: 10,
+                            backgroundColor: 'white',
+                          },
+                        }}
+                        disable={false}
                         placeholder="Select Organization"
                         value={values.organization}
-                      
-                        style={{input:{ 
-                          borderRadius: 10,borderWidth:0.3,borderColor:Colors.borderGrey}}}
-                        label={() => (
-                          <Text >Organization*</Text>
-                        )}
-                       
                         onSelect={(query) => {
-                          const selectedOrg = query;
+                          const selectedOrg = orgData.find((item: any) => item?.name == query);
 
-                          setFieldValue(
-                            'organizationId',
-                            selectedOrg?.organizationId,
-                          );
+                          setFieldValue('organizationId', selectedOrg?.organizationId);
                           setFieldValue('organization', selectedOrg.name);
                           setFieldValue('organizationName', selectedOrg.name);
                         }}
+                        dropDownList={orgData}
                       />
+
+                      // <Autocomplete
+                      //   data={orgData}
+                      //   placeholder="Select Organization"
+                      //   value={values.organization}
+                      //   style={{
+                      //     input: {
+                      //       borderRadius: 10,
+                      //       borderWidth: 0.3,
+                      //       borderColor: Colors.borderGrey,
+                      //     },
+                      //   }}
+                      //   label={() => <Text>Organization*</Text>}
+                      //   onSelect={(query) => {
+                      //     const selectedOrg = query;
+
+                      //     setFieldValue('organizationId', selectedOrg?.organizationId);
+                      //     setFieldValue('organization', selectedOrg.name);
+                      //     setFieldValue('organizationName', selectedOrg.name);
+                      //   }}
+                      // />
                     )}
                     <View
                       style={{
@@ -1211,9 +1219,7 @@ const obj: UserLoginResponse = {
                         flexWrap: 'wrap',
                       }}
                     >
-                      <Text style={{ fontSize: 13 }}>
-                        Can't find school/organization?{' '}
-                      </Text>
+                      <Text style={{ fontSize: 13 }}>Can't find school/organization? </Text>
                       <TouchableOpacity
                         onPress={() =>
                           Alert.alert(
@@ -1226,35 +1232,32 @@ const obj: UserLoginResponse = {
                               {
                                 text: 'Confirm',
                                 onPress: () =>
-                                  navigation.navigate(
-                                    'FinalOrgRegistrationScreen',
-                                    {
-                                      emailAddress: emailAddress,
-                                      registrationId: 'test',
-                                      user_type: user_type,
-                                      activation_code: activation_code,
-                                      details: {
-                                        email: emailAddress,
-                                        firstname: values.firstName,
-                                        lastname: values.lastName,
-                                        phoneNumber: values.phoneNumber,
-                                        state: values.state,
-                                        country: values.country,
-                                        city: values.city,
-                                        zipcode: values.zipcode,
-                                        selected_entity: values.selected_entity,
-                                        photo: uploadedImage?.path,
-                                      },
+                                  navigation.navigate('FinalOrgRegistrationScreen', {
+                                    emailAddress: emailAddress,
+                                    registrationId: 'test',
+                                    user_type: user_type,
+                                    activation_code: activation_code,
+                                    schoolData: schoolsData,
+                                    orgData: orgData,
+                                    details: {
+                                      email: emailAddress,
+                                      firstname: values.firstName,
+                                      lastname: values.lastName,
+                                      phoneNumber: values.phoneNumber,
+                                      state: '',
+                                      country: '',
+                                      city: '',
+                                      zipcode: '',
+                                      selected_entity: values.selected_entity,
+                                      photo: uploadedImage?.path,
                                     },
-                                  ),
+                                  }),
                               },
-                            ],
+                            ]
                           )
                         }
                       >
-                        <Text style={{ color: Colors.primary, fontSize: 13 }}>
-                          Register
-                        </Text>
+                        <Text style={{ color: Colors.primary, fontSize: 13 }}>Register</Text>
                       </TouchableOpacity>
                     </View>
                     <Input
@@ -1292,17 +1295,13 @@ const obj: UserLoginResponse = {
                       onBlur={handleBlur('confirmPassword')}
                     />
                     {errors.confirmPassword && touched.confirmPassword && (
-                      <Text style={styles.errorText}>
-                        {errors.confirmPassword}
-                      </Text>
+                      <Text style={styles.errorText}>{errors.confirmPassword}</Text>
                     )}
                     <View style={{ flexDirection: 'row' }}>
                       <CheckBox
                         style={[styles.termsCheckBox, { flex: 1 }]}
                         checked={values.termsAccepted}
-                        onChange={() =>
-                          setFieldValue('termsAccepted', !values.termsAccepted)
-                        }
+                        onChange={() => setFieldValue('termsAccepted', !values.termsAccepted)}
                       >
                         {''}
                       </CheckBox>
@@ -1339,8 +1338,7 @@ const obj: UserLoginResponse = {
                 confirmPassword: '',
                 termsAccepted: false,
                 phoneNumber: student ? student.phone : '',
-                parentId:
-                  student && student.parentIds ? student.parentIds[0] : 0,
+                parentId: student && student.parentIds ? student.parentIds[0] : 0,
               }}
               onSubmit={(values, {}) => {
                 dispatch(ChangeModalState.action({ loading: true }));
@@ -1366,12 +1364,12 @@ const obj: UserLoginResponse = {
                         token: response?.data?.token,
                         userType: 'student',
                         id: student.studentId,
-                      }),
+                      })
                     );
                     dispatch(
                       ChangeModalState.action({
                         welcomeMessageModal: true,
-                      }),
+                      })
                     );
                   })
                   .catch((error) => {
@@ -1384,32 +1382,27 @@ const obj: UserLoginResponse = {
                       autoHide: true,
                       topOffset: 30,
                       bottomOffset: 40,
-                      onShow: () => {
-                      },
-                      onHide: () => {
-                      },
-                      onPress: () => {
-                      },
+                      onShow: () => {},
+                      onHide: () => {},
+                      onPress: () => {},
                     });
                   })
                   .finally(() => {
                     dispatch(ChangeModalState.action({ loading: false }));
-                    dispatch(
-                      ChangeModalState.action({ biometricRequestModal: true }),
-                    );
+                    dispatch(ChangeModalState.action({ biometricRequestModal: true }));
                   });
               }}
             >
               {({
-                  handleChange,
-                  setFieldValue,
-                  handleBlur,
-                  handleSubmit,
-                  values,
-                  errors,
-                  touched,
-                  isValid,
-                }) => (
+                handleChange,
+                setFieldValue,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+                isValid,
+              }) => (
                 <>
                   <Layout style={styles.formContainer} level="1">
                     <Input
@@ -1545,9 +1538,8 @@ const obj: UserLoginResponse = {
                           fontSize: 16,
                         }}
                       >
-                        Do not proceed if any of the above information is not
-                        correct. Ensure your parent/guardian has entered your
-                        correct information.
+                        Do not proceed if any of the above information is not correct. Ensure your
+                        parent/guardian has entered your correct information.
                       </Text>
                     </View>
                     <Input
@@ -1580,17 +1572,13 @@ const obj: UserLoginResponse = {
                     />
                     {/* {console.log("error", errors)} */}
                     {errors.confirmPassword && touched.confirmPassword && (
-                      <Text style={styles.errorText}>
-                        {errors.confirmPassword}
-                      </Text>
+                      <Text style={styles.errorText}>{errors.confirmPassword}</Text>
                     )}
                     <View style={{ flexDirection: 'row' }}>
                       <CheckBox
                         style={[styles.termsCheckBox, { flex: 1 }]}
                         checked={values.termsAccepted}
-                        onChange={() =>
-                          setFieldValue('termsAccepted', !values.termsAccepted)
-                        }
+                        onChange={() => setFieldValue('termsAccepted', !values.termsAccepted)}
                       >
                         {''}
                       </CheckBox>
@@ -1755,6 +1743,6 @@ const themedStyles = StyleService.create({
   autoCompleteItem: {
     // elevation: 2,
 
-    width: Dimensions.get('screen').width*0.82
+    width: Dimensions.get('screen').width * 0.82,
   },
 });
