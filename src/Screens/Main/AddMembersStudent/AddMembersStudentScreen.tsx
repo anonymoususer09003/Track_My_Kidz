@@ -17,13 +17,12 @@ import { AddMembersNavigatorParamList } from '@/Navigators/Main/AddMembersNaviga
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
-
 type AddMembersStudentScreenProps = {
-  route: RouteProp<AddMembersNavigatorParamList, 'AddMembersStudent'>
-}
+  route: RouteProp<AddMembersNavigatorParamList, 'AddMembersStudent'>;
+};
 const AddMembersStudentScreen: FC<AddMembersStudentScreenProps> = ({ route }) => {
   const isFocused = useIsFocused();
-  const [{ group }, _dispatch]: any = useStateValue();
+  const [{ group, students }, _dispatch]: any = useStateValue();
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
 
   // const studentss = useSelector(
@@ -34,7 +33,7 @@ const AddMembersStudentScreen: FC<AddMembersStudentScreenProps> = ({ route }) =>
   const [selectedStudents, setSelectedStudents] = useState<any[]>([]);
 
   const [askPermission, setAskPermission] = useState<boolean>(false);
-  const [students, setStudents] = useState<any[]>([]);
+  // const [students, setStudents] = useState<any[]>([]);
   const [deletedStudents, setDeletedStudents] = useState<any[]>([]);
   const [deletedInstructors, setDeletedInstructors] = useState<any[]>([]);
 
@@ -49,7 +48,7 @@ const AddMembersStudentScreen: FC<AddMembersStudentScreenProps> = ({ route }) =>
       dispatch(
         ChangeAddMembersStudentsState.action({
           students: _selectedStudents,
-        }),
+        })
       );
     } else {
       const item = selectedStudents[index];
@@ -58,13 +57,13 @@ const AddMembersStudentScreen: FC<AddMembersStudentScreenProps> = ({ route }) =>
       _selectedStudents = _selectedStudents.filter((i) => i !== item);
       setSelectedStudents(_selectedStudents);
       const filterDeletedInstrutors = deletedInstructors.filter(
-        (instructor) => instructor?.email != item?.email,
+        (instructor) => instructor?.email != item?.email
       );
       setDeletedInstructors(filterDeletedInstrutors);
       dispatch(
         ChangeAddMembersStudentsState.action({
           students: _selectedStudents,
-        }),
+        })
       );
     }
   };
@@ -81,15 +80,16 @@ const AddMembersStudentScreen: FC<AddMembersStudentScreenProps> = ({ route }) =>
     }
     addStudents = group?.isEdit ? temp : [...students];
     let filter = addStudents.filter((s) => s?.firstName !== '');
-
+    console.log('filter', filter);
     _dispatch({
       type: actions.SET_GROUP,
       payload: {
         ...group,
         deletedStudent: group?.isEdit ? deletedStudents : false,
-        students: addStudents.filter((s) => s?.firstName !== ''),
+        students: addStudents.filter((s) => s?.name !== ''),
       },
     });
+
     navigation.navigate('AddMembers', {
       screen: 'AddMembersInstructor',
       data: !!group?.isEdit,
@@ -105,13 +105,17 @@ const AddMembersStudentScreen: FC<AddMembersStudentScreenProps> = ({ route }) =>
       setDeletedStudents([...deletedStudents, item]);
       data = data.filter((d) => d?.studentId !== item?.studentId);
     }
-    setStudents(data);
+    _dispatch({
+      type: actions.SET_GROUPS_STUDENTS,
+      payload: data,
+    });
+    // setStudents(data);
   };
   const resetFields = () => {
     dispatch(
       ChangeAddMembersStudentsState.action({
         students: [],
-      }),
+      })
     );
     setSelectedStudents([]);
     setAskPermission(false);
@@ -120,20 +124,20 @@ const AddMembersStudentScreen: FC<AddMembersStudentScreenProps> = ({ route }) =>
   useEffect(() => {
     setSelectedStudents([]);
     setAskPermission(false);
-    setStudents([]);
+    // setStudents([]);
     if (isFocused && group?.isEdit) {
-      setStudents(group?.isEdit?.students);
+      _dispatch({
+        type: actions.SET_GROUPS_STUDENTS,
+        payload: group?.isEdit?.students,
+      });
+      // setStudents(group?.isEdit?.students);
       // setSelectedStudents([...group?.isEdit?.students]);
     }
   }, [isFocused]);
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}>
-      <AddIndividialMembersModal
-        individuals={students}
-        setIndividuals={setStudents}
-        hideImport
-      />
+      <AddIndividialMembersModal individuals={students} setIndividuals={() => null} hideImport />
       <View style={styles.layout}>
         <View
           style={{
@@ -165,7 +169,7 @@ const AddMembersStudentScreen: FC<AddMembersStudentScreenProps> = ({ route }) =>
                 dispatch(
                   ChangeModalState.action({
                     addIndividualMemberModalVisibility: true,
-                  }),
+                  })
                 )
               }
             >

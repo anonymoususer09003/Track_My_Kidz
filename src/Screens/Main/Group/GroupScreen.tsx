@@ -41,17 +41,12 @@ const GroupScreen = () => {
   let prevOpenedRow: any;
   let row: Array<any> = [];
 
-  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
-    useState<boolean>(false);
-  const searchBarValue = useSelector(
-    (state: any) => state.header.searchBarValue,
-  );
+  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] = useState<boolean>(false);
+  const searchBarValue = useSelector((state: any) => state.header.searchBarValue);
   const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
   // const dependent = route && route.params && route.params.dependent;
 
-  const currentUser: any = useSelector(
-    (state: { user: UserState }) => state.user.item,
-  );
+  const currentUser: any = useSelector((state: { user: UserState }) => state.user.item);
   const [groupCount, setGroupCount] = useState<any>({});
   // const [initialRoute, setInitialRoute] = useState("FeaturedScreen");
   // const [loading, setLoading] = useState(true);
@@ -59,7 +54,7 @@ const GroupScreen = () => {
   // const [searchParam, setSearchParam] = useState("");
   const [selectedDependent, setSelectedDependent] = useState<any>(null);
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility,
+    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
   );
   const [groups, setGroups] = useState<any[]>([]);
 
@@ -95,7 +90,7 @@ const GroupScreen = () => {
         setHeaderParams.action({
           selectedDropDownOption: '',
           searchBarValue: '',
-        }),
+        })
       );
     }
   }, [isFocused]);
@@ -136,52 +131,50 @@ const GroupScreen = () => {
       outputRange: [1, 0],
       extrapolate: 'clamp',
     });
-    useEffect(()=>{
 
-    },[])
     return (
       <>
-         <AppHeader isCalendar={true} />
-      <View
-        style={{
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            dispatch(
-              SetChatParam.action({
-                title: item?.groupName,
-                chatId: `activity_${item?.groupId}`,
-                subcollection: 'student',
-                user: {
-                  _id: currentUser?.studentId,
-                  avatar: currentUser?.imageurl,
-                  name: currentUser?.firstname
-                    ? currentUser?.firstname[0].toUpperCase() +
-                    currentUser?.firstname.slice(1) +
-                    ' ' +
-                    currentUser?.lastname[0].toUpperCase()
-                    : currentUser?.firstname + '' + currentUser?.lastname,
-                },
-              }),
-            );
-            navigation.navigate('ChatScreen', {
-              title: item?.groupName,
-              showHeader: true,
-            });
-          }}
+        <AppHeader isCalendar={true} />
+        <View
           style={{
-            padding: 5,
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
-        </TouchableOpacity>
-        <TouchableOpacity
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(
+                SetChatParam.action({
+                  title: item?.groupName,
+                  chatId: `activity_${item?.groupId}`,
+                  subcollection: 'student',
+                  user: {
+                    _id: currentUser?.studentId,
+                    avatar: currentUser?.imageurl,
+                    name: currentUser?.firstname
+                      ? currentUser?.firstname[0].toUpperCase() +
+                        currentUser?.firstname.slice(1) +
+                        ' ' +
+                        currentUser?.lastname[0].toUpperCase()
+                      : currentUser?.firstname + '' + currentUser?.lastname,
+                  },
+                })
+              );
+              navigation.navigate('ChatScreen', {
+                title: item?.groupName,
+                showHeader: true,
+              });
+            }}
+            style={{
+              padding: 5,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
+          </TouchableOpacity>
+          <TouchableOpacity
             style={{
               padding: 5,
               alignItems: 'center',
@@ -193,30 +186,25 @@ const GroupScreen = () => {
                 type: actions.SET_SELECTED_GROUP,
                 payload: item?.groupId,
               });
-             navigation.navigate('GroupScehdule')
-
+              navigation.navigate('GroupScehdule');
             }}
           >
             <FontAwesome5 size={25} name="calendar" color={Colors.primary} />
           </TouchableOpacity>
 
-        {!item.status && (
-          <TouchableOpacity
-            onPress={() => setSelectedDependent(item)}
-            style={{
-              padding: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Icon
-              style={{ width: 30, height: 30 }}
-              fill={Colors.primary}
-              name="trash"
-            />
-          </TouchableOpacity>
-        )}
-      </View>
+          {!item.status && (
+            <TouchableOpacity
+              onPress={() => setSelectedDependent(item)}
+              style={{
+                padding: 10,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Icon style={{ width: 30, height: 30 }} fill={Colors.primary} name="trash" />
+            </TouchableOpacity>
+          )}
+        </View>
       </>
     );
   };
@@ -235,7 +223,7 @@ const GroupScreen = () => {
 
   return (
     <>
-       <AppHeader hideCalendar={true} isCalendar={true} hideCenterIcon={true}/>
+      <AppHeader hideCalendar={true} isCalendar={true} hideCenterIcon={true} />
       {isVisible && (
         <InstructionsModal
           group={selectedInstructions}
@@ -268,9 +256,7 @@ const GroupScreen = () => {
             }}
             renderItem={({ item, index }) => {
               let temp: any[] = [];
-              let instructor = item?.instructors?.map((item: any) =>
-                temp.push(item?.firstName),
-              );
+              let instructor = item?.instructors?.map((item: any) => temp.push(item?.firstName));
               return (
                 <Swipeable
                   ref={(ref) => (row[index] = ref)}
@@ -318,8 +304,7 @@ const GroupScreen = () => {
                             }}
                           >
                             <Text style={styles.footerText}>{`${
-                              groupCount[item.groupId]?.countApprovedStudents ||
-                              '0'
+                              groupCount[item.groupId]?.countApprovedStudents || '0'
                             }`}</Text>
                             <Entypo
                               name="book"
@@ -340,13 +325,9 @@ const GroupScreen = () => {
                             }}
                           >
                             <Text style={styles.text}>
-                              {groupCount[item.groupId]
-                                ?.countApprovedInstructors || '0'}
+                              {groupCount[item.groupId]?.countApprovedInstructors || '0'}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -366,8 +347,7 @@ const GroupScreen = () => {
                             }}
                           >
                             <Text style={styles.text}>{`${
-                              groupCount[item.groupId]?.countDeclinedStudents ||
-                              '0'
+                              groupCount[item.groupId]?.countDeclinedStudents || '0'
                             }`}</Text>
                             <Entypo
                               name="book"
@@ -388,13 +368,9 @@ const GroupScreen = () => {
                             }}
                           >
                             <Text style={styles.text}>
-                              {groupCount[item.groupId]
-                                ?.countDeclinedInstructors || '0'}
+                              {groupCount[item.groupId]?.countDeclinedInstructors || '0'}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -414,10 +390,7 @@ const GroupScreen = () => {
                             style={styles.horizontal}
                           >
                             <Text style={styles.text}>
-                              {`${
-                                groupCount[item.groupId]
-                                  ?.countPendingStudents || '0'
-                              }`}
+                              {`${groupCount[item.groupId]?.countPendingStudents || '0'}`}
                             </Text>
                             <Entypo
                               name="book"
@@ -438,14 +411,10 @@ const GroupScreen = () => {
                             }}
                           >
                             <Text style={styles.text}>
-                              {groupCount[item.groupId]
-                                ?.countPendingInstructors || '0'}
+                              {groupCount[item.groupId]?.countPendingInstructors || '0'}
                               {/* {item.countPendingInstructors || `0`} */}
                             </Text>
-                            <Image
-                              source={instructorImage}
-                              style={styles.iconImages}
-                            />
+                            <Image source={instructorImage} style={styles.iconImages} />
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -457,7 +426,7 @@ const GroupScreen = () => {
                         dispatch(
                           ChangeModalState.action({
                             instructionsModalVisibility: true,
-                          }),
+                          })
                         );
                       }}
                       style={{ width: '100%', alignItems: 'center' }}

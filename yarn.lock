@@ -3984,6 +3984,7 @@ __metadata:
     react-native-mask-input: "npm:^1.2.3"
     react-native-modal: "npm:^13.0.1"
     react-native-pager-view: "npm:^6.2.3"
+    react-native-permissions: "npm:^3.0.0"
     react-native-popup-menu: "npm:^0.16.1"
     react-native-qrcode-scanner: "npm:^1.5.5"
     react-native-qrcode-svg: "npm:^6.3.0"
@@ -10356,6 +10357,20 @@ __metadata:
     react: ">=16.8.6"
     react-native: ">=0.60.0"
   checksum: 10c0/e407ad7a1d5ec07f60cdf8665cb53c877e44f7eec4a3688bfb869062d12b622bec291f5bdb5480b760b6ebbfbcffe6fbf5f299bb8abd9132bb57f18be7872a60
+  languageName: node
+  linkType: hard
+
+"react-native-permissions@npm:^3.0.0":
+  version: 3.10.1
+  resolution: "react-native-permissions@npm:3.10.1"
+  peerDependencies:
+    react: ">=16.13.1"
+    react-native: ">=0.63.3"
+    react-native-windows: ">=0.62.0"
+  peerDependenciesMeta:
+    react-native-windows:
+      optional: true
+  checksum: 10c0/3d1f4f36aa17aafb5d15bf3a246452bddcd967b281cc447d9f7001f95f9765638d4f803faf8baff842bda4a5bd689810aada7997b88cd551544c9bfb68889bcf
   languageName: node
   linkType: hard
 

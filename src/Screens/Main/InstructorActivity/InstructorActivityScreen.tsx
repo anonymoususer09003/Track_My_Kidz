@@ -12,7 +12,12 @@ import {
   ShowInstructorsStudentsModal,
 } from '@/Modals';
 import { Activity, Optin } from '@/Models/DTOs';
-import { FindActivitiesByUserId, GetActivitesCount, GetActivityByName, GetAllActivity } from '@/Services/Activity';
+import {
+  FindActivitiesByUserId,
+  GetActivitesCount,
+  GetActivityByName,
+  GetAllActivity,
+} from '@/Services/Activity';
 import GetActivityByInstructor from '@/Services/Activity/GetActivityByInstructor';
 import { GetInstructor } from '@/Services/Instructor';
 import CreateMultipleInstructor from '@/Services/Instructor/CreateMultipleInstructor';
@@ -58,13 +63,12 @@ import { UserTypeState } from '@/Store/UserType';
 import { InstructorActivityNavigatorParamList } from '@/Navigators/Main/InstructorActivityNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
-import SockJS from "sockjs-client";
+import SockJS from 'sockjs-client';
 // @ts-ignore
 import * as Stomp from 'react-native-stompjs';
 const instructorImage = require('@/Assets/Images/approval_icon2.png');
 const bookImage = require('@/Assets/Images/book.png');
 const thLargeImage = require('@/Assets/Images/th-large.png');
-
 
 type InstructorActivityScreenProps = {
   route: RouteProp<InstructorActivityNavigatorParamList, 'InstructorActivity'>;
@@ -79,31 +83,23 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   const cancelToken = axios.CancelToken;
   const source = cancelToken.source();
   // const { abortControllerRef } = abortController();
-  const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries,
-  );
+  const countries = useSelector((state: { places: PlaceState }) => state.places.countries);
   // let abortControllerRef = useRef<AbortController>(new AbortController());
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const isFocused = useIsFocused();
   // const swipeableRef = useRef(null);
   const [activitiesCount, setActivitiesCount] = useState<any>({});
   const dispatch = useDispatch();
-  const user_type = useSelector(
-    (state: { userType: UserTypeState }) => state.userType.userType,
-  );
+  const user_type = useSelector((state: { userType: UserTypeState }) => state.userType.userType);
 
-  const showVehicle = useSelector(
-    (state: { modal: ModalState }) => state.modal.setupVehicleModal,
-  );
+  const showVehicle = useSelector((state: { modal: ModalState }) => state.modal.setupVehicleModal);
   const showJourneytracker = useSelector(
-    (state: { modal: ModalState }) => state.modal.journeyTrackerModalVisibility,
+    (state: { modal: ModalState }) => state.modal.journeyTrackerModalVisibility
   );
   const rollCallModal = useSelector(
-    (state: { modal: ModalState }) => state.modal.rollCallModalVisibility,
+    (state: { modal: ModalState }) => state.modal.rollCallModalVisibility
   );
-  const searchBarValue = useSelector(
-    (state: any) => state.header.searchBarValue,
-  );
+  const searchBarValue = useSelector((state: any) => state.header.searchBarValue);
   const dropDownValue = useSelector((state: any) => state.header.dropDownValue);
 
   const [cancelModal, setCancelModal] = useState<boolean>(false);
@@ -119,25 +115,19 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
-  const [selectedInstructorActivities, setSelectedInstructorActivities] =
-    useState<any>(null);
-  const [originalInstructorActivities, setOriginalInstructorActivities] =
-    useState<any>(null);
-  const isCalendarVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.showCalendar,
-  );
+  const [selectedInstructorActivities, setSelectedInstructorActivities] = useState<any>(null);
+  const [originalInstructorActivities, setOriginalInstructorActivities] = useState<any>(null);
+  const isCalendarVisible = useSelector((state: { modal: ModalState }) => state.modal.showCalendar);
   const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.requestPermissionModalVisibility,
+    (state: { modal: ModalState }) => state.modal.requestPermissionModalVisibility
   );
   const showInstructorModal = useSelector(
-    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility,
+    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
   );
   const showRolCall = useSelector(
-    (state: { modal: ModalState }) => state.modal.rollCallModalVisibility,
+    (state: { modal: ModalState }) => state.modal.rollCallModalVisibility
   );
-  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
-    useState(false);
+  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] = useState(false);
   const [selectionData, setSelectionData] = useState({
     type: 'student',
     status: 'pending',
@@ -147,13 +137,10 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   const [buses, setBuses] = useState<any[]>([]);
   let prevOpenedRow: any;
   let row: Array<any> = [];
-  const currentUser: any = useSelector(
-    (state: { user: UserState }) => state.user.item,
-  );
+  const currentUser: any = useSelector((state: { user: UserState }) => state.user.item);
 
   const { selectedDayForFilter, selectedMonthForFilter } = useSelector(
-    (state: { instructorsActivity: InstructorState }) =>
-      state.instructorsActivity,
+    (state: { instructorsActivity: InstructorState }) => state.instructorsActivity
   );
   // console.log("filterday and month", filterDayAndMonth);
   const setOrgInstructors = async () => {
@@ -164,14 +151,13 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         await CreateMultipleInstructor(JSON.parse(res), userId);
         removeInstructors();
       }
-    } catch (err) {
-    }
+    } catch (err) {}
   };
   useEffect(() => {
     dispatch(
       ChangeNavigationCustomState.action({
         navigationLeftDrawer: 'activity',
-      }),
+      })
     );
     if (selectedInstructions) {
       dispatch(ChangeModalState.action({ instructionsModalVisibility: true }));
@@ -199,7 +185,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
             'instructor_activites',
             JSON.stringify({
               result: data,
-            }),
+            })
           );
         }
         // res.result
@@ -272,7 +258,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
             'instructor_activites',
             JSON.stringify({
               result: data,
-            }),
+            })
           );
         }
         if (refreshing) {
@@ -313,7 +299,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
           ChangeUserState.action({
             item: res,
             fetchOne: { loading: false, error: null },
-          }),
+          })
         );
         _dispatch({
           type: actions.INSTRUCTOR_DETAIL,
@@ -405,11 +391,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
       cancelToken: source.token,
     })
       .then((res) => {
-        filterInstructorActivities(
-          selectedMonthForFilter,
-          selectedDayForFilter,
-          res,
-        );
+        filterInstructorActivities(selectedMonthForFilter, selectedDayForFilter, res);
       })
       .catch((err) => console.log('getActivitiesByInstructor'));
   };
@@ -518,12 +500,15 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
           sendCoordinates(crd.latitude, crd.longitude);
         });
       } else {
-        Geolocation.getCurrentPosition(async (pos: { coords: any }) => {
-          const crd = pos.coords;
+        Geolocation.getCurrentPosition(
+          async (pos: { coords: any }) => {
+            const crd = pos.coords;
 
-          sendCoordinates(crd.latitude, crd.longitude);
-        }, () => {
-        }, {});
+            sendCoordinates(crd.latitude, crd.longitude);
+          },
+          () => {},
+          {}
+        );
       }
     } catch (err) {
       console.log('er99999999999999', err);
@@ -532,8 +517,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
     // }
   };
   const backgroundCall = async () => {
-    const sleep = (time: any) =>
-      new Promise((resolve: any) => setTimeout(() => resolve(), time));
+    const sleep = (time: any) => new Promise((resolve: any) => setTimeout(() => resolve(), time));
 
     // You can do anything in your task such as network requests, timers and so on,
     // as long as it doesn't touch UI. Once your task completes (i.e. the promise is resolved),
@@ -646,10 +630,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
             setVisible(true);
           }}
         >
-          <Image
-            source={thLargeImage}
-            style={{ height: 35, width: 35 }}
-          />
+          <Image source={thLargeImage} style={{ height: 35, width: 35 }} />
         </TouchableOpacity>
       </View>
     );
@@ -663,15 +644,15 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
     let temp: any[] = [];
     if (originalInstructorActivities?.length) {
       originalInstructorActivities.map((item: any) => {
-
-        const date1 = moment(item?.fromDate, ['YYYY-MM-DDTHH:mm:ss.SSSZ', 'MMM DD, YYYYTHH:mm:ss.SSSZ'], true);
+        const date1 = moment(
+          item?.fromDate,
+          ['YYYY-MM-DDTHH:mm:ss.SSSZ', 'MMM DD, YYYYTHH:mm:ss.SSSZ'],
+          true
+        );
         const date2 = moment(date, ['YYYY-M-D'], true).add(1, 'month').add(1, 'day');
         console.log('date1: ', date1);
         console.log('date2: ', date2);
-        if (
-          moment(date1).isSame(date2, 'day') &&
-          moment(date1).isSame(date2, 'month')
-        ) {
+        if (moment(date1).isSame(date2, 'day') && moment(date1).isSame(date2, 'month')) {
           temp.push(item);
         }
       });
@@ -680,10 +661,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
       originalActivities?.result?.map((item: any, index: number) => {
         // let itemDate = item?.date.split("T");
 
-        if (
-          moment(item?.fromDate).format('MMM DD, YYYY') ==
-          moment(date).format('MMM DD, YYYY')
-        ) {
+        if (moment(item?.fromDate).format('MMM DD, YYYY') == moment(date).format('MMM DD, YYYY')) {
           temp.push(item);
         }
       });
@@ -692,14 +670,8 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
     allActivities.result = temp;
 
     setActivities(allActivities);
-
-
   };
-  const filterInstructorActivities = (
-    month: any,
-    day: any,
-    activities: any,
-  ) => {
+  const filterInstructorActivities = (month: any, day: any, activities: any) => {
     let allActivities = [...activities];
 
     if (!isCalendarVisible) {
@@ -717,7 +689,6 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
       });
       setSelectedInstructorActivities(temp);
     }
-
   };
 
   useEffect(() => {
@@ -731,7 +702,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
     let allActivities = { ...activities };
 
     allActivities.result = originalActivities?.result?.filter((item: any, index: number) =>
-      item.activityName.toLowerCase().includes(text.toLowerCase()),
+      item.activityName.toLowerCase().includes(text.toLowerCase())
     );
     setActivities(allActivities);
   };
@@ -762,8 +733,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
 
   useEffect(() => {
     if (!isCalendarVisible) {
-      if (user_type === 'instructor')
-        setSelectedInstructorActivities(originalInstructorActivities);
+      if (user_type === 'instructor') setSelectedInstructorActivities(originalInstructorActivities);
     }
   }, [isCalendarVisible]);
 
@@ -777,10 +747,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         });
 
         getActivityesCountApi(temp);
-      } else if (
-        selectedInstructorActivities &&
-        selectedInstructorActivities?.length > 0
-      ) {
+      } else if (selectedInstructorActivities && selectedInstructorActivities?.length > 0) {
         selectedInstructorActivities?.forEach(async (element: any) => {
           temp.push(element.activityId);
           await getActivityesCountApi(element?.activityId);
@@ -789,10 +756,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         // getActivityesCountApi(temp);
       }
     }
-  }, [
-    activities?.result?.length || selectedInstructorActivities?.length,
-    isFocused,
-  ]);
+  }, [activities?.result?.length || selectedInstructorActivities?.length, isFocused]);
 
   useEffect(() => {
     if (dropDownValue) {
@@ -802,18 +766,14 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
       } else {
         setSelectedInstructor(
           instructors?.result[dropDownValue.row - 1]?.firstname +
-          ' ' +
-          instructors?.result[dropDownValue.row - 1]?.lastname,
+            ' ' +
+            instructors?.result[dropDownValue.row - 1]?.lastname
         );
 
-        getActivitiesByInstructor(
-          instructors?.result[dropDownValue.row - 1]?.instructorId,
-        );
+        getActivitiesByInstructor(instructors?.result[dropDownValue.row - 1]?.instructorId);
       }
     } else if (userId) {
-      getActivitiesByInstructor(
-        userId,
-      );
+      getActivitiesByInstructor(userId);
     }
   }, [dropDownValue, userId]);
   useEffect(() => {
@@ -823,7 +783,6 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
       setActivities(originalActivities);
     }
   }, [searchBarValue]);
-
 
   return (
     <>
@@ -883,9 +842,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
           setSelectedActivity={setSelectedActivity}
         />
       )}
-      {isVisible && (
-        <RequestPermissionModal />
-      )}
+      {isVisible && <RequestPermissionModal />}
       {showInstructorModal && (
         <InstructionsModal
           selectedInstructions={selectedInstructions}
@@ -898,12 +855,11 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
       )}
 
       <View style={styles.layout}>
-        {
-          (activities?.result?.length == 0 && selectedInstructorActivities?.length == 0) && (
-            <Text style={{ textAlign: 'center', marginTop: 5 }}>
-              You currently do not have any activities
-            </Text>
-          )}
+        {activities?.result?.length == 0 && selectedInstructorActivities?.length == 0 && (
+          <Text style={{ textAlign: 'center', marginTop: 5 }}>
+            You currently do not have any activities
+          </Text>
+        )}
         <FlatList
           data={
             selectedInstructorActivities
@@ -978,20 +934,15 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
                         }}
                       />
                       <View>
-                        <Text style={styles.text}>{`${moment.utc(
-                          item?.fromDate == 'string'
-                            ? new Date()
-                            : item?.fromDate,
-                        ).format('MMM DD, YYYY')} at ${moment.utc(
-                          item?.fromDate == 'string'
-                            ? new Date()
-                            : item?.fromDate,
-                        ).format('hh:mm a')} `}</Text>
+                        <Text style={styles.text}>{`${moment
+                          .utc(item?.fromDate == 'string' ? new Date() : item?.fromDate)
+                          .format('MMM DD, YYYY')} at ${moment
+                          .utc(item?.fromDate == 'string' ? new Date() : item?.fromDate)
+                          .format('hh:mm a')} `}</Text>
                         <Text style={styles.text}>{`${moment(
-                          item?.toDate == 'string' ? new Date() : item?.toDate,
-                        ).format('MMM DD, YYYY')} at ${moment.utc(
-                          item?.toDate == 'string' ? new Date() : item?.toDate,
-                        )
+                          item?.toDate == 'string' ? new Date() : item?.toDate
+                        ).format('MMM DD, YYYY')} at ${moment
+                          .utc(item?.toDate == 'string' ? new Date() : item?.toDate)
                           .format('hh:mm a')} `}</Text>
                       </View>
                     </View>
@@ -1025,13 +976,9 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
                           }}
                         >
                           <Text style={styles.footerText}>{`${
-                            activitiesCount[item.activityId]
-                              ?.countApprovedStudents || '0'
+                            activitiesCount[item.activityId]?.countApprovedStudents || '0'
                           }`}</Text>
-                          <Image
-                            source={bookImage}
-                            style={styles.iconImages}
-                          />
+                          <Image source={bookImage} style={styles.iconImages} />
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={styles.horizontal}
@@ -1048,13 +995,9 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
                           }}
                         >
                           <Text style={styles.text}>
-                            {activitiesCount[item.activityId]
-                              ?.countApprovedInstructors || '0'}
+                            {activitiesCount[item.activityId]?.countApprovedInstructors || '0'}
                           </Text>
-                          <Image
-                            source={instructorImage}
-                            style={styles.iconImages}
-                          />
+                          <Image source={instructorImage} style={styles.iconImages} />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -1077,13 +1020,9 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
                           }}
                         >
                           <Text style={styles.text}>{`${
-                            activitiesCount[item.activityId]
-                              ?.countDeclinedStudents || '0'
+                            activitiesCount[item.activityId]?.countDeclinedStudents || '0'
                           }`}</Text>
-                          <Image
-                            source={bookImage}
-                            style={styles.iconImages}
-                          />
+                          <Image source={bookImage} style={styles.iconImages} />
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={styles.horizontal}
@@ -1100,13 +1039,9 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
                           }}
                         >
                           <Text style={styles.text}>
-                            {activitiesCount[item.activityId]
-                              ?.countDeclinedInstructors || '0'}
+                            {activitiesCount[item.activityId]?.countDeclinedInstructors || '0'}
                           </Text>
-                          <Image
-                            source={instructorImage}
-                            style={styles.iconImages}
-                          />
+                          <Image source={instructorImage} style={styles.iconImages} />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -1129,15 +1064,9 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
                           style={styles.horizontal}
                         >
                           <Text style={styles.text}>
-                            {`${
-                              activitiesCount[item.activityId]
-                                ?.countPendingStudents || '0'
-                            }`}
+                            {`${activitiesCount[item.activityId]?.countPendingStudents || '0'}`}
                           </Text>
-                          <Image
-                            source={bookImage}
-                            style={styles.iconImages}
-                          />
+                          <Image source={bookImage} style={styles.iconImages} />
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={styles.horizontal}
@@ -1154,14 +1083,10 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
                           }}
                         >
                           <Text style={styles.text}>
-                            {activitiesCount[item.activityId]
-                              ?.countPendingInstructors || '0'}
+                            {activitiesCount[item.activityId]?.countPendingInstructors || '0'}
                             {/* {item.countPendingInstructors || `0`} */}
                           </Text>
-                          <Image
-                            source={instructorImage}
-                            style={styles.iconImages}
-                          />
+                          <Image source={instructorImage} style={styles.iconImages} />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -1181,13 +1106,10 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
           onRefresh={() => null}
         />
 
-        {refreshing && (
-          <ActivityIndicator size="large" color={Colors.primary} />
-        )}
+        {refreshing && <ActivityIndicator size="large" color={Colors.primary} />}
       </View>
 
       <AppHeader
-  
         onAddPress={() => {
           navigation.navigate('CreateActivity');
           _dispatch({

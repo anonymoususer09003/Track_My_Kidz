@@ -2,7 +2,14 @@ import { useIsFocused } from '@react-navigation/native';
 import { Icon, Text } from '@ui-kitten/components';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useDispatch, useSelector } from 'react-redux';
@@ -40,14 +47,13 @@ const ParentPendingScreen = () => {
   const [children, setChildren] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
   const [groups, setGroups] = useState<any[]>([]);
+  const [group, setSelectedGroup] = useState(null);
   const [activity, setActivity] = useState<any>(null);
   const [declineActivity, setDeclineActivity] = useState<any>(null);
   const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
   const [selectedChild, setSelectedChild] = useState<any>('');
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const currentUser: any = useSelector(
-    (state: { user: UserState }) => state.user.item,
-  );
+  const currentUser: any = useSelector((state: { user: UserState }) => state.user.item);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const closeRow = (index: number) => {
     console.log(index);
@@ -73,12 +79,7 @@ const ParentPendingScreen = () => {
     let pageNumberGroupCount = refreshing ? pageGroup : 0;
     let email = currentUser?.email;
 
-    GetChildrenAcitivities(
-      email,
-      'pending',
-      pageNumberActivityCount,
-      pageSizeActivity,
-    )
+    GetChildrenAcitivities(email, 'pending', pageNumberActivityCount, pageSizeActivity)
       .then((res) => {
         setTotalRecordsActivity(res.totalRecords);
         setRefreshing(false);
@@ -183,7 +184,7 @@ const ParentPendingScreen = () => {
                 dispatch(
                   ChangeModalState.action({
                     childrenSelectionModalVisibility: true,
-                  }),
+                  })
                 );
                 setShowAcceptModal(true);
                 setActivity(item);
@@ -207,7 +208,7 @@ const ParentPendingScreen = () => {
                 dispatch(
                   ChangeModalState.action({
                     childrenSelectionModalVisibility: true,
-                  }),
+                  })
                 );
                 // setShowAcceptModal(true);
                 setActivity(item);
@@ -219,18 +220,14 @@ const ParentPendingScreen = () => {
           </View>
         )}
         {!item.status && (
-          <Icon
-            style={{ width: 30, height: 30 }}
-            fill={Colors.primary}
-            name="trash"
-          />
+          <Icon style={{ width: 30, height: 30 }} fill={Colors.primary} name="trash" />
         )}
       </View>
     );
   };
 
   const approveActivityModalVisibility = useSelector(
-    (state: { modal: ModalState }) => state.modal.approveActivityModalVisibility,
+    (state: { modal: ModalState }) => state.modal.approveActivityModalVisibility
   );
 
   return (
@@ -238,7 +235,11 @@ const ParentPendingScreen = () => {
       {selectedInstructions && (
         <InstructionsModal
           selectedInstructions={selectedInstructions}
-          setSelectedInstructions={setSelectedInstructions}
+          setSelectedInstructions={() => {
+            setSelectedInstructions(null);
+            setSelectedGroup(null);
+          }}
+          group={group}
           activity={selectedInstructions?.activity}
         />
       )}
@@ -265,9 +266,7 @@ const ParentPendingScreen = () => {
               console.log('declinedactivity', activity);
 
               console.log('activites', activities);
-              let filter = activities.filter(
-                (item) => item?.activity?.activityId != id,
-              );
+              let filter = activities.filter((item) => item?.activity?.activityId != id);
 
               setActivities(filter);
             } else {
@@ -290,9 +289,7 @@ const ParentPendingScreen = () => {
               console.log('declinedactivity', declineActivity);
 
               console.log('activites', activities);
-              let filter = activities.filter(
-                (item) => item?.activity?.activityId != id,
-              );
+              let filter = activities.filter((item) => item?.activity?.activityId != id);
               setDeclineActivity(false);
               setActivities(filter);
             } else {
@@ -304,9 +301,7 @@ const ParentPendingScreen = () => {
       )}
 
       {activities.length === 0 && groups.length === 0 && (
-        <View
-          style={{ backgroundColor: Colors.newBackgroundColor, padding: 10 }}
-        >
+        <View style={{ backgroundColor: Colors.newBackgroundColor, padding: 10 }}>
           <Text style={[styles.text, { textAlign: 'center' }]}>
             You do not have any pending activities or groups to approve
           </Text>
@@ -336,15 +331,14 @@ const ParentPendingScreen = () => {
                       <Text style={[styles.text, { fontSize: 25 }]}>
                         {`${item?.activity?.activityName}`}
                       </Text>
-                      <View style={{flexDirection:'row',alignItems:'center'}}>
-<Image source={instructorImage} style={styles.iconImages} />
-<Text>{item?.firstName+' '+ item?.lastName}</Text>
-</View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Image source={instructorImage} style={styles.iconImages} />
+                        <Text>{item?.firstName + ' ' + item?.lastName}</Text>
+                      </View>
                       <View
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
-
                         }}
                       >
                         <Image
@@ -360,22 +354,25 @@ const ParentPendingScreen = () => {
                           <Text style={styles.text}>{`${moment(
                             item?.activity?.fromDate == 'string'
                               ? new Date()
-                              : item?.activity?.fromDate,
-                          ).format('MMM DD YYYY')} at ${moment.utc(
-                            item?.activity?.fromDate == 'string'
-                              ? new Date()
-                              : item?.activity?.fromDate,
-                          )
+                              : item?.activity?.fromDate
+                          ).format('MMM DD YYYY')} at ${moment
+                            .utc(
+                              item?.activity?.fromDate == 'string'
+                                ? new Date()
+                                : item?.activity?.fromDate
+                            )
                             .format('hh:mm a')} `}</Text>
                           <Text style={styles.text}>{`${moment(
-                            item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
-                          ).format('MMM DD YYYY')} at ${moment.utc(
-                            item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
-                          )
+                            item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate
+                          ).format('MMM DD YYYY')} at ${moment
+                            .utc(
+                              item?.activity?.toDate == 'string'
+                                ? new Date()
+                                : item?.activity?.toDate
+                            )
                             .format('hh:mm a')} `}</Text>
                         </View>
                       </View>
-
 
                       <View style={styles.horizontal}>
                         <Image source={marker} style={styles.iconStyle} />
@@ -396,7 +393,7 @@ const ParentPendingScreen = () => {
                         dispatch(
                           ChangeModalState.action({
                             instructionsModalVisibility: true,
-                          }),
+                          })
                         );
                         setSelectedInstructions(item);
                       }}
@@ -406,7 +403,6 @@ const ParentPendingScreen = () => {
                         style={[styles.text, { textAlign: 'center' }]}
                       >{`Instructions / Disclaimer / Agreement`}</Text>
                     </TouchableOpacity>
-
                   </Swipeable>
                 );
               } else {
@@ -417,24 +413,33 @@ const ParentPendingScreen = () => {
                     onSwipeableOpen={() => closeRow(item?.groupId)}
                   >
                     <View style={[styles.item]}>
-                      <Text style={[styles.text, { fontSize: 25 }]}>
-                        {item?.group?.groupName}
-                      </Text>
+                      <Text style={[styles.text, { fontSize: 25 }]}>{item?.group?.groupName}</Text>
                       <View style={styles.horizontal}>
-                        <Image
-                          source={instructorImage}
-                          style={styles.iconStyle}
-                        />
-                        <Text
-                          style={styles.text}
-                        >{` ${item?.firstName} ${item?.lastName}`}</Text>
+                        <Image source={instructorImage} style={styles.iconStyle} />
+                        <Text style={styles.text}>{` ${item?.firstName} ${item?.lastName}`}</Text>
                       </View>
-                      <View style={styles.horizontal}>
+                      {/* <View style={styles.horizontal}>
                         <Image source={calendarIcon} style={styles.iconStyle} />
                         <Text style={styles.text}>{`${moment(
-                          item?.activity?.scheduler?.fromDate,
+                          item?.activity?.scheduler?.fromDate
                         ).format('YYYY-MM-DD')}`}</Text>
-                      </View>
+                      </View> */}
+                      <TouchableOpacity
+                        onPress={() => {
+                          dispatch(
+                            ChangeModalState.action({
+                              instructionsModalVisibility: true,
+                            })
+                          );
+                          setSelectedInstructions(item);
+                          setSelectedGroup(item?.group);
+                        }}
+                        style={[styles.footer]}
+                      >
+                        <Text
+                          style={[styles.text, { textAlign: 'center' }]}
+                        >{`Instructions / Disclaimer / Agreement`}</Text>
+                      </TouchableOpacity>
 
                       {/* <View style={styles.horizontal}>
                         <Image source={email} style={styles.iconStyle} />
@@ -461,9 +466,7 @@ const ParentPendingScreen = () => {
             refreshing={false}
             onRefresh={() => null}
           />
-          {refreshing && (
-            <ActivityIndicator size="large" color={Colors.primary} />
-          )}
+          {refreshing && <ActivityIndicator size="large" color={Colors.primary} />}
         </View>
       )}
     </>

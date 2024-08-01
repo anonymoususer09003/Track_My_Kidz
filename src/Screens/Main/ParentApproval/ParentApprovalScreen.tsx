@@ -1,7 +1,14 @@
 import { Icon, Text } from '@ui-kitten/components';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,6 +25,7 @@ import Colors from '@/Theme/Colors';
 
 const ParentApprovalScreen = () => {
   const instructorImage = require('@/Assets/Images/approval_icon2.png');
+  const calendarIcon = require('@/Assets/Images/navigation_icon2.png');
   // const calendarIcon = require("@/Assets/Images/navigation_icon2.png");
   const marker = require('@/Assets/Images/marker.png');
 
@@ -33,12 +41,11 @@ const ParentApprovalScreen = () => {
   // const [loading, setLoading] = useState(true);
   // const [thumbnail, setThumbnail] = useState(false);
   // const [searchParam, setSearchParam] = useState("");
+  const [group, setSelectedGroup] = useState(null);
   const [activities, setActivities] = useState<any[]>([]);
   const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
   const [declineActivity, setDeclineActivity] = useState<any>(null);
-  const currentUser: any = useSelector(
-    (state: { user: UserState }) => state.user.item,
-  );
+  const currentUser: any = useSelector((state: { user: UserState }) => state.user.item);
   // const [activity, setActivity] = useState(null);
   let prevOpenedRow: any;
   let row: any[] = [];
@@ -66,10 +73,9 @@ const ParentApprovalScreen = () => {
       'approved',
 
       pageNumberActivityCount,
-      pageSizeActivity,
+      pageSizeActivity
     )
       .then((res) => {
-
         setTotalRecordsActivity(res.totalRecords);
         setRefreshing(false);
         setPageSizeActivity(10);
@@ -101,13 +107,12 @@ const ParentApprovalScreen = () => {
     let email = currentUser?.email;
     GetChildrenGroups(email, 'approved', pageNumberGroupCount, pageSizeGroup)
       .then((res) => {
-        console.log('res', res);
         setTotalRecordsGroup(res.totalRecords);
         setRefreshing(false);
         setPageSizeGroup(10);
 
         pageNumberGroup(refreshing ? pageGroup + 1 : 1);
-        console.log('res', res);
+
         if (refreshing) {
           setGroups([...groups, ...res?.result]);
         } else {
@@ -178,7 +183,7 @@ const ParentApprovalScreen = () => {
             dispatch(
               ChangeModalState.action({
                 childrenSelectionModalVisibility: true,
-              }),
+              })
             );
             setDeclineActivity(item);
           }}
@@ -186,23 +191,22 @@ const ParentApprovalScreen = () => {
           {item.status ? (
             <AntDesign size={30} name="dislike2" color={Colors.primary} />
           ) : (
-            <Icon
-              style={{ width: 30, height: 30 }}
-              fill={Colors.primary}
-              name="trash"
-            />
+            <Icon style={{ width: 30, height: 30 }} fill={Colors.primary} name="trash" />
           )}
         </TouchableOpacity>
       </View>
     );
   };
 
-
   return (
     <>
       <InstructionsModal
+        group={group}
         selectedInstructions={selectedInstructions}
-        setSelectedInstructions={setSelectedInstructions}
+        setSelectedInstructions={() => {
+          setSelectedInstructions(null);
+          setSelectedGroup(null);
+        }}
         activity={selectedInstructions?.activity}
       />
       {declineActivity && (
@@ -224,12 +228,7 @@ const ParentApprovalScreen = () => {
           setActivity={(id: any) => {
             setSelectedChild('');
             if (declineActivity?.activity) {
-              console.log('declinedactivity', declineActivity);
-
-              console.log('activites', activities);
-              let filter = activities.filter(
-                (item) => item?.activity?.activityId != id,
-              );
+              let filter = activities.filter((item) => item?.activity?.activityId != id);
               setDeclineActivity(false);
               setActivities(filter);
             } else {
@@ -239,11 +238,10 @@ const ParentApprovalScreen = () => {
           }}
         />
       )}
+      {console.log('groups', groups)}
       <View style={styles.layout}>
         {activities.length === 0 && groups.length == 0 && (
-          <View
-            style={{ padding: 10, backgroundColor: Colors.newBackgroundColor }}
-          >
+          <View style={{ padding: 10, backgroundColor: Colors.newBackgroundColor }}>
             <Text style={[styles.text, { textAlign: 'center' }]}>
               You do not have any approved activities or groups
             </Text>
@@ -325,16 +323,15 @@ const ParentApprovalScreen = () => {
                       <Text style={[styles.text, { fontSize: 25 }]}>
                         {`${item?.activity?.activityName}`}
                       </Text>
-                   
-<View style={{flexDirection:'row',alignItems:'center'}}>
-<Image source={instructorImage} style={styles.iconImages} />
-<Text>{item?.firstName+' '+ item?.lastName}</Text>
-</View>
+
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Image source={instructorImage} style={styles.iconImages} />
+                        <Text>{item?.firstName + ' ' + item?.lastName}</Text>
+                      </View>
                       <View
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
-
                         }}
                       >
                         <Image
@@ -350,22 +347,25 @@ const ParentApprovalScreen = () => {
                           <Text style={styles.text}>{`${moment(
                             item?.activity?.fromDate == 'string'
                               ? new Date()
-                              : item?.activity?.fromDate,
-                          ).format('MMM DD YYYY')} at ${moment.utc(
-                            item?.activity?.fromDate == 'string'
-                              ? new Date()
-                              : item?.activity?.fromDate,
-                          )
+                              : item?.activity?.fromDate
+                          ).format('MMM DD YYYY')} at ${moment
+                            .utc(
+                              item?.activity?.fromDate == 'string'
+                                ? new Date()
+                                : item?.activity?.fromDate
+                            )
                             .format('hh:mm a')} `}</Text>
                           <Text style={styles.text}>{`${moment(
-                            item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
-                          ).format('MMM DD YYYY')} at ${moment.utc(
-                            item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
-                          )
+                            item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate
+                          ).format('MMM DD YYYY')} at ${moment
+                            .utc(
+                              item?.activity?.toDate == 'string'
+                                ? new Date()
+                                : item?.activity?.toDate
+                            )
                             .format('hh:mm a')} `}</Text>
                         </View>
                       </View>
-
 
                       <View style={styles.horizontal}>
                         <Image source={marker} style={styles.iconStyle} />
@@ -386,7 +386,7 @@ const ParentApprovalScreen = () => {
                         dispatch(
                           ChangeModalState.action({
                             instructionsModalVisibility: true,
-                          }),
+                          })
                         );
                         setSelectedInstructions(item);
                       }}
@@ -455,18 +455,57 @@ const ParentApprovalScreen = () => {
                           style={styles.text}
                         >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
                       </View> */}
-
-
                   </Swipeable>
                 );
               } else {
-                return <></>;
+                return (
+                  <Swipeable
+                    ref={(ref) => (row[item?.groupId] = ref)}
+                    renderRightActions={(e) => RightActions(e, item)}
+                    onSwipeableOpen={() => closeRow(item?.groupId)}
+                  >
+                    <View style={[styles.item]}>
+                      <Text style={[styles.text, { fontSize: 25 }]}>{item?.group?.groupName}</Text>
+                      <View style={styles.horizontal}>
+                        <Image source={instructorImage} style={styles.iconStyle} />
+                        <Text style={styles.text}>{` ${item?.firstName} ${item?.lastName}`}</Text>
+                      </View>
+                      {/* <View style={styles.horizontal}> */}
+                      {/* <Image source={calendarIcon} style={styles.iconStyle} />
+                        <Text style={styles.text}>{`${moment(
+                          item?.
+                        ).format('YYYY-MM-DD')}`}</Text>
+                      </View> */}
+                      <TouchableOpacity
+                        onPress={() => {
+                          dispatch(
+                            ChangeModalState.action({
+                              instructionsModalVisibility: true,
+                            })
+                          );
+                          setSelectedGroup(item?.group);
+                          setSelectedInstructions(item);
+                        }}
+                        style={[styles.footer]}
+                      >
+                        <Text
+                          style={[styles.text, { textAlign: 'center' }]}
+                        >{`Instructions / Disclaimer / Agreement`}</Text>
+                      </TouchableOpacity>
+
+                      {/* <View style={styles.horizontal}>
+                      <Image source={email} style={styles.iconStyle} />
+                      <Text
+                        style={styles.text}
+                      >{`Parent Email 1: ${item?.parentEmail1}`}</Text>
+                    </View> */}
+                    </View>
+                  </Swipeable>
+                );
               }
             }}
             onEndReached={async () => {
               if (totalRecordsActivity > activities.length) {
-                console.log('logs');
-
                 getActivities(true);
 
                 if (totalRecordsGroup > groups.length) {
@@ -477,9 +516,7 @@ const ParentApprovalScreen = () => {
             refreshing={false}
             onRefresh={() => null}
           />
-          {refreshing && (
-            <ActivityIndicator size="large" color={Colors.primary} />
-          )}
+          {refreshing && <ActivityIndicator size="large" color={Colors.primary} />}
         </View>
       </View>
     </>

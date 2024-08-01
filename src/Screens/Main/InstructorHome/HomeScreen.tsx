@@ -259,11 +259,6 @@ const HomeScreen = () => {
 
                   // Check if latitude and longitude are valid numbers
                   if (isNaN(latitude) || isNaN(longitude)) {
-                    console.log(
-                      `Invalid coordinates for child ${child.firstname}:`,
-                      child.latitude,
-                      child.longititude
-                    );
                     return null; // Skip rendering this marker
                   }
 

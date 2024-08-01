@@ -125,7 +125,6 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
       if (!userId) return;
 
       let res = await GetInstructor(userId);
-      console.log('res', res);
 
       if (res.schoolId || res.orgId) {
         let response = res.schoolId ? await GetSchool(res?.schoolId) : await GetOrg(res?.orgId);

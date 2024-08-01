@@ -1,20 +1,15 @@
-import { LinearGradientButton } from "@/Components";
-import { GetOptIn } from "@/Services/Activity";
-import { GetOptInGroup } from "@/Services/Group";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import { useTheme } from "@/Theme";
-import Colors from "@/Theme/Colors";
-import {
-  Card,
-  IndexPath,
-  Modal,
-  Text
-} from "@ui-kitten/components";
-import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { LinearGradientButton } from '@/Components';
+import { GetOptIn } from '@/Services/Activity';
+import { GetOptInGroup } from '@/Services/Group';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserState } from '@/Store/User';
+import { useTheme } from '@/Theme';
+import Colors from '@/Theme/Colors';
+import { Card, IndexPath, Modal, Text } from '@ui-kitten/components';
+import React, { useEffect, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 const InstructionsModal = ({
   selectedInstructions,
   setSelectedInstructions,
@@ -28,20 +23,19 @@ const InstructionsModal = ({
 }) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);
   const amountValues = [
-    { id: 0, amount: 500, label: "$5" },
-    { id: 1, amount: 1000, label: "$10" },
+    { id: 0, amount: 500, label: '$5' },
+    { id: 1, amount: 1000, label: '$10' },
     {
       id: 3,
       amount: 2000,
-      label: "$20",
+      label: '$20',
     },
-    { id: 4, amount: 5000, label: "$50" },
-    { id: 5, amount: 10000, label: "$100" },
+    { id: 4, amount: 5000, label: '$50' },
+    { id: 5, amount: 10000, label: '$100' },
   ];
 
   const { Layout } = useTheme();
-  const [selectedAmountIndex, setSelectedAmountIndex] =
-    useState<IndexPath | null>(null);
+  const [selectedAmountIndex, setSelectedAmountIndex] = useState<IndexPath | null>(null);
   // const [cardData, setCardData] = useState<any>({});
   const [isValid, setIsValid] = useState<boolean>(false);
   const [payment, setPayment] = useState<boolean>(false);
@@ -49,23 +43,23 @@ const InstructionsModal = ({
   const availableAmounts = [
     {
       amount: 1,
-      label: "$50 - Annually (Best Deal)",
+      label: '$50 - Annually (Best Deal)',
     },
     {
       amount: 5,
-      label: "$4.99 - Monthly",
+      label: '$4.99 - Monthly',
     },
   ];
   const isVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
   );
   const dispatch = useDispatch();
-
+  console.log('group', selectedInstructions);
   useEffect(() => {
     setPayment(false);
     setIsValid(false);
     setSelectedAmountIndex(null);
-    console.log('isVisible',isVisible,activity)
+
     if (isVisible) {
       if (group) {
         getGroupsOptInDetail();
@@ -74,22 +68,21 @@ const InstructionsModal = ({
   }, [isVisible, group, activity]);
   const getActivityOptInDetail = async () => {
     try {
-      console.log("activity99", activity?.activityId);
       let res = await GetOptIn(activity?.activityId);
-console.log('resssss',res)
+
       setInformation({ ...infomation, ...res });
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
 
   const getGroupsOptInDetail = async () => {
     try {
-      console.log("group------990909090099090", group);
       let res = await GetOptInGroup(group?.groupId || group?.id);
+
       setInformation({ ...infomation, ...res });
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
 
@@ -99,9 +92,7 @@ console.log('resssss',res)
       visible={isVisible}
       backdropStyle={styles.backdrop}
       onBackdropPress={() => {
-        dispatch(
-          ChangeModalState.action({ instructionsModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ instructionsModalVisibility: false }));
         setSelectedInstructions(null);
       }}
     >
@@ -109,10 +100,10 @@ console.log('resssss',res)
         <View style={styles.body}>
           <View style={{ paddingBottom: 10, paddingTop: 10 }}>
             <Text
-              textBreakStrategy={"highQuality"}
+              textBreakStrategy={'highQuality'}
               style={{
-                textAlign: "center",
-                color: "#606060",
+                textAlign: 'center',
+                color: '#606060',
                 fontSize: 18,
               }}
             >
@@ -145,9 +136,7 @@ console.log('resssss',res)
             status="control"
             onPress={() => {
               // DeclineToGift().then()
-              dispatch(
-                ChangeModalState.action({ instructionsModalVisibility: false })
-              );
+              dispatch(ChangeModalState.action({ instructionsModalVisibility: false }));
               setSelectedInstructions(null);
             }}
           >
@@ -164,9 +153,9 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   textArea: {
     marginRight: 20,
@@ -174,7 +163,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 1,
     backgroundColor: Colors.white,
-    width: "100%",
+    width: '100%',
 
     minHeight: 100,
     marginBottom: 10,
@@ -188,11 +177,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.newBackgroundColor,
   },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     color: Colors.white,
     zIndex: -1,
   },
@@ -201,33 +190,33 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   bottom: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 45,
     marginTop: 10,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   buttonText: {
     flex: 1,
     borderRadius: 25,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     margin: 2,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
     marginTop: 10,
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

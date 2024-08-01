@@ -291,6 +291,7 @@ const HomeScreen = () => {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
   }, [selectedDependent]);
+
   const mapFitToCoordinates = () => {
     if (thumbnail && children.length > 0) {
       let temp = [];
@@ -436,13 +437,11 @@ const HomeScreen = () => {
         onChangeText={(value) => setSearchParam(value)}
         thumbnailView={false}
         onToggleChange={() => {
-       
           _dispatch({
             type: actions.SET_THUMBNAIL,
-            payload:!thumbnail
+            payload: !thumbnail,
           });
-        
-         
+
           dispatch(
             ChangeModalState.action({
               showCalendar: false,
@@ -486,7 +485,6 @@ const HomeScreen = () => {
                 let studentsMarker = [...originalStudentsEmails];
                 let markers = studentsMarker[index.row - 1];
 
-         
                 setStudentsEmail([markers]);
               }
               setSelectedChild(child);
@@ -643,11 +641,6 @@ const HomeScreen = () => {
 
                 // Check if latitude and longitude are valid numbers
                 if (isNaN(latitude) || isNaN(longitude)) {
-                  console.log(
-                    `Invalid coordinates for child ${child.firstname}:`,
-                    child.latitude,
-                    child.longititude
-                  );
                   return null; // Skip rendering this marker
                 }
 

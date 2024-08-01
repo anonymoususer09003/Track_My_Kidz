@@ -143,8 +143,9 @@ const ParentPaymentModal = ({ onCancel, loginObj, userEmail, onPay }: ParentPaym
       Alert.alert('Payment confirmation error.', error.message, [{ text: 'OK', style: 'cancel' }]);
     } else if (paymentIntent) {
       setIsLoading(false);
-      // await updateUser();
-
+      if (!userEmail) {
+        await updateUser();
+      }
       Toast.show({
         type: 'success',
         position: 'top',
@@ -162,9 +163,30 @@ const ParentPaymentModal = ({ onCancel, loginObj, userEmail, onPay }: ParentPaym
   const updateUser = async () => {
     try {
       console.log('userrrrr', loginObj);
+      let data = { ...loginObj };
+      if (!userEmail) {
+        data = {
+          id: user?.parentId,
+          email: user?.email,
+          firstname: user?.firstname,
+          lastname: user?.lastname,
+          apt: user?.apt || '',
+          address: user?.address || '',
+          state: user?.state || '',
+          country: user?.country || '',
+          city: user?.city || '',
+          zipcode: user?.zipcode || '',
+          phone: user?.phone,
+          status: null,
+          activationCode: user?.referenceCode,
+          term: null,
+        };
+      }
 
+      console.log('data', data);
+      console.log('data202020020202020202', { ...data, isSubscribed: true });
       let res = await UpdateUser({ ...loginObj, isSubscribed: true }, 'parent');
-      console.log('res', res);
+      console.log('res----------99999999999 is update', res);
       await storeIsSubscribed(true);
     } catch (err) {
       console.log('err', err);

@@ -328,11 +328,28 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
       setRerender(true);
     }
   }, [isFocuesed]);
-  const updateUser = async () => {
-    try {
-      console.log('userrrrr', loginObj);
 
-      let res = await UpdateUser({ ...loginObj, isSubscribed: true }, 'parent');
+  const updateUser = async (user: any) => {
+    try {
+      console.log('userrrrr', user);
+      let data = {
+        id: user?.parentId,
+        email: user?.email,
+        firstname: user?.firstname,
+        lastname: user?.lastname,
+        apt: user?.apt || '',
+        address: user?.address || '',
+        state: user?.state || '',
+        country: user?.country || '',
+        city: user?.city || '',
+        zipcode: user?.zipcode || '',
+        phone: user?.phone,
+        status: null,
+        activationCode: user?.referenceCode,
+        term: null,
+      };
+      console.log('data000000', data);
+      let res = await UpdateUser({ ...data, isSubscribed: true }, 'parent');
       console.log('res', res);
       await storeIsSubscribed(true);
     } catch (err) {
@@ -451,8 +468,8 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                 state: '',
                 zipcode: '',
                 phoneNumber: '',
-                password: '',
-                confirmPassword: '',
+                password: 'nomi9303',
+                confirmPassword: 'nomi9303',
                 termsAccepted: false,
               }}
               onSubmit={(values, {}) => {
@@ -496,12 +513,12 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                           isSubscribed: true,
                         };
                         console.log(obj);
-                        console.log('==============');
+                        console.log('==============', response);
                         // setLoginObj(obj);
                         if (response.status == 201) {
                           console.log(emailAddress);
                           console.log(values.password);
-                          await updateUser();
+                          await updateUser(response?.data);
                           let res = await Login(
                             {
                               email: emailAddress,

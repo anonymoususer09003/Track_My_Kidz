@@ -4,16 +4,16 @@ import { actions } from '@/Context/state/Reducer';
 import { useStateValue } from '@/Context/state/State';
 import { AddIndividialMembersModal, GroupSelectionModal } from '@/Modals';
 import {
-  CreateActivity, DeleteActivityParticipants, GetActivity,
-  GetOptIn, UpdateActivity,
+  CreateActivity,
+  DeleteActivityParticipants,
+  GetActivity,
+  GetOptIn,
+  UpdateActivity,
 } from '@/Services/Activity';
 import NotifyToInstructors from '@/Services/Activity/NotifyToInstructors';
 import NotifyToParent from '@/Services/Activity/NotifyToParent';
 import { GetGroup } from '@/Services/Group';
-import {
-  FindInstructorBySchoolOrg,
-  GetInstructor,
-} from '@/Services/Instructor';
+import { FindInstructorBySchoolOrg, GetInstructor } from '@/Services/Instructor';
 import { GetOrg } from '@/Services/Org';
 import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
 import { GetSchool } from '@/Services/School';
@@ -27,20 +27,31 @@ import Colors from '@/Theme/Colors';
 import { RouteProp, useIsFocused, useNavigation } from '@react-navigation/native';
 import Autocomplete from '@/Components/CustomAutocomplete';
 import {
-
-  AutocompleteItem, CheckBox, Datepicker, Divider,
+  AutocompleteItem,
+  CheckBox,
+  Datepicker,
+  Divider,
   Input,
   Radio,
   RadioGroup,
   Select,
-  SelectItem, Text,
+  SelectItem,
+  Text,
 } from '@ui-kitten/components';
 import { Formik } from 'formik';
 import moment from 'moment';
 import React, { FC, useEffect, useState } from 'react';
 import {
+  Alert,
   GestureResponderEvent,
-  Image, ScrollView, StatusBar, StyleSheet, TextInput, TouchableOpacity, TouchableOpacityProps, View,
+  Image,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -68,8 +79,8 @@ const filterCities = (item: string, query: string) => {
   return item?.toLowerCase().includes(query.toLowerCase());
 };
 type CreateActivityScreenProps = {
-  route: RouteProp<MainStackNavigatorParamsList, 'CreateActivity'>
-}
+  route: RouteProp<MainStackNavigatorParamsList, 'CreateActivity'>;
+};
 const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
   const isFocused = useIsFocused();
   const validationSchema = yup.object().shape({
@@ -77,9 +88,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
     fromAddress: yup.string().required('Address is required'),
   });
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
-  const currentUser: any = useSelector(
-    (state: { user: UserState }) => state.user.item,
-  );
+  const currentUser: any = useSelector((state: { user: UserState }) => state.user.item);
   const [orgId, setOrgId] = useState<any>({});
   const [hideForm, setHideForm] = useState<boolean>(true);
 
@@ -90,15 +99,11 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [timeSelectedIndex, setTimeSelectedIndex] = useState<number>(0);
   const [selectedDay, setSelectedDay] = useState<string>('');
-  const [askPermission, setAskPermission] = useState<any>(
-    activity?.requestPermission || false,
-  );
+  const [askPermission, setAskPermission] = useState<any>(activity?.requestPermission || false);
 
   const [groups, setGroups] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
-  const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries,
-  );
+  const countries = useSelector((state: { places: PlaceState }) => state.places.countries);
   const [optIn, setOptIn] = useState<any>({});
   const [instructorsList, setInstructorList] = useState<any[]>([]);
   const [onBehalf, setOnBehalf] = useState<string>('');
@@ -156,9 +161,11 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
       console.log('err school', err);
     }
   };
+
   const getOrgInfo = async (id: any) => {
     try {
       let res = await GetOrg(id);
+
       setOrgSchoolInfo(res);
     } catch (err) {
       console.log('err org', err);
@@ -204,7 +211,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
           ChangeUserState.action({
             item: res,
             fetchOne: { loading: false, error: null },
-          }),
+          })
         );
         _dispatch({
           type: actions.INSTRUCTOR_DETAIL,
@@ -217,9 +224,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
       } else {
         setInstructorInfo(currentUser);
         findInstructorBySchoolId(currentUser);
-        currentUser?.orgId
-          ? getOrgInfo(currentUser?.orgId)
-          : getSchoolInfo(currentUser?.schoolId);
+        currentUser?.orgId ? getOrgInfo(currentUser?.orgId) : getSchoolInfo(currentUser?.schoolId);
 
         setUser(currentUser);
       }
@@ -280,8 +285,6 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
   const getActivityDetail = () => {
     GetActivity(activity?.activityId)
       .then((res) => {
-        
-
         let students = res?.students?.map((item: any) => ({
           name: item?.firstName + ' ' + item.lastName,
           id: item?.studentActivityId,
@@ -296,7 +299,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
           isEdit: true,
           instructorId: item?.instructorActivityId,
         }));
-      
+
         setInstructorList(instructors);
         setStudents(students);
         setInformation({ ...infomation, ...res });
@@ -401,39 +404,31 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
       getActivityDetail();
     }
   }, [isFocused]);
-  const fetchState=async()=>{
-    try{
-  let res=await    GetAllStates(
-        currentUser?.country)
-        setStates(res.data);
-        setStatesData(res.data);
+  const fetchState = async () => {
+    try {
+      let res = await GetAllStates(currentUser?.country);
+      setStates(res.data);
+      setStatesData(res.data);
+    } catch (err) {
+      console.log('err', err);
     }
-    catch(err)
-    {
-      console.log('err',err)
+  };
+  const fetchCity = async () => {
+    try {
+      let res = await GetAllCities(currentUser?.country, currentUser?.state);
+      setCities(res.data);
+      setCitiesData(res.data);
+    } catch (err) {
+      console.log('err', err);
     }
+  };
+  useEffect(() => {
+    fetchState();
+    fetchCity();
+  }, []);
+  {
+    console.log('curent user', currentUser);
   }
-  const fetchCity=async()=>{
-    try{
-  let res=await    GetAllCities( currentUser?.country,
-        currentUser?.state)
-        setCities(res.data);
-        setCitiesData(res.data);
-    }
-    catch(err)
-    {
-      console.log('err',err)
-    }
-  }
-    useEffect(()=>{
-    
-  
-      fetchState()
-      fetchCity()
-    
-  
-                          
-  },[])
   useEffect(() => {
     if (isFocused) {
       setInitialValues({
@@ -446,11 +441,9 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
           : new Date(),
         // activity ? new Date(activity?.date?.split(" ")[0]) : new Date(),
         fromTime: infomation?.scheduler
-          ? moment(infomation?.scheduler?.fromDate)
-            .subtract('hours', 5)
-            .format('hh:mm a')
+          ? moment(infomation?.scheduler?.fromDate).subtract('hours', 5).format('hh:mm a')
           : //  moment(activity.date).subtract("hours", 5).format("hh:mm a")
-          timeStamp[0],
+            timeStamp[0],
         // activity
         //   ? activity?.date?.split(" ")[2]
         //   : //  moment(activity.date).subtract("hours", 5).format("hh:mm a")
@@ -459,12 +452,10 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
           ? new Date(infomation?.scheduler?.toDate?.split('T')[0])
           : new Date(),
         toTime: infomation?.scheduler
-          ? moment(infomation?.scheduler?.toDate)
-            .subtract('hours', 5)
-            .format('hh:mm a')
+          ? moment(infomation?.scheduler?.toDate).subtract('hours', 5).format('hh:mm a')
           : timeStamp[3],
         // activity && activity?.date.split(" ")[2],
-        fromCountry: activity?.venueFromCountry || currentUser?.country||  '',
+        fromCountry: activity?.venueFromCountry || currentUser?.country || '',
         fromVenueName: activity?.venueFromName || '',
         fromAddress: activity?.venueFromAddress || '',
         fromCity: activity?.venueFromCity || currentUser?.city || '',
@@ -475,19 +466,21 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
         venueName: activity?.venueToName || '',
         address: activity?.venueToAddress || '',
         city: infomation?.venueToCity || '',
-        selectedCity: infomation?.venueToCity?infomation?.venueToCity  : currentUser?.state
-        ? currentUser?.state
-        : '',
+        selectedCity: infomation?.venueToCity
+          ? infomation?.venueToCity
+          : currentUser?.state
+          ? currentUser?.state
+          : '',
         state: infomation?.venueToState
           ? infomation?.venueToState
           : currentUser?.state
-            ? currentUser?.state
-            : '',
+          ? currentUser?.state
+          : '',
         selectedState: infomation?.venueToState
           ? infomation?.venueToState
           : currentUser?.state
-            ? currentUser?.state
-            : '',
+          ? currentUser?.state
+          : '',
         zipCode: activity?.venueToZip || '',
         instructions: optIn?.instructions || '',
         disclaimer: optIn?.disclaimer || '',
@@ -511,9 +504,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
         <GroupSelectionModal
           getGroupDetail={(id: any) => {
             getGroupDetail(id);
-            dispatch(
-              ChangeModalState.action({ groupSelectionModalVisibility: false }),
-            );
+            dispatch(ChangeModalState.action({ groupSelectionModalVisibility: false }));
           }}
           individuals={groups}
           setIndividuals={setGroups}
@@ -552,21 +543,18 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                   (instructors &&
                     instructors?.result?.length > 0 &&
                     instructors?.result.find(
-                      (i: any) =>
-                        i?.firstname + ' ' + i?.lastname === values.onBehalfOf,
+                      (i: any) => i?.firstname + ' ' + i?.lastname === values.onBehalfOf
                     ) &&
                     instructors?.result.find(
-                      (i: any) =>
-                        i?.firstname + ' ' + i?.lastname === values.onBehalfOf,
+                      (i: any) => i?.firstname + ' ' + i?.lastname === values.onBehalfOf
                     ).instructorId) ||
                   0;
                 // console.log("onBhelf", _instructor);
-                let totime = moment(values.toTime, ['h:mm A']).format('HH:mm');
-                let todate = moment(values.to).format('YYYY-MM-DD');
-                let fromtime = moment(values.fromTime, ['h:mm A']).format(
-                  'HH:mm',
-                );
+                let totime = moment(values.toTime).format('HH:mm');
+                let todate = moment(new Date(values.to)).format('YYYY-MM-DD');
+                let fromtime = moment(values.fromTime).format('HH:mm');
                 let fromdate = moment(new Date(values.from)).format('YYYY-MM-DD');
+
                 // console.log("date", values.from + "----", +values.fromTime);
                 // console.log("fafaffafafafafa", date + "T" + time + ":00.000Z");
                 const data = {
@@ -588,8 +576,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                   venueFromZip: values.fromZipCode,
                   schoolId: currentUser?.schoolId || null,
                   venueToCountry: selectedIndex == 0 ? values.country : '',
-                  venueFromCountry:
-                    selectedIndex != 0 ? values.fromCountry : '',
+                  venueFromCountry: selectedIndex != 0 ? values.fromCountry : '',
                   orgId: currentUser?.orgId || null,
                   onBehalfOf: values.onBehalfOf ? _instructor : 0,
                   students: [],
@@ -611,9 +598,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                     //   values.toTime
                     // }`,,
                     days:
-                      timeSelectedIndex === 2
-                        ? days.map((d) => (d.selected ? 1 : 0)).join('')
-                        : 0,
+                      timeSelectedIndex === 2 ? days.map((d) => (d.selected ? 1 : 0)).join('') : 0,
                     status: 'enabled',
                   },
 
@@ -630,7 +615,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                     status: true,
                   },
                 };
-                // console.log("data", data);
+                console.log('data', data);
                 const _students: any[] = [];
                 students.map((item) => {
                   if (!item?.isEdit) {
@@ -678,10 +663,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                       let notifyToParents = true;
                       if (_students && _students?.length > 0) {
                         notifyToParents = false;
-                        notifyToParents = await NotifyToParent(
-                          res?.activityId,
-                          _students,
-                        );
+                        notifyToParents = await NotifyToParent(res?.activityId, _students);
                         notifyToParents = true;
                       }
                       // NotifyToParent(res?.activityId, _students)
@@ -696,10 +678,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                       let notifyToInstructor = true;
                       if (_instructors?.length > 0) {
                         notifyToInstructor = false;
-                        await NotifyToInstructors(
-                          res?.activityId,
-                          _instructors,
-                        );
+                        await NotifyToInstructors(res?.activityId, _instructors);
                         notifyToInstructor = true;
                       }
 
@@ -767,17 +746,10 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                       deletedStudents.map((item) => {
                         deletedStudent.push(item?.id);
                       });
-                      if (
-                        deletedInstructor.length > 0 ||
-                        deletedStudent.length > 0
-                      ) {
+                      if (deletedInstructor.length > 0 || deletedStudent.length > 0) {
                         await DeleteActivityParticipants({
-                          studentId:
-                            deletedStudent.length == 0 ? [] : deletedStudent,
-                          instructorId:
-                            deletedInstructor.length == 0
-                              ? []
-                              : deletedInstructor,
+                          studentId: deletedStudent.length == 0 ? [] : deletedStudent,
+                          instructorId: deletedInstructor.length == 0 ? [] : deletedInstructor,
                           activityId: activity?.activityId,
                         });
                       }
@@ -785,10 +757,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                       let notifyToParents = true;
                       if (_students && _students?.length > 0) {
                         notifyToParents = false;
-                        notifyToParents = await NotifyToParent(
-                          activity?.activityId,
-                          _students,
-                        );
+                        notifyToParents = await NotifyToParent(activity?.activityId, _students);
                         notifyToParents = true;
                       }
                       // NotifyToParent(activity?.activityId, _students)
@@ -814,10 +783,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                       let notifyToInstructor = true;
                       if (instructors?.length > 0) {
                         notifyToInstructor = false;
-                        await NotifyToInstructors(
-                          activity?.activityId,
-                          instructors,
-                        );
+                        await NotifyToInstructors(activity?.activityId, instructors);
                         notifyToInstructor = true;
                       }
 
@@ -859,65 +825,64 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
               }}
             >
               {({
-                  handleChange,
-                  handleSubmit,
-                  setFieldValue,
-                  values,
-                  errors,
-                  isValid,
-                  resetForm,
-                  touched,
-                }) => (
+                handleChange,
+                handleSubmit,
+                setFieldValue,
+                values,
+                errors,
+                isValid,
+                resetForm,
+                touched,
+              }) => (
                 <>
                   <View style={styles.formContainer}>
-                    {console.log('values', values)}
-                    {currentUser.isAdmin && (<View
-                      style={{
-                        marginTop: 5,
-
-                        width: '95%',
-                        marginLeft: '5%',
-                      }}
-                    >
-                      <Select
+                    {currentUser.isAdmin && (
+                      <View
                         style={{
-                          width: '100%',
-                          marginTop: -10,
-                          borderRadius: 20,
+                          marginTop: 5,
+
+                          width: '95%',
+                          marginLeft: '5%',
                         }}
-                        value={values.onBehalfOf}
-                        placeholder="Select Name"
-                        onSelect={(index: any) => {
-                          setFieldValue(
-                            'onBehalfOf',
-                            instructors?.result[index.row]?.firstname +
-                            ' ' +
-                            instructors?.result[index.row]?.lastname,
-                          );
-                        }}
-                        label={(evaProps: any) => (
-                          <Text style={styles.inputLabels}>On behalf of</Text>
-                        )}
                       >
-                        {instructors &&
-                          instructors?.result &&
-                          instructors?.result?.map((item: any) => (
-                            <SelectItem
-                              key={item?.instructorId}
-                              title={item?.firstname + ' ' + item?.lastname}
-                            />
-                          ))}
-                      </Select>
-                    </View>)}
+                        <Select
+                          style={{
+                            width: '100%',
+                            marginTop: -10,
+                            borderRadius: 20,
+                          }}
+                          value={values.onBehalfOf}
+                          placeholder="Select Name"
+                          onSelect={(index: any) => {
+                            setFieldValue(
+                              'onBehalfOf',
+                              instructors?.result[index.row]?.firstname +
+                                ' ' +
+                                instructors?.result[index.row]?.lastname
+                            );
+                          }}
+                          label={(evaProps: any) => (
+                            <Text style={styles.inputLabels}>On behalf of</Text>
+                          )}
+                        >
+                          {instructors &&
+                            instructors?.result &&
+                            instructors?.result?.map((item: any) => (
+                              <SelectItem
+                                key={item?.instructorId}
+                                title={item?.firstname + ' ' + item?.lastname}
+                              />
+                            ))}
+                        </Select>
+                      </View>
+                    )}
 
                     <Input
                       style={styles.textInput}
                       placeholder="Name your Activity/Trip*"
                       onChangeText={handleChange('name')}
                       value={values.name}
-                      label={(evaProps: any) => (
-                        <Text style={styles.inputLabels}>Event name</Text>
-                      )}
+                      label={(evaProps: any) => <Text style={styles.inputLabels}>Event name</Text>}
                     />
                     {errors.name ? (
                       <Text style={styles.errorText}>{String(errors.name)}</Text>
@@ -931,9 +896,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                         width: '100%',
                       }}
                     >
-                      <Text
-                        style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}
-                      >
+                      <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}>
                         {' '}
                         Event Type*
                       </Text>
@@ -956,18 +919,12 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                           style={[
                             styles.radioButton,
                             {
-                              borderColor:
-                                selectedIndex == 0
-                                  ? Colors.primary
-                                  : 'transparent',
+                              borderColor: selectedIndex == 0 ? Colors.primary : 'transparent',
                             },
                           ]}
                         >
                           {(evaProps) => (
-                            <Text style={{ fontSize: 14, marginLeft: 10 }}>
-                              {' '}
-                              Activity
-                            </Text>
+                            <Text style={{ fontSize: 14, marginLeft: 10 }}> Activity</Text>
                           )}
                         </Radio>
                         <Divider />
@@ -976,24 +933,15 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                           style={[
                             styles.radioButton,
                             {
-                              borderColor:
-                                selectedIndex == 2
-                                  ? Colors.primary
-                                  : 'transparent',
+                              borderColor: selectedIndex == 2 ? Colors.primary : 'transparent',
                             },
                           ]}
                         >
-                          {(evaProps) => (
-                            <Text style={{ fontSize: 14, marginLeft: 10 }}>
-                              Trip
-                            </Text>
-                          )}
+                          {(evaProps) => <Text style={{ fontSize: 14, marginLeft: 10 }}>Trip</Text>}
                         </Radio>
                         <Divider />
                       </RadioGroup>
-                      <Text
-                        style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}
-                      >
+                      <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}>
                         {' '}
                         Event Duration*
                       </Text>
@@ -1011,18 +959,12 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                           style={[
                             styles.radioButton,
                             {
-                              borderColor:
-                                timeSelectedIndex == 0
-                                  ? Colors.primary
-                                  : 'transparent',
+                              borderColor: timeSelectedIndex == 0 ? Colors.primary : 'transparent',
                             },
                           ]}
                         >
                           {(evaProps) => (
-                            <Text
-                              {...evaProps}
-                              style={{ fontSize: 14, marginLeft: 10 }}
-                            >
+                            <Text {...evaProps} style={{ fontSize: 14, marginLeft: 10 }}>
                               {' '}
                               One-Time
                             </Text>
@@ -1033,18 +975,12 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                           style={[
                             styles.radioButton,
                             {
-                              borderColor:
-                                timeSelectedIndex == 2
-                                  ? Colors.primary
-                                  : 'transparent',
+                              borderColor: timeSelectedIndex == 2 ? Colors.primary : 'transparent',
                             },
                           ]}
                         >
                           {(evaProps) => (
-                            <Text
-                              {...evaProps}
-                              style={{ fontSize: 14, marginLeft: 10 }}
-                            >
+                            <Text {...evaProps} style={{ fontSize: 14, marginLeft: 10 }}>
                               {' '}
                               Recurring
                             </Text>
@@ -1076,11 +1012,11 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                             }}
                           >
                             <TextInput
-                              value={values.from ? values.from.toLocaleDateString() : ""}
+                              value={values.from ? values.from.toLocaleDateString() : ''}
                               placeholder="Select date"
                               style={{
-                                color: "red",
-                                backgroundColor: "red",
+                                color: 'red',
+                                backgroundColor: 'red',
                                 width: 2,
                               }}
                             />
@@ -1102,15 +1038,20 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                           >
                             <TimeStampSelect timeStamp={timeStamp} />
                           </Select> */}
-<View style={{width:'50%',marginTop:22,}}>
-<CustomTextDropDown   value={typeof values?.fromTime=='object'?values.fromTime?.name:values?.fromTime}   placeholder="Time" dropDownList={timeStamp} 
-onSelect={(name:any)=>    {  
-
-  setFieldValue('fromTime', name)
-
-}}/>
-</View>
-
+                          <View style={{ width: '50%', marginTop: 22 }}>
+                            <CustomTextDropDown
+                              value={
+                                typeof values?.fromTime == 'object'
+                                  ? values.fromTime?.name
+                                  : values?.fromTime
+                              }
+                              placeholder="Time"
+                              dropDownList={timeStamp}
+                              onSelect={(name: any) => {
+                                setFieldValue('fromTime', name);
+                              }}
+                            />
+                          </View>
                         </View>
                         <View
                           style={{
@@ -1148,15 +1089,20 @@ onSelect={(name:any)=>    {
                           >
                             <TimeStampSelect timeStamp={timeStamp} />
                           </Select> */}
-<View style={{width:'50%',marginTop:22,}}>
-<CustomTextDropDown    value={typeof values?.toTime=='object'?values.toTime?.name:values?.toTime}  placeholder="Time" dropDownList={timeStamp} 
-onSelect={(name:any)=>    {  
-
-  setFieldValue('toTime', name)
-
-}}/>
-</View>
-
+                          <View style={{ width: '50%', marginTop: 22 }}>
+                            <CustomTextDropDown
+                              value={
+                                typeof values?.toTime == 'object'
+                                  ? values.toTime?.name
+                                  : values?.toTime
+                              }
+                              placeholder="Time"
+                              dropDownList={timeStamp}
+                              onSelect={(name: any) => {
+                                setFieldValue('toTime', name);
+                              }}
+                            />
+                          </View>
                         </View>
                       </>
                     )}
@@ -1207,13 +1153,8 @@ onSelect={(name:any)=>    {
                           >
                             <Datepicker
                               min={new Date(1900, 0, 0)}
-                              style={[
-                                styles.selectSettings,
-                                { width: '60%', borderRadius: 20 },
-                              ]}
-                              label={() => (
-                                <Text style={styles.inputLabels}>From*</Text>
-                              )}
+                              style={[styles.selectSettings, { width: '60%', borderRadius: 20 }]}
+                              label={() => <Text style={styles.inputLabels}>From*</Text>}
                               placeholder="From"
                               date={values.from}
                               onSelect={(date: Date | null) => {
@@ -1222,14 +1163,14 @@ onSelect={(name:any)=>    {
                               }}
                             >
                               <TextInput
-                                value={values.from ? values.from.toLocaleDateString() : ""}
+                                value={values.from ? values.from.toLocaleDateString() : ''}
                                 onFocus={() => {}}
                                 onBlur={() => {}}
                                 onChangeText={() => {}}
                                 placeholder="Select date"
                                 style={{
-                                  color: "red",
-                                  backgroundColor: "red",
+                                  color: 'red',
+                                  backgroundColor: 'red',
                                   width: 2,
                                 }}
                               />
@@ -1251,13 +1192,20 @@ onSelect={(name:any)=>    {
                             >
                               <TimeStampSelect timeStamp={timeStamp} />
                             </Select> */}
-                         <View style={{width:'50%',marginTop:22,}}>
-                            <CustomTextDropDown    value={typeof values?.fromTime=='object'?values.fromTime?.name:values?.fromTime}   placeholder="Time" dropDownList={timeStamp} 
-onSelect={(name:any)=>    {  
-  setFieldValue('fromTime', name)
-
-}}/>
-</View>
+                            <View style={{ width: '50%', marginTop: 22 }}>
+                              <CustomTextDropDown
+                                value={
+                                  typeof values?.fromTime == 'object'
+                                    ? values.fromTime?.name
+                                    : values?.fromTime
+                                }
+                                placeholder="Time"
+                                dropDownList={timeStamp}
+                                onSelect={(name: any) => {
+                                  setFieldValue('fromTime', name);
+                                }}
+                              />
+                            </View>
                           </View>
                           <View
                             style={{
@@ -1271,9 +1219,7 @@ onSelect={(name:any)=>    {
                               disabled={values?.noEnd}
                               min={new Date(1900, 0, 0)}
                               style={[styles.selectSettings, { width: '60%' }]}
-                              label={() => (
-                                <Text style={styles.inputLabels}>To*</Text>
-                              )}
+                              label={() => <Text style={styles.inputLabels}>To*</Text>}
                               placeholder="To"
                               date={values.to}
                               onSelect={(date: Date | null) => {
@@ -1281,8 +1227,7 @@ onSelect={(name:any)=>    {
                               }}
                             />
                             {/* {console.log("values", values.toTime)} */}
-                            
-                            
+
                             {/* <Select
                               disabled={values?.noEnd}
                               value={values.toTime}
@@ -1301,13 +1246,20 @@ onSelect={(name:any)=>    {
                             >
                               <TimeStampSelect timeStamp={timeStamp} />
                             </Select> */}
-                            <View style={{width:'50%',marginTop:22,}}>
-                            <CustomTextDropDown   value={typeof values?.toTime=='object'?values.toTime?.name:values?.toTime}  placeholder="Time" dropDownList={timeStamp} 
-onSelect={(name:any)=>    {  
-  setFieldValue('toTime', name)
-
-}}/>
-</View>
+                            <View style={{ width: '50%', marginTop: 22 }}>
+                              <CustomTextDropDown
+                                value={
+                                  typeof values?.toTime == 'object'
+                                    ? values.toTime?.name
+                                    : values?.toTime
+                                }
+                                placeholder="Time"
+                                dropDownList={timeStamp}
+                                onSelect={(name: any) => {
+                                  setFieldValue('toTime', name);
+                                }}
+                              />
+                            </View>
                           </View>
                         </>
 
@@ -1318,9 +1270,7 @@ onSelect={(name:any)=>    {
                             alignItems: 'center',
                           }}
                         >
-                          <Text style={{ marginHorizontal: 15, marginTop: 10 }}>
-                            No end
-                          </Text>
+                          <Text style={{ marginHorizontal: 15, marginTop: 10 }}>No end</Text>
                           <CheckBox
                             style={[{ flex: 1, marginTop: 15 }]}
                             checked={values?.noEnd}
@@ -1357,14 +1307,10 @@ onSelect={(name:any)=>    {
                           {days &&
                             days.map((day) => (
                               <TouchableOpacity
-                                style={
-                                  day.selected ? styles.selectedDay : styles.day
-                                }
+                                style={day.selected ? styles.selectedDay : styles.day}
                                 onPress={() => {
                                   const data = [...days];
-                                  const index = data.findIndex(
-                                    (i) => i.name === day.name,
-                                  );
+                                  const index = data.findIndex((i) => i.name === day.name);
                                   data[index].selected = !day.selected;
                                   setDays(data);
                                 }}
@@ -1407,9 +1353,7 @@ onSelect={(name:any)=>    {
                           alignItems: 'center',
                         }}
                       >
-                        <Text style={{ marginRight: 20, marginTop: 10 }}>
-                          Use school/org
-                        </Text>
+                        <Text style={{ marginRight: 20, marginTop: 10 }}>Use school/org</Text>
                         <CheckBox
                           disabled={toCheckBox}
                           style={[{ flex: 1, marginTop: 15 }]}
@@ -1417,26 +1361,14 @@ onSelect={(name:any)=>    {
                           onChange={(checked) => {
                             setFromCheckBox(checked);
                             if (!fromCheckBox) {
-                              setFieldValue(
-                                'fromVenueName',
-                                orgSchoolInfo?.name,
-                              );
-                              setFieldValue(
-                                'fromAddress',
-                                orgSchoolInfo?.address,
-                              );
+                              setFieldValue('fromVenueName', orgSchoolInfo?.name);
+                              setFieldValue('fromAddress', orgSchoolInfo?.address);
 
                               setFieldValue('fromState', orgSchoolInfo?.state);
 
-                              setFieldValue(
-                                'fromCountry',
-                                orgSchoolInfo?.country,
-                              );
+                              setFieldValue('fromCountry', orgSchoolInfo?.country);
                               setFieldValue('fromCity', orgSchoolInfo?.city);
-                              setFieldValue(
-                                'fromZipCode',
-                                orgSchoolInfo?.zipcode,
-                              );
+                              setFieldValue('fromZipCode', orgSchoolInfo?.zipcode);
                             } else {
                               setFieldValue('fromVenueName', '');
                               setFieldValue('fromAddress', '');
@@ -1506,71 +1438,68 @@ onSelect={(name:any)=>    {
                       <Autocomplete
                         placeholder="Country*"
                         value={values?.fromCountry}
-                     data={countriesData}
-                        style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
+                        data={countriesData}
+                        style={{
+                          input: styles.textInput,
+                          list: { ...styles.textInput, marginLeft: 20 },
+                        }}
                         // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                       
+
                         onSelect={(query) => {
                           const selectedCountry = query;
                           console.log('000000', selectedCountry.name);
                           setFieldValue('fromCountry', selectedCountry.name);
-                          setFieldValue(
-                            'selectedCountry',
-                            selectedCountry.name,
-                          );
+                          setFieldValue('selectedCountry', selectedCountry.name);
                           setFieldValue('fromSelectedState', '');
                           setFieldValue('fromState', '');
                           setStates([]);
-                          GetAllStates(
-                            selectedCountry.name.replace(/ /g, ''),
-                          ).then((res) => {
+                          GetAllStates(selectedCountry.name.replace(/ /g, '')).then((res) => {
                             setStates(res.data);
                             setStatesData(res.data);
                           });
                         }}
-                    />
-                       
-                    
+                      />
+
                       <Autocomplete
                         placeholder="State"
                         value={values.fromState}
-                    
-                        style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
+                        style={{
+                          input: styles.textInput,
+                          list: { ...styles.textInput, marginLeft: 20 },
+                        }}
                         data={statesData}
                         // label={evaProps => <Text {...evaProps}>State</Text>}
-                   
+
                         onSelect={(query) => {
-                          const selectedState =query;
+                          const selectedState = query;
                           setFieldValue('fromState', selectedState);
                           setFieldValue('fromSelectedState', selectedState);
                           setFieldValue('fromSelectedCity', '');
                           setFieldValue('fromCity', '');
                           setCities([]);
-                          GetAllCities(
-                            values.selectedCountry,
-                            selectedState,
-                          ).then((res) => {
+                          GetAllCities(values.selectedCountry, selectedState).then((res) => {
                             setCities(res.data);
-                            setCitiesData(res.data)
+                            setCitiesData(res.data);
                           });
                         }}
                       />
-                       
+
                       <Autocomplete
-                      data={citiesData}
+                        data={citiesData}
                         placeholder="City"
                         value={values.fromCity}
-                       
-                        style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
+                        style={{
+                          input: styles.textInput,
+                          list: { ...styles.textInput, marginLeft: 20 },
+                        }}
                         // label={evaProps => <Text {...evaProps}>City</Text>}
-                       
+
                         onSelect={(query) => {
                           setFieldValue('fromCity', query);
-                          setFieldValue('fromSelectedCity',query);
+                          setFieldValue('fromSelectedCity', query);
                         }}
-                    />
-                       
-                    
+                      />
+
                       <Input
                         style={styles.textInput}
                         placeholder="Zip/Post Code"
@@ -1607,9 +1536,7 @@ onSelect={(name:any)=>    {
                               alignItems: 'center',
                             }}
                           >
-                            <Text style={{ marginRight: 20, marginTop: 10 }}>
-                              Use school/org
-                            </Text>
+                            <Text style={{ marginRight: 20, marginTop: 10 }}>Use school/org</Text>
                             <CheckBox
                               disabled={fromCheckBox}
                               style={[{ flex: 1, marginTop: 15 }]}
@@ -1617,26 +1544,14 @@ onSelect={(name:any)=>    {
                               onChange={(checked) => {
                                 setToCheckBox(checked);
                                 if (!toCheckBox) {
-                                  setFieldValue(
-                                    'venueName',
-                                    orgSchoolInfo?.name,
-                                  );
-                                  setFieldValue(
-                                    'address',
-                                    orgSchoolInfo?.address,
-                                  );
+                                  setFieldValue('venueName', orgSchoolInfo?.name);
+                                  setFieldValue('address', orgSchoolInfo?.address);
 
                                   setFieldValue('state', orgSchoolInfo?.state);
 
-                                  setFieldValue(
-                                    'country',
-                                    orgSchoolInfo?.country,
-                                  );
+                                  setFieldValue('country', orgSchoolInfo?.country);
                                   setFieldValue('city', orgSchoolInfo?.city);
-                                  setFieldValue(
-                                    'zipCode',
-                                    orgSchoolInfo?.zipcode,
-                                  );
+                                  setFieldValue('zipCode', orgSchoolInfo?.zipcode);
                                 } else {
                                   setFieldValue('venueName', '');
                                   setFieldValue('address', '');
@@ -1686,37 +1601,38 @@ onSelect={(name:any)=>    {
                           <Autocomplete
                             placeholder="Country*"
                             value={values.country}
-                        data={countriesData}
-                            style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
+                            data={countriesData}
+                            style={{
+                              input: styles.textInput,
+                              list: { ...styles.textInput, marginLeft: 20 },
+                            }}
                             // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                          
+
                             onSelect={(query) => {
                               const selectedCountry = query;
                               console.log('000000', selectedCountry.name);
                               setFieldValue('country', selectedCountry.name);
-                              setFieldValue(
-                                'selectedCountry',
-                                selectedCountry.name,
-                              );
+                              setFieldValue('selectedCountry', selectedCountry.name);
                               setFieldValue('toSelectedState', '');
                               setFieldValue('state', '');
                               setStates([]);
-                              GetAllStates(
-                                selectedCountry.name.replace(/ /g, ''),
-                              ).then((res) => {
+                              GetAllStates(selectedCountry.name.replace(/ /g, '')).then((res) => {
                                 setStates(res.data);
                                 setStatesData(states);
                               });
                             }}
                           />
-                          
+
                           <Autocomplete
                             placeholder="State"
                             value={values.state}
-                       data={statesData}
-                            style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
+                            data={statesData}
+                            style={{
+                              input: styles.textInput,
+                              list: { ...styles.textInput, marginLeft: 20 },
+                            }}
                             // label={evaProps => <Text {...evaProps}>State</Text>}
-                         
+
                             onSelect={(query) => {
                               const selectedState = query;
                               setFieldValue('state', selectedState);
@@ -1724,32 +1640,27 @@ onSelect={(name:any)=>    {
                               setFieldValue('toSelectedCity', '');
                               setFieldValue('city', '');
                               setCities([]);
-                              GetAllCities(
-                                values.selectedCountry,
-                                selectedState,
-                              ).then((res) => {
+                              GetAllCities(values.selectedCountry, selectedState).then((res) => {
                                 setCities(res.data);
                               });
                             }}
                           />
-                          
+
                           <Autocomplete
                             placeholder="City"
                             value={values.city}
-                         data={citiesData}
-
-                         style={{input:styles.textInput,list:{...styles.textInput, marginLeft:20}}}
+                            data={citiesData}
+                            style={{
+                              input: styles.textInput,
+                              list: { ...styles.textInput, marginLeft: 20 },
+                            }}
                             // label={evaProps => <Text {...evaProps}>City</Text>}
-                           
+
                             onSelect={(query) => {
                               setFieldValue('city', query);
-                              setFieldValue(
-                                'toSelectedCity',
-                                citiesData[query],
-                              );
+                              setFieldValue('toSelectedCity', citiesData[query]);
                             }}
                           />
-                           
 
                           <Input
                             style={styles.textInput}
@@ -1804,16 +1715,14 @@ onSelect={(name:any)=>    {
                           justifyContent: 'space-between',
                         }}
                       >
-                        <Text style={[{ color: Colors.primary, fontSize: 15 }]}>
-                          Add Students
-                        </Text>
+                        <Text style={[{ color: Colors.primary, fontSize: 15 }]}>Add Students</Text>
                         <TouchableOpacity
                           disabled={!isValid}
                           onPress={() => {
                             dispatch(
                               ChangeModalState.action({
                                 addIndividualMemberModalVisibility: true,
-                              }),
+                              })
                             );
                           }}
                         >
@@ -1838,8 +1747,7 @@ onSelect={(name:any)=>    {
                                 style={[
                                   styles.participantsListCards,
                                   {
-                                    borderBottomWidth:
-                                      students.length != index + 1 ? 2 : 0,
+                                    borderBottomWidth: students.length != index + 1 ? 2 : 0,
                                   },
                                 ]}
                               >
@@ -1851,7 +1759,6 @@ onSelect={(name:any)=>    {
                                 >
                                   <View>
                                     <Text>{item?.name}</Text>
-
                                   </View>
                                 </View>
                                 <AntDesign
@@ -1878,16 +1785,11 @@ onSelect={(name:any)=>    {
                       onSelect={(index: any) => {
                         // console.log("LOGS000000", instructorsList[index.row]);
                         let findItem = instructorsList.filter(
-                          (item) =>
-                            item?.instructorId ==
-                            instructorsList[index.row]?.instructorId,
+                          (item) => item?.instructorId == instructorsList[index.row]?.instructorId
                         );
                         // console.log("findItem", findItem);
                         if (findItem.length == 0) {
-                          setInstructorList([
-                            ...instructorsList,
-                            instructors?.result[index.row],
-                          ]);
+                          setInstructorList([...instructorsList, instructors?.result[index.row]]);
                         }
                         // console.log("logs", moment().format("M"));
                         // console.log("index", index.row);
@@ -1910,10 +1812,7 @@ onSelect={(name:any)=>    {
                     >
                       {instructors?.result?.map((item: any, index: number) => {
                         return (
-                          <SelectItem
-                            key={index}
-                            title={item?.firstname + ' ' + item?.lastname}
-                          />
+                          <SelectItem key={index} title={item?.firstname + ' ' + item?.lastname} />
                         );
                       })}
                     </Select>
@@ -1927,8 +1826,7 @@ onSelect={(name:any)=>    {
                                 style={[
                                   styles.participantsListCards,
                                   {
-                                    borderBottomWidth:
-                                      students.length != index + 1 ? 2 : 0,
+                                    borderBottomWidth: students.length != index + 1 ? 2 : 0,
                                   },
                                 ]}
                               >
@@ -1939,9 +1837,7 @@ onSelect={(name:any)=>    {
                                   }}
                                 >
                                   <View>
-                                    <Text>
-                                      {item?.firstname + ' ' + item?.lastname}
-                                    </Text>
+                                    <Text>{item?.firstname + ' ' + item?.lastname}</Text>
                                   </View>
                                 </View>
                                 <AntDesign
@@ -1963,7 +1859,7 @@ onSelect={(name:any)=>    {
                           dispatch(
                             ChangeModalState.action({
                               groupSelectionModalVisibility: true,
-                            }),
+                            })
                           )
                         }
                       >
@@ -2040,16 +1936,17 @@ onSelect={(name:any)=>    {
                       </CheckBox>
                     </View> */}
 
-                      <SubmitButton style={{ width: '100%', alignItems: 'center' }} onSubmit={handleSubmit}>
+                      <SubmitButton
+                        style={{ width: '100%', alignItems: 'center' }}
+                        onSubmit={handleSubmit}
+                      >
                         <LinearGradient
                           colors={[Colors.primary, '#EC5ADD']}
                           start={{ x: 0, y: 1 }}
                           end={{ x: 1, y: 1 }}
                           style={styles.linearGradient}
                         >
-                          <Text style={styles.button}>
-                            {isEdit ? 'Update' : `Send invitation`}
-                          </Text>
+                          <Text style={styles.button}>{isEdit ? 'Update' : `Send invitation`}</Text>
                         </LinearGradient>
                       </SubmitButton>
                     </View>
@@ -2064,19 +1961,24 @@ onSelect={(name:any)=>    {
   );
 };
 
-
-
 export default CreateActivityScreen;
 
-type DatepickerTextInputProps = { date: any, onFocus: any, onBlur: any }
-const DatepickerTextInput: FC<DatepickerTextInputProps> =  ({ date, onFocus, onBlur }:{ date: any, onFocus: any, onBlur: any } ) => {
+type DatepickerTextInputProps = { date: any; onFocus: any; onBlur: any };
+const DatepickerTextInput: FC<DatepickerTextInputProps> = ({
+  date,
+  onFocus,
+  onBlur,
+}: {
+  date: any;
+  onFocus: any;
+  onBlur: any;
+}) => {
   return (
     <TextInput
       value={date ? date.toLocaleDateString() : ''}
       onFocus={onFocus}
       onBlur={onBlur}
-      onChangeText={() => {
-      }}
+      onChangeText={() => {}}
       placeholder="Select date"
       style={{
         color: 'red',
@@ -2085,7 +1987,7 @@ const DatepickerTextInput: FC<DatepickerTextInputProps> =  ({ date, onFocus, onB
       }} // set the color of the text input
     />
   );
-}
+};
 
 const styles = StyleSheet.create({
   layout: {

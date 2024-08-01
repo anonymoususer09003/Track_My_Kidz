@@ -2,7 +2,14 @@ import { useIsFocused } from '@react-navigation/native';
 import { Icon, Text } from '@ui-kitten/components';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,7 +26,7 @@ import Colors from '@/Theme/Colors';
 const ParentDeclineScreen = () => {
   const calendarIcon = require('@/Assets/Images/navigation_icon2.png');
   const marker = require('@/Assets/Images/marker.png');
-
+  const [group, setSelectedGroup] = useState(null);
   // const email = require("@/Assets/Images/email.png");
   // const clockIcon = require("@/Assets/Images/clock1.png");
   const instructorImage = require('@/Assets/Images/approval_icon2.png');
@@ -34,9 +41,7 @@ const ParentDeclineScreen = () => {
   // const [thumbnail, setThumbnail] = useState(false);
   // const [searchParam, setSearchParam] = useState("");
   const [activity, setActivity] = useState<any>(null);
-  const currentUser: any = useSelector(
-    (state: { user: UserState }) => state.user.item,
-  );
+  const currentUser: any = useSelector((state: { user: UserState }) => state.user.item);
   const [selectedChild, setSelectedChild] = useState<any>('');
   const [groups, setGroups] = useState<any[]>([]);
   const [pageGroup, pageNumberGroup] = useState<number>(0);
@@ -58,12 +63,7 @@ const ParentDeclineScreen = () => {
     let pageNumberActivityCount = refreshing ? pageActivity : 0;
     let pageNumberGroupCount = refreshing ? pageGroup : 0;
     let email = currentUser?.email;
-    GetChildrenAcitivities(
-      email,
-      'declined',
-      pageNumberActivityCount,
-      pageSizeActivity,
-    )
+    GetChildrenAcitivities(email, 'declined', pageNumberActivityCount, pageSizeActivity)
       .then((res) => {
         console.log('res98828989899889', res);
         setTotalRecordsActivity(res.totalRecords);
@@ -175,7 +175,7 @@ const ParentDeclineScreen = () => {
             dispatch(
               ChangeModalState.action({
                 childrenSelectionModalVisibility: true,
-              }),
+              })
             );
             setShowAcceptModal(true);
             setActivity(item);
@@ -184,11 +184,7 @@ const ParentDeclineScreen = () => {
           {item.status ? (
             <AntDesign size={30} name="like1" color={Colors.primary} />
           ) : (
-            <Icon
-              style={{ width: 30, height: 30 }}
-              fill={Colors.primary}
-              name="trash"
-            />
+            <Icon style={{ width: 30, height: 30 }} fill={Colors.primary} name="trash" />
           )}
         </TouchableOpacity>
       </View>
@@ -199,8 +195,12 @@ const ParentDeclineScreen = () => {
     <>
       <InstructionsModal
         selectedInstructions={selectedInstructions}
-        setSelectedInstructions={setSelectedInstructions}
+        group={group}
         activity={selectedInstructions?.activity}
+        setSelectedInstructions={() => {
+          setSelectedInstructions(null);
+          setSelectedGroup(null);
+        }}
       />
       {activity && (
         <ChildrenSelectionModal
@@ -235,9 +235,7 @@ const ParentDeclineScreen = () => {
       )}
 
       {activities.length === 0 && groups.length == 0 && (
-        <View
-          style={{ padding: 10, backgroundColor: Colors.newBackgroundColor }}
-        >
+        <View style={{ padding: 10, backgroundColor: Colors.newBackgroundColor }}>
           <Text style={[styles.text, { textAlign: 'center' }]}>
             You do not have any declined activities or groups
           </Text>
@@ -265,15 +263,14 @@ const ParentDeclineScreen = () => {
                     <Text style={[styles.text, { fontSize: 25 }]}>
                       {`${item?.activity?.activityName}`}
                     </Text>
-                    <View style={{flexDirection:'row',alignItems:'center'}}>
-<Image source={instructorImage} style={styles.iconImages} />
-<Text>{item?.firstName+' '+ item?.lastName}</Text>
-</View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Image source={instructorImage} style={styles.iconImages} />
+                      <Text>{item?.firstName + ' ' + item?.lastName}</Text>
+                    </View>
                     <View
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-
                       }}
                     >
                       <Image
@@ -289,22 +286,23 @@ const ParentDeclineScreen = () => {
                         <Text style={styles.text}>{`${moment(
                           item?.activity?.fromDate == 'string'
                             ? new Date()
-                            : item?.activity?.fromDate,
-                        ).format('MMM DD YYYY')} at ${moment.utc(
-                          item?.activity?.fromDate == 'string'
-                            ? new Date()
-                            : item?.activity?.fromDate,
-                        )
+                            : item?.activity?.fromDate
+                        ).format('MMM DD YYYY')} at ${moment
+                          .utc(
+                            item?.activity?.fromDate == 'string'
+                              ? new Date()
+                              : item?.activity?.fromDate
+                          )
                           .format('hh:mm a')} `}</Text>
                         <Text style={styles.text}>{`${moment(
-                          item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
-                        ).format('MMM DD YYYY')} at ${moment.utc(
-                          item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate,
-                        )
+                          item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate
+                        ).format('MMM DD YYYY')} at ${moment
+                          .utc(
+                            item?.activity?.toDate == 'string' ? new Date() : item?.activity?.toDate
+                          )
                           .format('hh:mm a')} `}</Text>
                       </View>
                     </View>
-
 
                     <View style={styles.horizontal}>
                       <Image source={marker} style={styles.iconStyle} />
@@ -325,7 +323,7 @@ const ParentDeclineScreen = () => {
                       dispatch(
                         ChangeModalState.action({
                           instructionsModalVisibility: true,
-                        }),
+                        })
                       );
                       setSelectedInstructions(item);
                     }}
@@ -345,24 +343,34 @@ const ParentDeclineScreen = () => {
                   onSwipeableOpen={() => closeRow(item?.groupId)}
                 >
                   <View style={[styles.item]}>
-                    <Text style={[styles.text, { fontSize: 25 }]}>
-                      {item?.group?.groupName}
-                    </Text>
+                    <Text style={[styles.text, { fontSize: 25 }]}>{item?.group?.groupName}</Text>
                     <View style={styles.horizontal}>
-                      <Image
-                        source={instructorImage}
-                        style={styles.iconStyle}
-                      />
-                      <Text
-                        style={styles.text}
-                      >{` ${item?.firstName} ${item?.lastName}`}</Text>
+                      <Image source={instructorImage} style={styles.iconStyle} />
+                      <Text style={styles.text}>{` ${item?.firstName} ${item?.lastName}`}</Text>
                     </View>
-                    <View style={styles.horizontal}>
+                    {/* <View style={styles.horizontal}>
                       <Image source={calendarIcon} style={styles.iconStyle} />
                       <Text style={styles.text}>{`${moment(
-                        item?.activity?.scheduler?.fromDate,
+                        item?.activity?.scheduler?.fromDate
                       ).format('YYYY-MM-DD')}`}</Text>
-                    </View>
+                    </View> */}
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        dispatch(
+                          ChangeModalState.action({
+                            instructionsModalVisibility: true,
+                          })
+                        );
+                        setSelectedGroup(item?.group);
+                        setSelectedInstructions(item);
+                      }}
+                      style={[styles.footer]}
+                    >
+                      <Text
+                        style={[styles.text, { textAlign: 'center' }]}
+                      >{`Instructions / Disclaimer / Agreement`}</Text>
+                    </TouchableOpacity>
 
                     {/* <View style={styles.horizontal}>
                       <Image source={email} style={styles.iconStyle} />
@@ -389,9 +397,7 @@ const ParentDeclineScreen = () => {
           refreshing={false}
           onRefresh={() => null}
         />
-        {refreshing && (
-          <ActivityIndicator size="large" color={Colors.primary} />
-        )}
+        {refreshing && <ActivityIndicator size="large" color={Colors.primary} />}
       </View>
     </>
   );

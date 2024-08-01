@@ -1,21 +1,20 @@
-import {CustomTextDropDown, LinearGradientButton, Spinner} from '@/Components';
+import { CustomTextDropDown, LinearGradientButton, Spinner } from '@/Components';
 import ProfileAvatarPicker from '@/Components/ProfileAvatar';
-import {PersonIcon, PhoneIcon} from '@/Components/SignUp/icons';
-import {ImagePickerModal} from '@/Modals';
-import {CountryDTO} from '@/Models/CountryDTOs';
-import {GetAllCities, GetAllStates} from '@/Services/PlaceServices';
-import {GetAllSchools, GetSchoolByFilters} from '@/Services/School';
-import {CreateStudent} from '@/Services/Student';
-import {loadUserId} from '@/Storage/MainAppStorage';
-import {ModalState} from '@/Store/Modal';
+import { PersonIcon, PhoneIcon } from '@/Components/SignUp/icons';
+import { ImagePickerModal } from '@/Modals';
+import { CountryDTO } from '@/Models/CountryDTOs';
+import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
+import { GetAllSchools, GetSchoolByFilters } from '@/Services/School';
+import { CreateStudent } from '@/Services/Student';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import { ModalState } from '@/Store/Modal';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
-import {PlaceState} from '@/Store/Places';
-import {UserState} from '@/Store/User';
+import { PlaceState } from '@/Store/Places';
+import { UserState } from '@/Store/User';
 import Colors from '@/Theme/Colors';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import Autocomplete from '@/Components/CustomAutocomplete';
 import {
-
   AutocompleteItem,
   Button,
   CheckBox,
@@ -25,14 +24,14 @@ import {
   Modal,
   Text,
 } from '@ui-kitten/components';
-import {Formik} from 'formik';
-import React, {useEffect, useState} from 'react';
-import {Alert, Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
+import { Formik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { Alert, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {Toast} from 'react-native-toast-message/lib/src/Toast';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import ProfileIcon from 'react-native-vector-icons/EvilIcons';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 
 const filterCountries = (item: CountryDTO, query: string) => {
@@ -51,20 +50,14 @@ const filterSchools = (item: string, query: string) => {
 
 const AddStudentModal = () => {
   const navigation = useNavigation();
-  const [selectedImage, setSelectedImage] = React.useState<string | undefined>(
-    '',
-  );
+  const [selectedImage, setSelectedImage] = React.useState<string | undefined>('');
   const [loading, setLoading] = useState(false);
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const [schools, setSchools] = useState<[]>([]);
   const [grades, setGrades] = useState<string>('');
-  const isVisible = useSelector(
-    (state: {modal: ModalState}) => state.modal.addStudentModal,
-  );
-  const countries = useSelector(
-    (state: {places: PlaceState}) => state.places.countries,
-  );
+  const isVisible = useSelector((state: { modal: ModalState }) => state.modal.addStudentModal);
+  const countries = useSelector((state: { places: PlaceState }) => state.places.countries);
   const [visible, setVisible] = useState(false);
   const [checkBox, setCheckBox] = useState(false);
   const [countriesData, setCountriesData] = React.useState(countries);
@@ -74,13 +67,10 @@ const AddStudentModal = () => {
   const [cities, setCities] = useState<Array<any>>([]);
   const [schoolsData, setSchoolsData] = React.useState(schools);
   const [uploadedImage, setUploadedImage] = React.useState(null);
-  const currentUser = useSelector(
-    (state: {user: UserState}) => state.user.item,
-  );
+  const currentUser = useSelector((state: { user: UserState }) => state.user.item);
   function getUriSource(): any {
-    return {uri: selectedImage};
+    return { uri: selectedImage };
   }
-  console.log('selectedimage', selectedImage);
 
   const imageGalleryLaunch = () => {
     ImagePicker.openPicker({
@@ -90,9 +80,9 @@ const AddStudentModal = () => {
       height: 130,
       compressImageQuality: 0.2,
       loadingLabelText: 'Loading image',
-    }).then(image => {
+    }).then((image) => {
       if (image != null) {
-        const source = {uri: image?.path};
+        const source = { uri: image?.path };
         setUploadedImage(image);
         setSelectedImage(source.uri);
         // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
@@ -107,9 +97,9 @@ const AddStudentModal = () => {
       height: 130,
       compressImageQuality: 0.2,
       loadingLabelText: 'Loading image',
-    }).then(image => {
+    }).then((image) => {
       if (image != null) {
-        const source = {uri: image?.path};
+        const source = { uri: image?.path };
         setUploadedImage(image);
         setSelectedImage(source.uri);
         // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
@@ -117,12 +107,7 @@ const AddStudentModal = () => {
     });
   };
 
-  const getSchoolsByFilter = (
-    country = '',
-    state = '',
-    city = '',
-    schoolName: any,
-  ) => {
+  const getSchoolsByFilter = (country = '', state = '', city = '', schoolName: any) => {
     const query = {
       country: country,
       state: state,
@@ -130,7 +115,7 @@ const AddStudentModal = () => {
       schoolName: schoolName,
     };
     GetSchoolByFilters(query)
-      .then(res => {
+      .then((res) => {
         console.log('res', res);
         const _data = {
           schoolId: 0,
@@ -141,7 +126,7 @@ const AddStudentModal = () => {
         setSchools(_schools);
         setSchoolsData(_schools);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   };
@@ -149,10 +134,7 @@ const AddStudentModal = () => {
   const validationSchema = yup.object().shape({
     firstName: yup.string().required('First Name is required'),
     lastName: yup.string().required('Last Name is required'),
-    email: yup
-      .string()
-      .email('Please enter valid email')
-      .required('Email is required'),
+    email: yup.string().email('Please enter valid email').required('Email is required'),
     country: yup.string().required('Please select country'),
     state: yup.string().required('Please select state'),
     school: yup.string().required('Please select school'),
@@ -165,12 +147,12 @@ const AddStudentModal = () => {
   // @ts-ignore
   const getSchools = () => {
     GetAllSchools(0, 30)
-      .then(res => {
+      .then((res) => {
         console.log('result', res);
         setSchools(res.result);
         setSchoolsData(res.result);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log('err', err);
       });
   };
@@ -186,8 +168,7 @@ const AddStudentModal = () => {
     />
   );
   const renderEditButtonElement = (): ButtonElement => {
-    const buttonElement: React.ReactElement<ButtonProps> =
-      renderEditAvatarButton();
+    const buttonElement: React.ReactElement<ButtonProps> = renderEditAvatarButton();
 
     return React.cloneElement(buttonElement, {
       style: [buttonElement.props.style, styles.editButton],
@@ -211,8 +192,9 @@ const AddStudentModal = () => {
         marginTop: 50,
       }}
       onBackdropPress={() => {
-        dispatch(ChangeModalState.action({addStudentModal: false}));
-      }}>
+        dispatch(ChangeModalState.action({ addStudentModal: false }));
+      }}
+    >
       <>
         {visible && (
           <ImagePickerModal
@@ -222,16 +204,18 @@ const AddStudentModal = () => {
           />
         )}
         <KeyboardAwareScrollView
-        keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps="handled"
           nestedScrollEnabled={true}
-          style={{flex: 1, backgroundColor: Colors.newBackgroundColor}}>
+          style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}
+        >
           <View
             style={{
               flex: 1,
               backgroundColor: Colors.newBackgroundColor,
               borderTopLeftRadius: 10,
               borderTopRightRadius: 10,
-            }}>
+            }}
+          >
             <View style={styles.layout}>
               <Formik
                 validateOnMount={true}
@@ -258,7 +242,7 @@ const AddStudentModal = () => {
                   addMore: false,
                   image: selectedImage,
                 }}
-                onSubmit={async (values, {resetForm}) => {
+                onSubmit={async (values, { resetForm }) => {
                   console.log('values', values);
                   setLoading(true);
                   const userId = await loadUserId();
@@ -275,7 +259,7 @@ const AddStudentModal = () => {
                           uri: 'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
                           name: 'avatar',
                           type: 'image/png',
-                        },
+                        }
                   );
                   formData.append('parentId', parseInt(userId, 0));
                   formData.append('firstname', values.firstName);
@@ -284,17 +268,15 @@ const AddStudentModal = () => {
                   formData.append('email', values?.email);
                   formData.append(
                     'school',
-                    values.selectedSchool != ''
-                      ? values.selectedSchool
-                      : values.school,
+                    values.selectedSchool != '' ? values.selectedSchool : values.school
                   );
                   formData.append('country', values.country);
                   formData.append('state', values.state);
                   formData.append('city', values.city);
                   formData.append('parentemail1', currentUser.email);
-console.log('form data',formData)
+                  console.log('form data', formData);
                   CreateStudent(formData)
-                    .then(response => {
+                    .then((response) => {
                       console.log('response', response);
                       Toast.show({
                         type: 'success',
@@ -311,7 +293,7 @@ console.log('form data',formData)
                         dispatch(
                           ChangeModalState.action({
                             addStudentModal: false,
-                          }),
+                          })
                         );
                       }
 
@@ -319,7 +301,7 @@ console.log('form data',formData)
                       //     ChangeModalState.action({ addStudentModal: false })
                       //   );
                     })
-                    .catch(err => {
+                    .catch((err) => {
                       console.log('err', err);
                       Toast.show({
                         type: 'info',
@@ -328,7 +310,8 @@ console.log('form data',formData)
                       });
                     })
                     .finally(() => setLoading(false));
-                }}>
+                }}
+              >
                 {({
                   handleChange,
                   setFieldValue,
@@ -341,7 +324,7 @@ console.log('form data',formData)
                 }) => (
                   <>
                     <Layout style={styles.formContainer} level="1">
-                      <View style={{width: '100%'}}>
+                      <View style={{ width: '100%' }}>
                         {selectedImage != '' && (
                           <ProfileAvatarPicker
                             style={styles.profileImage}
@@ -349,13 +332,10 @@ console.log('form data',formData)
                             source={
                               Platform.OS == 'android'
                                 ? {
-                                    uri:
-                                      selectedImage +
-                                      '?time' +
-                                      new Date().getTime(),
-                                    headers: {Pragma: 'no-cache'},
+                                    uri: selectedImage + '?time' + new Date().getTime(),
+                                    headers: { Pragma: 'no-cache' },
                                   }
-                                : {uri: selectedImage}
+                                : { uri: selectedImage }
                             }
                             // editButton={false ? renderEditAvatarButton : null}
                           />
@@ -371,7 +351,8 @@ console.log('form data',formData)
                                 justifyContent: 'center',
                                 backgroundColor: Colors.lightgray,
                               },
-                            ]}>
+                            ]}
+                          >
                             <ProfileIcon size={110} name="user" />
                             {/* {true && renderEditButtonElement()} */}
                           </View>
@@ -385,20 +366,20 @@ console.log('form data',formData)
                               lineHeight: 17,
                               textAlign: 'center',
                             },
-                          ]}>
+                          ]}
+                        >
                           Mandatory. Close-up preferred
                         </Text>
                       </View>
 
-                      {errors?.image && (
-                        <Text style={styles.errorText}>{errors?.image}</Text>
-                      )}
+                      {errors?.image && <Text style={styles.errorText}>{errors?.image}</Text>}
                       <View
                         style={{
                           flexDirection: 'row',
 
                           alignItems: 'center',
-                        }}>
+                        }}
+                      >
                         <Text
                           style={{
                             marginRight: 20,
@@ -406,38 +387,27 @@ console.log('form data',formData)
                             color: Colors.black,
                             fontSize: 14,
                             marginLeft: 10,
-                          }}>
+                          }}
+                        >
                           Use My address
                         </Text>
                         <CheckBox
-                          style={[{flex: 1, marginTop: 13}]}
+                          style={[{ flex: 1, marginTop: 13 }]}
                           checked={checkBox}
-                          onChange={checked => {
+                          onChange={(checked) => {
                             if (checked) {
                               setCheckBox(checked);
-                              setFieldValue(
-                                'country',
-                                currentUser?.country || '',
-                              );
-                              setFieldValue(
-                                'selectedCountry',
-                                currentUser?.country || '',
-                              );
+                              setFieldValue('country', currentUser?.country || '');
+                              setFieldValue('selectedCountry', currentUser?.country || '');
                               setFieldValue('state', currentUser?.state || '');
-                              setFieldValue(
-                                'selectedState',
-                                currentUser?.state || '',
-                              );
+                              setFieldValue('selectedState', currentUser?.state || '');
                               setFieldValue('city', currentUser?.city || '');
-                              setFieldValue(
-                                'selectedCity',
-                                currentUser?.city || '',
-                              );
+                              setFieldValue('selectedCity', currentUser?.city || '');
 
                               getSchoolsByFilter(
                                 currentUser?.country,
                                 currentUser?.state,
-                                currentUser?.city,
+                                currentUser?.city
                               );
                             } else {
                               setSchoolsData([]);
@@ -455,7 +425,8 @@ console.log('form data',formData)
                             // } else {
                             //   Alert.alert(checked);
                             // }
-                          }}></CheckBox>
+                          }}
+                        ></CheckBox>
                       </View>
                       <Input
                         style={styles.textInput}
@@ -486,60 +457,59 @@ console.log('form data',formData)
                       <Autocomplete
                         placeholder="Country*"
                         value={values.country}
-                     data={countriesData}
-                     style={{input:{...styles.textInput,marginTop:2},list:{marginHorizontal:10}}}
+                        data={countriesData}
+                        style={{
+                          input: { ...styles.textInput, marginTop: 2 },
+                          list: { marginHorizontal: 10 },
+                        }}
                         // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                       
-                        onSelect={query => {
-                          const selectedCountry =query;
+
+                        onSelect={(query) => {
+                          const selectedCountry = query;
                           setFieldValue('country', selectedCountry.name);
-                          setFieldValue(
-                            'selectedCountry',
-                            selectedCountry.name,
-                          );
+                          setFieldValue('selectedCountry', selectedCountry.name);
                           setFieldValue('selectedState', '');
                           setFieldValue('state', '');
                           setStates([]);
-                          GetAllStates(
-                            selectedCountry.name.replace(/ /g, ''),
-                          ).then(res => {
+                          GetAllStates(selectedCountry.name.replace(/ /g, '')).then((res) => {
                             setStates(res.data);
                             setStatesData(res.data);
                           });
                           // getSchoolsByFilter(selectedCountry.name);
-                        }}/>
-                       
+                        }}
+                      />
+
                       {errors.country && touched.country && (
                         <Text style={styles.errorText}>{errors.country}</Text>
                       )}
                       <Autocomplete
                         placeholder="State*"
                         value={values.state}
-                       data={statesData}
-                       style={{input:{...styles.textInput,marginTop:2},list:{marginHorizontal:10}}}
+                        data={statesData}
+                        style={{
+                          input: { ...styles.textInput, marginTop: 2 },
+                          list: { marginHorizontal: 10 },
+                        }}
                         disabled={!values.selectedCountry}
                         // label={evaProps => <Text {...evaProps}>State</Text>}
-                       
-                        onSelect={query => {
+
+                        onSelect={(query) => {
                           const selectedState = query;
                           setFieldValue('state', selectedState);
                           setFieldValue('selectedState', selectedState);
                           setFieldValue('selectedCity', '');
                           setFieldValue('city', '');
                           setCities([]);
-                          GetAllCities(
-                            values.selectedCountry,
-                            selectedState,
-                          ).then(res => {
+                          GetAllCities(values.selectedCountry, selectedState).then((res) => {
                             setCities(res.data);
                           });
                           // getSchoolsByFilter(
                           //   values.selectedCountry,
                           //   selectedState
                           // );
-                        }}/>
-                       
-                      
+                        }}
+                      />
+
                       {errors.state && touched.state && (
                         <Text style={styles.errorText}>{errors.state}</Text>
                       )}
@@ -547,40 +517,39 @@ console.log('form data',formData)
                         placeholder="City*"
                         value={values.city}
                         data={cities}
-                       
                         disabled={!values.selectedState}
-                        style={{input:{...styles.textInput,marginTop:2},list:{marginHorizontal:10}}}
+                        style={{
+                          input: { ...styles.textInput, marginTop: 2 },
+                          list: { marginHorizontal: 10 },
+                        }}
                         // label={evaProps => <Text {...evaProps}>City</Text>}
-                        
-                        onSelect={query => {
+
+                        onSelect={(query) => {
                           const selectedCity = query;
                           setFieldValue('city', selectedCity);
                           setFieldValue('selectedCity', selectedCity);
                           getSchoolsByFilter(
                             values.selectedCountry,
                             values.selectedState,
-                            selectedCity,
+                            selectedCity
                           );
-                        }}/>
-                       
-                      <View style={{width: '100%',  zIndex: 2,marginTop:10}}>
+                        }}
+                      />
+
+                      <View style={{ width: '100%', zIndex: 2, marginTop: 10 }}>
                         <CustomTextDropDown
                           disable={schoolsData?.length == 0 ? true : false}
                           placeholder="Select School"
                           value={values.school}
                           onSelect={(index: any) => {
+                            let school = schoolsData.find((item: any) => item?.name == index);
 
-let school=schoolsData.find((item:any)=>item?.name==index)
-                          
-                    
                             setFieldValue('school', school?.name);
                             setFieldValue('selectedSchool', '');
                             if (school?.name != 'Other') {
-                       
                               setFieldValue('schoolName', school?.name);
                               setFieldValue('schoolAddress', school?.address);
                             } else {
-                          
                               setFieldValue('schoolName', 'Other');
                               setFieldValue('schoolAdress', '');
                             }
@@ -634,12 +603,9 @@ let school=schoolsData.find((item:any)=>item?.name==index)
                             onChangeText={handleChange('selectedSchool')}
                             onBlur={handleBlur('selectedSchool')}
                           />
-                          {values.selectedSchool == '' &&
-                            touched.selectedSchool && (
-                              <Text style={styles.errorText}>
-                                {'School is required'}
-                              </Text>
-                            )}
+                          {values.selectedSchool == '' && touched.selectedSchool && (
+                            <Text style={styles.errorText}>{'School is required'}</Text>
+                          )}
                         </>
                       )}
 
@@ -655,14 +621,9 @@ let school=schoolsData.find((item:any)=>item?.name==index)
                       {errors.email && touched.email && (
                         <Text style={styles.errorText}>{errors.email}</Text>
                       )}
-                      <Text
-                        style={[
-                          styles.errorText,
-                          {marginTop: 5, lineHeight: 17},
-                        ]}>
-                        Your child will need to log in with this email and must
-                        be different from parent's email for your child's
-                        account.
+                      <Text style={[styles.errorText, { marginTop: 5, lineHeight: 17 }]}>
+                        Your child will need to log in with this email and must be different from
+                        parent's email for your child's account.
                       </Text>
                       <Input
                         style={styles.textInput}
@@ -690,51 +651,49 @@ let school=schoolsData.find((item:any)=>item?.name==index)
                             paddingBottom: 30,
                             alignSelf: 'center',
                             zIndex: -10,
-                          }}>
-                          <View style={{height: 20}} />
+                          }}
+                        >
+                          <View style={{ height: 20 }} />
                           <LinearGradientButton
-                            disabled={
-                              !(isValid && selectedImage)
-                            }
+                            disabled={!(isValid && selectedImage)}
                             onPress={() => {
                               if (selectedImage != '') {
                                 setFieldValue('addMore', false);
                                 handleSubmit();
                               }
-                            }}>
+                            }}
+                          >
                             I'm done
                           </LinearGradientButton>
-                          <View style={{height: 20}} />
+                          <View style={{ height: 20 }} />
                           <LinearGradientButton
-                            disabled={
-                              !(isValid && selectedImage)
-                            }
+                            disabled={!(isValid && selectedImage)}
                             onPress={() => {
                               if (selectedImage != '') {
                                 setFieldValue('addMore', true);
                                 handleSubmit(true);
                               }
-                            }}>
+                            }}
+                          >
                             Add one more
                           </LinearGradientButton>
-                          <View style={{height: 10}} />
-                          <View style={[{marginBottom: 50}]}>
+                          <View style={{ height: 10 }} />
+                          <View style={[{ marginBottom: 50 }]}>
                             <TouchableOpacity
                               onPress={() =>
                                 dispatch(
                                   ChangeModalState.action({
                                     addStudentModal: false,
-                                  }),
+                                  })
                                 )
-                              }>
+                              }
+                            >
                               <Text style={styles.button}>Cancel</Text>
                             </TouchableOpacity>
                           </View>
                         </View>
                       ) : (
-                        <View style={{marginBottom: 50}}>
-                          {/* <Spinner /> */}
-                        </View>
+                        <View style={{ marginBottom: 50 }}>{/* <Spinner /> */}</View>
                       )}
                     </>
                   </>
@@ -757,9 +716,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '90%',
   },
-  modal: {borderRadius: 10},
-  header: {flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20},
-  body: {flex: 3},
+  modal: { borderRadius: 10 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
+  body: { flex: 3 },
   background: {
     flex: 0,
     color: Colors.white,

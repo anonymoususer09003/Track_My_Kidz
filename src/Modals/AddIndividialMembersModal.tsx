@@ -1,40 +1,41 @@
-import { LinearGradientButton } from "@/Components";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Colors from "@/Theme/Colors";
-import { Input, Layout, Modal, Text } from "@ui-kitten/components";
-import { Formik } from "formik";
-import Papa from "papaparse";
+import { LinearGradientButton } from '@/Components';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Colors from '@/Theme/Colors';
+import { Input, Layout, Modal, Text } from '@ui-kitten/components';
+import { Formik } from 'formik';
+import Papa from 'papaparse';
 import React, { FC } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import DocumentPicker from "react-native-document-picker";
-import { useDispatch, useSelector } from "react-redux";
-import * as yup from "yup";
-
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import DocumentPicker from 'react-native-document-picker';
+import { useDispatch, useSelector } from 'react-redux';
+import * as yup from 'yup';
+import { useStateValue } from '@/Context/state/State';
+import { actions } from '@/Context/state/Reducer';
 type AddIndividialMembersModalProps = {
-  individuals?: any,
-  setIndividuals?: any,
-  hideImport?: any,
-}
+  individuals?: any;
+  setIndividuals?: any;
+  hideImport?: any;
+};
 const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
   individuals,
   setIndividuals,
   hideImport,
 }) => {
   const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.addIndividualMemberModalVisibility
+    (state: { modal: ModalState }) => state.modal.addIndividualMemberModalVisibility
   );
+  const [{ students }, _dispatch]: any = useStateValue();
   const dispatch = useDispatch();
 
   const validationSchema = yup.object().shape({
-    first_name: yup.string().required("First Name is required"),
-    last_name: yup.string().required("Last Name is required"),
+    first_name: yup.string().required('First Name is required'),
+    last_name: yup.string().required('Last Name is required'),
     parent1_email: yup
       .string()
-      .email("Please enter valid email")
-      .required("Parent1 Email is required"),
-    parent2_email: yup.string().email("Please enter valid email"),
+      .email('Please enter valid email')
+      .required('Parent1 Email is required'),
+    parent2_email: yup.string().email('Please enter valid email'),
   });
 
   const handleImport = () => {
@@ -44,24 +45,28 @@ const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
       .then((res: any) => {
         Papa.parse(res[0].fileCopyUri, {
           download: true,
-          delimiter: ",",
+          delimiter: ',',
           complete: function (results: any) {
-            const _data: any = [...individuals];
+            const _data: any = [...students];
             if (results.data && results.data.length > 0) {
               let i = 1;
               results.data.map((item: any) => {
-                const items = item[0].split(";");
+                const items = item[0].split(';');
                 _data.push({
                   id: i,
                   firstName: items[0],
                   lastName: items[1],
                   parent1_email: items[2],
                   parent2_email: items[2],
-                  name: items[0] + " " + items[1],
+                  name: items[0] + ' ' + items[1],
                 });
                 i = i + 1;
               });
-              setIndividuals(_data);
+              _dispatch({
+                type: actions.SET_GROUPS_STUDENTS,
+                payload: _data,
+              });
+              // setIndividuals(_data);
             }
           },
           error: function (error: any) {},
@@ -81,9 +86,7 @@ const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
       visible={isVisible}
       style={styles.modal}
       onBackdropPress={() => {
-        dispatch(
-          ChangeModalState.action({ addIndividualMemberModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ addIndividualMemberModalVisibility: false }));
       }}
     >
       <View style={{ flex: 1 }}>
@@ -96,28 +99,30 @@ const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
             borderRadius: 5,
           }}
         >
-          <Text
-            style={{ textAlign: "center", marginTop: 13, fontWeight: "bold" }}
-          >
-            Add Students
+          <Text style={{ textAlign: 'center', marginTop: 13, fontWeight: 'bold' }}>
+            Add Student
           </Text>
           <Formik
             validationSchema={validationSchema}
             initialValues={{
-              first_name: "",
-              last_name: "",
-              parent1_email: "",
-              parent2_email: "",
+              first_name: '',
+              last_name: '',
+              parent1_email: '',
+              parent2_email: '',
             }}
             onSubmit={(values, { resetForm }) => {
               const item = {
-                name: values.first_name + " " + values.last_name,
+                name: values.first_name + ' ' + values.last_name,
                 parent1_email: values.parent1_email,
                 parent2_email: values.parent2_email,
               };
-              const data = [...individuals];
+              const data = [...students];
               data.push(item);
-              setIndividuals(data);
+              _dispatch({
+                type: actions.SET_GROUPS_STUDENTS,
+                payload: data,
+              });
+              // setIndividuals(data);
               resetForm();
             }}
           >
@@ -138,19 +143,19 @@ const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
                     value={values.first_name}
                     style={styles.textInput}
                     placeholder="First Name"
-                    onChangeText={handleChange("first_name")}
+                    onChangeText={handleChange('first_name')}
                   />
                   <Input
                     style={styles.textInput}
                     value={values.last_name}
                     placeholder="Last Name"
-                    onChangeText={handleChange("last_name")}
+                    onChangeText={handleChange('last_name')}
                   />
                   <Input
                     value={values.parent1_email}
                     style={styles.textInput}
                     placeholder="Parent1 Email"
-                    onChangeText={handleChange("parent1_email")}
+                    onChangeText={handleChange('parent1_email')}
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
@@ -158,7 +163,7 @@ const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
                     value={values.parent2_email}
                     style={styles.textInput}
                     placeholder="Parent2 Email (Optional)"
-                    onChangeText={handleChange("parent2_email")}
+                    onChangeText={handleChange('parent2_email')}
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
@@ -166,22 +171,26 @@ const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
                 <View
                   style={{
                     marginTop: 20,
-                    width: "100%",
-                    alignItems: "center",
+                    width: '100%',
+                    alignItems: 'center',
                     paddingLeft: 40,
                   }}
                 >
                   <View
                     style={{
                       height: 50,
-                      width: "100%",
+                      width: '100%',
                       marginBottom: 10,
                     }}
                   >
                     <LinearGradientButton
                       size="medium"
                       onPress={handleSubmit}
-                      disabled={isValid&&values.first_name&&values.last_name&&values.parent1_email ? false : true }
+                      disabled={
+                        isValid && values.first_name && values.last_name && values.parent1_email
+                          ? false
+                          : true
+                      }
                     >
                       Add one more
                     </LinearGradientButton>
@@ -189,7 +198,7 @@ const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
                   <View
                     style={{
                       height: 50,
-                      width: "100%",
+                      width: '100%',
                       marginBottom: 10,
                     }}
                   >
@@ -199,7 +208,11 @@ const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
                         handleSubmit();
                         hidemodal();
                       }}
-                      disabled={isValid&&values.first_name&&values.last_name&&values.parent1_email ? false : true }
+                      disabled={
+                        isValid && values.first_name && values.last_name && values.parent1_email
+                          ? false
+                          : true
+                      }
                     >
                       I'm done
                     </LinearGradientButton>
@@ -207,7 +220,7 @@ const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
                   <View
                     style={{
                       height: 50,
-                      width: "100%",
+                      width: '100%',
                       marginBottom: 10,
                     }}
                   >
@@ -223,10 +236,7 @@ const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
                   </View>
                 </View>
                 {false && (
-                  <TouchableOpacity
-                    style={styles.bottomButton}
-                    onPress={handleImport}
-                  >
+                  <TouchableOpacity style={styles.bottomButton} onPress={handleImport}>
                     <Text style={styles.button}>Import from CSV</Text>
                   </TouchableOpacity>
                 )}
@@ -242,8 +252,8 @@ export default AddIndividialMembersModal;
 
 const styles = StyleSheet.create({
   modal: {
-    width: "90%",
-    height: "63%",
+    width: '90%',
+    height: '63%',
     backgroundColor: Colors.white,
     elevation: 5,
     shadowColor: Colors.primaryGray,
@@ -256,16 +266,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
   },
   bottomButton: {
-    width: "60%",
+    width: '60%',
     borderRadius: 10,
     paddingBottom: 17,
     paddingVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 30,
     backgroundColor: Colors.primary,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   background: {
     flex: 0,
@@ -278,29 +288,29 @@ const styles = StyleSheet.create({
     marginTop: 35,
   },
   container: {
-    width: "100%",
+    width: '100%',
     marginTop: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   heading: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginTop: 10,
   },
   item: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "30%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '30%',
   },
   modalButton: {
-    width: "95%",
+    width: '95%',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -308,9 +318,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   mainAsset: {
-    alignItems: "center",
+    alignItems: 'center',
     height: 300,
-    width: "100%",
+    width: '100%',
     flex: 3,
   },
   mainContent: {
@@ -319,44 +329,44 @@ const styles = StyleSheet.create({
   textContent: {
     fontSize: 16,
     padding: 10,
-    width: "100%",
+    width: '100%',
     borderBottomColor: Colors.lightgray,
     borderBottomWidth: 1,
   },
   extraImages: {
     flex: 1,
-    flexDirection: "row",
-    width: "100%",
+    flexDirection: 'row',
+    width: '100%',
     height: 100,
   },
   centerItems: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
   },
   formView: {
     flex: 9,
   },
   bottomView: {
-    width: "100%",
-    flexDirection: "row",
-    position: "absolute",
-    justifyContent: "center",
+    width: '100%',
+    flexDirection: 'row',
+    position: 'absolute',
+    justifyContent: 'center',
     backgroundColor: Colors.transparent,
     bottom: 0,
     height: 50,
   },
   linearBottom: {
-    width: "100%",
+    width: '100%',
 
     height: 50,
   },
   createPostButton: {
     margin: 3,
-    width: "50%",
+    width: '50%',
 
     height: 50,
     right: 0,
@@ -366,20 +376,20 @@ const styles = StyleSheet.create({
   },
   ghostButton: {
     margin: 8,
-    width: "100%",
-    alignSelf: "center",
+    width: '100%',
+    alignSelf: 'center',
   },
   buttonSettings: {
     marginTop: 20,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   formContainer: {
     flex: 1,
     marginVertical: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   button: {
     paddingTop: 5,
@@ -388,37 +398,37 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   backgroundButton: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 16,
     marginLeft: 10,
     marginTop: 10,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.gray,
-    textAlign: "center",
+    textAlign: 'center',
   },
   selectSettings: {
     marginTop: 18,
   },
   textInput: {
     marginTop: 10,
-    alignSelf: "center",
-    width: "95%",
-    marginLeft: "5%",
+    alignSelf: 'center',
+    width: '95%',
+    marginLeft: '5%',
     borderRadius: 8,
     elevation: 2,
   },
