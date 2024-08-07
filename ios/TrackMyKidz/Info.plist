@@ -47,7 +47,8 @@
 	<string>$(PRODUCT_NAME) requires access to camera for uploading Profile Picture of users.</string>
 		<key>NSMotionUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs access to your activity data to for accurate location tracking.</string>
-
+<key>NSMicrophoneUsageDescription</key>
+<string>$(PRODUCT_NAME) needs access to your microphone during taking pictures for your profile picture or for using qr scanner.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>$(PRODUCT_NAME) requires access to photo library for uploading photos for user profile picture.</string>
 	<key>UIAppFonts</key>

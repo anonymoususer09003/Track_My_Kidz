@@ -20,15 +20,15 @@ import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavig
 import { StackNavigationProp } from '@react-navigation/stack';
 
 type StudentSettingsScreenProps = {
-  navigation: StackNavigationProp<MainStackNavigatorParamsList, 'StudentSettings'>
-}
+  navigation: StackNavigationProp<MainStackNavigatorParamsList, 'StudentSettings'>;
+};
 const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) => {
   const dispatch = useDispatch();
   const { Layout } = useTheme();
   const [openDeactivateModal, setopenDeactivateModal] = useState<boolean>(false);
   // const [canAdvertise, setcanAdvertise] = useState(false);
   const user: any = useSelector((state: { user: UserState }) => state.user.item);
-  console.log('user', user);
+
   // const [twoFAActive, setTwoFAActive] = useState(user?.isTwoFA);
   const [isSending, setisSending] = useState<boolean>(false);
   const [isSent, setisSent] = useState<boolean>(false);
@@ -66,7 +66,7 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
         },
       ],
     })
-      .then(res => {
+      .then((res) => {
         Toast.show({
           type: 'success',
           position: 'top',
@@ -76,16 +76,12 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
           autoHide: true,
           topOffset: 30,
           bottomOffset: 40,
-          onShow: () => {
-          },
-          onHide: () => {
-          },
-          onPress: () => {
-          },
+          onShow: () => {},
+          onHide: () => {},
+          onPress: () => {},
         });
-        console.log(res);
       })
-      .catch(err => {
+      .catch((err) => {
         err && console.log(err);
       });
   };
@@ -101,34 +97,28 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
       <Modal
         visible={openDeactivateModal}
         backdropStyle={styles.backdrop}
-        onBackdropPress={() => setopenDeactivateModal(false)}>
-        <Card
-          disabled={true}
-          style={{ minHeight: 100, width: 300, borderRadius: 10 }}>
+        onBackdropPress={() => setopenDeactivateModal(false)}
+      >
+        <Card disabled={true} style={{ minHeight: 100, width: 300, borderRadius: 10 }}>
           {isSending ? (
             isSent ? (
               <View style={styles.sppinerContainer}>
-                <Text style={styles.sent}>
-                  Your account has been successfully deactivated.
-                </Text>
+                <Text style={styles.sent}>Your account has been successfully deactivated.</Text>
               </View>
             ) : (
-              <View style={styles.sppinerContainer}>
-                {/* <Spinner status="primary" /> */}
-              </View>
+              <View style={styles.sppinerContainer}>{/* <Spinner status="primary" /> */}</View>
             )
           ) : (
             <>
-              <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
-                Account Deactivation
-              </Text>
+              <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Account Deactivation</Text>
               <Text
                 style={{
                   fontSize: 15,
                   color: 'grey',
                   marginTop: 10,
                   marginBottom: 20,
-                }}>
+                }}
+              >
                 We hate to see you leave. Your account will be deactivated.
               </Text>
 
@@ -137,9 +127,9 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
                   flexDirection: 'row',
                   justifyContent: 'flex-end',
                   marginTop: 15,
-                }}>
-                <TouchableOpacity onPress={() => {
-                }}>
+                }}
+              >
+                <TouchableOpacity onPress={() => {}}>
                   <Text style={styles.modalButton}>OKAY</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setopenDeactivateModal(false)}>
@@ -155,19 +145,11 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
           <TouchableOpacity
             onPress={() => navigation.navigate('StudentPersonalProfile')}
             style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-                styles.firstItem,
-              ],
-            ]}>
+              [Layout.row, Layout.justifyContentBetween, Layout.alignItemsCenter, styles.firstItem],
+            ]}
+          >
             <Text style={{ fontSize: 16 }}>Profile</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
+            <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate('ChangePassword')}
@@ -178,35 +160,26 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
                 Layout.alignItemsCenter,
                 styles.otherItems,
               ],
-            ]}>
+            ]}
+          >
             <Text style={{ fontSize: 16 }}>Reset Password</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
+            <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
           </TouchableOpacity>
 
-
-
           <TouchableOpacity
-              onPress={() => navigation.navigate('Notifications')}
-              style={[
-                [
-                  Layout.row,
-                  Layout.justifyContentBetween,
-                  Layout.alignItemsCenter,
-                  styles.otherItems,
-                ],
-              ]}
-            >
-              <Text style={{ fontSize: 16 }}>Notifications</Text>
-              <Icon
-                style={styles.icon}
-                fill={Colors.gray}
-                name="chevron-right-outline"
-              />
-            </TouchableOpacity>
+            onPress={() => navigation.navigate('Notifications')}
+            style={[
+              [
+                Layout.row,
+                Layout.justifyContentBetween,
+                Layout.alignItemsCenter,
+                styles.otherItems,
+              ],
+            ]}
+          >
+            <Text style={{ fontSize: 16 }}>Notifications</Text>
+            <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
+          </TouchableOpacity>
           {/* <View style={[[Layout.row, Layout.justifyContentBetween, Layout.alignItemsCenter, { marginTop: 15 }]]}>
                         <Text style={{ fontSize: 16 }}>2 Factor Authentication</Text>
                         <Switch
@@ -243,13 +216,10 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
                 Layout.alignItemsCenter,
                 styles.otherItems,
               ],
-            ]}>
+            ]}
+          >
             <Text style={{ fontSize: 16 }}>Report a problem</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
+            <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate('ContactUs')}
@@ -260,13 +230,10 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
                 Layout.alignItemsCenter,
                 styles.otherItems,
               ],
-            ]}>
+            ]}
+          >
             <Text style={{ fontSize: 16 }}>Contact Us</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
+            <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={onShare}
@@ -277,30 +244,19 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
                 Layout.alignItemsCenter,
                 styles.otherItems,
               ],
-            ]}>
+            ]}
+          >
             <Text style={{ fontSize: 16 }}>Share with Friends</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
+            <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate('AppList')}
             style={[
-              [
-                Layout.row,
-                Layout.justifyContentBetween,
-                Layout.alignItemsCenter,
-                styles.lastItem,
-              ],
-            ]}>
+              [Layout.row, Layout.justifyContentBetween, Layout.alignItemsCenter, styles.lastItem],
+            ]}
+          >
             <Text style={{ fontSize: 16 }}>Our Other Apps</Text>
-            <Icon
-              style={styles.icon}
-              fill={Colors.gray}
-              name="chevron-right-outline"
-            />
+            <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
           </TouchableOpacity>
           <View style={styles.buttonsContainer}>
             <View style={{ marginVertical: 5 }}>
@@ -311,13 +267,14 @@ const StudentSettingsScreen: FC<StudentSettingsScreenProps> = ({ navigation }) =
                       // todo redux ts warning not a priority
                       // @ts-ignore
                       userType: '',
-                    }),
+                    })
                   );
                   await BackgroundService.stop();
                   // todo: solve this not a priority
                   // @ts-ignore
                   dispatch(LogoutStore.action());
-                }}>
+                }}
+              >
                 Log Out
               </LinearGradientButton>
               <View style={{ marginVertical: 5 }}>

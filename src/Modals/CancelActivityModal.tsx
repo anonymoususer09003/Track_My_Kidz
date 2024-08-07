@@ -41,7 +41,7 @@ const CancelActivityModal = ({
   //     (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
   //   );
   const dispatch = useDispatch();
-  const [{ item: activity }, _dispatch] : any= useStateValue();
+  const [{ item: activity }, _dispatch]: any = useStateValue();
   // @ts-ignore
   return (
     <Modal
@@ -55,9 +55,9 @@ const CancelActivityModal = ({
       <Card style={styles.modal} disabled={true}>
         <View
           style={{
-            flexDirection: "column",
+            flexDirection: 'column',
 
-            height: "100%",
+            height: '100%',
           }}
         >
           <TouchableOpacity
@@ -66,28 +66,26 @@ const CancelActivityModal = ({
               {
                 marginTop: 10,
 
-                justifyContent: "center",
+                justifyContent: 'center',
                 paddingLeft: 0,
               },
             ]}
             onPress={async () => {
               const userId = await loadUserId();
-              if (!userId) return
+              if (!userId) return;
               GetInstructor(userId)
                 .then((res) => {
-                  console.log("res", res);
                   let body = {
                     activityId: item?.activityId,
                     instructorId: res?.instructorId,
                   };
-                  console.log("body", body);
-                  if (item.status != "cancel") {
+
+                  if (item.status != 'cancel') {
                     CancelOngoingActivity(body)
                       .then((res) => {
-                        console.log(res);
                         Toast.show({
-                          type: "success",
-                          text2: "Activity has been cancelled successfully ",
+                          type: 'success',
+                          text2: 'Activity has been cancelled successfully ',
                         });
                         getActivities();
                         hide();
@@ -96,10 +94,9 @@ const CancelActivityModal = ({
                   } else {
                     DeleteActivity(item.activityId)
                       .then((res) => {
-                        console.log(res);
                         Toast.show({
-                          type: "success",
-                          text2: "Activity has been deleted successfully ",
+                          type: 'success',
+                          text2: 'Activity has been deleted successfully ',
                         });
                         getActivities();
                         hide();
@@ -108,7 +105,7 @@ const CancelActivityModal = ({
                   }
                 })
                 .catch((err) => {
-                  console.log("err", err);
+                  console.log('err', err);
                 });
               //   console.log("logs", item);
               //   CancelOngoingActivity(item?.activityId)
@@ -124,7 +121,7 @@ const CancelActivityModal = ({
           >
             {/* <Entypo size={25} color={Colors.primary} name="clock" /> */}
             <Text style={styles.textStyle}>
-              {item.status == "cancel" ? "Delete Activity" : "Cancel Activity"}
+              {item.status == 'cancel' ? 'Delete Activity' : 'Cancel Activity'}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -133,13 +130,13 @@ const CancelActivityModal = ({
               {
                 marginTop: 10,
                 // backgroundColor: Colors.primary,
-                justifyContent: "center",
+                justifyContent: 'center',
                 paddingLeft: 0,
               },
             ]}
             onPress={() => {
               hide();
-              navigation.navigate("CreateActivity", {
+              navigation.navigate('CreateActivity', {
                 isEdit: true,
               });
               _dispatch({
@@ -165,7 +162,7 @@ const CancelActivityModal = ({
               {
                 marginTop: 10,
                 backgroundColor: Colors.primary,
-                justifyContent: "center",
+                justifyContent: 'center',
                 paddingLeft: 0,
               },
             ]}
@@ -190,16 +187,16 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   modal: { borderRadius: 10 },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     color: Colors.white,
     zIndex: -1,
   },
@@ -208,53 +205,53 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   bottom: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 45,
     marginTop: 10,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   buttonText: {
     flex: 1,
     borderRadius: 25,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     margin: 2,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
     marginTop: 10,
   },
   textStyle: {
-    width: "75%",
+    width: '75%',
     // backgroundColor: "red",
-    textAlign: "center",
+    textAlign: 'center',
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   buttonStyle: {
     padding: 5,
-    alignItems: "center",
+    alignItems: 'center',
     //   justifyContent: "center",
     //   padding: 5,
-    width: "100%",
+    width: '100%',
     height: 50,
     backgroundColor: Colors.tintgray,
     borderRadius: 4,
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingLeft: 20,
     marginBottom: 10,
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

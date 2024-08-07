@@ -1,12 +1,4 @@
-import {
-  Card,
-  IndexPath,
-  Modal,
-  Input,
-  Text,
-  Select,
-  SelectItem,
-} from '@ui-kitten/components';
+import { Card, IndexPath, Modal, Input, Text, Select, SelectItem } from '@ui-kitten/components';
 import api from '@/Services';
 import { useDispatch, useSelector } from 'react-redux';
 import { ModalState } from '@/Store/Modal';
@@ -23,18 +15,17 @@ import { navigate } from '@/Navigators/Functions';
 import { GetStudent } from '@/Services/Student';
 import QRCode from 'react-native-qrcode-svg';
 
-const StudentActivationCodeModal = (
-  {
-    student,
-    setStudent,
-  }: {
-    student: any;
-    setStudent: (item?: any) => void;
-  }) => {
+const StudentActivationCodeModal = ({
+  student,
+  setStudent,
+}: {
+  student: any;
+  setStudent: (item?: any) => void;
+}) => {
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.studentActivationCodeModal,
+    (state: { modal: ModalState }) => state.modal.studentActivationCodeModal
   );
-  console.log('student', student);
+
   const [activationCode, setActivationCode] = useState('');
   const dispatch = useDispatch();
   const getActivationCode = async () => {
@@ -66,9 +57,7 @@ const StudentActivationCodeModal = (
       visible={isVisible}
       backdropStyle={styles.backdrop}
       onBackdropPress={() => {
-        dispatch(
-          ChangeModalState.action({ studentActivationCodeModal: false }),
-        );
+        dispatch(ChangeModalState.action({ studentActivationCodeModal: false }));
         setStudent(null);
         setActivationCode('');
       }}
@@ -89,8 +78,12 @@ const StudentActivationCodeModal = (
           </View>
         </View>
         <View style={{ marginVertical: 30 }}>
-          <Text style={{ fontSize: 15, textAlign: 'center' }}>
+          <Text style={{ fontSize: 22, textAlign: 'center', fontWeight: 'bold' }}>
             {activationCode}
+          </Text>
+
+          <Text style={{ color: Colors.orangeDark, textAlign: 'center' }}>
+            {'(Valid for 24 Hours)'}
           </Text>
           <View style={{ marginVertical: 15, alignItems: 'center' }}>
             <QRCode
@@ -118,9 +111,7 @@ const StudentActivationCodeModal = (
             size="medium"
             status="control"
             onPress={() => {
-              dispatch(
-                ChangeModalState.action({ studentActivationCodeModal: false }),
-              );
+              dispatch(ChangeModalState.action({ studentActivationCodeModal: false }));
               setStudent(null);
               setActivationCode('');
             }}

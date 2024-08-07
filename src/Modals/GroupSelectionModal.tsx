@@ -13,18 +13,15 @@ import { GROUPS } from '@/Constants';
 const _groups = GROUPS;
 
 type GroupSelectionModalProps = {
-  individuals?: any,
-  setIndividuals?: any,
-  getGroupDetail?: any,
-}
-const GroupSelectionModal = ({
-                               getGroupDetail,
-                             }: GroupSelectionModalProps) => {
+  individuals?: any;
+  setIndividuals?: any;
+  getGroupDetail?: any;
+};
+const GroupSelectionModal = ({ getGroupDetail }: GroupSelectionModalProps) => {
   const [groups, setGroups] = useState<any[]>([]);
 
   // const { Layout } = useTheme();
-  const [selectedAmountIndex, setSelectedAmountIndex] =
-    useState<IndexPath | null>(null);
+  const [selectedAmountIndex, setSelectedAmountIndex] = useState<IndexPath | null>(null);
   // const [cardData, setCardData] = useState({});
   const [page, pageNumber] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -44,7 +41,7 @@ const GroupSelectionModal = ({
   //   },
   // ];
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.groupSelectionModalVisibility,
+    (state: { modal: ModalState }) => state.modal.groupSelectionModalVisibility
   );
   const dispatch = useDispatch();
 
@@ -95,9 +92,7 @@ const GroupSelectionModal = ({
       visible={isVisible}
       backdropStyle={styles.backdrop}
       onBackdropPress={() => {
-        dispatch(
-          ChangeModalState.action({ groupSelectionModalVisibility: false }),
-        );
+        dispatch(ChangeModalState.action({ groupSelectionModalVisibility: false }));
       }}
     >
       <Card style={styles.modal} disabled={true}>
@@ -136,7 +131,6 @@ const GroupSelectionModal = ({
             }}
             onEndReached={async () => {
               if (totalRecords > groups.length) {
-                console.log('logs');
                 //   const userId = await loadUserId();
                 getGroups(true);
               }
@@ -144,9 +138,7 @@ const GroupSelectionModal = ({
             refreshing={false}
             onRefresh={() => null}
           />
-          {refreshing && (
-            <ActivityIndicator size="large" color={Colors.primary} />
-          )}
+          {refreshing && <ActivityIndicator size="large" color={Colors.primary} />}
           {/* {groups.map((group, index) => (
             <TouchableOpacity
               style={{

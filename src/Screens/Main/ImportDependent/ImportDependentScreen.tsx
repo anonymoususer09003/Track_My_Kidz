@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { StyleSheet, View } from 'react-native';
-import { Text } from '@ui-kitten/components';
+import { Input, Text } from '@ui-kitten/components';
 import { useDispatch, useSelector } from 'react-redux';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaskInput from 'react-native-mask-input';
@@ -13,7 +13,11 @@ import { UserState } from '@/Store/User';
 import Colors from '@/Theme/Colors';
 import BackgroundLayout from '@/Components/BackgroundLayout';
 import FetchOne from '@/Services/Parent/GetParentChildrens';
-import { GetAuthStudentByActivationCode, ImportAllChildren, ImportSingleChildren } from '@/Services/Student';
+import {
+  GetAuthStudentByActivationCode,
+  ImportAllChildren,
+  ImportSingleChildren,
+} from '@/Services/Student';
 import { AppHeader, LinearGradientButton } from '@/Components';
 import { ImportDependentsModal, QRCodeModal } from '@/Modals';
 import { ReferenceCodeRegex, ReferenceCodeStyle } from '@/Theme/Variables';
@@ -24,7 +28,9 @@ const ImportDependent = () => {
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const user = useSelector((state: { user: UserState }) => state.user.item);
-  console.log('user', user);
+
+  const [parentEmail, setParentEmail] = useState<string>('');
+  const [partnersCode, setPartnerCode] = useState<string>('');
   // const [searchParam, setSearchParam] = useState("");
   const [showQR, setShowQR] = useState<boolean>(false);
   const [referenceCode, setReferenceCode] = useState<string>('');
@@ -35,7 +41,7 @@ const ImportDependent = () => {
     dispatch(
       ChangeModalState.action({
         qrcodeModalVisibility: show,
-      }),
+      })
     );
   };
   const onScan = (e: any) => {
@@ -61,7 +67,7 @@ const ImportDependent = () => {
     dispatch(
       ChangeModalState.action({
         qrcodeModalVisibility: false,
-      }),
+      })
     );
     FetchOne(referenceCode)
       .then((res) => {
@@ -73,7 +79,7 @@ const ImportDependent = () => {
         dispatch(
           ChangeModalState.action({
             importDependentsModalVisibility: true,
-          }),
+          })
         );
       })
       .catch((err) => {
@@ -90,7 +96,7 @@ const ImportDependent = () => {
         dispatch(
           ChangeModalState.action({
             importDependentsModalVisibility: true,
-          }),
+          })
         );
       })
       .catch((err) => {
@@ -108,10 +114,10 @@ const ImportDependent = () => {
     dispatch(
       ChangeModalState.action({
         importDependentsModalVisibility: false,
-      }),
+      })
     );
 
-    ImportSingleChildren(referenceCode)
+    ImportSingleChildren({ parentEmail }, referenceCode)
       .then((res) => {
         Toast.show({
           type: 'success',
@@ -121,6 +127,7 @@ const ImportDependent = () => {
         setReferenceCode('');
         setChildren([]);
         goBackToHome();
+        setParentEmail('');
         //  setSingleChild(false)
         console.log('response', res);
       })
@@ -135,15 +142,15 @@ const ImportDependent = () => {
   };
   const importChildrens = () => {
     let body = {
-      referenceCode: referenceCode,
+      parentEmail: parentEmail,
       // email: user?.email,
     };
     dispatch(
       ChangeModalState.action({
         importDependentsModalVisibility: false,
-      }),
+      })
     );
-    ImportAllChildren(body)
+    ImportAllChildren(body, partnersCode)
       .then((res) => {
         setReferenceCode('');
         setChildren([]);
@@ -167,27 +174,25 @@ const ImportDependent = () => {
       });
   };
   const removeDependent = async (child: any) => {
-    let filterArray = children.filter(
-      (item) => item?.studentId != child.studentId,
-    );
+    let filterArray = children.filter((item) => item?.studentId != child.studentId);
     setChildren(filterArray);
   };
 
-  useEffect(() => {
-    if (referenceCode.length == 36) {
-      fetchChildrens(referenceCode);
-    }
-    if (!isFocused) {
-      console.log('log');
-      setReferenceCode('');
-      setChildren([]);
-      dispatch(
-        ChangeModalState.action({
-          importDependentsModalVisibility: false,
-        }),
-      );
-    }
-  }, [referenceCode, isFocused]);
+  // useEffect(() => {
+  //   if (referenceCode.length == 6) {
+  //     fetchChildrens(referenceCode);
+  //   }
+  //   if (!isFocused) {
+  //     console.log('log');
+  //     setReferenceCode('');
+  //     setChildren([]);
+  //     dispatch(
+  //       ChangeModalState.action({
+  //         importDependentsModalVisibility: false,
+  //       })
+  //     );
+  //   }
+  // }, [referenceCode, isFocused]);
 
   return (
     <BackgroundLayout title="Import Dependent">
@@ -209,39 +214,57 @@ const ImportDependent = () => {
           singleChild ? importSingleChildren() : importChildrens();
         }}
       />
-      <AppHeader
-        isBack={false}
-        hideCalendar={true}
-        hideCenterIcon={true}
-        isStack={false}
-      />
+      <AppHeader isBack={false} hideCalendar={true} hideCenterIcon={true} isStack={false} />
       <View style={styles.layout}>
         {/* <SearchBar
           searchText={searchParam}
           onChangeText={(value) => setSearchParam(value)}
         /> */}
         <View style={{ flex: 1, padding: 20 }}>
+          <Text style={{ fontSize: 14, fontWeight: 'bold' }}>Partner's Email</Text>
+          <Input
+            placeholder="Enter Partner's Email"
+            style={{ marginBottom: 10 }}
+            onChangeText={(value) => setParentEmail(value)}
+            value={parentEmail}
+          />
+
           <View style={{ marginVertical: 20 }}>
-            <Text style={{ fontWeight: '600', fontSize: 20 }}>
-              To add all dependents at once:
-            </Text>
+            <Text style={{ fontWeight: '600', fontSize: 20 }}>To add all dependents at once:</Text>
+
             <Text style={{ fontSize: 16, marginTop: 10 }}>
-              Enter your partner's reference code from your partner's phone or
-              scan qr code.
+              Enter your partner's reference code from your partner's phone or scan qr code.
             </Text>
+            <View style={{ marginTop: 15 }}>
+              {/* <Text style={{ fontSize: 14, fontWeight: 'bold' }}>Enter Reference Code</Text> */}
+
+              <Input
+                disabled={referenceCode ? true : false}
+                placeholder="Enter partner's 6 digit reference code"
+                onChangeText={(value) => setPartnerCode(value)}
+                value={partnersCode}
+              />
+            </View>
+
             <Text style={{ fontWeight: '600', fontSize: 20, marginTop: 20 }}>
               To add dependents individually:
             </Text>
+
             <Text style={{ fontSize: 16, marginTop: 10 }}>
-              Enter reference code of dependent from your partner's phone or
-              scan qr code.
+              Enter reference code of dependent from your partner's phone or scan qr code.
             </Text>
           </View>
-          <View style={{ marginTop: 20 }}>
-            <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-              Enter Reference Code
-            </Text>
-            <MaskInput
+
+          <View style={{ marginTop: 15 }}>
+            {/* <Text style={{ fontSize: 14, fontWeight: 'bold' }}>Enter Reference Code</Text> */}
+
+            <Input
+              disabled={partnersCode ? true : false}
+              placeholder="Enter child's 6 digit reference code"
+              onChangeText={(value) => setReferenceCode(value)}
+              value={referenceCode}
+            />
+            {/* <MaskInput
               value={referenceCode}
               placeholderTextColor={Colors.textInputPlaceholderColor}
               style={ReferenceCodeStyle}
@@ -249,9 +272,9 @@ const ImportDependent = () => {
                 setReferenceCode(masked); // you can use the unmasked value as well
               }}
               mask={ReferenceCodeRegex}
-            />
+            /> */}
           </View>
-          <View
+          {/* <View
             style={{
               marginVertical: 10,
               width: '100%',
@@ -259,23 +282,21 @@ const ImportDependent = () => {
               justifyContent: 'flex-end',
             }}
           >
-            <Entypo
-              name="camera"
-              size={30}
-              color={Colors.primary}
-              onPress={handleQR}
-            />
-          </View>
+            <Entypo name="camera" size={30} color={Colors.primary} onPress={handleQR} />
+          </View> */}
         </View>
         <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
           <LinearGradientButton
             size="medium"
-            onPress={() =>
-              dispatch(
-                ChangeModalState.action({
-                  importDependentsModalVisibility: true,
-                }),
-              )
+            onPress={
+              () => {
+                partnersCode ? importChildrens() : importSingleChildren();
+              }
+              // dispatch(
+              //   ChangeModalState.action({
+              //     importDependentsModalVisibility: true,
+              //   })
+              // )
             }
             style={{ borderRadius: 20 }}
           >

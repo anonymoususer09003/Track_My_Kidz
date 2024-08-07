@@ -1,20 +1,18 @@
 const playbackService = async () => {
-  TrackPlayer.addEventListener("playback-track-changed", (event) => {
+  TrackPlayer.addEventListener('playback-track-changed', (event) => {
     // Handle playback track change event
-    console.log("Playback track changed:", event);
   });
 
-  TrackPlayer.addEventListener("playback-state", (event) => {
+  TrackPlayer.addEventListener('playback-state', (event) => {
     // Handle playback state change event
-    console.log("Playback state changed:", event);
   });
 
-  TrackPlayer.addEventListener("remote-play", () => {
+  TrackPlayer.addEventListener('remote-play', () => {
     // Handle remote play event
     TrackPlayer.play();
   });
 
-  TrackPlayer.addEventListener("remote-pause", () => {
+  TrackPlayer.addEventListener('remote-pause', () => {
     // Handle remote pause event
     TrackPlayer.pause();
   });

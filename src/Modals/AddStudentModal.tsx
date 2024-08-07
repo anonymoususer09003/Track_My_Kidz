@@ -44,7 +44,6 @@ const filterCities = (item: string, query: string) => {
   return item?.toLowerCase().includes(query.toLowerCase());
 };
 const filterSchools = (item: string, query: string) => {
-  console.log(item, query);
   return item?.toLowerCase().includes(query.toLowerCase());
 };
 
@@ -116,7 +115,6 @@ const AddStudentModal = () => {
     };
     GetSchoolByFilters(query)
       .then((res) => {
-        console.log('res', res);
         const _data = {
           schoolId: 0,
           name: 'Other',
@@ -148,7 +146,6 @@ const AddStudentModal = () => {
   const getSchools = () => {
     GetAllSchools(0, 30)
       .then((res) => {
-        console.log('result', res);
         setSchools(res.result);
         setSchoolsData(res.result);
       })
@@ -243,7 +240,6 @@ const AddStudentModal = () => {
                   image: selectedImage,
                 }}
                 onSubmit={async (values, { resetForm }) => {
-                  console.log('values', values);
                   setLoading(true);
                   const userId = await loadUserId();
                   let formData = new FormData();
@@ -274,10 +270,9 @@ const AddStudentModal = () => {
                   formData.append('state', values.state);
                   formData.append('city', values.city);
                   formData.append('parentemail1', currentUser.email);
-                  console.log('form data', formData);
+
                   CreateStudent(formData)
                     .then((response) => {
-                      console.log('response', response);
                       Toast.show({
                         type: 'success',
                         position: 'top',

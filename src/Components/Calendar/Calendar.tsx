@@ -1,19 +1,12 @@
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserTypeState } from "@/Store/UserType";
-import Colors from "@/Theme/Colors";
-import { useIsFocused, useRoute } from "@react-navigation/native";
-import { Select, SelectItem } from "@ui-kitten/components";
-import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  FlatList,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserTypeState } from '@/Store/UserType';
+import Colors from '@/Theme/Colors';
+import { useIsFocused, useRoute } from '@react-navigation/native';
+import { Select, SelectItem } from '@ui-kitten/components';
+import moment from 'moment';
+import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import { MONTHS } from '@/Constants';
 
 export interface CalendarProps {
@@ -24,7 +17,7 @@ export interface CalendarProps {
   style?: any;
 }
 
-const months = MONTHS
+const months = MONTHS;
 
 const Calendar = ({
   selectedMonth,
@@ -33,33 +26,25 @@ const Calendar = ({
   setSelectedDay,
   style,
 }: CalendarProps) => {
-
-  const user_type = useSelector(
-    (state: { userType: UserTypeState }) => state.userType.userType
-  );
+  const user_type = useSelector((state: { userType: UserTypeState }) => state.userType.userType);
   const getDays = (month: string) => {
     const year = moment(new Date()).year();
-    console.log("year", month);
+
     if (
-      month === "Jan" ||
-      month === "Mar" ||
-      month === "May" ||
-      month === "Jul" ||
-      month === "Aug" ||
-      month === "Oct" ||
-      month === "Dec"
+      month === 'Jan' ||
+      month === 'Mar' ||
+      month === 'May' ||
+      month === 'Jul' ||
+      month === 'Aug' ||
+      month === 'Oct' ||
+      month === 'Dec'
     ) {
       const data = [];
       for (let i = 0; i < 31; i++) {
         data.push(i + 1);
       }
       return data;
-    } else if (
-      month === "Apr" ||
-      month === "Jun" ||
-      month === "Sept" ||
-      month === "Nov"
-    ) {
+    } else if (month === 'Apr' || month === 'Jun' || month === 'Sept' || month === 'Nov') {
       const data = [];
       for (let i = 0; i < 30; i++) {
         data.push(i + 1);
@@ -90,7 +75,7 @@ const Calendar = ({
 
   const route = useRoute();
   useEffect(() => {
-    if (!isFirstRender.current && !focused ) {
+    if (!isFirstRender.current && !focused) {
       dispatch(
         ChangeModalState.action({
           showCalendar: false,
@@ -104,11 +89,10 @@ const Calendar = ({
     <>
       <View style={[styles.calendar, style && style]}>
         <Select
-          style={{ width: "30%" }}
+          style={{ width: '30%' }}
           value={months[selectedMonth]}
           placeholder="Grade"
           onSelect={(index: any) => {
-            console.log('index',index.row)
             setSelectedMonth(index.row);
             setDays(getDays(months[index.row]));
           }}
@@ -122,7 +106,7 @@ const Calendar = ({
         <View
           style={{
             flex: 1,
-            marginTop: Platform.OS == "android" ? 5 : 0,
+            marginTop: Platform.OS == 'android' ? 5 : 0,
             marginLeft: 15,
           }}
         >
@@ -139,11 +123,7 @@ const Calendar = ({
                   style={selectedDay === item ? styles.selectedDay : styles.day}
                   onPress={() => setSelectedDay(item)}
                 >
-                  <Text
-                    style={{ color: selectedDay === item ? "#fff" : "#000" }}
-                  >
-                    {item}
-                  </Text>
+                  <Text style={{ color: selectedDay === item ? '#fff' : '#000' }}>{item}</Text>
                 </TouchableOpacity>
               )}
             />
@@ -161,19 +141,19 @@ const styles = StyleSheet.create({
     color: Colors.white,
     // zIndex: -1,
     padding: 10,
-    width: "100%",
-    backgroundColor: "transparent",
-    flexDirection: "row",
-    alignItems: "center",
+    width: '100%',
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   day: {
     width: 40,
     height: 40,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderWidth: 0.5,
     marginTop: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   selectedDay: {
     width: 40,
@@ -181,8 +161,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderWidth: 0.5,
     marginTop: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    borderColor: "#fff",
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: '#fff',
   },
 });

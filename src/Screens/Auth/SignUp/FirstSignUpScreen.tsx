@@ -46,6 +46,11 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
   const isFocuesed = useIsFocused();
   let values = { email: '', user_type: '' };
   const [initialValues, setInitialValues] = useState({ ...values });
+  const [studentInitialValues, setStudentnitialValues] = useState({
+    parentEmail: '',
+    studentEmail: '',
+    code: '',
+  });
   const [showQR, setShowQR] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState('');
   const [isDesignatedAdmin, setIsDesignatedAdmin] = useState(false);
@@ -56,20 +61,21 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
     email: yup.string().email('Please enter valid email').required('Email is required'),
   });
   const activationCodeValidationSchema = yup.object().shape({
-    email: yup.string().min(12).required('Activation Code is required'),
+    code: yup.string().min(6).required('Activation Code is required'),
+    studentEmail: yup.string().required('Student Email is required'),
+    parentEmail: yup.string().required('Parent Email is required'),
   });
-  const getStudentQrApiCall = async (email: any, user_type: any) => {
+  const getStudentQrApiCall = async (values: any, user_type: any) => {
     dispatch(ChangeModalState.action({ loading: true }));
-    GetAuthStudentByActivationCode(email)
+    GetAuthStudentByActivationCode(values)
       .then((res) => {
-        console.log('res', res);
         setShowQR(false);
         navigation &&
           navigation.navigate('FinalRegistrationScreen', {
             student: res,
             registrationId: 'test',
             user_type,
-            activation_code: email,
+            activation_code: values.code,
           });
       })
       .catch((err) => {
@@ -108,11 +114,13 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
   }, [isFocuesed]);
   return (
     <BackgroundLayout>
-          <KeyboardAwareScrollView
-            extraHeight={10}
-            enableOnAndroid={true}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ flex: 1 }} style={styles.container}>
+      <KeyboardAwareScrollView
+        extraHeight={10}
+        enableOnAndroid={true}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ flex: 1 }}
+        style={styles.container}
+      >
         {!showQR ? (
           <>
             <View style={styles.headerContainer}>
@@ -120,8 +128,8 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                 style={{
                   justifyContent: 'center',
                   alignItems: 'center',
-                  maxHeight: Normalize(160),
-                  maxWidth: Normalize(160),
+                  maxHeight: Normalize(120),
+                  maxWidth: Normalize(120),
                 }}
                 source={require('@/Assets/Images/logo1.png')}
                 resizeMode="contain"
@@ -132,11 +140,13 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
             {isFocuesed && (
               <Formik
                 validationSchema={
-                  selectedUserType === 'Student'
-                    ? activationCodeValidationSchema
-                    : emailValidationSchema
+                  selectedUserType != 'Student'
+                    ? emailValidationSchema
+                    : activationCodeValidationSchema
                 }
-                initialValues={initialValues}
+                initialValues={
+                  selectedUserType === 'Student' ? studentInitialValues : initialValues
+                }
                 validateOnMount={true}
                 onSubmit={(values, { resetForm }) => {
                   // navigation && navigation.navigate('EmailConfirmation', { emailAddress: values.email, user_type: values.user_type, activation_code: '' })
@@ -147,7 +157,7 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                   if (emailObject.user_type === 'Student') {
                     dispatch(ChangeModalState.action({ loading: true }));
 
-                    getStudentQrApiCall(emailObject.email, values.user_type);
+                    getStudentQrApiCall(values, values.user_type);
                     // GetAuthStudentByActivationCode(emailObject.email)
                     //   .then((res) => {
                     //     navigation &&
@@ -239,6 +249,7 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                   isValid,
                 }) => (
                   <>
+                    {console.log('errors', errors)}
                     <Layout style={styles.formContainer}>
                       <View style={{ height: 30 }} />
                       <CustomDropdown
@@ -254,6 +265,36 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                       <View style={{ height: 30 }} />
                       {values.user_type === 'Student' && (
                         <View style={{ marginVertical: 10, zIndex: -20 }}>
+                          <Input
+                            selectionColor={Colors.white}
+                            placeholderTextColor={Colors.white}
+                            placeholder={'Student Email'}
+                            accessoryLeft={renderPersonIcon}
+                            onChangeText={handleChange('studentEmail')}
+                            onBlur={handleBlur('studentEmail')}
+                            value={values.studentEmail}
+                            keyboardType={'email-address'}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            textStyle={{ color: Colors.white }}
+                            style={styles.selectSettings}
+                          />
+
+                          <Input
+                            selectionColor={Colors.white}
+                            placeholderTextColor={Colors.white}
+                            placeholder={'Parent Email'}
+                            accessoryLeft={renderPersonIcon}
+                            onChangeText={handleChange('parentEmail')}
+                            onBlur={handleBlur('parentEmail')}
+                            value={values.parentEmail}
+                            keyboardType={'email-address'}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            textStyle={{ color: Colors.white }}
+                            style={styles.selectSettings}
+                          />
+
                           <Text
                             style={{
                               fontSize: 16,
@@ -262,7 +303,7 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                               color: Colors.white,
                             }}
                           >
-                            Enter your 32-digit reference code from your parent's Dependent
+                            Enter your 6-digit reference code from your parent's Dependent
                             Information or scan the QR code corresponding to your name.
                           </Text>
                         </View>
@@ -284,7 +325,25 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                         />
                       )}
                       <View style={{ width: '100%', alignItems: 'center' }}>
-                        {values.user_type.toLowerCase() === 'student' && (
+                        {values.user_type === 'Student' && (
+                          <Input
+                            selectionColor={Colors.black}
+                            placeholderTextColor={Colors.black}
+                            // placeholder={'Code'}
+                            // accessoryLeft={renderPersonIcon}
+                            onChangeText={handleChange('code')}
+                            onBlur={handleBlur('code')}
+                            value={values.code}
+                            keyboardType={'email-address'}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            textStyle={{ color: Colors.black, textAlign: 'center' }}
+                            style={{ height: 50, width: '50%' }}
+                            maxLength={6}
+                          />
+                        )}
+
+                        {/* {values.user_type.toLowerCase() === 'student' && (
                           <MaskInput
                             selectionColor={Colors.white}
                             value={values.email}
@@ -303,10 +362,10 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                         )}
                         {errors.email && touched.email && values.user_type !== 'Student' && (
                           <Text style={styles.errorText}>{errors.email}</Text>
-                        )}
+                        )} */}
                       </View>
                       <View style={{ marginTop: 10, zIndex: -10 }}>
-                        {values.user_type === 'Student' && (
+                        {/* {values.user_type === 'Student' && (
                           <View
                             style={{
                               marginVertical: 5,
@@ -323,7 +382,7 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                               onPress={() => setShowQR(true)}
                             />
                           </View>
-                        )}
+                        )} */}
                         {values.user_type === 'Instructor' && (
                           <View
                             style={{
@@ -445,7 +504,7 @@ const themedStyles = StyleService.create({
   },
   headerContainer: {
     // flex: 2,
-    height: screenHeight * 0.25,
+    height: screenHeight * 0.18,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',

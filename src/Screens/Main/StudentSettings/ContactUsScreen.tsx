@@ -1,15 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {
-  View,
-  KeyboardAvoidingView,
-  Alert,
-  Image,
-  TouchableOpacity,
-  Linking,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, KeyboardAvoidingView, Alert, Image, TouchableOpacity, Linking } from 'react-native';
 
 import LinearGradient from 'react-native-linear-gradient';
-import {AppHeader} from '@/Components';
+import { AppHeader } from '@/Components';
 import {
   Button,
   Input,
@@ -20,12 +13,12 @@ import {
   Spinner,
 } from '@ui-kitten/components';
 // @ts-ignore
-import {ContactUs} from '../../../Services/ContactUsServices';
+import { ContactUs } from '../../../Services/ContactUsServices';
 import * as yup from 'yup';
-import {Formik} from 'formik';
+import { Formik } from 'formik';
 import Colors from '@/Theme/Colors';
-import {useIsFocused} from '@react-navigation/native';
-import {loadId, loadUserId} from '@/Storage/MainAppStorage';
+import { useIsFocused } from '@react-navigation/native';
+import { loadId, loadUserId } from '@/Storage/MainAppStorage';
 
 const ContactUsScreen = () => {
   const isFocuesed = useIsFocused();
@@ -34,7 +27,7 @@ const ContactUsScreen = () => {
   const contactUsValidationSchema = yup.object().shape({
     message: yup
       .string()
-      .min(50, ({min}) => `Message needs to be at least ${min} characters`)
+      .min(50, ({ min }) => `Message needs to be at least ${min} characters`)
       .required('Message is required'),
   });
   const [isTouched, setisTouched] = useState(false);
@@ -55,8 +48,8 @@ const ContactUsScreen = () => {
           <Formik
             validationSchema={contactUsValidationSchema}
             validateOnMount={true}
-            initialValues={{message: ''}}
-            onSubmit={async (values, {resetForm}) => {
+            initialValues={{ message: '' }}
+            onSubmit={async (values, { resetForm }) => {
               setisSending(true);
               const userId = await loadId();
               let objectToPass = {
@@ -66,7 +59,6 @@ const ContactUsScreen = () => {
               };
               ContactUs(objectToPass)
                 .then((response: any) => {
-                  console.log('res', response);
                   if (response.status == 200) {
                     setisSent(true);
                     setTimeout(() => {
@@ -79,21 +71,22 @@ const ContactUsScreen = () => {
                 .catch((error: any) => {
                   console.log('err', error);
                   Alert.alert('An error occured', 'Please try again', [
-                    {text: 'OK', style: 'cancel'},
+                    { text: 'OK', style: 'cancel' },
                   ]);
 
                   setisSending(false);
                 });
               resetForm();
-            }}>
-            {({handleChange, handleSubmit, values, errors, isValid}) => (
+            }}
+          >
+            {({ handleChange, handleSubmit, values, errors, isValid }) => (
               <>
                 {isSending ? (
                   isSent ? (
                     <View style={styles.sppinerContainer}>
                       <Text style={styles.sent}>
-                        Your message has been successfully submited.{'\n'}Thank
-                        you for contacting us!
+                        Your message has been successfully submited.{'\n'}Thank you for contacting
+                        us!
                       </Text>
                     </View>
                   ) : (
@@ -104,7 +97,7 @@ const ContactUsScreen = () => {
                 ) : (
                   <Layout style={styles.formContainer}>
                     <Input
-                      style={{marginTop: 20, fontSize: 20}}
+                      style={{ marginTop: 20, fontSize: 20 }}
                       textStyle={{
                         minHeight: 200,
                         marginLeft: -1,
@@ -131,7 +124,8 @@ const ContactUsScreen = () => {
                           <TouchableOpacity
                             style={styles.background}
                             disabled={!isValid}
-                            onPress={handleSubmit}>
+                            onPress={handleSubmit}
+                          >
                             <Text style={styles.button}>Send</Text>
                           </TouchableOpacity>
                         </View>
@@ -140,10 +134,9 @@ const ContactUsScreen = () => {
                           <TouchableOpacity
                             style={styles.disabledBackground}
                             disabled={!isValid}
-                            onPress={handleSubmit}>
-                            <Text style={[styles.button, {color: '#fff'}]}>
-                              Send
-                            </Text>
+                            onPress={handleSubmit}
+                          >
+                            <Text style={[styles.button, { color: '#fff' }]}>Send</Text>
                           </TouchableOpacity>
                         </View>
                       )}

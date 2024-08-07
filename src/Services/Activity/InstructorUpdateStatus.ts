@@ -1,4 +1,4 @@
-import api from "@/Services";
+import api from '@/Services';
 
 interface UpdateActivityStatus {
   activityId: number;
@@ -7,10 +7,6 @@ interface UpdateActivityStatus {
 }
 
 export default async (data: UpdateActivityStatus) => {
-  console.log("90009099009", data);
-  const response = await api.post(
-    `/activity/instructor-update-activity-status`,
-    data
-  );
+  const response = await api.post(`/activity/instructor-update-activity-status`, data);
   return response.data;
 };

@@ -54,7 +54,7 @@ const InstructionsModal = ({
     (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
   );
   const dispatch = useDispatch();
-  console.log('group', selectedInstructions);
+
   useEffect(() => {
     setPayment(false);
     setIsValid(false);

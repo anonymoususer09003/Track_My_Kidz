@@ -31,9 +31,9 @@ import {
   StudentLocationScreen,
   StudentPersonalProfileScreen,
   StudentSettingsScreen,
-GroupScheduleNavigator,
-PracticesScreen,
-CompetitionScreen
+  GroupScheduleNavigator,
+  PracticesScreen,
+  CompetitionScreen,
 } from '@/Screens';
 
 import { Alert } from 'react-native';
@@ -142,25 +142,25 @@ const RightDrawerNavigator = () => {
   const intervalIdRef = useRef(null);
   const isFocused = useIsFocused();
   const user_type = useSelector((state: { userType: UserTypeState }) => state.userType.userType);
-  console.log('user type', user_type);
+
   const { updateCoordinates } = useTracker();
 
   const stompClient = useRef<Stomp.Client | null>(null);
 
-  // useEffect(() => {
-  //   const connectToSocket = async () => {
-  //     const token = await loadToken();
-    
-  //     const socket = new SockJS(Config.WS_URL);
-  //     stompClient.current = Stomp.over(socket);
-  //     stompClient.current.connect({ token }, () => {
-  //       trackDevicesById(stompClient.current, ['']);
+  useEffect(() => {
+    const connectToSocket = async () => {
+      const token = await loadToken();
 
-  //       if (user_type !== 'parent') locationPermission();
-  //     });
-  //   };
-  //   setTimeout(connectToSocket, 15000);
-  // }, []);
+      const socket = new SockJS(Config.WS_URL);
+      stompClient.current = Stomp.over(socket);
+      stompClient.current.connect({ token }, () => {
+        trackDevicesById(stompClient.current, ['']);
+
+        locationPermission();
+      });
+    };
+    setTimeout(connectToSocket, 15000);
+  }, []);
   const disconnectStompClient = () => {
     if (stompClient.current && stompClient.current.connected) {
       stompClient.current.disconnect(() => {
@@ -184,6 +184,7 @@ const RightDrawerNavigator = () => {
         backgroundCall();
       }
     } else {
+      Geolocation.requestAuthorization();
       backgroundCall();
       // todo: add logic for ios
       // backgroundCall();
@@ -203,51 +204,69 @@ const RightDrawerNavigator = () => {
       }
     }, 15000);
 
-    // if (times > 4) {
-    //   disconnectStompClient();
-    //   BackgroundTimer.clearInterval(intervalId);
-    // }
+    if (times > 4) {
+      disconnectStompClient();
+      BackgroundTimer.clearInterval(intervalId);
+    }
   };
 
-  // const trackAndroidAnIos = async () => {
-  //   try {
-  //     // Geolocation.setRNConfiguration({ enableBackgroundLocationUpdates: true, skipPermissionRequests: true });
-  //     // Geolocation.getCurrentPosition(({ coords }) => {
-  //     //   console.log('coords', coords);
-  //     //   sendCoordinates(coords.latitude, coords.longitude);
-  //     // }, console.log);
+  const trackAndroidAnIos = async () => {
+    try {
+      // Geolocation.setRNConfiguration({ enableBackgroundLocationUpdates: true, skipPermissionRequests: true });
+      if (user_type != 'parent') {
+        // Geolocation.getCurrentPosition(({ coords }) => {
+        //   console.log('------s--s-s--s-s-scoords', coords);
+        //   sendCoordinates(coords.latitude, coords.longitude);
+        // }, console.log);
 
-  //     // BackgroundTimer.clearInterval(intervalId);
+        Geolocation.getCurrentPosition(
+          (position) => {
+            // Alert.alert(JSON.stringify(position));
+            console.log('position', position);
+            const { latitude, longitude } = position.coords;
+            // console.log('coords', coords);
+            sendCoordinates(latitude, longitude);
+          },
+          (error) => {
+            console.log(error);
+            // setError(error.message);
+          },
+          { enableHighAccuracy: true, maximumAge: 9000 }
+        );
+      }
+      // BackgroundTimer.clearInterval(intervalId);
 
-  //     BackgroundGeolocation.ready({}).then((state: any) => {
-  //       // YES -- .ready() has now resolved.
-  //       intervalIdRef.current = setInterval(() => {
-  //         BackgroundGeolocation.getCurrentPosition({})
-  //           .then((res) => {
-  //             if (user_type) sendCoordinates(res.coords.latitude, res.coords.longitude);
-  //           })
-  //           .catch(console.log);
-  //       }, 15000);
-  //       BackgroundGeolocation.start();
-  //     });
-  //   } catch (err) {
-  //     console.log('trackAndroidAnIos error TrackerProvider.tsx line 139', err);
-  //   }
-  // };
-  // const sendCoordinates = async (latitude: number, longitude: number) => {
-  //   const token = await loadToken();
-  //   const deviceId = await getUniqueId();
+      BackgroundGeolocation.ready({}).then((state: any) => {
+        // YES -- .ready() has now resolved.
+        intervalIdRef.current = setInterval(() => {
+          BackgroundGeolocation.getCurrentPosition({
+            desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
+          })
+            .then((res) => {
+              if (user_type) sendCoordinates(res.coords.latitude, res.coords.longitude);
+            })
+            .catch(console.log);
+        }, 15000);
+        BackgroundGeolocation.start();
+      });
+    } catch (err) {
+      console.log('trackAndroidAnIos error TrackerProvider.tsx line 139', err);
+    }
+  };
+  const sendCoordinates = async (latitude: number, longitude: number) => {
+    const token = await loadToken();
+    const deviceId = await getUniqueId();
 
-  //   stompClient.current.send(
-  //     '/socket/ws-location',
-  //     { token },
-  //     JSON.stringify({
-  //       latitude,
-  //       longitude,
-  //       deviceId,
-  //     })
-  //   );
-  // };
+    stompClient.current.send(
+      '/socket/ws-location',
+      { token },
+      JSON.stringify({
+        latitude,
+        longitude,
+        deviceId,
+      })
+    );
+  };
   const subscriptions: any[] = [];
   const trackDevicesById = async (stompClient: any, deviceIds: string[]) => {
     try {
@@ -383,7 +402,7 @@ const RightDrawerNavigator = () => {
           <Stack.Screen name="CreateParentActivity" component={CreateParentActivityScreen} />
           <Stack.Screen name="Approval" component={ApprovalNavigator} />
           <Stack.Screen name="ActivationCode" component={ActivationCodeScreen} />
-  
+
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="PaymentInfo" component={PaymentInformationScreen} />
           <Stack.Screen name="DependentInfo" component={DependentInfoScreen} />
@@ -398,7 +417,7 @@ const RightDrawerNavigator = () => {
           <Stack.Screen name="AppList" component={AppListScreen} />
           <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
 
-          <Stack.Screen name="GroupScehdule" component={GroupScheduleNavigator}/>
+          <Stack.Screen name="GroupScehdule" component={GroupScheduleNavigator} />
           <Stack.Screen name="PracticesScreen" component={PracticesScreen} />
           <Stack.Screen name="CompetitionScreen" component={CompetitionScreen} />
         </>

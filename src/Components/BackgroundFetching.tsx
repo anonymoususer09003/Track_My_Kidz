@@ -7,8 +7,8 @@ const SilentAudioPlayer = () => {
   useEffect(() => {
     // Define the silent audio track
     const track = {
-      id: "silence",
-      url: "http://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg",
+      id: 'silence',
+      url: 'http://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg',
     };
 
     // Initialize Track Player
@@ -19,10 +19,10 @@ const SilentAudioPlayer = () => {
       try {
         await TrackPlayer.add(track);
         await TrackPlayer.play();
-        console.log("Background fetch task completed successfully");
+
         BackgroundFetch.finish(taskId);
       } catch (error) {
-        console.error("Error playing silent audio:", error);
+        console.error('Error playing silent audio:', error);
         BackgroundFetch.finish(taskId);
       }
     };
@@ -36,7 +36,7 @@ const SilentAudioPlayer = () => {
         enableHeadless: true, // Enable headless mode (Android)
       },
       handleBackgroundFetch,
-      (error) => console.error("Background fetch configure error:", error)
+      (error) => console.error('Background fetch configure error:', error)
     );
 
     // Clean up on component unmount

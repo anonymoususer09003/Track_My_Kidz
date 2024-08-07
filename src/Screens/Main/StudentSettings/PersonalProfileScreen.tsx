@@ -39,9 +39,7 @@ const PersonalProfileScreen = () => {
   const [userId, setuserId] = useState<any>(null);
   const [visible, setVisible] = useState<boolean>(false);
   const user: any = useSelector((state: { user: UserState }) => state.user.item);
-  const isLoading = useSelector(
-    (state: { user: UserState }) => state.user.fetchOne.loading,
-  );
+  const isLoading = useSelector((state: { user: UserState }) => state.user.fetchOne.loading);
   const dispatch = useDispatch();
 
   const renderPersonIcon = () => (
@@ -60,18 +58,10 @@ const PersonalProfileScreen = () => {
   // );
 
   const renderEmailIcon = () => (
-    <Image
-      source={email}
-      style={{ height: 18, width: 18, marginRight: 12 }}
-      resizeMode="contain"
-    />
+    <Image source={email} style={{ height: 18, width: 18, marginRight: 12 }} resizeMode="contain" />
   );
   const renderPhoneIcon = () => (
-    <Image
-      source={phone}
-      style={{ height: 20, width: 20, marginRight: 10 }}
-      resizeMode="contain"
-    />
+    <Image source={phone} style={{ height: 20, width: 20, marginRight: 10 }} resizeMode="contain" />
   );
 
   const renderSchoolIcon = () => (
@@ -93,7 +83,6 @@ const PersonalProfileScreen = () => {
     getUserId();
   }, []);
 
-
   const onPasswordIconPress = (): void => {
     setPasswordVisible(!passwordVisible);
   };
@@ -106,7 +95,7 @@ const PersonalProfileScreen = () => {
       height: 130,
       compressImageQuality: 0.2,
       loadingLabelText: 'Loading image',
-    }).then(image => {
+    }).then((image) => {
       if (image != null) {
         const source = { uri: image?.path };
         setUploadedImage(image);
@@ -120,23 +109,19 @@ const PersonalProfileScreen = () => {
   //     <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
   //   </TouchableWithoutFeedback>
   // );
-  const updateProfilePic = async (image:any) => {
+  const updateProfilePic = async (image: any) => {
     let formData = new FormData();
-    formData.append(
-      'image',
-       {
-            uri: image?.path,
-            name: image.mime+new Date(),
-            type: image.mime,
-          }
-       
-    );
+    formData.append('image', {
+      uri: image?.path,
+      name: image.mime + new Date(),
+      type: image.mime,
+    });
     formData.append('id', user?.studentId);
 
     formData.append('parentId', parseInt(user?.parentId));
     formData.append('firstname', user?.firstname);
     formData.append('lastname', user?.lastname);
-    formData.append('phone', user?.phoneNumber||'00');
+    formData.append('phone', user?.phoneNumber || '00');
     formData.append('email', user?.email);
     formData.append('school', user?.school);
     formData.append('country', user.country);
@@ -145,7 +130,7 @@ const PersonalProfileScreen = () => {
 
     formData.append('parentemail1', user?.parentemail1);
     formData.append('parentemail2', user?.parentemail2);
-    console.log('formData', formData);
+
     // setisSending(true);
     // let objectToPass = {
     //   firstName: values.firstName,
@@ -157,17 +142,15 @@ const PersonalProfileScreen = () => {
     // };
     UpdateStudent(formData)
       .then(async (response: any) => {
-     
-          dispatch(
-            ChangeUserState.action({
-              item: response,
-              fetchOne: { loading: false, error: null },
-            }),
-          );
-     
-          setisEditMode(false);
-          setisSending(false);
-        
+        dispatch(
+          ChangeUserState.action({
+            item: response,
+            fetchOne: { loading: false, error: null },
+          })
+        );
+
+        setisEditMode(false);
+        setisSending(false);
       })
       .catch((error: any) => {
         console.log('err', error);
@@ -201,7 +184,7 @@ const PersonalProfileScreen = () => {
       height: 130,
       compressImageQuality: 0.2,
       loadingLabelText: 'Loading image',
-    }).then(image => {
+    }).then((image) => {
       if (image != null) {
         const source = { uri: image?.path };
         setUploadedImage(image);
@@ -218,10 +201,8 @@ const PersonalProfileScreen = () => {
       .required('Username is required'),
   });
 
-
   const renderEditButtonElement = (): ButtonElement => {
-    const buttonElement: React.ReactElement<ButtonProps> =
-      renderEditAvatarButton();
+    const buttonElement: React.ReactElement<ButtonProps> = renderEditAvatarButton();
 
     return React.cloneElement(buttonElement, {
       style: [buttonElement.props.style, styles.editButton],
@@ -240,9 +221,7 @@ const PersonalProfileScreen = () => {
       <AppHeader hideCenterIcon hideCalendar={true} />
       {isLoading ? (
         <View style={styles.sppinerContainer}>
-          <View style={styles.sppinerContainer}>
-            {/* <Spinner status="primary" /> */}
-          </View>
+          <View style={styles.sppinerContainer}>{/* <Spinner status="primary" /> */}</View>
         </View>
       ) : (
         <BackgroundLayout title="Profile">
@@ -252,9 +231,7 @@ const PersonalProfileScreen = () => {
                 style={styles.profileImage}
                 // resizeMode='center'
                 source={{
-                  uri:
-                    selectedImage ||
-                    user?.studentPhoto + '?time' + new Date().getTime(),
+                  uri: selectedImage || user?.studentPhoto + '?time' + new Date().getTime(),
                   headers: { Pragma: 'no-cache' },
                 }}
                 // source={{ uri: selectedImage || user?.studentPhoto }}
@@ -270,7 +247,8 @@ const PersonalProfileScreen = () => {
                     justifyContent: 'center',
                     backgroundColor: Colors.lightgray,
                   },
-                ]}>
+                ]}
+              >
                 <Text style={{ fontSize: 30 }}>
                   {user?.firstname?.substring(0, 1)?.toUpperCase()}{' '}
                   {user?.lastname?.substring(0, 1)?.toUpperCase()}
@@ -279,9 +257,7 @@ const PersonalProfileScreen = () => {
               </View>
             )}
           </View>
-          <KeyboardAwareScrollView
-            style={styles.layout}
-            extraScrollHeight={150}>
+          <KeyboardAwareScrollView style={styles.layout} extraScrollHeight={150}>
             <ScrollView style={styles.container}>
               <View style={[[Layout.column, Layout.justifyContentCenter]]}>
                 <Formik
@@ -303,14 +279,10 @@ const PersonalProfileScreen = () => {
                     parentemail2: user?.parentemail2 || '',
                   }}
                   onSubmit={(values: any) => {
-                    updateProfilePic()
-                  }}>
-                  {({
-                      handleChange,
-                      handleSubmit,
-                      setFieldValue,
-                      values,
-                    }) => (
+                    updateProfilePic();
+                  }}
+                >
+                  {({ handleChange, handleSubmit, setFieldValue, values }) => (
                     <>
                       {isSending ? (
                         <View style={styles.sppinerContainer}>
@@ -330,30 +302,27 @@ const PersonalProfileScreen = () => {
                               flexDirection: 'row',
                               justifyContent: 'space-between',
                               width: '100%',
-                            }}>
+                            }}
+                          >
                             {!isEditMode ? (
                               <View
                                 style={{
                                   flexDirection: 'column',
                                   width: '45%',
-                                }}>
+                                }}
+                              >
                                 <Text style={styles.editLabel}>First Name</Text>
 
                                 <View style={styles.editField}>
                                   {renderPersonIcon()}
-                                  <Text style={{ fontSize: 15 }}>
-                                    {' '}
-                                    {values.firstName}
-                                  </Text>
+                                  <Text style={{ fontSize: 15 }}> {values.firstName}</Text>
                                 </View>
                               </View>
                             ) : (
                               <Input
                                 style={styles.inputSettings}
                                 autoCapitalize="none"
-                                label={evaProps => (
-                                  <Text {...evaProps}>First Name</Text>
-                                )}
+                                label={(evaProps) => <Text {...evaProps}>First Name</Text>}
                                 value={values.firstName}
                                 onChangeText={handleChange('firstName')}
                               />
@@ -364,23 +333,20 @@ const PersonalProfileScreen = () => {
                                 style={{
                                   flexDirection: 'column',
                                   width: '45%',
-                                }}>
+                                }}
+                              >
                                 <Text style={styles.editLabel}>Last Name</Text>
 
                                 <View style={styles.editField}>
                                   {renderPersonIcon()}
-                                  <Text style={{ fontSize: 15 }}>
-                                    {values.lastName}
-                                  </Text>
+                                  <Text style={{ fontSize: 15 }}>{values.lastName}</Text>
                                 </View>
                               </View>
                             ) : (
                               <Input
                                 style={styles.inputSettings}
                                 autoCapitalize="none"
-                                label={evaProps => (
-                                  <Text {...evaProps}>Last Name</Text>
-                                )}
+                                label={(evaProps) => <Text {...evaProps}>Last Name</Text>}
                                 value={values.lastName}
                                 onChangeText={handleChange('lastName')}
                               />
@@ -391,9 +357,7 @@ const PersonalProfileScreen = () => {
                               <Text style={styles.editLabel}>School</Text>
                               <View style={styles.editField}>
                                 {renderSchoolIcon()}
-                                <Text style={{ fontSize: 15 }}>
-                                  {values.school}
-                                </Text>
+                                <Text style={{ fontSize: 15 }}>{values.school}</Text>
                               </View>
                             </View>
                           ) : (
@@ -401,9 +365,7 @@ const PersonalProfileScreen = () => {
                               accessoryLeft={renderSchoolIcon()}
                               style={styles.inputSettings}
                               autoCapitalize="none"
-                              label={evaProps => (
-                                <Text {...evaProps}>School</Text>
-                              )}
+                              label={(evaProps) => <Text {...evaProps}>School</Text>}
                               value={values.school}
                               onChangeText={handleChange('school')}
                             />
@@ -426,26 +388,18 @@ const PersonalProfileScreen = () => {
                         )} */}
 
                           <View style={{ flexDirection: 'column' }}>
-                            <Text style={styles.editLabel}>
-                              Parent 1/Guardian 1 Email
-                            </Text>
+                            <Text style={styles.editLabel}>Parent 1/Guardian 1 Email</Text>
                             <View style={styles.editField}>
                               {renderEmailIcon()}
-                              <Text style={{ fontSize: 15 }}>
-                                {values.parentemail1}
-                              </Text>
+                              <Text style={{ fontSize: 15 }}>{values.parentemail1}</Text>
                             </View>
                           </View>
 
                           <View style={{ flexDirection: 'column' }}>
-                            <Text style={styles.editLabel}>
-                              Parent 2/Guardian 2 Email
-                            </Text>
+                            <Text style={styles.editLabel}>Parent 2/Guardian 2 Email</Text>
                             <View style={styles.editField}>
                               {renderEmailIcon()}
-                              <Text style={{ fontSize: 15 }}>
-                                {values.parentemail2}
-                              </Text>
+                              <Text style={{ fontSize: 15 }}>{values.parentemail2}</Text>
                             </View>
                           </View>
 
@@ -478,7 +432,8 @@ const PersonalProfileScreen = () => {
                                   setFieldValue('city', user?.city);
                                   setisEditMode(false);
                                 }}
-                                style={{ borderRadius: 10, width: '100%' }}>
+                                style={{ borderRadius: 10, width: '100%' }}
+                              >
                                 Cancel
                               </Button>
                             </View>

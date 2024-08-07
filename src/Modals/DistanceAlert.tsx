@@ -1,28 +1,32 @@
-import { LinearGradientButton } from "@/Components";
-import { CountryDTO } from "@/Models/CountryDTOs";
-import { GetAllCities, GetAllStates } from "@/Services/PlaceServices";
-import {
-  GetAllSchools
-} from "@/Services/School";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { PlaceState } from "@/Store/Places";
-import { UserState } from "@/Store/User";
-import Colors from "@/Theme/Colors";
-import { useIsFocused } from "@react-navigation/native";
+import { LinearGradientButton } from '@/Components';
+import { CountryDTO } from '@/Models/CountryDTOs';
+import { GetAllCities, GetAllStates } from '@/Services/PlaceServices';
+import { GetAllSchools } from '@/Services/School';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { PlaceState } from '@/Store/Places';
+import { UserState } from '@/Store/User';
+import Colors from '@/Theme/Colors';
+import { useIsFocused } from '@react-navigation/native';
 import {
   Autocomplete,
-  AutocompleteItem, Card, CheckBox, Input, Modal, Radio,
-  RadioGroup, Text
-} from "@ui-kitten/components";
-import axios from "axios";
-import { Formik } from "formik";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import Geocoder from "react-native-geocoding";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { useDispatch, useSelector } from "react-redux";
-import * as yup from "yup";
+  AutocompleteItem,
+  Card,
+  CheckBox,
+  Input,
+  Modal,
+  Radio,
+  RadioGroup,
+  Text,
+} from '@ui-kitten/components';
+import axios from 'axios';
+import { Formik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import Geocoder from 'react-native-geocoding';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useDispatch, useSelector } from 'react-redux';
+import * as yup from 'yup';
 const filterCountries = (item: CountryDTO, query: string) => {
   return item.name.toLowerCase().includes(query.toLowerCase());
 };
@@ -33,7 +37,7 @@ const filterCities = (item: string, query: string) => {
   return item?.toLowerCase().includes(query.toLowerCase());
 };
 
-Geocoder.init("AIzaSyBBDJwlh5Mnc6Aa1l371eEOZ9G6Uc0ByWA");
+Geocoder.init('AIzaSyBBDJwlh5Mnc6Aa1l371eEOZ9G6Uc0ByWA');
 const DistanceAlerttModal = ({
   selectedDependent,
   setSelectedDependent,
@@ -52,19 +56,15 @@ const DistanceAlerttModal = ({
   const [student, setStudent] = useState(null);
   const [schools, setSchools] = useState([]);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
-  );
+  const currentUser = useSelector((state: { user: UserState }) => state.user.item);
 
   const grades =
     schools &&
     schools.length > 0 &&
     schools.find((s) => s.name === selectedDependent?.school) &&
     schools?.find((s) => s.name === selectedDependent?.school)?.gradeEntities;
-  const countries = useSelector(
-    (state: { places: PlaceState }) => state.places.countries
-  );
-  console.log("selectedepenedted", selectedDependent);
+  const countries = useSelector((state: { places: PlaceState }) => state.places.countries);
+
   const [countriesData, setCountriesData] = React.useState(countries);
   const [statesData, setStatesData] = React.useState<Array<any>>([]);
   const [citiesData, setCitiesData] = React.useState<Array<any>>([]);
@@ -77,15 +77,12 @@ const DistanceAlerttModal = ({
     (state: { modal: ModalState }) => state.modal.editDependentModalVisibility
   );
   const validationSchema = yup.object().shape({
-    firstName: yup.string().required("First Name is required"),
-    lastName: yup.string().required("Last Name is required"),
-    email: yup
-      .string()
-      .email("Please enter valid email")
-      .required("Email is required"),
-    country: yup.string().required("Please select country"),
-    state: yup.string().required("Please select state"),
-    school: yup.string().required("Please select school"),
+    firstName: yup.string().required('First Name is required'),
+    lastName: yup.string().required('Last Name is required'),
+    email: yup.string().email('Please enter valid email').required('Email is required'),
+    country: yup.string().required('Please select country'),
+    state: yup.string().required('Please select state'),
+    school: yup.string().required('Please select school'),
   });
   const dispatch = useDispatch();
 
@@ -112,18 +109,11 @@ const DistanceAlerttModal = ({
     distanceinkm: any;
     distance: any;
   }) => {
-    let location =
-      address +
-      " " +
-      selectedCity +
-      " " +
-      selectedState +
-      " " +
-      selectedCountry;
+    let location = address + ' ' + selectedCity + ' ' + selectedState + ' ' + selectedCountry;
     let res = await axios.get(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${location}&key=AIzaSyBBDJwlh5Mnc6Aa1l371eEOZ9G6Uc0ByWA`
     );
-    console.log("res", res.data.results[0].geometry.location);
+
     let coord = res.data.results[0].geometry.location;
     onSubmit({
       address,
@@ -182,9 +172,7 @@ const DistanceAlerttModal = ({
       visible={visible}
       backdropStyle={styles.backdrop}
       onBackdropPress={() => {
-        dispatch(
-          ChangeModalState.action({ editDependentModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ editDependentModalVisibility: false }));
         setSelectedDependent(null);
         setStudent(null);
       }}
@@ -194,10 +182,10 @@ const DistanceAlerttModal = ({
           <View style={styles.body}>
             <View style={{ paddingBottom: 10, paddingTop: 10 }}>
               <Text
-                textBreakStrategy={"highQuality"}
+                textBreakStrategy={'highQuality'}
                 style={{
-                  textAlign: "center",
-                  color: "#606060",
+                  textAlign: 'center',
+                  color: '#606060',
                   fontSize: 18,
                 }}
               >
@@ -210,15 +198,15 @@ const DistanceAlerttModal = ({
             validateOnMount={true}
             // validationSchema={validationSchema}
             initialValues={{
-              address: "",
+              address: '',
               // email: student?.email,
-              country: student?.country || "",
-              state: student?.state || "",
-              city: student?.city || "",
-              selectedCountry: student?.country || "",
-              selectedState: student?.state || "",
-              selectedCity: student?.city || "",
-              distance: "",
+              country: student?.country || '',
+              state: student?.state || '',
+              city: student?.city || '',
+              selectedCountry: student?.country || '',
+              selectedState: student?.state || '',
+              selectedCity: student?.city || '',
+              distance: '',
               distanceinkm: false,
             }}
             onSubmit={async (values, { resetForm }) => {
@@ -251,45 +239,34 @@ const DistanceAlerttModal = ({
                 <View style={{ marginTop: 30, padding: 20 }}>
                   <View
                     style={{
-                      flexDirection: "row",
+                      flexDirection: 'row',
 
-                      alignItems: "center",
+                      alignItems: 'center',
                     }}
                   >
-                    <Text style={{ marginRight: 20, marginTop: 10 }}>
-                      Use my address
-                    </Text>
+                    <Text style={{ marginRight: 20, marginTop: 10 }}>Use my address</Text>
                     <CheckBox
                       style={[{ flex: 1, marginTop: 13 }]}
                       checked={checkBox}
                       onChange={(checked) => {
                         if (checked) {
                           setCheckBox(checked);
-                          setFieldValue("address", currentUser?.address || "");
-                          setFieldValue("country", currentUser?.country || "");
-                          setFieldValue(
-                            "selectedCountry",
-                            currentUser?.country || ""
-                          );
-                          setFieldValue("state", currentUser?.state || "");
-                          setFieldValue(
-                            "selectedState",
-                            currentUser?.state || ""
-                          );
-                          setFieldValue("city", currentUser?.city || "");
-                          setFieldValue(
-                            "selectedCity",
-                            currentUser?.city || ""
-                          );
+                          setFieldValue('address', currentUser?.address || '');
+                          setFieldValue('country', currentUser?.country || '');
+                          setFieldValue('selectedCountry', currentUser?.country || '');
+                          setFieldValue('state', currentUser?.state || '');
+                          setFieldValue('selectedState', currentUser?.state || '');
+                          setFieldValue('city', currentUser?.city || '');
+                          setFieldValue('selectedCity', currentUser?.city || '');
                         } else {
                           setCheckBox(checked);
-                          setFieldValue("address", "");
-                          setFieldValue("country", "");
-                          setFieldValue("selectedCountry", "");
-                          setFieldValue("selectedCity", "");
-                          setFieldValue("selectedState", "");
-                          setFieldValue("state", "");
-                          setFieldValue("city", "");
+                          setFieldValue('address', '');
+                          setFieldValue('country', '');
+                          setFieldValue('selectedCountry', '');
+                          setFieldValue('selectedCity', '');
+                          setFieldValue('selectedState', '');
+                          setFieldValue('state', '');
+                          setFieldValue('city', '');
                         }
                         // if (checked) {
                         //   Alert.alert(checked);
@@ -305,8 +282,8 @@ const DistanceAlerttModal = ({
                     autoCorrect={false}
                     placeholder={`Address`}
                     value={values?.address}
-                    onChangeText={handleChange("address")}
-                    onBlur={handleBlur("address")}
+                    onChangeText={handleChange('address')}
+                    onBlur={handleBlur('address')}
                     // onChangeText={(value: string) =>
                     //   setStudent({
                     //     ...student,
@@ -331,24 +308,20 @@ const DistanceAlerttModal = ({
                     //   );
                     // }}
                     onChangeText={(query) => {
-                      setFieldValue("country", query);
-                      setCountriesData(
-                        countries.filter((item) => filterCountries(item, query))
-                      );
+                      setFieldValue('country', query);
+                      setCountriesData(countries.filter((item) => filterCountries(item, query)));
                     }}
                     onSelect={(query) => {
                       const selectedCountry = countriesData[query];
-                      setFieldValue("country", selectedCountry.name);
-                      setFieldValue("selectedCountry", selectedCountry.name);
-                      setFieldValue("selectedState", "");
-                      setFieldValue("state", "");
+                      setFieldValue('country', selectedCountry.name);
+                      setFieldValue('selectedCountry', selectedCountry.name);
+                      setFieldValue('selectedState', '');
+                      setFieldValue('state', '');
                       setStates([]);
-                      GetAllStates(selectedCountry.name.replace(/ /g, "")).then(
-                        (res) => {
-                          setStates(res.data);
-                          setStatesData(states);
-                        }
-                      );
+                      GetAllStates(selectedCountry.name.replace(/ /g, '')).then((res) => {
+                        setStates(res.data);
+                        setStatesData(states);
+                      });
                       // getSchoolsByFilter(selectedCountry.name);
                     }}
                   >
@@ -367,23 +340,19 @@ const DistanceAlerttModal = ({
                     style={{ marginVertical: 5 }}
                     disabled={!values.selectedCountry}
                     onChangeText={(query) => {
-                      setFieldValue("state", query);
-                      setStatesData(
-                        states.filter((item) => filterStates(item, query))
-                      );
+                      setFieldValue('state', query);
+                      setStatesData(states.filter((item) => filterStates(item, query)));
                     }}
                     onSelect={(query) => {
                       const selectedState = statesData[query];
-                      setFieldValue("state", selectedState);
-                      setFieldValue("selectedState", selectedState);
-                      setFieldValue("selectedCity", "");
-                      setFieldValue("city", "");
+                      setFieldValue('state', selectedState);
+                      setFieldValue('selectedState', selectedState);
+                      setFieldValue('selectedCity', '');
+                      setFieldValue('city', '');
                       setCities([]);
-                      GetAllCities(values.selectedCountry, selectedState).then(
-                        (res) => {
-                          setCities(res.data);
-                        }
-                      );
+                      GetAllCities(values.selectedCountry, selectedState).then((res) => {
+                        setCities(res.data);
+                      });
                       // getSchoolsByFilter(values.selectedCountry, selectedState);
                     }}
                   >
@@ -403,16 +372,14 @@ const DistanceAlerttModal = ({
                     // disabled={!student?.selectedState}
                     style={{ marginVertical: 5 }}
                     onChangeText={(query) => {
-                      setFieldValue("city", query);
+                      setFieldValue('city', query);
                       // setFieldValue("selectedCity", query);
-                      setCitiesData(
-                        cities.filter((item) => filterCities(item, query))
-                      );
+                      setCitiesData(cities.filter((item) => filterCities(item, query)));
                     }}
                     onSelect={(query) => {
                       const selectedCity = citiesData[query];
-                      setFieldValue("city", selectedCity);
-                      setFieldValue("selectedCity", selectedCity);
+                      setFieldValue('city', selectedCity);
+                      setFieldValue('selectedCity', selectedCity);
                       // getSchoolsByFilter("", "", selectedCity);
                     }}
                   >
@@ -427,8 +394,8 @@ const DistanceAlerttModal = ({
                     autoCorrect={false}
                     placeholder={`Distance`}
                     value={values?.distance}
-                    onChangeText={handleChange("distance")}
-                    onBlur={handleBlur("distance")}
+                    onChangeText={handleChange('distance')}
+                    onBlur={handleBlur('distance')}
                     // onChangeText={(value: string) =>
                     //   setStudent({
                     //     ...student,
@@ -494,19 +461,19 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   inputSettings: {
     marginTop: 7,
   },
   modal: { borderRadius: 10 },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     color: Colors.white,
     zIndex: -1,
   },
@@ -515,36 +482,36 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   bottom: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 45,
     marginTop: 10,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   buttonText: {
     flex: 1,
     borderRadius: 25,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     margin: 2,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   errorText: {
     fontSize: 13,
-    color: "red",
+    color: 'red',
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

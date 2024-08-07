@@ -26,12 +26,8 @@ export default {
       {
         dispatch,
         // , rejectWithValue
-      },
+      }
     ) => {
-      console.log(token);
-      console.log(userType);
-      console.log(id);
-      console.log(isSubscribed);
       await storeToken(token);
       await storeUserType(userType);
       await storeUserId(`${id}`);
@@ -46,16 +42,16 @@ export default {
       // }
 
       const user = await fetchOneUserService();
-      console.log('LoginStore.ts line 49 user -', user);
-      // if (!res?.childTrackHistory) {
+
+      // if (!res?.childTrackHistory)
       //   // await BackgroundService.stop();
       // }
       // await BackgroundService.stop();
-       dispatch(
+      dispatch(
         ChangeUserState.action({
           item: user,
           fetchOne: { loading: false, error: null },
-        }),
+        })
       );
 
       //   dispatch(FetchCountries.action());
@@ -66,9 +62,9 @@ export default {
       dispatch(
         ChangeUserTypeState.action({
           userType: userType,
-        }),
+        })
       );
-    },
+    }
   ),
   reducers: buildAsyncReducers({ itemKey: null }), // We do not want to modify some item by default
 };

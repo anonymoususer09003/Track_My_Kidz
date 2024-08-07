@@ -16,12 +16,10 @@ import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useDispatch, useSelector } from 'react-redux';
 
 type InstructorActivityDetailScreenProps = {
-  route: any
-}
-
+  route: any;
+};
 
 const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route }) => {
-  console.log('route.params', route.params);
   const focused = useIsFocused();
   const { student, parent } = route.params;
   // const navigation = useNavigation();
@@ -33,23 +31,15 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
   const [selectedDependent, setSelectedDependent] = useState<any>(null);
   const [trackHistroy, setTrackHistory] = useState<any[]>([]);
   const [originaltrackHistroy, setOriginalTrackHistory] = useState<any[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState<number>(
-    moment(new Date()).month(),
-  );
+  const [selectedMonth, setSelectedMonth] = useState<number>(moment(new Date()).month());
   const [selectedDay, setSelectedDay] = useState<string>(moment().format('D'));
   // const currentUser = useSelector(
   //   (state: { user: UserState }) => state.user.item
   // );
 
-  const isCalendarVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.showCalendar,
-  );
+  const isCalendarVisible = useSelector((state: { modal: ModalState }) => state.modal.showCalendar);
   const filterHistory = (month: any, day: any) => {
-    console.log('studet', student);
     let activities: any[] = [...originaltrackHistroy];
-
-    console.log('month', month);
-    console.log('day', day);
 
     let temp: any[] = [];
     activities.map((item) => {
@@ -59,8 +49,6 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
       if (activeday == day && activmonth == month) {
         temp.push(item);
       }
-      console.log('month-', activmonth);
-      console.log('day-', activeday);
     });
     setTrackHistory(temp);
   };
@@ -69,8 +57,7 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
       let res = await GetChildTrackHistory(student.studentId);
       setTrackHistory(res);
       setOriginalTrackHistory(res);
-    } catch (err) {
-    }
+    } catch (err) {}
   };
   useEffect(() => {
     if (selectedDependent) {
@@ -81,7 +68,7 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
       getChildrenHistory();
     }
   }, [selectedDependent, focused]);
-  console.log('trackhostro', trackHistroy);
+
   return (
     <BackgroundLayout>
       <OtherTrackingModal />
@@ -135,7 +122,7 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
             dispatch(
               ChangeModalState.action({
                 showCalendar: false,
-              }),
+              })
             );
           }}
           isThumbnail
@@ -155,7 +142,7 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
           size="small"
           onPress={() => {
             Linking.openURL(
-              `https://live-api.trackmykidz.com/user/parent/download-csv?studentId=${student.studentId}`,
+              `https://live-api.trackmykidz.com/user/parent/download-csv?studentId=${student.studentId}`
             );
           }}
         >
@@ -197,25 +184,11 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
                   height: 30,
                 }}
               >
-                <View
-                  style={[
-                    styles.rowItem,
-                    { backgroundColor: '#cccccc', width: '22%' },
-                  ]}
-                >
-                  <Text style={styles.title}>
-                    {moment(new Date()).format('YYYY-MM-DD')}
-                  </Text>
+                <View style={[styles.rowItem, { backgroundColor: '#cccccc', width: '22%' }]}>
+                  <Text style={styles.title}>{moment(new Date()).format('YYYY-MM-DD')}</Text>
                 </View>
-                <View
-                  style={[
-                    styles.rowItem,
-                    { backgroundColor: '#cccccc', width: '22%' },
-                  ]}
-                >
-                  <Text style={styles.title}>
-                    {moment(new Date()).format('hh:mm')}
-                  </Text>
+                <View style={[styles.rowItem, { backgroundColor: '#cccccc', width: '22%' }]}>
+                  <Text style={styles.title}>{moment(new Date()).format('hh:mm')}</Text>
                 </View>
                 <View style={[styles.rowItem, { backgroundColor: '#cccccc' }]}>
                   <Text style={styles.title}>{student?.latitude}</Text>
@@ -245,9 +218,7 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
                     },
                   ]}
                 >
-                  <Text style={styles.title}>
-                    {moment(item?.date).format('YYYY-MM-DD')}
-                  </Text>
+                  <Text style={styles.title}>{moment(item?.date).format('YYYY-MM-DD')}</Text>
                 </View>
                 <View
                   style={[
@@ -259,9 +230,7 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
                     },
                   ]}
                 >
-                  <Text style={styles.title}>
-                    {moment(item?.date).format('hh:mm')}
-                  </Text>
+                  <Text style={styles.title}>{moment(item?.date).format('hh:mm')}</Text>
                 </View>
                 <View
                   style={[
@@ -292,8 +261,8 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
           </View>
         ) : (
           <MapView
-          showsUserLocation
-          showsMyLocationButton
+            showsUserLocation
+            showsMyLocationButton
             initialRegion={{
               latitude: parseFloat(student?.latitude),
               longitude: parseFloat(student?.longititude),
@@ -303,7 +272,7 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
             style={{ width: '100%', height: '100%' }}
           >
             <>
-              {(
+              {
                 <Circle
                   center={{
                     latitude: parent?.location[0]?.parentLat
@@ -312,14 +281,13 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
                     longitude: parent?.location[0]?.parentLong
                       ? parseFloat(parent?.location[0]?.parentLong)
                       : 10,
-
                   }}
                   radius={student?.allowedDistance || 100}
                   strokeWidth={2}
                   strokeColor={'#1a66ff'}
                   fillColor={'rgba(230,238,255,0.5)'}
                 />
-              )}
+              }
               <Marker
                 coordinate={{
                   latitude: parseFloat(student?.latitude),
@@ -349,10 +317,8 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
                         }}
                       >
                         <Text style={{ color: Colors.white }}>
-                          {student?.firstname?.substring(0, 1)?.toUpperCase() ||
-                            ''}
-                          {student?.lastname?.substring(0, 1)?.toUpperCase() ||
-                            ''}
+                          {student?.firstname?.substring(0, 1)?.toUpperCase() || ''}
+                          {student?.lastname?.substring(0, 1)?.toUpperCase() || ''}
                         </Text>
                       </View>
                     )}
@@ -373,8 +339,6 @@ const StudentLocationScreen: FC<InstructorActivityDetailScreenProps> = ({ route 
                   </View>
                   {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
                 </View>
-
-         
               </Marker>
             </>
           </MapView>

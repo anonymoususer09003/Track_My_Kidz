@@ -1,11 +1,6 @@
-import React from "react";
-import { StyleSheet, View, ViewProps } from "react-native";
-import {
-  Avatar,
-  AvatarProps,
-  ButtonElement,
-  ButtonProps,
-} from "@ui-kitten/components";
+import React from 'react';
+import { StyleSheet, View, ViewProps } from 'react-native';
+import { Avatar, AvatarProps, ButtonElement, ButtonProps } from '@ui-kitten/components';
 
 export interface ProfileAvatarPickerProps extends AvatarProps {
   editButton?: () => ButtonElement;
@@ -24,12 +19,7 @@ const ProfileAvatarPicker = (props: any): React.ReactElement<ViewProps> => {
 
   return (
     <View style={style}>
-      {console.log("rest props", restProps)}
-      <Avatar
-        key={new Date().getTime()}
-        style={[style, styles.avatar]}
-        {...restProps}
-      />
+      <Avatar key={new Date().getTime()} style={[style, styles.avatar]} {...restProps} />
       {props.editButton && props.editButton()}
     </View>
   );
@@ -40,8 +30,8 @@ const styles = StyleSheet.create({
     // alignSelf: "center",
   },
   editButton: {
-    position: "absolute",
-    alignSelf: "flex-end",
+    position: 'absolute',
+    alignSelf: 'flex-end',
     bottom: 0,
   },
 });

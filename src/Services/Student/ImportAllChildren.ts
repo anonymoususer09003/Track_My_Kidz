@@ -1,8 +1,6 @@
-import api from "@/Services";
+import api from '@/Services';
 
-export default async (param: any) => {
-  const response = await api.post(
-    `/user/student/v2/importAllChildren/${param.referenceCode}`
-  );
+export default async (body: any, code: any) => {
+  const response = await api.post(`/user/student/v2/importAllChildren/${code}`, body);
   return response.data;
 };

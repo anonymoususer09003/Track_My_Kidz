@@ -1,31 +1,64 @@
-import { loadToken } from '@/Storage/MainAppStorage';
+import React, { useEffect, useState, useRef } from 'react';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { Icon, Select, SelectItem, Text } from '@ui-kitten/components';
-import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-import SockJS from 'sockjs-client';
+import { Text, Icon, Select, SelectItem } from '@ui-kitten/components';
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Dimensions,
+} from 'react-native';
 import * as Stomp from 'react-native-stompjs';
+import SockJS from 'sockjs-client';
+import firestore from '@react-native-firebase/firestore';
+import Fontisto from 'react-native-vector-icons/Fontisto';
+import { loadToken } from '@/Storage/MainAppStorage';
 // import { LinearGradientButton } from "@/Components/LinearGradientButton/LinearGradientButton";
-import { AppHeader, Calendar, LinearGradientButton } from '@/Components';
-import SearchBar from '@/Components/SearchBar/SearchBar';
-import { actions } from '@/Context/state/Reducer';
-import { useStateValue } from '@/Context/state/State';
-import { AddStudentModal, EditDependentModal, ParentPaymentModal } from '@/Modals';
-import { GetParent } from '@/Services/Parent';
-import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
-import FetchOne from '@/Services/User/FetchOne';
-import { loadIsSubscribed, loadUserId } from '@/Storage/MainAppStorage';
-import LogoutStore from '@/Store/Authentication/LogoutStore';
-import { ModalState } from '@/Store/Modal';
-import ChangeModalState from '@/Store/Modal/ChangeModalState';
-import { UserState } from '@/Store/User';
-import Colors from '@/Theme/Colors';
-import Geolocation from '@react-native-community/geolocation';
-import moment from 'moment';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
-import MapView, { Circle, LatLng, Marker } from 'react-native-maps';
-import MaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
+import { AppHeader } from '@/Components';
+import TrackHistory from '@/Services/Parent/TrackHistory';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import { AwsLocationTracker } from '@/Services/TrackController';
+import messaging from '@react-native-firebase/messaging';
+import { UpdateDeviceToken } from '@/Services/User';
 import { useDispatch, useSelector } from 'react-redux';
+import ChangeSearchString from '@/Store/Blogs/ChangeSearchString';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { navigateAndSimpleReset } from '@/Navigators/Functions';
+import {
+  WelcomeMessageModal,
+  EditDependentModal,
+  AddStudentModal,
+  ParentPaymentModal,
+} from '@/Modals';
+import FA5 from 'react-native-vector-icons/FontAwesome5';
+import SearchBar from '@/Components/SearchBar/SearchBar';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Colors from '@/Theme/Colors';
+import MaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Entypo from 'react-native-vector-icons/Entypo';
+import { LinearGradientButton } from '@/Components';
+import MapView, { Marker, Circle } from 'react-native-maps';
+import { ModalState } from '@/Store/Modal';
+import moment from 'moment';
+import { Calendar } from '@/Components';
+import { UserState } from '@/Store/User';
+import { GetAllStudents, GetParent } from '@/Services/Parent';
+import { loadIsSubscribed, loadUserId, loadId } from '@/Storage/MainAppStorage';
+import FetchOne from '@/Services/User/FetchOne';
+import { GetAllActivity, GetChildrenAcitivities } from '@/Services/Activity';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { useStateValue } from '@/Context/state/State';
+import { actions } from '@/Context/state/Reducer';
+import { color } from 'react-native-reanimated';
+import LogoutStore from '@/Store/Authentication/LogoutStore';
+import Geolocation from '@react-native-community/geolocation';
+import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
+// import { iteratorSymbol } from 'immer/dist/internal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 const window = Dimensions.get('window');
 const { width, height } = window;
@@ -33,7 +66,7 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const focused = useIsFocused();
   const swipeableRef = useRef(null);
-  const ref = useRef<MapView>();
+  const ref = useRef();
   const [, _dispatch] = useStateValue();
   let row: Array<any> = [];
   let prevOpenedRow: any;
@@ -57,19 +90,13 @@ const HomeScreen = () => {
     });
   }, []);
   useEffect(() => {
-    _dispatch({
-      type: actions.SET_THUMBNAIL,
-      payload: false,
-    });
-  }, []);
-
-  const [{ thumbnail, any }]: any = useStateValue();
+    setThumbnail(false);
+  }, [focused]);
   const [children, setChildren] = useState([]);
   const [trackingList, setTrackingList] = useState({});
   const [getChildrendeviceIds, setChildrensDeviceIds] = useState([]);
   const [originalChildren, setOriginalChildren] = useState([]);
-
-  // const [thumbnail, setThumbnail] = useState(false);
+  const [thumbnail, setThumbnail] = useState(false);
   const [searchParam, setSearchParam] = useState('');
   const [selectedDependent, setSelectedDependent] = useState(null);
   const [parentLatLong, setparentLatLong] = useState();
@@ -88,7 +115,6 @@ const HomeScreen = () => {
   const [activities, setActivities] = useState([]);
   const currentUser = useSelector((state: { user: UserState }) => state.user.item);
   const socketRef = useRef();
-  const [userLocation, setUserLocation] = useState<LatLng>({ longitude: 0, latitude: 0 });
 
   // console.log("currentUser", currentUser);
   const [isSubscribed, setIsSubscribed] = useState<boolean>();
@@ -105,6 +131,7 @@ const HomeScreen = () => {
       );
     }
   };
+
   const getParentInfo = async () => {
     const userId = await loadUserId();
 
@@ -145,7 +172,7 @@ const HomeScreen = () => {
       });
       setChildrensDeviceIds(deviceIds);
 
-      // turnOnTracker(currentUser?.id, deviceIds, 'activity');
+      turnOnTracker(currentUser?.id, deviceIds, 'activity');
 
       setOriginalChildren(res);
 
@@ -182,7 +209,7 @@ const HomeScreen = () => {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
   }, [selectedDependent]);
-  let stompClient: any = React.createRef<Stomp.Client | null>();
+  let stompClient: any = React.createRef<Stomp.Client>();
   const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
     try {
       const token = await loadToken();
@@ -209,6 +236,7 @@ const HomeScreen = () => {
       },
     });
   };
+
   // const RightActions = (dragX: any, item) => {
   //   const scale = dragX.interpolate({
   //     inputRange: [-100, 0],
@@ -291,7 +319,6 @@ const HomeScreen = () => {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
   }, [selectedDependent]);
-
   const mapFitToCoordinates = () => {
     if (thumbnail && children.length > 0) {
       let temp = [];
@@ -383,7 +410,6 @@ const HomeScreen = () => {
       </View>
     );
   };
-
   function navigateToMyLocation() {
     ref.current?.animateToRegion({
       ...userLocation,
@@ -391,12 +417,6 @@ const HomeScreen = () => {
       longitudeDelta: 0.896,
     });
   }
-
-  useEffect(() => {
-    if (userLocation.longitude !== 0 || userLocation.latitude !== 0) {
-      navigateToMyLocation();
-    }
-  }, [userLocation]);
 
   return (
     <>
@@ -431,7 +451,6 @@ const HomeScreen = () => {
           setSelectedDay={setSelectedDay}
         />
       )}
-
       <SearchBar
         searchText={searchParam}
         onChangeText={(value) => setSearchParam(value)}
@@ -459,7 +478,6 @@ const HomeScreen = () => {
           setShowChildFilter(value);
         }}
       />
-
       <View style={[styles.layout]}>
         {showChildFilter && (
           <Select
@@ -586,7 +604,7 @@ const HomeScreen = () => {
           </View>
         ) : (
           <View style={styles.container}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={navigateToMyLocation}
               style={{
                 position: 'absolute',
@@ -600,26 +618,14 @@ const HomeScreen = () => {
               }}
             >
               <Ionicons name="accessibility" style={{ fontSize: 28 }} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <MapView
               showsUserLocation
-              showsMyLocationButton
-              followsUserLocation
-              //METHOD TO FETCH USER LOCATION , USE ON YOUR OWN
-              onUserLocationChange={(e) => {
-                setUserLocation({
-                  latitude: e.nativeEvent.coordinate?.latitude || 0,
-                  longitude: e.nativeEvent.coordinate?.longitude || 0,
-                });
-              }}
               ref={ref}
-              style={{ flex: 1 }}
-              initialRegion={position} // Set initial region to current position
               onLayout={() => {
-                let temp = studentsEmails.filter(
-                  (item) => item.latitude != null && item.longitude != null
-                );
-                ref.current.fitToCoordinates(temp, {
+                let temp = studentsEmails.filter((item) => item.latitude != null);
+
+                ref?.current?.fitToCoordinates(temp, {
                   edgePadding: {
                     top: 10,
                     right: 10,
@@ -629,33 +635,105 @@ const HomeScreen = () => {
                   animated: true,
                 });
               }}
+              style={{ flex: 1 }}
             >
-              <Marker
-                coordinate={position}
-                title="Your Location"
-                description="This is where you are"
-              />
-              {children.map((child, index) => {
-                const latitude = parseFloat(child.latitude);
-                const longitude = parseFloat(child.longititude);
+              {children
+                .filter(
+                  (item) =>
+                    trackingList[item.childDevice]?.lat != 'undefined' &&
+                    trackingList[item.childDevice]?.lat != null
+                )
+                .map((item, index) => {
+                  let latitude = trackingList[item.childDevice]?.lat;
+                  let longititude = trackingList[item.childDevice]?.lang;
 
-                // Check if latitude and longitude are valid numbers
-                if (isNaN(latitude) || isNaN(longitude)) {
-                  return null; // Skip rendering this marker
-                }
+                  return (
+                    <>
+                      {item?.toggleAlert && (
+                        <Circle
+                          key={index}
+                          center={{
+                            latitude: latitude ? parseFloat(latitude) : parseFloat(10),
+                            longitude: longititude ? parseFloat(longititude) : parseFloat(10),
+                          }}
+                          radius={item?.allowedDistance || 50}
+                          strokeWidth={10}
+                          strokeColor={'red'}
+                          fillColor={'rgba(230,238,255,0.5)'}
+                        />
+                      )}
 
-                return (
-                  <Marker
-                    key={index}
-                    coordinate={{
-                      latitude: latitude,
-                      longitude: longitude,
-                    }}
-                    title={child.firstname}
-                    description={child.lastname}
-                  />
-                );
-              })}
+                      <Marker
+                        onSelect={() => console.log('pressed')}
+                        onPress={() => {
+                          ref.current.fitToSuppliedMarkers(
+                            [
+                              {
+                                latitude: latitude ? parseFloat(latitude) : parseFloat(10),
+                                longitude: longititude ? parseFloat(longititude) : parseFloat(10),
+                              },
+                            ]
+                            // false, // not animated
+                          );
+                        }}
+                        identifier={item?.childEmail}
+                        key={index}
+                        coordinate={{
+                          latitude: latitude ? parseFloat(latitude) : parseFloat(10),
+                          longitude: longititude ? parseFloat(longititude) : parseFloat(10),
+                        }}
+                      >
+                        <View style={{}}>
+                          <View
+                            style={{
+                              height: 30,
+                              width: 30,
+                              borderRadius: 80,
+                              overflow: 'hidden',
+                              // top: 33,
+                              // zIndex: 10,
+                            }}
+                          >
+                            {true && (
+                              <View
+                                style={{
+                                  height: '100%',
+                                  width: '100%',
+                                  borderRadius: 80,
+                                  backgroundColor: Colors.primary,
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                }}
+                              >
+                                <Text style={{ color: Colors.white }}>
+                                  {item?.firstname?.substring(0, 1)?.toUpperCase() || ''}
+                                  {item?.lastname?.substring(0, 1)?.toUpperCase() || ''}
+                                </Text>
+                              </View>
+                            )}
+                            {/* {item?.studentImage != '' && (
+                              <Image
+                                source={{
+                                  uri: item?.studentImage,
+                                }}
+                                style={{
+                                  height: '100%',
+                                  width: '100%',
+                                  borderRadius: 80,
+                                  aspectRatio: 1.5,
+                                }}
+                                resizeMode="contain"
+                              />
+                            )} */}
+                          </View>
+                          {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+                        </View>
+                      </Marker>
+                    </>
+                    // </>
+                    // </Circle>
+                  );
+                })}
             </MapView>
           </View>
         )}

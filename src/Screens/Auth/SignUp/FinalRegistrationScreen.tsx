@@ -15,6 +15,7 @@ import {
   Text,
   useStyleSheet,
 } from '@ui-kitten/components';
+import ChangeUserState from '@/Store/User/FetchOne';
 import { ThunkDispatch } from '@reduxjs/toolkit';
 import { storeIsSubscribed } from '@/Storage/MainAppStorage';
 import { UpdateUser } from '@/Services/SettingsServies';
@@ -30,6 +31,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import { UpdateStudent } from '@/Services/Student';
 import { CustomTextDropDown } from '@/Components';
 import { getDeviceId } from 'react-native-device-info';
 import { Formik } from 'formik';
@@ -250,15 +252,16 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
       });
   };
 
-  const getOrgByFilter = (country = '', state = '', city = '', schoolName = '') => {
-    const query = {
+  const getOrgByFilter = (country = '', state = '', city = '', orgName = '') => {
+    let query = {
       country: country,
       state: state,
       city: city,
-      schoolName: schoolName,
+      orgName: orgName,
     };
     GetOrgByFilters(query)
       .then((res) => {
+        console.log('res', res);
         // const _data = {
         //   schoolId: 0,
         //   name: 'Other',
@@ -331,7 +334,6 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
 
   const updateUser = async (user: any) => {
     try {
-      console.log('userrrrr', user);
       let data = {
         id: user?.parentId,
         email: user?.email,
@@ -356,6 +358,11 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
       console.log('err', err);
     }
   };
+
+  const studentParams = route?.params?.student?.parents[0]?.students.find(
+    (item: any) => item.email === route?.params?.student?.email
+  );
+
   return (
     <BackgroundLayout title="Registration">
       {_user_type?.id == 2 && (
@@ -422,15 +429,32 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                 },
               ]}
             >
-              <View
-                style={{
-                  position: 'absolute',
-                  marginTop: 70,
-                  marginLeft: 75,
-                }}
-              >
-                {renderEditButtonElement()}
-              </View>
+              {studentParams?.studentPhoto && (
+                <ProfileAvatarPicker
+                  style={styles.profileImage}
+                  source={
+                    Platform.OS == 'android'
+                      ? {
+                          uri: studentParams?.studentPhoto,
+                          headers: { Pragma: 'no-cache' },
+                        }
+                      : { uri: studentParams?.studentPhoto }
+                  }
+                  editButton={renderEditAvatarButton}
+                />
+              )}
+
+              {!studentParams?.studentPhoto && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    marginTop: 70,
+                    marginLeft: 75,
+                  }}
+                >
+                  {renderEditButtonElement()}
+                </View>
+              )}
             </View>
           )}
         </View>
@@ -468,8 +492,8 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                 state: '',
                 zipcode: '',
                 phoneNumber: '',
-                password: 'nomi9303',
-                confirmPassword: 'nomi9303',
+                password: '',
+                confirmPassword: '',
                 termsAccepted: false,
               }}
               onSubmit={(values, {}) => {
@@ -512,8 +536,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                           mainId: res.data?.userId,
                           isSubscribed: true,
                         };
-                        console.log(obj);
-                        console.log('==============', response);
+
                         // setLoginObj(obj);
                         if (response.status == 201) {
                           console.log(emailAddress);
@@ -1373,6 +1396,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                 Register(registerObject, 'student')
                   .then(async (response) => {
                     console.log('response--', response.data);
+
                     await Login(loginObject, user_type.toLowerCase());
                     dispatch(
                       // todo not a priority
@@ -1383,6 +1407,55 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                         id: student.studentId,
                       })
                     );
+
+                    if (uploadedImage) {
+                      let formData = new FormData();
+                      formData.append('image', {
+                        uri: uploadedImage?.path,
+                        name: uploadedImage.mime + new Date(),
+                        type: uploadedImage.mime,
+                      });
+                      formData.append('id', student?.studentId);
+
+                      formData.append('parentId', parseInt(student?.parents[0]?.parentId));
+                      formData.append('firstname', student?.firstname);
+                      formData.append('lastname', student?.lastname);
+                      formData.append('phone', student?.phone || '00');
+                      formData.append('email', student?.email);
+                      formData.append('school', student?.school);
+                      formData.append('country', studentParams?.country);
+                      formData.append('state', studentParams?.state);
+                      formData.append('city', studentParams?.city);
+
+                      formData.append('parentemail1', student?.parentemail1);
+                      formData.append('parentemail2', student?.parentemail2);
+
+                      // setisSending(true);
+                      // let objectToPass = {
+                      //   firstName: values.firstName,
+                      //   lastName: values.lastName,
+                      //   id: userId,
+                      //   country: values.country,
+                      //   state: values.state,
+                      //   city: values.city,
+                      // };
+                      UpdateStudent(formData)
+                        .then(async (response: any) => {
+                          dispatch(
+                            ChangeUserState.action({
+                              item: response,
+                              fetchOne: { loading: false, error: null },
+                            })
+                          );
+                        })
+                        .catch((error: any) => {
+                          console.log('err', error);
+                          Alert.alert(error.response.data.title, error.response.data.detail, [
+                            { text: 'OK', style: 'cancel' },
+                          ]);
+                        });
+                    }
+
                     dispatch(
                       ChangeModalState.action({
                         welcomeMessageModal: true,

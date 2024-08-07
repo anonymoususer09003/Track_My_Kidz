@@ -34,7 +34,6 @@ const DeclineActivityModal = ({
   );
   const [{ instructorDetail: instructorDetail }, _dispatch] = useStateValue();
   const dispatch = useDispatch();
-  console.log('acitivity', activity);
 
   const parentDecline = () => {
     if (activity?.activity) {
@@ -44,7 +43,7 @@ const DeclineActivityModal = ({
         studentId: activity?.selectedStudentId,
         studentActivityId: activity?.studentId,
       };
-      console.log('data', data);
+
       UpdateActivityByStatus(data)
         .then((res) => {
           setActivity(activity?.activity?.activityId);
@@ -68,7 +67,7 @@ const DeclineActivityModal = ({
         studentId: activity?.selectedStudentId,
         studentGroupId: activity?.studentId,
       };
-      console.log('data000', data);
+
       UpdateGroupByStatus(data)
         .then((res) => {
           setActivity(activity?.activity?.activityId);
@@ -90,7 +89,6 @@ const DeclineActivityModal = ({
       };
       InstructorUpdateStatus(data)
         .then((res) => {
-          console.log(res);
           dispatch(
             ChangeModalState.action({
               declineActivityModalVisibility: false,
@@ -109,7 +107,6 @@ const DeclineActivityModal = ({
       };
       UpdateInstructorGroupStatus(data)
         .then((res) => {
-          console.log(res);
           dispatch(
             ChangeModalState.action({
               declineActivityModalVisibility: false,

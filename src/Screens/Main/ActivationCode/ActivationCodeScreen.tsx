@@ -38,15 +38,18 @@ const ActivationCodeScreen = () => {
               letterSpacing: 1.5,
             }}
           >
-            Share ALL your dependents' information with partner using the
-            reference code or have him/her scan the QR code
+            Share ALL your dependents' information with partner using the reference code or have
+            him/her scan the QR code
           </Text>
           <View style={{ marginTop: 30, width: '100%' }}>
-            <Text
-              style={{ fontSize: 18, fontWeight: 'bold', alignSelf: 'center' }}
-            >
+            <Text style={{ fontSize: 22, fontWeight: 'bold', alignSelf: 'center' }}>
               {activationCode || ''}
             </Text>
+
+            <Text style={{ color: Colors.orangeDark, textAlign: 'center' }}>
+              {'(Valid for 24 Hours)'}
+            </Text>
+
             <TouchableOpacity>
               <View style={{ marginVertical: 15, alignItems: 'center' }}>
                 <QRCode
@@ -71,8 +74,8 @@ const ActivationCodeScreen = () => {
                 color: 'red',
               }}
             >
-              To share a particular dependent's information, have partner scan
-              only that dependent's QR code.
+              To share a particular dependent's information, have partner scan only that dependent's
+              QR code.
             </Text>
             <Text
               style={{

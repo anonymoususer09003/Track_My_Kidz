@@ -122,7 +122,7 @@ const StudentActivityScreen: FC = () => {
     const _date = moment(new Date()).format();
 
     const res = await TrackHistory(status, id, _date, latitude, longitude);
-    sendCoordinates(latitude, longitude);
+    // sendCoordinates(latitude, longitude);
   };
 
   const handleTrackHistorySchedule = async (tracking?: any) => {
@@ -1085,6 +1085,126 @@ const StudentActivityScreen: FC = () => {
               );
             })}
           </MapView>
+
+          <MapView
+            style={{ flex: 1 }}
+            showsUserLocation
+            showsMyLocationButton
+            initialRegion={{ ...userLocation, latitudeDelta: 0.896, longitudeDelta: 0.896 }}
+            onUserLocationChange={(e) => {
+              setUserLocation({
+                latitude: e.nativeEvent.coordinate?.latitude || 0,
+                longitude: e.nativeEvent.coordinate?.longitude || 0,
+              });
+            }}
+            ref={ref}
+          >
+            {partcipants.map((item, index) => {
+              // console.log("item", item);
+              let latitude = trackingList[item?.childDeviceId]?.lat;
+              let longititude = trackingList[item?.childDeviceId]?.lang;
+
+              return (
+                <View style={{ flex: 1 }}>
+                  {latitude && longititude && (
+                    <Marker
+                      onSelect={() => console.log('pressed')}
+                      onPress={() => {
+                        if (item?.group) {
+                          setModal(true);
+                          setSelectedGroup(item?.groupName);
+                        }
+                      }}
+                      identifier={item?.email}
+                      title={item.name}
+                      description={item.description}
+                      key={index}
+                      coordinate={{
+                        latitude,
+                        longitude: longititude,
+                      }}
+                    >
+                      {!item?.group && (
+                        <View style={{}}>
+                          <View
+                            style={{
+                              height: 30,
+                              width: 30,
+                              borderRadius: 80,
+                              overflow: 'hidden',
+                              // top: 33,
+                              // zIndex: 10,
+                            }}
+                          >
+                            {item?.image == '' && (
+                              <View
+                                style={{
+                                  // height: "100%",
+                                  // width: "100%",
+                                  borderRadius: 20,
+                                  backgroundColor: Colors.primary,
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                }}
+                              >
+                                <Text style={{ color: Colors.white }}>
+                                  {item?.firstName?.substring(0, 1)?.toUpperCase() || ''}
+                                  {item?.lastName?.substring(0, 1)?.toUpperCase() || ''}
+                                </Text>
+                              </View>
+                            )}
+                            {item?.image != '' && (
+                              <Image
+                                source={{
+                                  uri: item?.image,
+                                }}
+                                style={{
+                                  height: 40,
+                                  width: 40,
+                                  borderRadius: 30,
+                                  aspectRatio: 1.5,
+                                }}
+                                resizeMode="contain"
+                              />
+                            )}
+                          </View>
+                          {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
+                        </View>
+                      )}
+
+                      {item?.group && (
+                        <TouchableOpacity
+                          style={{
+                            alignItems: 'center',
+                          }}
+                        >
+                          <View
+                            style={{
+                              // position: "absolute",
+                              zIndex: 10,
+                              bottom: 2,
+                              // height: 80,
+                              // width: 80,
+                              // backgroundColor: Colors.primary,
+                              // opacity: 0.7,
+                            }}
+                          >
+                            <Text style={{ fontWeight: 'bold' }}>
+                              {groups[item?.groupName]?.participants?.length}
+                            </Text>
+                          </View>
+
+                          <Fontisto name="map-marker-alt" size={25} color="red" />
+                        </TouchableOpacity>
+                      )}
+                    </Marker>
+                  )}
+                </View>
+                // </>
+                // </Circle>
+              );
+            })}
+          </MapView>
         </View>
       ) : (
         <View style={{ flex: 1 }}>
@@ -1166,7 +1286,11 @@ const StudentActivityScreen: FC = () => {
           </MapView>
         </View>
       )}
-      <AppHeader hideCenterIcon={true} hideCalendar={showFamilyMap? true:false} showGlobe={true}/>
+      <AppHeader
+        hideCenterIcon={true}
+        hideCalendar={showFamilyMap ? true : false}
+        showGlobe={true}
+      />
     </>
   );
 };

@@ -9,36 +9,35 @@ import Colors from '@/Theme/Colors';
 import { StudentState } from '@/Store/StudentActivity';
 
 type BackgroundLayoutProps = {
-  title?: string,
-  children?: any,
-  hideHeader?: boolean,
-  style?: any,
-  rightIcon?: any,
-  dropDownList?: any,
-  showDropDown?: any,
-  hideLeftIcon?: any,
-}
-const BackgroundLayout: FC<BackgroundLayoutProps> = (
-  {
-    title,
-    children,
-    hideHeader,
-    style,
-    rightIcon,
-    dropDownList,
-    showDropDown,
-    hideLeftIcon,
-  }) => {
+  title?: string;
+  children?: any;
+  hideHeader?: boolean;
+  style?: any;
+  rightIcon?: any;
+  dropDownList?: any;
+  showDropDown?: any;
+  hideLeftIcon?: any;
+};
+const BackgroundLayout: FC<BackgroundLayoutProps> = ({
+  title,
+  children,
+  hideHeader,
+  style,
+  rightIcon,
+  dropDownList,
+  showDropDown,
+  hideLeftIcon,
+}) => {
   const searchIcon = require('@/Assets/Images/search_icon.png');
   const arrowBackIcon = require('@/Assets/Images/arrow_back.png');
   const navigation = useNavigation();
   const focused = useIsFocused();
   const dispatch = useDispatch();
 
-  const headerState = useSelector((state: { user: any, header: any }) => state.header);
+  const headerState = useSelector((state: { user: any; header: any }) => state.header);
 
   const { showFamilyMap } = useSelector(
-    (state: { studentActivity: StudentState }) => state.studentActivity,
+    (state: { studentActivity: StudentState }) => state.studentActivity
   );
   const [showSearchBar, setShowSearchBar] = useState(false);
   useEffect(() => {
@@ -47,17 +46,14 @@ const BackgroundLayout: FC<BackgroundLayoutProps> = (
         setHeaderParams.action({
           selectedDropDownOption: '',
           searchBarValue: '',
-        }),
+        })
       );
     }
   }, [focused]);
   const renderSearchIcon = (setShowSearchBar: any) => {
     return (
       <TouchableOpacity onPress={() => setShowSearchBar(!showSearchBar)}>
-        <Image
-          source={searchIcon}
-          style={{ height: 15, width: 15, resizeMode: 'contain' }}
-        />
+        <Image source={searchIcon} style={{ height: 15, width: 15, resizeMode: 'contain' }} />
       </TouchableOpacity>
     );
   };
@@ -72,22 +68,15 @@ const BackgroundLayout: FC<BackgroundLayoutProps> = (
     >
       {!hideHeader && !showFamilyMap && (
         <View style={[styles.main, style && style]}>
-          <TouchableOpacity onPress={() => {
-
-            navigation.goBack();
-
-          }}>
-            {!hideLeftIcon && (
-              <Image
-                source={arrowBackIcon}
-                style={{ height: 25, width: 25 }}
-              />
-            )}
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+            }}
+          >
+            {!hideLeftIcon && <Image source={arrowBackIcon} style={{ height: 15, width: 25 }} />}
           </TouchableOpacity>
 
-          <Text style={{ color: Colors.white, fontWeight: 'bold' }}>
-            {title}
-          </Text>
+          <Text style={{ color: Colors.white, fontWeight: 'bold' }}>{title}</Text>
           <View style={{ height: 10, width: 10, paddingRight: 20 }}>
             {rightIcon && renderSearchIcon(setShowSearchBar)}
           </View>
@@ -102,7 +91,7 @@ const BackgroundLayout: FC<BackgroundLayoutProps> = (
             dispatch(
               setHeaderParams.action({
                 selectedDropDownOption: index,
-              }),
+              })
             );
           }}
           label={(evaProps: any) => <Text {...evaProps}></Text>}
@@ -110,10 +99,7 @@ const BackgroundLayout: FC<BackgroundLayoutProps> = (
           <SelectItem title="All" />
           {dropDownList &&
             dropDownList?.map((item: any, index: any) => (
-              <SelectItem
-                key={index}
-                title={item?.firstname + ' ' + item?.lastname}
-              />
+              <SelectItem key={index} title={item?.firstname + ' ' + item?.lastname} />
             ))}
         </Select>
       )}
@@ -128,7 +114,7 @@ const BackgroundLayout: FC<BackgroundLayoutProps> = (
             dispatch(
               setHeaderParams.action({
                 searchBarValue: nextValue,
-              }),
+              })
             );
 
             //@ts-ignore
@@ -151,8 +137,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 10,
     paddingTop: 10,
-    paddingBottom: 40,
-    marginTop: 30,
+    paddingBottom: 20,
+    // marginTop: 30,
   },
   searchBar: {
     width: '90%',

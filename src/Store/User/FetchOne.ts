@@ -14,18 +14,17 @@
 //   }),
 // };
 
-import { createAction } from "@reduxjs/toolkit";
-import { ModalState } from "@/Store/Modal";
+import { createAction } from '@reduxjs/toolkit';
+import { ModalState } from '@/Store/Modal';
 
 interface PayloadInterface {
   payload: Partial<ModalState>;
 }
 
 export default {
-  initialState: {item:null},
-  action: createAction<Partial<any>>("user/fetchOne"),
+  initialState: { item: null },
+  action: createAction<Partial<any>>('user/fetchOne'),
   reducers(state: any, { payload }: any) {
-    console.log('0000000000payload',payload)
     state.item = payload?.item;
   },
 };

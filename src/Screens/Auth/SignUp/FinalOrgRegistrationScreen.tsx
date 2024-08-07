@@ -724,7 +724,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                           dispatch(ChangeModalState.action({ loading: false }));
                         });
                     } else if (values.selected_entity != 'School' && !orgId) {
-                      console.log('schoolobj------------', schoolObject);
                       CompleteRegistration(schoolObject, 'org')
                         .then((_res) => {
                           console.log({
@@ -1198,9 +1197,9 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                               autoCapitalize="none"
                               autoCorrect={false}
                               placeholder={`Organisation Name*`}
-                              value={values.schoolName}
-                              onChangeText={handleChange('schoolName')}
-                              onBlur={handleBlur('schoolName')}
+                              value={values.school_name}
+                              onChangeText={handleChange('school_name')}
+                              onBlur={handleBlur('school_name')}
                             />
                             {errors.schoolName && touched.schoolName && (
                               <Text style={styles.errorText}>{errors.schoolName}</Text>

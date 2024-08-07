@@ -18,17 +18,16 @@ type ApproveActivityModal = {
   fromParent: any;
   visible: any;
   onClose: any;
-}
+};
 
-const ApproveActivityModal: FC<ApproveActivityModal> = (
-  {
-    setSelectedChild,
-    activity,
-    setActivity,
-    fromParent,
-    visible,
-    onClose,
-  }) => {
+const ApproveActivityModal: FC<ApproveActivityModal> = ({
+  setSelectedChild,
+  activity,
+  setActivity,
+  fromParent,
+  visible,
+  onClose,
+}) => {
   const [{ instructorDetail: instructorDetail }, _dispatch]: any = useStateValue();
   // const isVisible = useSelector(
   //   (state: { modal: ModalState }) => state.modal.approveActivityModalVisibility,
@@ -63,14 +62,13 @@ const ApproveActivityModal: FC<ApproveActivityModal> = (
         studentId: activity?.selectedStudentId,
         studentActivityId: activity?.studentId,
       };
-      console.log('data', data);
+
       UpdateActivityByStatus(data)
         .then((res) => {
-          console.log('accepted', res);
           dispatch(
             ChangeModalState.action({
               approveActivityModalVisibility: false,
-            }),
+            })
           );
           onClose();
           setActivity(activity?.activity?.activityId);
@@ -80,7 +78,7 @@ const ApproveActivityModal: FC<ApproveActivityModal> = (
           dispatch(
             ChangeModalState.action({
               approveActivityModalVisibility: false,
-            }),
+            })
           );
           onClose();
           setActivity(activity?.activity?.activityId);
@@ -95,11 +93,10 @@ const ApproveActivityModal: FC<ApproveActivityModal> = (
       };
       UpdateGroupByStatus(data)
         .then((res) => {
-          console.log(res);
           dispatch(
             ChangeModalState.action({
               approveActivityModalVisibility: false,
-            }),
+            })
           );
           onClose();
           // setSelectedChild();
@@ -111,7 +108,6 @@ const ApproveActivityModal: FC<ApproveActivityModal> = (
   };
 
   const instructorApproval = () => {
-    console.log('activity0000888', activity);
     if (activity?.activityId) {
       const data = {
         activityId: activity?.activityId,
@@ -120,11 +116,10 @@ const ApproveActivityModal: FC<ApproveActivityModal> = (
       };
       InstructorUpdateStatus(data)
         .then((res) => {
-          console.log('approved', res);
           dispatch(
             ChangeModalState.action({
               approveActivityModalVisibility: false,
-            }),
+            })
           );
           onClose();
           // setSelectedChild();
@@ -142,11 +137,10 @@ const ApproveActivityModal: FC<ApproveActivityModal> = (
       };
       UpdateInstructorGroupStatus(data)
         .then((res) => {
-          console.log(res);
           dispatch(
             ChangeModalState.action({
               approveActivityModalVisibility: false,
-            }),
+            })
           );
           onClose();
           // setSelectedChild();
@@ -184,14 +178,12 @@ const ApproveActivityModal: FC<ApproveActivityModal> = (
       backdropStyle={styles.backdrop}
       onBackdropPress={() => {
         // setSelectedChild();
-        dispatch(
-          ChangeModalState.action({ approveActivityModalVisibility: false }),
-        );
+        dispatch(ChangeModalState.action({ approveActivityModalVisibility: false }));
         onClose();
         // setActivity(null);
       }}
     >
-      {(
+      {
         <Card style={styles.modal} disabled={true}>
           <View style={{ flex: 1 }}>
             <View style={styles.body}>
@@ -210,38 +202,22 @@ const ApproveActivityModal: FC<ApproveActivityModal> = (
             </View>
             {
               <View style={{ marginTop: 20, paddingHorizontal: 10 }}>
-                <Text style={{ fontWeight: '600', fontSize: 16 }}>
-                  Instructions
-                </Text>
+                <Text style={{ fontWeight: '600', fontSize: 16 }}>Instructions</Text>
                 <View style={{ maxHeight: 100 }}>
                   <ScrollView nestedScrollEnabled>
-                    <Text style={{ fontSize: 15, marginTop: 10 }}>
-                      {infomation?.instructions}
-                    </Text>
+                    <Text style={{ fontSize: 15, marginTop: 10 }}>{infomation?.instructions}</Text>
                   </ScrollView>
                 </View>
-                <Text
-                  style={{ fontWeight: '600', fontSize: 16, marginTop: 20 }}
-                >
-                  Disclaimer
-                </Text>
+                <Text style={{ fontWeight: '600', fontSize: 16, marginTop: 20 }}>Disclaimer</Text>
                 <View style={{ maxHeight: 100 }}>
                   <ScrollView nestedScrollEnabled>
-                    <Text style={{ fontSize: 15, marginTop: 10 }}>
-                      {infomation?.disclaimer}
-                    </Text>
+                    <Text style={{ fontSize: 15, marginTop: 10 }}>{infomation?.disclaimer}</Text>
                   </ScrollView>
                 </View>
-                <Text
-                  style={{ fontWeight: '600', fontSize: 16, marginTop: 20 }}
-                >
-                  Agreement
-                </Text>
+                <Text style={{ fontWeight: '600', fontSize: 16, marginTop: 20 }}>Agreement</Text>
                 <View style={{ maxHeight: 100 }}>
                   <ScrollView nestedScrollEnabled>
-                    <Text style={{ fontSize: 15, marginTop: 10 }}>
-                      {infomation?.agreement}
-                    </Text>
+                    <Text style={{ fontSize: 15, marginTop: 10 }}>{infomation?.agreement}</Text>
                   </ScrollView>
                 </View>
               </View>
@@ -259,10 +235,7 @@ const ApproveActivityModal: FC<ApproveActivityModal> = (
               </View>
             </View>
             <View
-              style={[
-                styles.buttonText,
-                { backgroundColor: terms ? Colors.primary : Colors.gray },
-              ]}
+              style={[styles.buttonText, { backgroundColor: terms ? Colors.primary : Colors.gray }]}
             >
               <LinearGradientButton
                 style={{
@@ -293,7 +266,7 @@ const ApproveActivityModal: FC<ApproveActivityModal> = (
                   dispatch(
                     ChangeModalState.action({
                       approveActivityModalVisibility: false,
-                    }),
+                    })
                   );
                   onClose();
                   // setSelectedChild();
@@ -305,7 +278,7 @@ const ApproveActivityModal: FC<ApproveActivityModal> = (
             </View>
           </View>
         </Card>
-      )}
+      }
     </Modal>
   );
 };

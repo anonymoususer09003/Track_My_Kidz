@@ -1,6 +1,9 @@
-import api from '@/Services'
+import api from '@/Services';
 
-export default async (activiationCode) => {
-    const response = await api.get(`/auth/student/${activiationCode}`)
-    return response.data
-}
+export default async (values) => {
+  const response = await api.post(`/auth/student/${values.code}`, {
+    studentEmail: values.studentEmail,
+    parentEmail: values.parentEmail,
+  });
+  return response.data;
+};

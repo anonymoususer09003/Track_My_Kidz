@@ -5,7 +5,11 @@ import {
   GetGroupByStudentId,
   GetGroupCount,
 } from '@/Services/Group';
-import { getHomeScreenCacheInfo, loadToken, storeHomeScreenCacheInfo } from '@/Storage/MainAppStorage';
+import {
+  getHomeScreenCacheInfo,
+  loadToken,
+  storeHomeScreenCacheInfo,
+} from '@/Storage/MainAppStorage';
 import ChangeModalState from '@/Store/Modal/ChangeModalState';
 import { StudentState } from '@/Store/StudentActivity';
 import { UserState } from '@/Store/User';
@@ -14,13 +18,7 @@ import Colors from '@/Theme/Colors';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Icon, Text } from '@ui-kitten/components';
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -50,11 +48,9 @@ const StudentGroupScreen = () => {
   let prevOpenedRow: any;
   const [, _dispatch]: any = useStateValue();
   let row: any[] = [];
-  const searchBarValue = useSelector(
-    (state: any) => state.header.searchBarValue,
-  );
+  const searchBarValue = useSelector((state: any) => state.header.searchBarValue);
   const { showFamilyMap } = useSelector(
-    (state: { studentActivity: StudentState }) => state.studentActivity,
+    (state: { studentActivity: StudentState }) => state.studentActivity
   );
   const [studentsEmails, setStudentsEmail] = useState<any[]>([]);
 
@@ -62,9 +58,7 @@ const StudentGroupScreen = () => {
   const [groups, setGroups] = useState<any[]>([]);
   const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
   const [userLocation, setUserLocation] = useState<LatLng>({ longitude: 0, latitude: 0 });
-  const currentUser: any = useSelector(
-    (state: { user: UserState }) => state.user.item,
-  );
+  const currentUser: any = useSelector((state: { user: UserState }) => state.user.item);
 
   const getGroups = async () => {
     GetGroupByStudentId(currentUser?.studentId)
@@ -170,8 +164,6 @@ const StudentGroupScreen = () => {
     const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
     stompClient = Stomp.over(socket);
     stompClient.connect({ token }, () => {
-      console.log('Connected');
-
       deviceIds.map((item) => {
         stompClient.subscribe(`/device/${item}`, subscriptionCallback);
       });
@@ -179,7 +171,6 @@ const StudentGroupScreen = () => {
   };
   const subscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
-    console.log('Update Received', messageBody);
 
     setTrackingList({
       ...trackingList,
@@ -218,9 +209,6 @@ const StudentGroupScreen = () => {
           justifyContent: 'center',
         }}
       >
-
-
-
         <TouchableOpacity
           onPress={() => {
             dispatch(
@@ -233,12 +221,12 @@ const StudentGroupScreen = () => {
                   avatar: currentUser?.imageurl,
                   name: currentUser?.firstname
                     ? currentUser?.firstname[0].toUpperCase() +
-                    currentUser?.firstname.slice(1) +
-                    '' +
-                    currentUser?.lastname[0]
+                      currentUser?.firstname.slice(1) +
+                      '' +
+                      currentUser?.lastname[0]
                     : currentUser?.firstname + '' + currentUser?.lastname,
                 },
-              }),
+              })
             );
             navigation.navigate('ChatScreen', {
               title: item?.groupName,
@@ -255,23 +243,22 @@ const StudentGroupScreen = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-            style={{
-              padding: 5,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onPress={() => {
-              prevOpenedRow?.close();
-              _dispatch({
-                type: actions.SET_SELECTED_GROUP,
-                payload: item?.groupId,
-              });
-             navigation.navigate('GroupScehdule')
-
-            }}
-          >
-            <FontAwesome5 size={25} name="calendar" color={Colors.primary} />
-          </TouchableOpacity>
+          style={{
+            padding: 5,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onPress={() => {
+            prevOpenedRow?.close();
+            _dispatch({
+              type: actions.SET_SELECTED_GROUP,
+              payload: item?.groupId,
+            });
+            navigation.navigate('GroupScehdule');
+          }}
+        >
+          <FontAwesome5 size={25} name="calendar" color={Colors.primary} />
+        </TouchableOpacity>
 
         {!item.status && (
           <TouchableOpacity
@@ -290,33 +277,26 @@ const StudentGroupScreen = () => {
                 })
             }
           >
-            <Icon
-              style={{ width: 30, height: 30 }}
-              fill={Colors.primary}
-              name="trash"
-            />
+            <Icon style={{ width: 30, height: 30 }} fill={Colors.primary} name="trash" />
           </TouchableOpacity>
         )}
       </View>
     );
   };
 
-
-function navigateToMyLocation() {
-  ref.current?.animateToRegion({
-    ...userLocation,
-    latitudeDelta: 0.896,
-    longitudeDelta: 0.896,
-  });
-}
-
-useEffect(() => {
-  if (userLocation.longitude !== 0 || userLocation.latitude !== 0) {
-    navigateToMyLocation();
+  function navigateToMyLocation() {
+    ref.current?.animateToRegion({
+      ...userLocation,
+      latitudeDelta: 0.896,
+      longitudeDelta: 0.896,
+    });
   }
-}, [userLocation]);
 
-
+  useEffect(() => {
+    if (userLocation.longitude !== 0 || userLocation.latitude !== 0) {
+      navigateToMyLocation();
+    }
+  }, [userLocation]);
 
   return (
     <>
@@ -472,7 +452,7 @@ useEffect(() => {
           />
         )}
         {showFamilyMap && (
-          <View style={{flex:1}}>
+          <View style={{ flex: 1 }}>
             <TouchableOpacity
               onPress={navigateToMyLocation}
               style={{
@@ -517,7 +497,7 @@ useEffect(() => {
               }}
             >
               <Marker
-                coordinate={{...userLocation}}
+                coordinate={{ ...userLocation }}
                 title="Your Location"
                 description="This is where you are"
               />
@@ -527,11 +507,6 @@ useEffect(() => {
 
                 // Check if latitude and longitude are valid numbers
                 if (isNaN(latitude) || isNaN(longitude)) {
-                  console.log(
-                    `Invalid coordinates for child ${child.firstname}:`,
-                    child.latitude,
-                    child.longititude
-                  );
                   return null; // Skip rendering this marker
                 }
 
@@ -557,7 +532,11 @@ useEffect(() => {
           </Text>
         )}
       </View>
-      <AppHeader hideCenterIcon={showFamilyMap?false: true} hideCalendar={true} showGlobe={true} />
+      <AppHeader
+        hideCenterIcon={showFamilyMap ? false : true}
+        hideCalendar={true}
+        showGlobe={true}
+      />
     </>
   );
 };

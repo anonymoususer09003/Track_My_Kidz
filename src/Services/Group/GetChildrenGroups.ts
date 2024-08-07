@@ -1,4 +1,4 @@
-import api from "@/Services";
+import api from '@/Services';
 
 interface ChildrenActivities {
   email: string;
@@ -7,16 +7,7 @@ interface ChildrenActivities {
   pageSize: number;
 }
 
-export default async (
-  email: string,
-  status: string,
-  page: number,
-  pageSize: number
-) => {
-  console.log(
-    "res-----",
-    `/group/getChildrenGroups?page_number=${page}&page_size=${pageSize}&email=${email}&status=${status}`
-  );
+export default async (email: string, status: string, page: number, pageSize: number) => {
   const response = await api.get(
     `/group/getChildrenGroups?page_number=${page}&page_size=${pageSize}&email=${email}&status=${status}`
   );

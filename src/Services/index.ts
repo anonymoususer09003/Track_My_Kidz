@@ -36,15 +36,12 @@ instance.interceptors.request.use(async (request) => {
     }
   }
 
-  console.log('request', request.headers);
   return request;
 });
 
 instance.interceptors.response.use(
   (response) => response,
   ({ message, response: { data, status } }) => {
-    console.log('response', message, data);
-
     return handleError({ message, data, status });
   }
 );

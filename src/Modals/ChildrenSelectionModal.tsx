@@ -1,22 +1,16 @@
-import {
-  Card,
-  IndexPath,
-  Modal,
-  RadioGroup,
-  Text,
-} from "@ui-kitten/components";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
-import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { UserState } from "@/Store/User";
-import { useTheme } from "@/Theme";
-import { LinearGradientButton } from "@/Components";
-import ChangeSelectedState from "@/Store/Selected/ChangeSelectedState";
-import { DeclineToGift } from "@/Services/GiftService";
-import Colors from "@/Theme/Colors";
-import EvilIcons from "react-native-vector-icons/EvilIcons";
+import { Card, IndexPath, Modal, RadioGroup, Text } from '@ui-kitten/components';
+import { useDispatch, useSelector } from 'react-redux';
+import { ModalState } from '@/Store/Modal';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { UserState } from '@/Store/User';
+import { useTheme } from '@/Theme';
+import { LinearGradientButton } from '@/Components';
+import ChangeSelectedState from '@/Store/Selected/ChangeSelectedState';
+import { DeclineToGift } from '@/Services/GiftService';
+import Colors from '@/Theme/Colors';
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 const ChildrenSelectionModal = ({
   setSelectedChild,
@@ -30,13 +24,11 @@ const ChildrenSelectionModal = ({
   acceptModal: any;
 }) => {
   const { Layout } = useTheme();
-  const [selectedAmountIndex, setSelectedAmountIndex] =
-    useState<IndexPath | null>(null);
+  const [selectedAmountIndex, setSelectedAmountIndex] = useState<IndexPath | null>(null);
   const [isValid, setIsValid] = useState(false);
   const [payment, setPayment] = useState(false);
   const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.childrenSelectionModalVisibility
+    (state: { modal: ModalState }) => state.modal.childrenSelectionModalVisibility
   );
   const dispatch = useDispatch();
 
@@ -45,7 +37,7 @@ const ChildrenSelectionModal = ({
     setIsValid(false);
     setSelectedAmountIndex(null);
   }, [isVisible]);
-  console.log("acitivyt", activity);
+
   // @ts-ignore
   return (
     <Modal
@@ -53,19 +45,17 @@ const ChildrenSelectionModal = ({
       visible={isVisible}
       backdropStyle={styles.backdrop}
       onBackdropPress={() => {
-        dispatch(
-          ChangeModalState.action({ childrenSelectionModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ childrenSelectionModalVisibility: false }));
       }}
     >
       <Card style={styles.modal} disabled={true}>
         <View style={styles.body}>
           <View style={{ paddingBottom: 10, paddingTop: 10 }}>
             <Text
-              textBreakStrategy={"highQuality"}
+              textBreakStrategy={'highQuality'}
               style={{
-                textAlign: "center",
-                color: "#606060",
+                textAlign: 'center',
+                color: '#606060',
                 fontSize: 18,
               }}
             >
@@ -83,20 +73,14 @@ const ChildrenSelectionModal = ({
                     setSelectedChild(child);
                     dispatch(
                       ChangeModalState.action({
-                        approveActivityModalVisibility: acceptModal
-                          ? true
-                          : false,
+                        approveActivityModalVisibility: acceptModal ? true : false,
                         childrenSelectionModalVisibility: false,
-                        declineActivityModalVisibility: acceptModal
-                          ? false
-                          : true,
+                        declineActivityModalVisibility: acceptModal ? false : true,
                       })
                     );
                   }}
                 >
-                  <Text style={{ fontSize: 15 }}>
-                    {child?.firstname + " " + child?.lastname}
-                  </Text>
+                  <Text style={{ fontSize: 15 }}>{child?.firstname + ' ' + child?.lastname}</Text>
                 </TouchableOpacity>
               ))}
           </ScrollView>
@@ -132,16 +116,16 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   modal: { borderRadius: 10 },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     color: Colors.white,
     zIndex: -1,
   },
@@ -150,33 +134,33 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   bottom: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 45,
     marginTop: 10,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   buttonText: {
     flex: 1,
     borderRadius: 25,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     margin: 2,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
     marginTop: 10,
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

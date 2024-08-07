@@ -4,12 +4,10 @@ import { GetInstructor } from '@/Services/Instructor';
 import { GetParent } from '@/Services/Parent';
 import { GetStudent } from '@/Services/Student';
 
-
 export default async () => {
   const userId = await loadUserId();
   const userType = await loadUserType();
-  console.log('FetchOne.ts line 9 userId', userId, typeof userId);
-  console.log('FetchOne.ts line 10 userType', userType, typeof userType);
+
   if (!userId || userId === 'null') {
     return handleError({ message: 'User ID is required' });
   }

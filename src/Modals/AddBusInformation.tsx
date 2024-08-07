@@ -1,26 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
-import {
-  Text,
-  CheckBox,
-  Input,
-  TopNavigationAction,
-  Icon,
-} from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import Colors from "@/Theme/Colors";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Modal from "react-native-modal";
-import PreviewBusInformation from "./PreviewBusInformation";
-import { LinearGradientButton } from "@/Components";
+import React, { useEffect, useState, useRef } from 'react';
+import { Text, CheckBox, Input, TopNavigationAction, Icon } from '@ui-kitten/components';
+import { StyleSheet, View, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import Colors from '@/Theme/Colors';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Modal from 'react-native-modal';
+import PreviewBusInformation from './PreviewBusInformation';
+import { LinearGradientButton } from '@/Components';
 
 const AddBusInformation = ({
   activity,
@@ -35,34 +23,28 @@ const AddBusInformation = ({
   selectedItem?: any;
   fromActivity?: any;
 }) => {
-  console.log("selectedItem", selectedItem);
   const dispatch = useDispatch();
   const isVisiblePreview = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.previewButInformationModalVisibility
+    (state: { modal: ModalState }) => state.modal.previewButInformationModalVisibility
   );
-  const [busName, setBusName] = useState(selectedItem?.busName || "");
+  const [busName, setBusName] = useState(selectedItem?.busName || '');
 
-  const [numberOfRows, setNumberOfRows] = useState(
-    selectedItem?.numberOfRows || ""
-  );
-  console.log("numb", numberOfRows);
+  const [numberOfRows, setNumberOfRows] = useState(selectedItem?.numberOfRows || '');
+
   const [numberOfSeatsPerRow, setNumberOfSeatsPerRow] = useState(
-    selectedItem?.numberOfSeatsPerRow || ""
+    selectedItem?.numberOfSeatsPerRow || ''
   );
 
-  console.log("numb per", numberOfSeatsPerRow);
   const [numberOfKidsPerSeat, setNumberOfKidsPerSeat] = useState(
-    selectedItem?.numberOfKidsPerSeat || ""
+    selectedItem?.numberOfKidsPerSeat || ''
   );
   const [isLongSeat, setIsLongSeat] = useState(selectedItem?.longSeat || false);
   const [numberOfKidsLongSeat, setNumberOfKidsLongSeat] = useState(
-    selectedItem?.numberOfKidsOnLongSeat || ""
+    selectedItem?.numberOfKidsOnLongSeat || ''
   );
 
   const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.addButInformationModalVisibility
+    (state: { modal: ModalState }) => state.modal.addButInformationModalVisibility
   );
 
   useEffect(() => {
@@ -73,27 +55,22 @@ const AddBusInformation = ({
       setNumberOfKidsPerSeat(selectedItem?.numberOfKidsPerSeat?.toString());
       setIsLongSeat(selectedItem?.longSeat);
       setNumberOfKidsLongSeat(
-        selectedItem?.longSeat
-          ? selectedItem?.numberOfKidsOnLongSeat?.toString()
-          : ""
+        selectedItem?.longSeat ? selectedItem?.numberOfKidsOnLongSeat?.toString() : ''
       );
     }
   }, [selectedItem, isVisible]);
   useEffect(() => {
     if (!isVisible) {
-      setNumberOfKidsLongSeat("");
+      setNumberOfKidsLongSeat('');
       setIsLongSeat(false);
-      setNumberOfKidsPerSeat("");
-      setNumberOfRows("");
-      setNumberOfSeatsPerRow("");
-      setBusName("");
+      setNumberOfKidsPerSeat('');
+      setNumberOfRows('');
+      setNumberOfSeatsPerRow('');
+      setBusName('');
     }
   }, [isVisible]);
   let disabled =
-    busName == "" ||
-    numberOfSeatsPerRow == "" ||
-    numberOfKidsPerSeat == "" ||
-    numberOfRows == ""
+    busName == '' || numberOfSeatsPerRow == '' || numberOfKidsPerSeat == '' || numberOfRows == ''
       ? true
       : false;
   // @ts-ignore
@@ -105,19 +82,13 @@ const AddBusInformation = ({
       style={{ margin: 0, marginTop: 50 }}
       swipeDirection="down"
       onSwipeComplete={() => {
-        dispatch(
-          ChangeModalState.action({ addButInformationModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ addButInformationModalVisibility: false }));
       }}
       onBackdropPress={() => {
-        dispatch(
-          ChangeModalState.action({ addButInformationModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ addButInformationModalVisibility: false }));
       }}
       onBackButtonPress={() => {
-        dispatch(
-          ChangeModalState.action({ addButInformationModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ addButInformationModalVisibility: false }));
       }}
     >
       <KeyboardAwareScrollView
@@ -155,7 +126,7 @@ const AddBusInformation = ({
               backgroundColor: Colors.newBackgroundColor,
               borderTopLeftRadius: 10,
               borderTopRightRadius: 10,
-              overflow: "hidden",
+              overflow: 'hidden',
             }}
           >
             <View style={styles.layout}>
@@ -167,9 +138,7 @@ const AddBusInformation = ({
                     placeholder="Give your bus a name"
                     value={busName}
                     onChangeText={(val) => setBusName(val)}
-                    label={(evaProps: any) => (
-                      <Text style={styles.inputLabels}>Bus Name</Text>
-                    )}
+                    label={(evaProps: any) => <Text style={styles.inputLabels}>Bus Name</Text>}
                   />
                 </View>
                 <View style={{ marginTop: 10, maxHeight: 150 }}>
@@ -194,14 +163,12 @@ const AddBusInformation = ({
                       onChangeText={(val) => setNumberOfSeatsPerRow(val)}
                       label={(evaProps: any) => (
                         <>
-                          <Text
-                            style={[styles.inputLabels, { marginBottom: 2 }]}
-                          >
+                          <Text style={[styles.inputLabels, { marginBottom: 2 }]}>
                             Number of seats per row
                           </Text>
                           <Text
                             style={{
-                              color: "red",
+                              color: 'red',
                               fontSize: 12,
                               marginBottom: 10,
                             }}
@@ -220,9 +187,7 @@ const AddBusInformation = ({
                       value={numberOfKidsPerSeat}
                       onChangeText={(val) => setNumberOfKidsPerSeat(val)}
                       label={(evaProps: any) => (
-                        <Text style={styles.inputLabels}>
-                          Number of kids per seat
-                        </Text>
+                        <Text style={styles.inputLabels}>Number of kids per seat</Text>
                       )}
                     />
                   </View>
@@ -235,7 +200,7 @@ const AddBusInformation = ({
                       checked={isLongSeat}
                       onChange={() => setIsLongSeat(!isLongSeat)}
                     >
-                      {""}
+                      {''}
                     </CheckBox>
                   </View>
                   {isLongSeat && (
@@ -247,9 +212,7 @@ const AddBusInformation = ({
                         value={numberOfKidsLongSeat}
                         onChangeText={(val) => setNumberOfKidsLongSeat(val)}
                         label={(evaProps: any) => (
-                          <Text style={styles.inputLabels}>
-                            Number of seats on long seat
-                          </Text>
+                          <Text style={styles.inputLabels}>Number of seats on long seat</Text>
                         )}
                       />
                     </View>
@@ -258,11 +221,11 @@ const AddBusInformation = ({
               </View>
               <View
                 style={{
-                  alignItems: "center",
-                  width: "90%",
+                  alignItems: 'center',
+                  width: '90%',
                   marginTop: 30,
-                  justifyContent: "center",
-                  alignSelf: "center",
+                  justifyContent: 'center',
+                  alignSelf: 'center',
                 }}
               >
                 <LinearGradientButton
@@ -291,7 +254,7 @@ const AddBusInformation = ({
                   <Text
                     style={{
                       fontSize: 13,
-                      textAlign: "center",
+                      textAlign: 'center',
                       color: Colors.primaryTint,
                     }}
                   >
@@ -312,17 +275,17 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   modal: { borderRadius: 10 },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   textInput: {
     marginTop: 10,
-    alignSelf: "center",
-    width: "95%",
+    alignSelf: 'center',
+    width: '95%',
 
     borderRadius: 8,
     elevation: 2,
@@ -346,32 +309,32 @@ const styles = StyleSheet.create({
   },
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   item: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     paddingHorizontal: 10,
     paddingTop: 10,
   },
   footer: {
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginVertical: 5,
   },
   text: {
@@ -379,12 +342,12 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   bottomButton: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -395,6 +358,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

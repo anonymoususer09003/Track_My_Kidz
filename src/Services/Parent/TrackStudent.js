@@ -1,4 +1,4 @@
-import api from "@/Services";
+import api from '@/Services';
 
 export default async (
   studentId,
@@ -8,10 +8,6 @@ export default async (
   distanceAllowed,
   kilometers
 ) => {
-  console.log(
-    "logsgss-----------------------------------------",
-    `/user/parent/v2/alert/trackStudent?studentId=${studentId}&parentLatitude=${parentLatitude}&parentLongitude=${parentLongititude}&toggleAlert=${toggleAlert}&distanceAllowed=${distanceAllowed}&kilometers=${kilometers}`
-  );
   const response = await api.post(
     `/user/parent/v2/alert/trackStudent?studentId=${studentId}&parentLatitude=${parentLatitude}&parentLongitude=${parentLongititude}&toggleAlert=${toggleAlert}&distanceAllowed=${distanceAllowed}&kilometers=${kilometers}`
   );
