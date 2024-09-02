@@ -1,4 +1,4 @@
-import api from "@/Services";
+import api from '@/Services';
 
 interface FindActivityByStudentStatus {
   activityId: number;
@@ -12,5 +12,6 @@ export default async (data: FindActivityByStudentStatus) => {
     `/activity/students-which-activity-status-pending/approved/decline?page_number=${data.page}&page_size=${data.page_size}`,
     data
   );
+  console.log('response data-------', response.data);
   return response.data;
 };

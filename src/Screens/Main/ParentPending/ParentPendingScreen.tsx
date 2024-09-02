@@ -266,9 +266,10 @@ const ParentPendingScreen = () => {
               console.log('declinedactivity', activity);
 
               console.log('activites', activities);
-              let filter = activities.filter((item) => item?.activity?.activityId != id);
+              getActivities();
+              // let filter = activities.filter((item) => item?.activity?.activityId != id);
 
-              setActivities(filter);
+              // setActivities(filter);
             } else {
               let filter = groups.filter((item) => item?.group?.groupId != id);
               setGroups(filter);

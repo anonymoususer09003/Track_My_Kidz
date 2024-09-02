@@ -3,7 +3,11 @@ import { actions } from '@/Context/state/Reducer';
 import { useStateValue } from '@/Context/state/State';
 import { GroupParticipantsModal, InstructionsModal, ShowInstructorsStudentsModal } from '@/Modals';
 import { Activity, Optin } from '@/Models/DTOs';
-import { GetActivitesCount, GetActivityByStudentId, ParticipantLocation } from '@/Services/Activity';
+import {
+  GetActivitesCount,
+  GetActivityByStudentId,
+  ParticipantLocation,
+} from '@/Services/Activity';
 import { InstructorState } from '@/Store/InstructorsActivity';
 import { ModalState } from '@/Store/Modal';
 import SetChatParam from '@/Store/chat/SetChatParams';
@@ -13,7 +17,7 @@ import { Icon, Text } from '@ui-kitten/components';
 import axios from 'axios';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import MapView, { Marker } from 'react-native-maps';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -28,21 +32,19 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 import { calculateDistance } from '@/Utils/DistanceCalculator';
 import { loadToken } from '@/Storage/MainAppStorage';
-
+import GroupMap from '../../../Components/groupMap/index';
 const ActivityScreen = () => {
   const isFocused = useIsFocused();
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const ref = useRef<any>();
+
   // const swipeableRef = useRef(null);
   const [, _dispatch]: any = useStateValue();
-  const searchBarValue = useSelector(
-    (state: any) => state.header.searchBarValue,
-  );
+  const searchBarValue = useSelector((state: any) => state.header.searchBarValue);
   const dispatch = useDispatch();
   let prevOpenedRow: any;
   let row: Array<any> = [];
-  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
-    useState<boolean>(false);
+  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] = useState<boolean>(false);
   const [selectionData, setSelectionData] = useState<any>({
     type: 'student',
     status: 'pending',
@@ -50,9 +52,7 @@ const ActivityScreen = () => {
   const instructorImage = require('@/Assets/Images/approval_icon2.png');
   // const dependent = route && route.params && route.params.dependent;
   // console.log('setThumbnail',route)
-  const currentUser: any = useSelector(
-    (state: { user: UserState }) => state.user.item,
-  );
+  const currentUser: any = useSelector((state: { user: UserState }) => state.user.item);
   const cancelToken = axios.CancelToken;
   const source = cancelToken.source();
   const [activitiesCount, setActivitiesCount] = useState<any>({});
@@ -72,12 +72,9 @@ const ActivityScreen = () => {
   const [newParticipnatsArr, setnewParticipnatsArr] = useState<any[]>([]);
 
   const { selectedDayForFilter, selectedMonthForFilter } = useSelector(
-    (state: { instructorsActivity: InstructorState }) =>
-      state.instructorsActivity,
+    (state: { instructorsActivity: InstructorState }) => state.instructorsActivity
   );
-  const isCalendarVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.showCalendar,
-  );
+  const isCalendarVisible = useSelector((state: { modal: ModalState }) => state.modal.showCalendar);
 
   const RightActions = (dragX: any, item: any) => {
     const scale = dragX.interpolate({
@@ -92,7 +89,7 @@ const ActivityScreen = () => {
           style={{
             // flexDirection: "column",
             alignItems: 'center',
-           justifyContent:"space-evenly",
+            justifyContent: 'space-evenly',
             height: 200,
             // backgroundColor:'red'
           }}
@@ -106,16 +103,17 @@ const ActivityScreen = () => {
                   subcollection: 'parent',
                   user: {
                     _id: currentUser?.parentId,
-                    avatar: currentUser?.imageurl ||
+                    avatar:
+                      currentUser?.imageurl ||
                       'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
                     name: currentUser?.firstname
                       ? currentUser?.firstname[0].toUpperCase() +
-                      currentUser?.firstname.slice(1) +
-                      ' ' +
-                      currentUser?.lastname[0].toUpperCase()
+                        currentUser?.firstname.slice(1) +
+                        ' ' +
+                        currentUser?.lastname[0].toUpperCase()
                       : currentUser?.firstname + '' + currentUser?.lastname,
                   },
-                }),
+                })
               );
               navigation.navigate('ChatScreen', {
                 title: item?.activityName,
@@ -141,10 +139,7 @@ const ActivityScreen = () => {
                 justifyContent: 'center',
               }}
             >
-              <Icon
-                style={{ width: 40, height: 40 }}
-                fill={Colors.primary}
-                name="trash" />
+              <Icon style={{ width: 40, height: 40 }} fill={Colors.primary} name="trash" />
             </TouchableOpacity>
           )}
           <TouchableOpacity
@@ -157,7 +152,8 @@ const ActivityScreen = () => {
           >
             <Entypo size={40} color={Colors.primary} name="location-pin" />
           </TouchableOpacity>
-        </View></>
+        </View>
+      </>
     );
   };
   const getParticipantLocation = async (activityId: any) => {
@@ -170,7 +166,7 @@ const ActivityScreen = () => {
 
       setParticipantsIds(deviceIds);
       connectSockets(deviceIds);
-      console.log('res', res);
+
       setParticipants(res);
     } catch (err) {
       console.log('err', err);
@@ -180,7 +176,6 @@ const ActivityScreen = () => {
   const getActivities = async () => {
     GetActivityByStudentId(child?.studentId)
       .then((res) => {
-        console.log('response:::', res);
         setActivities(res);
         setOriginalActivities(res);
       })
@@ -198,14 +193,13 @@ const ActivityScreen = () => {
       res.map((item) => {
         temp[item.activityId] = item;
       });
-      console.log('res', res);
+
       setActivitiesCount({ ...activitiesCount, ...temp });
     } catch (err) {
       console.log('err', err);
     }
   };
   const closeRow = (index: number) => {
-    console.log(index);
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
     }
@@ -213,6 +207,7 @@ const ActivityScreen = () => {
   };
 
   let stompClient: any = React.createRef<Stomp.Client>();
+  let subscriptions: Stomp.Subscription[] = []; // Array to store subscriptions
   const connectSockets = async (deviceIds: any[]) => {
     try {
       const token = await loadToken();
@@ -220,17 +215,30 @@ const ActivityScreen = () => {
       const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
       stompClient = Stomp.over(socket);
       stompClient.connect({ token }, () => {
-        console.log('Connected');
-        deviceIds.map((item) => {
-          stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+        deviceIds.forEach((item) => {
+          // Subscribe and store the subscription object
+          const subscription = stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+          subscriptions.push(subscription);
         });
       });
     } catch (err) {
       console.log('Error:', err);
     }
   };
+
+  const unsubscribeSockets = () => {
+    // Unsubscribe from all subscriptions
+    subscriptions.forEach((subscription) => {
+      subscription.unsubscribe();
+    });
+
+    // Clear the subscriptions array
+    subscriptions = [];
+  };
+
   const subscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
+
     setTrackingList({
       ...trackingList,
       [messageBody.deviceId]: {
@@ -238,40 +246,40 @@ const ActivityScreen = () => {
         lang: messageBody.longitude,
       },
     });
-    console.log('Update Received', messageBody);
+    console.log('Update Received iin actiivty screen', messageBody);
   };
-
+  useEffect(() => {
+    if (!isFocused) {
+      unsubscribeSockets();
+    }
+  }, [isFocused]);
   const search = (text: String) => {
     let allActivities = { ...activities };
 
     allActivities = originalActivities?.filter((item) =>
-      item.activityName.toLowerCase().includes(text.toLowerCase()),
+      item.activityName.toLowerCase().includes(text.toLowerCase())
     );
     setActivities(allActivities);
   };
 
   const filterActivities = (month: any, day: any) => {
-
     let date = new Date().getFullYear() + '-' + month + '-' + day;
     let temp: any[] = [];
     if (originalActivities?.length) {
       originalActivities.map((item: any) => {
-        console.log('item', item?.fromDate);
-        const date1 = moment(item?.fromDate, ['YYYY-MM-DDTHH:mm:ss.SSSZ', 'MMM DD, YYYYTHH:mm:ss.SSSZ'], true);
+        const date1 = moment(
+          item?.fromDate,
+          ['YYYY-MM-DDTHH:mm:ss.SSSZ', 'MMM DD, YYYYTHH:mm:ss.SSSZ'],
+          true
+        );
         const date2 = moment(date, ['YYYY-M-D'], true).add(1, 'month').add(1, 'day');
-        console.log('date1', date1);
-        console.log('date2', date2);
-        if (
-          moment(date1).isSame(date2, 'day') &&
-          moment(date1).isSame(date2, 'month')
-        ) {
+
+        if (moment(date1).isSame(date2, 'day') && moment(date1).isSame(date2, 'month')) {
           temp.push(item);
         }
       });
       setActivities(temp);
     }
-
-
   };
   useEffect(() => {
     if (!isCalendarVisible) {
@@ -291,7 +299,7 @@ const ActivityScreen = () => {
       getActivities();
       // }
     }
-  }, [child, isFocused]);
+  }, [isFocused]);
 
   useEffect(() => {
     if (isFocused) {
@@ -315,100 +323,165 @@ const ActivityScreen = () => {
       setActivities(originalActivities);
     }
   }, [searchBarValue]);
+  useEffect(() => {
+    let temp: any[] = [];
+    let groups: any = {};
+    let trackingListKeys = Object.keys(trackingList);
+
+    if (trackingListKeys.length > 1) {
+      trackingListKeys.map((item, index) => {
+        let latitude1 = trackingList[item]?.lat;
+        let longititude1 = trackingList[item]?.lang;
+        for (let j = index + 1; j < trackingListKeys.length - 1; j++) {
+          let nextParticipant = trackingList[trackingListKeys[j]];
+          let latitude2 = nextParticipant?.lat;
+          let longititude2 = nextParticipant?.lang;
+          let distance = calculateDistance(latitude1, longititude1, latitude2, longititude2);
+          const isUnderEqual100Meters = distance <= 100;
+          let participant = partcipants.find(
+            (pers) => pers.childDeviceId == nextParticipant.childDeviceId
+          );
+
+          if (isUnderEqual100Meters) {
+            participant['group'] = true;
+            participant['groupName'] = index + 1;
+            temp.push(participant);
+            if (groups[index + 1]) {
+              let tempValue = { ...groups[index + 1] };
+
+              tempValue.participants = [...tempValue.participants, participant];
+              groups[index + 1] = tempValue;
+            } else {
+              groups[index + 1] = {
+                id: index + 1,
+                participants: [participant],
+              };
+            }
+          } else {
+            temp.push(participant);
+          }
+        }
+
+        let firstPers = partcipants.find((firPer) => firPer?.childDeviceId == item);
+
+        let isAnyParticipantExist = temp.find((temMember) => temMember?.groupName == index + 1);
+        if (isAnyParticipantExist) {
+          firstPers['group'] = true;
+          firstPers['groupName'] = index + 1;
+          temp.push(firstPers);
+
+          if (groups[index + 1]) {
+            let tempValue = { ...groups[index + 1] };
+            tempValue.participants = [...tempValue.participants, firstPers];
+            groups[index + 1] = tempValue;
+          }
+
+          // }
+          else {
+            groups[index + 1] = {
+              id: index + 1,
+              participants: [firstPers],
+            };
+          }
+        } else {
+          temp.push(firstPers);
+        }
+      });
+
+      setGroups(groups);
+      let groupedArray: any[] = [];
+      let groupNames: any[] = [];
+
+      temp.forEach((item) => {
+        if (!item?.groupName || !groupNames.includes(item?.groupName)) {
+          groupedArray.push(item);
+          if (item?.groupName) {
+            groupNames.push(item?.groupName);
+          }
+        }
+      });
+
+      setnewParticipnatsArr(groupedArray);
+
+      setParticipants(temp);
+    } else {
+      let participant = [];
+      trackingListKeys.map((item, index) => {
+        participant = partcipants.filter((pers) => pers.childDeviceId == item);
+      });
+      setnewParticipnatsArr([...participant]);
+    }
+  }, [trackingList]);
 
   // useEffect(() => {
-  //   let temp: any[] = [];
-  //   let groups: any = {};
-  //   let trackingListKeys = Object.keys(trackingList);
-  //   trackingListKeys.map((item, index) => {
-  //     let latitude1 = trackingList[item]?.lat;
-  //     let longititude1 = trackingList[item]?.lang;
-  //     for (let j = index + 1; j < trackingListKeys.length - 1; j++) {
-  //       let nextParticipant = trackingList[trackingListKeys[j]];
-  //       let latitude2 = nextParticipant?.lat;
-  //       let longititude2 = nextParticipant?.lang;
-  //       let distance = calculateDistance(
-  //         latitude1,
-  //         longititude1,
-  //         latitude2,
-  //         longititude2,
-  //       );
-  //       const isUnderEqual100Meters = distance <= 100;
-  //       let participant = partcipants.find(
-  //         (pers) => pers?.childDeviceId == nextParticipant?.childDeviceId,
-  //       );
-  //       if (isUnderEqual100Meters) {
-  //         participant['group'] = true;
-  //         participant['groupName'] = index + 1;
-  //         temp.push(participant);
-  //         if (groups[index + 1]) {
-  //           let tempValue = { ...groups[index + 1] };
+  //   const temp = [];
+  //   const groups = {};
+  //   const trackingListKeys = Object.keys(trackingList);
 
-  //           tempValue.participants = [...tempValue.participants, participant];
-  //           groups[index + 1] = tempValue;
-  //         } else {
-  //           groups[index + 1] = {
-  //             id: index + 1,
-  //             participants: [participant],
-  //           };
+  //   if (trackingListKeys.length > 1) {
+  //     trackingListKeys.forEach((item, index) => {
+  //       const latitude1 = trackingList[item]?.lat;
+  //       const longitude1 = trackingList[item]?.lang;
+
+  //       const currentGroup = [];
+  //       for (let j = index + 1; j < trackingListKeys.length; j++) {
+  //         const nextParticipant = trackingList[trackingListKeys[j]];
+  //         const latitude2 = nextParticipant?.lat;
+  //         const longitude2 = nextParticipant?.lang;
+  //         const distance = calculateDistance(latitude1, longitude1, latitude2, longitude2);
+
+  //         if (distance <= 100) {
+  //           const participant = partcipants.find(
+  //             (pers) => pers.childDeviceId === nextParticipant.childDeviceId
+  //           );
+
+  //           if (participant) {
+  //             const updatedParticipant = {
+  //               ...participant,
+  //               group: true,
+  //               groupName: index + 1,
+  //             };
+  //             currentGroup.push(updatedParticipant);
+  //           }
   //         }
-  //       } else {
-  //         temp.push(participant);
-  //       }
-  //     }
-
-  //     let firstPers = partcipants.find(
-  //       (firPer) => firPer?.childDeviceId == item,
-  //     );
-
-  //     let isAnyParticipantExist = temp.find(
-  //       (temMember) => temMember?.groupName == index + 1,
-  //     );
-  //     if (isAnyParticipantExist) {
-  //       firstPers['group'] = true;
-  //       firstPers['groupName'] = index + 1;
-  //       temp.push(firstPers);
-
-  //       if (groups[index + 1]) {
-  //         let tempValue = { ...groups[index + 1] };
-  //         tempValue.participants = [...tempValue.participants, firstPers];
-  //         groups[index + 1] = tempValue;
   //       }
 
-  //       // }
-  //       else {
+  //       const firstPers = partcipants.find((firPer) => firPer?.childDeviceId === item);
+
+  //       if (currentGroup.length > 0 && firstPers) {
+  //         const updatedFirstPers = {
+  //           ...firstPers,
+  //           group: true,
+  //           groupName: index + 1,
+  //         };
+  //         currentGroup.push(updatedFirstPers);
+
   //         groups[index + 1] = {
   //           id: index + 1,
-  //           participants: [firstPers],
+  //           participants: [...currentGroup],
   //         };
+  //         temp.push(...currentGroup);
+  //       } else if (firstPers) {
+  //         temp.push(firstPers);
   //       }
-  //     } else {
-  //       temp.push(firstPers);
-  //     }
-  //   });
+  //     });
 
-  //   setGroups(groups);
-  //   let groupedArray: any[] = [];
-  //   let groupNames: any[] = [];
-
-  //   temp.forEach((item) => {
-  //     if (!item?.groupName || !groupNames.includes(item?.groupName)) {
-  //       groupedArray.push(item);
-  //       if (item?.groupName) {
-  //         groupNames.push(item?.groupName);
+  //     const groupedArray = temp.reduce((acc, item) => {
+  //       if (!item.groupName || !acc.some((i) => i.groupName === item.groupName)) {
+  //         acc.push(item);
   //       }
-  //     }
-  //   });
+  //       return acc;
+  //     }, []);
 
-  //   console.log('grouped', groupedArray);
-  //   setnewParticipnatsArr(groupedArray);
-  //   setParticipants(temp);
-  // }, [trackingList]);
+  //     setGroups(groups);
+  //     setnewParticipnatsArr(groupedArray);
+  //     setParticipants(temp);
+  //   } else {
+  //     const participant = partcipants.filter((pers) => pers.childDeviceId === trackingListKeys[0]);
+  //     setnewParticipnatsArr(participant);
+  //   }
+  // }, [trackingList, partcipants]);
 
-
-
-
-console.log('selected activity',activities)
   return (
     <>
       <AppHeader isCalendar={true} hideCalendar={false} />
@@ -436,7 +509,9 @@ console.log('selected activity',activities)
           type={selectionData.type}
         />
       )}
+
       <View style={styles.layout}>
+        {console.log('new ', newParticipnatsArr)}
         {!showParticipantMap ? (
           <>
             <FlatList
@@ -677,75 +752,14 @@ console.log('selected activity',activities)
             />
           </>
         ) : (
-          <MapView style={{ flex: 1 }} ref={ref}>
-            {groups[item?.groupName]?.participants?.map((item, index) => {
-              let latitude = trackingList[item?.childDeviceId]?.lat;
-              let longitude = trackingList[item?.childDeviceId]?.lang;
-
-              if (latitude && longitude) {
-                return (
-                  <Marker
-                    key={index}
-                    coordinate={{
-                      latitude: parseFloat(latitude),
-                      longitude: parseFloat(longitude),
-                    }}
-                    onPress={() => {
-                      if (!item?.group) {
-                        ref.current.fitToCoordinates(
-                          [
-                            {
-                              latitude: parseFloat(latitude),
-                              longitude: parseFloat(longitude),
-                            },
-                          ],
-                          {
-                            animated: true,
-                          }
-                        );
-                      } else {
-                        setModal(true);
-                        setSelectedGroup(item?.groupName);
-                      }
-                    }}
-                  >
-                    {!item?.group && (
-                      <View style={styles.markerContainer}>
-                        {item?.image === '' ? (
-                          <View style={styles.markerInner}>
-                            <Text style={styles.markerText}>
-                              {item?.firstName?.substring(0, 1)?.toUpperCase()}
-                              {item?.lastName?.substring(0, 1)?.toUpperCase()}
-                            </Text>
-                          </View>
-                        ) : (
-                          <Image
-                            source={{ uri: item?.image }}
-                            style={styles.markerImage}
-                            resizeMode="contain"
-                          />
-                        )}
-                      </View>
-                    )}
-
-                    {item?.group && (
-                      <TouchableOpacity style={styles.groupMarker} onPress={() => {}}>
-                        <Text style={styles.groupMarkerText}>
-                          {groups[item?.groupName]?.participants?.length}
-                        </Text>
-                        <Fontisto name="map-marker-alt" size={25} color="red" />
-                      </TouchableOpacity>
-                    )}
-                  </Marker>
-                );
-              } else {
-                return null; // Skip rendering if latitude or longitude is missing
-              }
-            })}
-          </MapView>
+          <GroupMap
+            newParticipnatsArr={newParticipnatsArr}
+            trackingList={trackingList}
+            groups={groups}
+          />
         )}
       </View>
-    </> 
+    </>
   );
 };
 

@@ -38,9 +38,9 @@ const SignInScreen = () => {
   const countries = useSelector((state: { places: any }) => state?.places.countries);
   let values = { email: '', password: '', user_type: '', is_default: false };
   const [intitialValues, setInitialValues] = useState({
-    email: '',
-    password: '',
-    user_type: '',
+    email: 'femibalogun@gmail.com',
+    password: 'TrackMyKidz',
+    user_type: 'parent',
     is_default: false,
   });
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);

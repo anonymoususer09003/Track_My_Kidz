@@ -52,6 +52,7 @@ const CancelActivityModal = ({
         hide();
       }}
     >
+      {console.log('item----', item)}
       <Card style={styles.modal} disabled={true}>
         <View
           style={{
@@ -60,12 +61,16 @@ const CancelActivityModal = ({
             height: '100%',
           }}
         >
+          <Text style={{ textAlign: 'center', marginVertical: 20, fontSize: 20 }}>
+            {' '}
+            Cancel this Activity?
+          </Text>
           <TouchableOpacity
             style={[
               styles.buttonStyle,
               {
                 marginTop: 10,
-
+                backgroundColor: Colors.primary,
                 justifyContent: 'center',
                 paddingLeft: 0,
               },
@@ -91,17 +96,6 @@ const CancelActivityModal = ({
                         hide();
                       })
                       .catch((err) => console.log(err));
-                  } else {
-                    DeleteActivity(item.activityId)
-                      .then((res) => {
-                        Toast.show({
-                          type: 'success',
-                          text2: 'Activity has been deleted successfully ',
-                        });
-                        getActivities();
-                        hide();
-                      })
-                      .catch((err) => console.log(err));
                   }
                 })
                 .catch((err) => {
@@ -120,52 +114,11 @@ const CancelActivityModal = ({
             }}
           >
             {/* <Entypo size={25} color={Colors.primary} name="clock" /> */}
-            <Text style={styles.textStyle}>
-              {item.status == 'cancel' ? 'Delete Activity' : 'Cancel Activity'}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.buttonStyle,
-              {
-                marginTop: 10,
-                // backgroundColor: Colors.primary,
-                justifyContent: 'center',
-                paddingLeft: 0,
-              },
-            ]}
-            onPress={() => {
-              hide();
-              navigation.navigate('CreateActivity', {
-                isEdit: true,
-              });
-              _dispatch({
-                type: actions.SET_SELECTED_ACTIVITY,
-                payload: item,
-              });
-              if (prevOpenedRow) {
-                prevOpenedRow?.close();
-              }
-            }}
-          >
-            {/* <Icon
-              style={{ width: 25, height: 25 }}
-              fill={Colors.primary}
-              name="edit-2"
-            /> */}
-            <Text style={styles.textStyle}>Reschedule Activity</Text>
+            <Text style={styles.textStyle}>{'Ok'}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              styles.buttonStyle,
-              {
-                marginTop: 10,
-                backgroundColor: Colors.primary,
-                justifyContent: 'center',
-                paddingLeft: 0,
-              },
-            ]}
+            style={[styles.buttonStyle]}
             onPress={() => {
               if (prevOpenedRow) {
                 prevOpenedRow?.close();
@@ -174,7 +127,14 @@ const CancelActivityModal = ({
             }}
           >
             {/* <Feather size={25} color={Colors.primary} name="copy" /> */}
-            <Text style={styles.textStyle}>Close</Text>
+            <Text
+              style={[
+                styles.textStyle,
+                { color: Colors.primary, textAlign: 'center', marginLeft: 20 },
+              ]}
+            >
+              Close
+            </Text>
           </TouchableOpacity>
         </View>
       </Card>
@@ -245,7 +205,9 @@ const styles = StyleSheet.create({
     //   padding: 5,
     width: '100%',
     height: 50,
-    backgroundColor: Colors.tintgray,
+    // backgroundColor: Colors.tintgray,
+    borderWidth: 1,
+    borderColor: Colors.primary,
     borderRadius: 4,
     flexDirection: 'row',
     paddingLeft: 20,

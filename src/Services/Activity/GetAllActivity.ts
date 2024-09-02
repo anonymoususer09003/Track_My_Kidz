@@ -6,6 +6,8 @@ export default async (page_number: number, page_size: number, config: any) => {
       `/activity/v2/findall?page_number=${page_number}&page_size=${page_size}`,
       config
     );
+    console.log('response', response.data.result);
+
     return response.data;
   } catch (err) {
     console.log('errr-------', err);

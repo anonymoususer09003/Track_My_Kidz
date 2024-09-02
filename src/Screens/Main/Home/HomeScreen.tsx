@@ -11,6 +11,7 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
+
 import * as Stomp from 'react-native-stompjs';
 import SockJS from 'sockjs-client';
 import firestore from '@react-native-firebase/firestore';
@@ -63,6 +64,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 const window = Dimensions.get('window');
 const { width, height } = window;
 const HomeScreen = () => {
+  const [{ thumbnail }]: any = useStateValue();
   const navigation = useNavigation();
   const focused = useIsFocused();
   const swipeableRef = useRef(null);
@@ -89,14 +91,14 @@ const HomeScreen = () => {
       });
     });
   }, []);
-  useEffect(() => {
-    setThumbnail(false);
-  }, [focused]);
+  // useEffect(() => {
+  //   setThumbnail(false);
+  // }, [focused]);
   const [children, setChildren] = useState([]);
   const [trackingList, setTrackingList] = useState({});
   const [getChildrendeviceIds, setChildrensDeviceIds] = useState([]);
   const [originalChildren, setOriginalChildren] = useState([]);
-  const [thumbnail, setThumbnail] = useState(false);
+  // const [thumbnail, setThumbnail] = useState(false);
   const [searchParam, setSearchParam] = useState('');
   const [selectedDependent, setSelectedDependent] = useState(null);
   const [parentLatLong, setparentLatLong] = useState();
@@ -114,6 +116,7 @@ const HomeScreen = () => {
   const [selectedChild, setSelectedChild] = useState('All');
   const [activities, setActivities] = useState([]);
   const currentUser = useSelector((state: { user: UserState }) => state.user.item);
+
   const socketRef = useRef();
 
   // console.log("currentUser", currentUser);
@@ -197,10 +200,12 @@ const HomeScreen = () => {
     } else {
       setSelectedChild('All');
       setShowChildFilter(false);
+      unsubscribeSockets();
     }
     return () => {
       setSelectedChild('All');
       setShowChildFilter(false);
+      unsubscribeSockets();
     };
   }, [focused]);
 
@@ -210,24 +215,41 @@ const HomeScreen = () => {
     }
   }, [selectedDependent]);
   let stompClient: any = React.createRef<Stomp.Client>();
+  let subscriptions: Stomp.Subscription[] = []; // Array to store subscriptions
   const turnOnTracker = async (id: any, deviceIds: any, from: any) => {
     try {
       const token = await loadToken();
-
       const socket = new SockJS('https://live-api.trackmykidz.com/ws-location');
       stompClient = Stomp.over(socket);
+
       stompClient.connect({ token }, () => {
-        deviceIds.map((item) => {
-          stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+        deviceIds.forEach((item) => {
+          // Subscribe and store the subscription object
+          const subscription = stompClient.subscribe(`/device/${item}`, subscriptionCallback);
+          subscriptions.push(subscription);
         });
       });
     } catch (err) {
       console.log('Error:', err);
     }
   };
+
+  const unsubscribeSockets = () => {
+    // Unsubscribe from all subscriptions
+    subscriptions.forEach((subscription) => {
+      subscription.unsubscribe();
+    });
+
+    // Clear the subscriptions array
+    subscriptions = [];
+  };
+
   const subscriptionCallback = (subscriptionMessage: any) => {
     const messageBody = JSON.parse(subscriptionMessage.body);
     console.log('Update Received', messageBody);
+
+    // if (Object.keys(trackingList).length === 0)
+    // zoomInToLocation({ latitude: messageBody.latitude, longitude: messageBody.latitude });
     setTrackingList({
       ...trackingList,
       [messageBody.deviceId]: {
@@ -319,6 +341,7 @@ const HomeScreen = () => {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
   }, [selectedDependent]);
+
   const mapFitToCoordinates = () => {
     if (thumbnail && children.length > 0) {
       let temp = [];
@@ -383,12 +406,12 @@ const HomeScreen = () => {
             padding: 5,
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: 15,
+            // marginBottom: 15,
           }}
         >
           <Icon style={{ width: 23, height: 23 }} fill={Colors.primary} name="edit-2" />
         </TouchableOpacity>
-
+        {/* 
         {item.childTrackHistory && (
           <TouchableOpacity
             style={{
@@ -406,15 +429,17 @@ const HomeScreen = () => {
           >
             <MaterialCommunity size={23} color={Colors.primary} name="restart" />
           </TouchableOpacity>
-        )}
+        )} */}
       </View>
     );
   };
-  function navigateToMyLocation() {
+
+  function zoomInToLocation({ latitude, longitude }) {
     ref.current?.animateToRegion({
-      ...userLocation,
-      latitudeDelta: 0.896,
-      longitudeDelta: 0.896,
+      latitude,
+      longitude,
+      latitudeDelta: 0.6665647557651191,
+      longitudeDelta: 0.5834163331793434,
     });
   }
 
@@ -481,7 +506,7 @@ const HomeScreen = () => {
       <View style={[styles.layout]}>
         {showChildFilter && (
           <Select
-            style={{ width: '90%', marginHorizontal: '5%' }}
+            style={{ width: '100%' }}
             value={selectedChild}
             placeholder="Select Child"
             onSelect={(index: any) => {
@@ -516,6 +541,7 @@ const HomeScreen = () => {
               ))}
           </Select>
         )}
+
         {thumbnail ? (
           <View style={{ flex: 1, backgroundColor: Colors.newBackgroundColor }}>
             {children.length == 0 && (
@@ -552,7 +578,8 @@ const HomeScreen = () => {
 
             <FlatList
               data={children}
-              style={{ padding: 10, width: '100%' }}
+              style={{ padding: 10, width: '100%', marginBottom: 100 }}
+              keyExtractor={(index) => index}
               renderItem={({ item, index }) => (
                 <Swipeable
                   ref={(ref) => (row[index] = ref)}
@@ -574,6 +601,7 @@ const HomeScreen = () => {
                       },
                     ]}
                     onPress={() => {
+                      prevOpenedRow?.close();
                       _dispatch({
                         type: actions.SET_SELECTED_CHILD,
                         payload: item,
@@ -588,9 +616,9 @@ const HomeScreen = () => {
                         style={[styles.text, { fontWeight: '600' }]}
                       >{`${item.firstname} ${item.lastname}`}</Text>
                     </View>
-                    <Text style={styles.text}>{`${
+                    {/* <Text style={styles.text}>{`${
                       (!!item.chidlSchool && item.childSchool) || ''
-                    }`}</Text>
+                    }`}</Text> */}
 
                     {item?.status ? (
                       <Text style={styles.text}>{`Status: ${item.status}`}</Text>
@@ -619,22 +647,23 @@ const HomeScreen = () => {
             >
               <Ionicons name="accessibility" style={{ fontSize: 28 }} />
             </TouchableOpacity> */}
+
             <MapView
               showsUserLocation
-              ref={ref}
-              onLayout={() => {
-                let temp = studentsEmails.filter((item) => item.latitude != null);
+              // ref={ref}
+              // onLayout={() => {
+              //   let temp = studentsEmails.filter((item) => item.latitude != null);
 
-                ref?.current?.fitToCoordinates(temp, {
-                  edgePadding: {
-                    top: 10,
-                    right: 10,
-                    bottom: 10,
-                    left: 10,
-                  },
-                  animated: true,
-                });
-              }}
+              //   // ref?.current?.fitToCoordinates(temp, {
+              //   //   edgePadding: {
+              //   //     top: 10,
+              //   //     right: 10,
+              //   //     bottom: 10,
+              //   //     left: 10,
+              //   //   },
+              //   //   animated: true,
+              //   // });
+              // }}
               style={{ flex: 1 }}
             >
               {children
@@ -649,7 +678,7 @@ const HomeScreen = () => {
 
                   return (
                     <>
-                      {item?.toggleAlert && (
+                      {/* {item?.toggleAlert && (
                         <Circle
                           key={index}
                           center={{
@@ -661,7 +690,7 @@ const HomeScreen = () => {
                           strokeColor={'red'}
                           fillColor={'rgba(230,238,255,0.5)'}
                         />
-                      )}
+                      )} */}
 
                       <Marker
                         onSelect={() => console.log('pressed')}
@@ -676,8 +705,8 @@ const HomeScreen = () => {
                             // false, // not animated
                           );
                         }}
-                        identifier={item?.childEmail}
-                        key={index}
+                        identifier={item.childEmail}
+                        key={item?.childDevice}
                         coordinate={{
                           latitude: latitude ? parseFloat(latitude) : parseFloat(10),
                           longitude: longititude ? parseFloat(longititude) : parseFloat(10),
@@ -694,7 +723,7 @@ const HomeScreen = () => {
                               // zIndex: 10,
                             }}
                           >
-                            {true && (
+                            {item?.studentImage == '' && (
                               <View
                                 style={{
                                   height: '100%',
@@ -711,7 +740,8 @@ const HomeScreen = () => {
                                 </Text>
                               </View>
                             )}
-                            {/* {item?.studentImage != '' && (
+
+                            {item?.studentImage != '' && (
                               <Image
                                 source={{
                                   uri: item?.studentImage,
@@ -719,12 +749,12 @@ const HomeScreen = () => {
                                 style={{
                                   height: '100%',
                                   width: '100%',
-                                  borderRadius: 80,
-                                  aspectRatio: 1.5,
+
+                                  // aspectRatio: 1.5,
                                 }}
                                 resizeMode="contain"
                               />
-                            )} */}
+                            )}
                           </View>
                           {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
                         </View>

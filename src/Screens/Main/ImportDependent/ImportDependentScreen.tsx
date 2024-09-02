@@ -73,7 +73,7 @@ const ImportDependent = () => {
       .then((res) => {
         setSingleChild(false);
         // setUser(res);
-        console.log('res-children--', res);
+
         setChildren(res);
         dispatch(ChangeModalState.action({ loading: false }));
         dispatch(

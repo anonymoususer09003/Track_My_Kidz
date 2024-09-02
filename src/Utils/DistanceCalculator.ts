@@ -19,10 +19,10 @@ function toRadians(degrees: number) {
 
 export { calculateDistance };
 // Usage
-const lat1 = 40.7128;
-const lon1 = -74.006;
-const lat2 = 40.7129;
-const lon2 = -74.006;
+// const lat1 = 40.7128;
+// const lon1 = -74.006;
+// const lat2 = 40.7129;
+// const lon2 = -74.006;
 
-const distance = calculateDistance(lat1, lon1, lat2, lon2);
-const isUnder100Meters = distance < 100;
+// const distance = calculateDistance(lat1, lon1, lat2, lon2);
+// const isUnder100Meters = distance < 100;

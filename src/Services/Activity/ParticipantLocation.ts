@@ -1,8 +1,7 @@
-import api from "@/Services";
+import api from '@/Services';
 
 export default async (id: any) => {
-  const response = await api.get(
-    `/activity/participantLocation?activity_id=${id}`
-  );
+  console.log(`/activity/participantLocation?activity_id=${id}`);
+  const response = await api.get(`/activity/participantLocation?activity_id=${id}`);
   return response.data;
 };

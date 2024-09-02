@@ -1,10 +1,10 @@
 import React, { FC, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, TextInput, View } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { useDispatch, useSelector } from 'react-redux';
 import { Bubble, GiftedChat } from 'react-native-gifted-chat';
 import moment from 'moment';
-
+import SendIcon from 'react-native-vector-icons/Feather';
 import { UserState } from '@/Store/User';
 import { Normalize } from '@/Utils/Shared/NormalizeDisplay';
 import { Button, Card, Icon, Modal, Text } from '@ui-kitten/components';
@@ -464,17 +464,48 @@ const SingleChatScreen: FC<SingleChatScreenProps> = ({ route, navigation }) => {
   // @ts-ignore
   // @ts-ignore
   // @ts-ignore
+  const customtInputToolbar = (props, renderIcon) => {
+    console.log('props----', props);
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <TextInput
+          {...props}
+          multiline
+          style={{
+            backgroundColor: Colors.white,
+            height: 50,
+            width: '85%',
+            borderColor: Colors.primary,
+            borderWidth: 2,
+            overflow: 'hidden',
+            marginLeft: 10,
+            marginRight: 10,
+            borderRadius: 10,
+            // alignSelf: 'center',
+          }}
+        />
+        <View style={{ width: '15%', height: 50 }}>{renderIcon()}</View>
+      </View>
+    );
+  };
+
+  const renderSendIcon = () => {
+    return <SendIcon color={Colors.white} name="send" size={35} />;
+  };
   return (
     <>
       {route?.params?.showHeader ? (
         <BackgroundLayout title={`${route?.params?.title} Chat`}>
           <GiftedChat
+            textInputProps={{ styles: {} }}
             renderLoading={renderLoading}
             messages={messages}
             alwaysShowSend={true}
             showAvatarForEveryMessage={true}
-            renderInputToolbar={
-              params?.chattersIds?.length <= 1 ? () => renderNoUserMessage() : undefined
+            renderInputToolbar={(props) =>
+              params?.chattersIds?.length <= 1
+                ? renderNoUserMessage()
+                : customtInputToolbar(props, renderSendIcon)
             }
             onSend={(messages) => onSend(messages)}
             user={{
@@ -502,7 +533,7 @@ const SingleChatScreen: FC<SingleChatScreenProps> = ({ route, navigation }) => {
                     },
                   }}
                   textStyle={{
-                    left: { fontWeight: 'bold' },
+                    left: { fontWeight: 'bold', color: 'red' },
                     right: {},
                   }}
                 />

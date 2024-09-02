@@ -1391,7 +1391,6 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                   email: student.email,
                   password: values.password,
                 };
-                console.log('response', registerObject);
 
                 Register(registerObject, 'student')
                   .then(async (response) => {
@@ -1416,8 +1415,15 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                         type: uploadedImage.mime,
                       });
                       formData.append('id', student?.studentId);
-
-                      formData.append('parentId', parseInt(student?.parents[0]?.parentId));
+                      formData.append(
+                        'parentId1',
+                        student?.parents[0]?.parentId ? parseInt(student?.parents[0]?.parentId) : ''
+                      );
+                      formData.append(
+                        'parentId2',
+                        student?.parents[1]?.parentId ? parseInt(student?.parents[1]?.parentId) : ''
+                      );
+                      // formData.append('parentId', parseInt(student?.parents[0]?.parentId));
                       formData.append('firstname', student?.firstname);
                       formData.append('lastname', student?.lastname);
                       formData.append('phone', student?.phone || '00');
@@ -1428,7 +1434,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       formData.append('city', studentParams?.city);
 
                       formData.append('parentemail1', student?.parentemail1);
-                      formData.append('parentemail2', student?.parentemail2);
+                      formData.append('parentemail2', student?.parentemail2 || 'nomi9303');
 
                       // setisSending(true);
                       // let objectToPass = {
@@ -1439,6 +1445,7 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
                       //   state: values.state,
                       //   city: values.city,
                       // };
+
                       UpdateStudent(formData)
                         .then(async (response: any) => {
                           dispatch(

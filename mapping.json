@@ -2421,7 +2421,7 @@
                 }
               },
               "primary": {
-                "borderColor": "color-primary-default",
+                "borderColor": "transparent",
                 "backgroundColor": "background-basic-color-2",
                 "textColor": "text-basic-color",
                 "labelColor": "text-hint-color",

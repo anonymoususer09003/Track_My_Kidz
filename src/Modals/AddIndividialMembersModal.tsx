@@ -122,7 +122,7 @@ const AddIndividialMembersModal: FC<AddIndividialMembersModalProps> = ({
                 type: actions.SET_GROUPS_STUDENTS,
                 payload: data,
               });
-              // setIndividuals(data);
+              setIndividuals(data);
               resetForm();
             }}
           >

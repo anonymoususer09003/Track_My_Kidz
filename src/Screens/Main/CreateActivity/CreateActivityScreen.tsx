@@ -102,7 +102,8 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
   const [askPermission, setAskPermission] = useState<any>(activity?.requestPermission || false);
 
   const [groups, setGroups] = useState<any[]>([]);
-  const [students, setStudents] = useState<any[]>([]);
+  // const [students, setStudents] = useState<any[]>([]);
+  const [{ students }]: any = useStateValue();
   const countries = useSelector((state: { places: PlaceState }) => state.places.countries);
   const [optIn, setOptIn] = useState<any>({});
   const [instructorsList, setInstructorList] = useState<any[]>([]);
@@ -183,8 +184,9 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
       });
       setOrgId({ schoolId: res?.schoolId || null, orgId: res?.orgId || null });
       setUser(res);
-      console.log('onBhelaf of', instructors);
+
       // if (activity) {
+
       let _ins = instructors?.find((i) => i?.email == currentUser.email);
       // console.log("_ins====================", _ins);
       setOnBehalf(_ins ? _ins?.firstname + ' ' + _ins?.lastname : '');
@@ -206,7 +208,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
     try {
       if (!currentUser) {
         let res = await GetInstructor(userId);
-        console.log('res', res);
+
         dispatch(
           ChangeUserState.action({
             item: res,
@@ -253,7 +255,11 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
     if (item?.isEdit) {
       setDeletedStudents([...deletedStudents, item]);
     }
-    setStudents(data);
+    _dispatch({
+      type: actions.SET_GROUPS_STUDENTS,
+      payload: data,
+    });
+    // setStudents(data);
   };
   const handleRemoveInstructors = (item: any) => {
     let data = [...instructorsList];
@@ -263,7 +269,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
     }
     setInstructorList(data);
   };
-  console.log('deleted students', deletedStudents);
+
   const handleRemoveGroup = (item: any) => {
     let data = [...groups];
     data = data.filter((d) => d.groupName !== item.groupName);
@@ -278,7 +284,11 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
         parent1_email: item.parentEmail1,
         parent2_email: item.parentEmail2,
       }));
-      setStudents(data);
+      // setStudents(data);
+      _dispatch({
+        type: actions.SET_GROUPS_STUDENTS,
+        payload: data,
+      });
     }
   };
 
@@ -301,7 +311,11 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
         }));
 
         setInstructorList(instructors);
-        setStudents(students);
+        // setStudents(students);
+        _dispatch({
+          type: actions.SET_GROUPS_STUDENTS,
+          payload: students,
+        });
         setInformation({ ...infomation, ...res });
         setHideForm(true);
         // setActivityDetail(res);
@@ -314,8 +328,6 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
   const getGroupDetail = async (id?: any) => {
     GetGroup(id || route?.params?.groupId)
       .then((res) => {
-        console.log('groupinfo', res);
-
         let students = res?.studentsGroupList?.map((item: any) => ({
           name: item?.firstName + ' ' + item.lastName,
 
@@ -328,9 +340,13 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
           email: item?.email,
           instructorId: index + 1,
         }));
-        console.log('instructors', instructors);
+
         setInstructorList(instructors);
-        setStudents(students);
+        // setStudents(students);
+        _dispatch({
+          type: actions.SET_GROUPS_STUDENTS,
+          payload: students,
+        });
         setStatesData(students);
         setGroupInfo(res);
       })
@@ -372,7 +388,11 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
       });
       setInformation({});
       setStatesData([]);
-      setStudents([]);
+      // setStudents([]);
+      _dispatch({
+        type: actions.SET_GROUPS_STUDENTS,
+        payload: [],
+      });
       setInstructorList([]);
       setHideForm(false);
       setDeletedStudents([]);
@@ -396,7 +416,6 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
       setSelectedDay('');
     };
   }, [isFocused]);
-  console.log('values', instructorInfo);
 
   useEffect(() => {
     if (isFocused && route?.params && !route?.params?.groupId) {
@@ -426,9 +445,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
     fetchState();
     fetchCity();
   }, []);
-  {
-    console.log('curent user', currentUser);
-  }
+
   useEffect(() => {
     if (isFocused) {
       setInitialValues({
@@ -441,7 +458,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
           : new Date(),
         // activity ? new Date(activity?.date?.split(" ")[0]) : new Date(),
         fromTime: infomation?.scheduler
-          ? moment(infomation?.scheduler?.fromDate).subtract('hours', 5).format('hh:mm a')
+          ? moment(infomation?.scheduler?.fromDate).subtract('hour', 1).format('h:mm A')
           : //  moment(activity.date).subtract("hours", 5).format("hh:mm a")
             timeStamp[0],
         // activity
@@ -452,7 +469,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
           ? new Date(infomation?.scheduler?.toDate?.split('T')[0])
           : new Date(),
         toTime: infomation?.scheduler
-          ? moment(infomation?.scheduler?.toDate).subtract('hours', 5).format('hh:mm a')
+          ? moment(infomation?.scheduler?.toDate).subtract('hour', 1).format('h:mm A')
           : timeStamp[3],
         // activity && activity?.date.split(" ")[2],
         fromCountry: activity?.venueFromCountry || currentUser?.country || '',
@@ -500,7 +517,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.primary }}>
       <StatusBar backgroundColor="transparent" translucent={true} />
-      <BackgroundLayout title="Create Event">
+      <BackgroundLayout title={isEdit ? 'Edit Event' : 'Create Event'}>
         <GroupSelectionModal
           getGroupDetail={(id: any) => {
             getGroupDetail(id);
@@ -515,7 +532,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
           //   setStudents([...students, item]);
           // }}
           setIndividuals={(item: any) => {
-            setStudents([...item]);
+            null;
           }}
         />
 
@@ -538,7 +555,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
               validationSchema={validationSchema}
               initialValues={initialValues}
               onSubmit={async (values, { resetForm }) => {
-                dispatch(ChangeModalState.action({ loading: true }));
+                // dispatch(ChangeModalState.action({ loading: true }));
                 const _instructor =
                   (instructors &&
                     instructors?.result?.length > 0 &&
@@ -549,11 +566,37 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                       (i: any) => i?.firstname + ' ' + i?.lastname === values.onBehalfOf
                     ).instructorId) ||
                   0;
-                // console.log("onBhelf", _instructor);
-                let totime = moment(values.toTime).format('HH:mm');
-                let todate = moment(new Date(values.to)).format('YYYY-MM-DD');
-                let fromtime = moment(values.fromTime).format('HH:mm');
-                let fromdate = moment(new Date(values.from)).format('YYYY-MM-DD');
+
+                // console.log('values', values);
+                // console.log("onBhelf", _instructor);'
+                // const dateTimeString = `${date} ${time}`;
+
+                // console.log('totime', totime);
+                // Alert.alert(JSON.stringify(totime));
+
+                let todate = moment(values.to).format('YYYY-MM-DD');
+
+                const dateToTimeString = `${todate} ${values.toTime}`;
+
+                // const parsedDateTime = moment(dateToTimeString, 'DD-MM-YYYY h:mm A');
+
+                // const totime = parsedDateTime.format();
+                const formattedToTime = moment(dateToTimeString, 'YYYY-MM-DD h:mm A').format(
+                  'YYYY-MM-DDTHH:mm:ss.SSS[Z]'
+                );
+
+                // console.log('date iso--------------', formattedToTime);
+
+                // let fromtime = moment(values.fromTime, ['h:mm A']).format('HH:mm');
+                let fromdate = moment(values.from).format('YYYY-MM-DD');
+
+                // let todate = moment(new Date(values.to)).format('YYYY-MM-DD');
+
+                const dateFromTimeString = `${fromdate} ${values.fromTime}`;
+
+                const formattedFromTime = moment(dateFromTimeString, 'YYYY-MM-DD h:mm A').format(
+                  'YYYY-MM-DDTHH:mm:ss.SSS[Z]'
+                );
 
                 // console.log("date", values.from + "----", +values.fromTime);
                 // console.log("fafaffafafafafa", date + "T" + time + ":00.000Z");
@@ -587,13 +630,11 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                   schedule: {
                     id: 0,
                     recurrence: timeSelectedIndex === 2 ? 1 : 0,
-                    fromDate: fromdate + 'T' + fromtime + ':00.000Z',
+                    fromDate: formattedFromTime,
                     // `${moment(values.from).format(
                     //   "YYYY-MM-DD hh:mm:ss"
                     // )} ${values.fromTime}`,
-                    toDate: values.noEnd
-                      ? '9999-12-31T12:00.000Z'
-                      : todate + 'T' + totime + ':00.000Z',
+                    toDate: values.noEnd ? '9999-12-31T12:00.000Z' : formattedToTime,
                     //  `${moment(values.to).format("YYYY-MM-DD hh:mm:ss")} ${
                     //   values.toTime
                     // }`,,
@@ -615,7 +656,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                     status: true,
                   },
                 };
-                console.log('data', data);
+
                 const _students: any[] = [];
                 students.map((item) => {
                   if (!item?.isEdit) {
@@ -655,9 +696,8 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                 //   schoolId: user?.schoolId,
                 //   orgId: user?.orgId,
                 // }));
-                // console.log("data-------------------------", data);
+
                 if (!isEdit) {
-                  console.log('data', data);
                   CreateActivity(data)
                     .then(async (res) => {
                       let notifyToParents = true;
@@ -694,7 +734,11 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                         });
                         dispatch(ChangeModalState.action({ loading: false }));
                         resetForm();
-                        setStudents([]);
+                        // setStudents([]);
+                        _dispatch({
+                          type: actions.SET_GROUPS_STUDENTS,
+                          payload: [],
+                        });
                         setDeletedStudents([]);
                         setDeletedInstructors([]);
                         setInstructorList([]);
@@ -724,104 +768,109 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                       });
                       // dispatch(ChangeModalState.action({ loading: false }));
                     });
-                } else {
-                  UpdateActivity(data)
-                    .then(async (res) => {
-                      Toast.show({
-                        type: 'success',
-                        text2: 'Activity has been updated successfully',
-                      });
-                      dispatch(ChangeModalState.action({ loading: false }));
-                      // navigation.navigate("InstructorActivity");
-                      // CreateMultipleInstructor(_individuals).then(res => {
-                      //   console.log(res)
-                      // }).catch(err => console.log('CreateMultipleInstructor', err))
-
-                      let deletedInstructor: any[] = [];
-                      let deletedStudent: any[] = [];
-                      deletedInstructors.map((item) => {
-                        deletedInstructor.push(item?.instructorId);
-                      });
-
-                      deletedStudents.map((item) => {
-                        deletedStudent.push(item?.id);
-                      });
-                      if (deletedInstructor.length > 0 || deletedStudent.length > 0) {
-                        await DeleteActivityParticipants({
-                          studentId: deletedStudent.length == 0 ? [] : deletedStudent,
-                          instructorId: deletedInstructor.length == 0 ? [] : deletedInstructor,
-                          activityId: activity?.activityId,
-                        });
-                      }
-
-                      let notifyToParents = true;
-                      if (_students && _students?.length > 0) {
-                        notifyToParents = false;
-                        notifyToParents = await NotifyToParent(activity?.activityId, _students);
-                        notifyToParents = true;
-                      }
-                      // NotifyToParent(activity?.activityId, _students)
-                      //   .then((res) => {})
-                      //   .catch((err) => console.log("NotifyToParent", err));
-                      let instructors: any[] = [];
-                      instructorsList?.map((item) => {
-                        if (!item?.isEdit) {
-                          instructors.push({
-                            firstName: item?.firstname,
-                            lastName: item?.lastname,
-                            email: item?.email,
-                          });
-                        }
-                      });
-
-                      // NotifyToInstructors(activity?.activityId, instructors)
-                      //   .then((res) => {
-                      //     console.log(res);
-                      //   })
-                      //   .catch((err) => console.log("NotifyToInstructors", err));
-
-                      let notifyToInstructor = true;
-                      if (instructors?.length > 0) {
-                        notifyToInstructor = false;
-                        await NotifyToInstructors(activity?.activityId, instructors);
-                        notifyToInstructor = true;
-                      }
-
-                      if (notifyToInstructor && notifyToParents) {
-                        dispatch(ChangeModalState.action({ loading: false }));
-                        resetForm();
-                        setStudents([]);
-                        setDeletedStudents([]);
-                        setDeletedInstructors([]);
-                        setInstructorList([]);
-                        setDeletedStudents([]);
-                        setDeletedInstructors([]);
-                        setInformation({});
-                        navigation.reset({
-                          index: 0,
-                          routes: [
-                            {
-                              name: 'InstructorActivity',
-                            },
-                          ],
-                        });
-
-                        setGroups([]);
-                        setInformation({});
-                        // setStudents([])
-                        setAskPermission(false);
-                      }
-                      // resetForm();
-                    })
-                    .catch((err) => {
-                      console.log('err', err);
-                      Toast.show({
-                        type: 'info',
-                        text2: 'Something went wrong',
-                      });
-                      // dispatch(ChangeModalState.action({ loading: false }));
-                    });
                 }
+                // else {
+                //   UpdateActivity(data)
+                //     .then(async (res) => {
+                //       Toast.show({
+                //         type: 'success',
+                //         text2: 'Activity has been updated successfully',
+                //       });
+                //       dispatch(ChangeModalState.action({ loading: false }));
+                //       // navigation.navigate("InstructorActivity");
+                //       // CreateMultipleInstructor(_individuals).then(res => {
+                //       //   console.log(res)
+                //       // }).catch(err => console.log('CreateMultipleInstructor', err))
+
+                //       let deletedInstructor: any[] = [];
+                //       let deletedStudent: any[] = [];
+                //       deletedInstructors.map((item) => {
+                //         deletedInstructor.push(item?.instructorId);
+                //       });
+
+                //       deletedStudents.map((item) => {
+                //         deletedStudent.push(item?.id);
+                //       });
+                //       if (deletedInstructor.length > 0 || deletedStudent.length > 0) {
+                //         await DeleteActivityParticipants({
+                //           studentId: deletedStudent.length == 0 ? [] : deletedStudent,
+                //           instructorId: deletedInstructor.length == 0 ? [] : deletedInstructor,
+                //           activityId: activity?.activityId,
+                //         });
+                //       }
+
+                //       let notifyToParents = true;
+                //       if (_students && _students?.length > 0) {
+                //         notifyToParents = false;
+                //         notifyToParents = await NotifyToParent(activity?.activityId, _students);
+                //         notifyToParents = true;
+                //       }
+                //       // NotifyToParent(activity?.activityId, _students)
+                //       //   .then((res) => {})
+                //       //   .catch((err) => console.log("NotifyToParent", err));
+                //       let instructors: any[] = [];
+                //       instructorsList?.map((item) => {
+                //         if (!item?.isEdit) {
+                //           instructors.push({
+                //             firstName: item?.firstname,
+                //             lastName: item?.lastname,
+                //             email: item?.email,
+                //           });
+                //         }
+                //       });
+
+                //       // NotifyToInstructors(activity?.activityId, instructors)
+                //       //   .then((res) => {
+                //       //     console.log(res);
+                //       //   })
+                //       //   .catch((err) => console.log("NotifyToInstructors", err));
+
+                //       let notifyToInstructor = true;
+                //       if (instructors?.length > 0) {
+                //         notifyToInstructor = false;
+                //         await NotifyToInstructors(activity?.activityId, instructors);
+                //         notifyToInstructor = true;
+                //       }
+
+                //       if (notifyToInstructor && notifyToParents) {
+                //         dispatch(ChangeModalState.action({ loading: false }));
+                //         resetForm();
+                //         // setStudents([]);
+                //         _dispatch({
+                //           type: actions.SET_GROUPS_STUDENTS,
+                //           payload: [],
+                //         });
+                //         setDeletedStudents([]);
+                //         setDeletedInstructors([]);
+                //         setInstructorList([]);
+                //         setDeletedStudents([]);
+                //         setDeletedInstructors([]);
+                //         setInformation({});
+                //         navigation.reset({
+                //           index: 0,
+                //           routes: [
+                //             {
+                //               name: 'InstructorActivity',
+                //             },
+                //           ],
+                //         });
+
+                //         setGroups([]);
+                //         setInformation({});
+                //         // setStudents([])
+                //         setAskPermission(false);
+                //       }
+                //       // resetForm();
+                //     })
+                //     .catch((err) => {
+                //       console.log('err', err);
+                //       Toast.show({
+                //         type: 'info',
+                //         text2: 'Something went wrong',
+                //       });
+                //       // dispatch(ChangeModalState.action({ loading: false }));
+                //     });
+                // }
               }}
             >
               {({
@@ -1001,6 +1050,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                           }}
                         >
                           <Datepicker
+                            status="primary"
                             min={new Date(1900, 0, 0)}
                             style={[styles.selectSettings, { width: '60%' }]}
                             label="From*"
@@ -1010,8 +1060,10 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                               setFieldValue('from', date);
                               setFieldValue('to', date);
                             }}
-                          >
-                            <TextInput
+                            sty
+                          />
+
+                          {/* <TextInput
                               value={values.from ? values.from.toLocaleDateString() : ''}
                               placeholder="Select date"
                               style={{
@@ -1019,8 +1071,8 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                                 backgroundColor: 'red',
                                 width: 2,
                               }}
-                            />
-                          </Datepicker>
+                            /> */}
+                          {/* </Datepicker> */}
                           {/* <Select
                             value={values.fromTime}
                             style={{
@@ -1062,6 +1114,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                           }}
                         >
                           <Datepicker
+                            status="primary"
                             min={new Date(1900, 0, 0)}
                             style={[styles.selectSettings, { width: '60%' }]}
                             label="To*"
@@ -1089,6 +1142,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                           >
                             <TimeStampSelect timeStamp={timeStamp} />
                           </Select> */}
+
                           <View style={{ width: '50%', marginTop: 22 }}>
                             <CustomTextDropDown
                               value={
@@ -1099,6 +1153,8 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                               placeholder="Time"
                               dropDownList={timeStamp}
                               onSelect={(name: any) => {
+                                console.log('name----00', name);
+
                                 setFieldValue('toTime', name);
                               }}
                             />
@@ -1717,7 +1773,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                       >
                         <Text style={[{ color: Colors.primary, fontSize: 15 }]}>Add Students</Text>
                         <TouchableOpacity
-                          disabled={!isValid}
+                          // disabled={!isValid}
                           onPress={() => {
                             dispatch(
                               ChangeModalState.action({
@@ -1773,7 +1829,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                         </View>
                       </View>
                     )}
-
+                    {console.log('on behlaf of', onBehalf)}
                     <Select
                       style={{
                         width: '94%',
@@ -1811,9 +1867,14 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                       )}
                     >
                       {instructors?.result?.map((item: any, index: number) => {
-                        return (
-                          <SelectItem key={index} title={item?.firstname + ' ' + item?.lastname} />
-                        );
+                        if (item?.firstname + ' ' + item?.lastname != onBehalf) {
+                          return (
+                            <SelectItem
+                              key={index}
+                              title={item?.firstname + ' ' + item?.lastname}
+                            />
+                          );
+                        }
                       })}
                     </Select>
                     {instructorsList?.length > 0 && (

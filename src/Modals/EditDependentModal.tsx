@@ -53,11 +53,6 @@ const EditDependentModal = ({
   const [schools, setSchools] = useState([]);
   const currentUser = useSelector((state: { user: UserState }) => state.user.item);
 
-  const grades =
-    schools &&
-    schools.length > 0 &&
-    schools.find((s) => s.name === selectedDependent?.school) &&
-    schools?.find((s) => s.name === selectedDependent?.school)?.gradeEntities;
   const countries = useSelector((state: { places: PlaceState }) => state.places.countries);
 
   const [countriesData, setCountriesData] = React.useState(countries);
@@ -363,7 +358,14 @@ const EditDependentModal = ({
                       }
                 );
                 formData.append('id', parseInt(student?.studentId));
-                formData.append('parentId', parseInt(userId, 0));
+                formData.append(
+                  'parentId1',
+                  selectedDependent?.parentId1 ? parseInt(selectedDependent?.parentId1) : ''
+                );
+                formData.append(
+                  'parentId2',
+                  selectedDependent?.parentId2 ? parseInt(selectedDependent?.parentId2) : ''
+                );
                 formData.append('firstname', values.firstName);
                 formData.append('lastname', values.lastName);
                 formData.append('phone', values.phoneNumber);
@@ -376,8 +378,8 @@ const EditDependentModal = ({
 
                 formData.append('state', values.state);
                 formData.append('city', values.city);
-                formData.append('parentemail1', currentUser.email);
-                formData.append('parentemail2', '');
+                formData.append('parentemail1', selectedDependent?.parentemail1);
+                formData.append('parentemail2', selectedDependent?.parentemail2);
 
                 UpdateStudent(formData)
                   .then((response) => {

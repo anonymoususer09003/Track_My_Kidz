@@ -42,11 +42,11 @@ const ParentPaymentModal = ({ onCancel, loginObj, userEmail, onPay }: ParentPaym
   const availableAmounts = [
     {
       amount: 1,
-      label: '$50 - Annually (Best Deal)',
+      label: '$60 - Annually (Best Deal)',
     },
     {
       amount: 5,
-      label: '$4.99 - Monthly',
+      label: '$5.99 - Monthly',
     },
   ];
   const intervals = ['YEAR', 'MONTH'];
@@ -100,11 +100,11 @@ const ParentPaymentModal = ({ onCancel, loginObj, userEmail, onPay }: ParentPaym
   const fetchPaymentIntentClientSecret = async (data: any) => {
     if (userEmail) {
       return await CreateSingleEmailPaymentIntent({
-        amountToPay: selectedIndex == 0 ? 50 : 4.99,
+        amountToPay: selectedIndex == 0 ? 60 : 5.99,
         email: userEmail,
       });
     } else {
-      return await CreateSinglePaymentIntent(selectedIndex == 0 ? 50 : 4.99);
+      return await CreateSinglePaymentIntent(selectedIndex == 0 ? 60 : 5.99);
     }
   };
 
@@ -183,10 +183,8 @@ const ParentPaymentModal = ({ onCancel, loginObj, userEmail, onPay }: ParentPaym
         };
       }
 
-      console.log('data', data);
-      console.log('data202020020202020202', { ...data, isSubscribed: true });
       let res = await UpdateUser({ ...loginObj, isSubscribed: true }, 'parent');
-      console.log('res----------99999999999 is update', res);
+
       await storeIsSubscribed(true);
     } catch (err) {
       console.log('err', err);

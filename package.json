@@ -57,11 +57,10 @@
     "react-native-image-crop-picker": "^0.40.3",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-linear-gradient": "^2.8.3",
-    "react-native-maps": "^1.11.3",
+    "react-native-maps": "1.15.3",
     "react-native-mask-input": "^1.2.3",
     "react-native-modal": "^13.0.1",
     "react-native-pager-view": "^6.2.3",
-    "react-native-permissions": "3.6.1",
     "react-native-popup-menu": "^0.16.1",
     "react-native-qrcode-scanner": "^1.5.5",
     "react-native-qrcode-svg": "^6.3.0",
@@ -113,14 +112,6 @@
   },
   "engines": {
     "node": ">=18"
-  },
-  "resolutions": {
-    "react-native-permissions": "3.6.1"
-  },
-  "overrides": {
-    "react-native-qrcode-scanner": {
-      "react-native-permissions": "3.6.1"
-    }
   },
   "packageManager": "yarn@4.3.1"
 }

@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { Image, KeyboardAvoidingView, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, View } from 'react-native';
 import { Button, Input, Layout, StyleService, Text, useStyleSheet } from '@ui-kitten/components';
 import CustomDropdown from '@/Components/CustomDropDown';
 import { Formik } from 'formik';
@@ -36,10 +36,7 @@ const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = ({ navigation }) => 
   // @ts-ignore
 
   const forgotPassValidationSchema = yup.object().shape({
-    email: yup
-      .string()
-      .email('Please enter valid email')
-      .required('Email is required'),
+    email: yup.string().email('Please enter valid email').required('Email is required'),
   });
   const renderPersonIcon = (props: any) => (
     <Image
@@ -77,6 +74,7 @@ const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = ({ navigation }) => 
               // activationNumber: values.activationCode,
               // password: values.password,
             };
+
             // dispatch(ChangeModalState.action({ loading: true }));
             ChangePassword(resetPasswordObject)
               .then((response) => {
@@ -88,21 +86,24 @@ const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = ({ navigation }) => 
                 });
                 dispatch(ChangeModalState.action({ loading: false }));
               })
+              .catch((err) => {
+                console.log('err', err);
+              })
               .finally(() => {
                 dispatch(ChangeModalState.action({ loading: false }));
               });
           }}
         >
           {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              setFieldValue,
-              values,
-              errors,
-              touched,
-              isValid,
-            }) => (
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            setFieldValue,
+            values,
+            errors,
+            touched,
+            isValid,
+          }) => (
             <>
               <Layout style={styles.formContainer}>
                 <CustomDropdown
@@ -147,12 +148,7 @@ const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = ({ navigation }) => 
                 </View>
               </Layout>
               <View style={styles.bottomView}>
-                <Button
-                  appearance="ghost"
-                  status="basic"
-                  size="small"
-                  onPress={onLoginButtonPress}
-                >
+                <Button appearance="ghost" status="basic" size="small" onPress={onLoginButtonPress}>
                   {() => <Text style={styles.buttonMessage}>Login</Text>}
                 </Button>
                 <Button

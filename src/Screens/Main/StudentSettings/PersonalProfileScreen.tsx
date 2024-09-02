@@ -109,6 +109,9 @@ const PersonalProfileScreen = () => {
   //     <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
   //   </TouchableWithoutFeedback>
   // );
+
+  console.log('user', user);
+
   const updateProfilePic = async (image: any) => {
     let formData = new FormData();
     formData.append('image', {
@@ -118,7 +121,8 @@ const PersonalProfileScreen = () => {
     });
     formData.append('id', user?.studentId);
 
-    formData.append('parentId', parseInt(user?.parentId));
+    formData.append('parentId1', user?.parentId1 ? parseInt(user?.parentId1) : '');
+    formData.append('parentId2', user?.parentId2 ? parseInt(user?.parentId2) : '');
     formData.append('firstname', user?.firstname);
     formData.append('lastname', user?.lastname);
     formData.append('phone', user?.phoneNumber || '00');
@@ -127,7 +131,8 @@ const PersonalProfileScreen = () => {
     formData.append('country', user.country);
     formData.append('state', user.state);
     formData.append('city', user.city);
-
+    formData.append('status', '');
+    formData.append('grade', '');
     formData.append('parentemail1', user?.parentemail1);
     formData.append('parentemail2', user?.parentemail2);
 
@@ -140,11 +145,15 @@ const PersonalProfileScreen = () => {
     //   state: values.state,
     //   city: values.city,
     // };
+
+    console.log('form daata', formData);
+
     UpdateStudent(formData)
       .then(async (response: any) => {
+        let res = await fetchOneUserService();
         dispatch(
           ChangeUserState.action({
-            item: response,
+            item: res,
             fetchOne: { loading: false, error: null },
           })
         );
@@ -299,8 +308,8 @@ const PersonalProfileScreen = () => {
                           </View>
                           <View
                             style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
+                              // flexDirection: 'row',
+                              // justifyContent: 'space-between',
                               width: '100%',
                             }}
                           >
@@ -308,7 +317,7 @@ const PersonalProfileScreen = () => {
                               <View
                                 style={{
                                   flexDirection: 'column',
-                                  width: '45%',
+                                  width: '100%',
                                 }}
                               >
                                 <Text style={styles.editLabel}>First Name</Text>
@@ -332,7 +341,7 @@ const PersonalProfileScreen = () => {
                               <View
                                 style={{
                                   flexDirection: 'column',
-                                  width: '45%',
+                                  width: '100%',
                                 }}
                               >
                                 <Text style={styles.editLabel}>Last Name</Text>
@@ -399,7 +408,7 @@ const PersonalProfileScreen = () => {
                             <Text style={styles.editLabel}>Parent 2/Guardian 2 Email</Text>
                             <View style={styles.editField}>
                               {renderEmailIcon()}
-                              <Text style={{ fontSize: 15 }}>{values.parentemail2}</Text>
+                              <Text style={{ fontSize: 15 }}>{user.parentemail2}</Text>
                             </View>
                           </View>
 

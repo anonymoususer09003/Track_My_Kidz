@@ -112,7 +112,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   const [selectedInstructor, setSelectedInstructor] = useState<string | null>('');
   const [visible, setVisible] = useState<boolean>(false);
   const [page, pageNumber] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [pageSize, setPageSize] = useState<number>(20);
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [selectedInstructorActivities, setSelectedInstructorActivities] = useState<any>(null);
@@ -415,7 +415,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   useEffect(() => {
     if (isFocused) {
       setOrgInstructors();
-      getCacheActivites();
+      // getCacheActivites();
     }
   }, [isFocused]);
   // useDebouncedEffect(
@@ -773,7 +773,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
         getActivitiesByInstructor(instructors?.result[dropDownValue.row - 1]?.instructorId);
       }
     } else if (userId) {
-      getActivitiesByInstructor(userId);
+      getActivities();
     }
   }, [dropDownValue, userId]);
   useEffect(() => {
@@ -878,222 +878,224 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
             //   temp.push(item?.firstName)
             // );
             // console.log("activity", item);
-            return (
-              <Swipeable
-                ref={(ref) => (row[index] = ref)}
-                // ref={swipeableRef}
+            if (true) {
+              return (
+                <Swipeable
+                  ref={(ref) => (row[index] = ref)}
+                  // ref={swipeableRef}
 
-                onSwipeableOpen={() => closeRow(index)}
-                renderRightActions={(e) => RightActions(e, item)}
-              >
-                <View
-                  style={[
-                    styles.item,
-                    {
-                      backgroundColor: '#fff',
-                    },
-                  ]}
+                  onSwipeableOpen={() => closeRow(index)}
+                  renderRightActions={(e) => RightActions(e, item)}
                 >
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate('InstructorActivityDetail', {
-                        data: item,
-                        activitiesCount: activitiesCount,
-                      });
-                    }}
+                  <View
+                    style={[
+                      styles.item,
+                      {
+                        backgroundColor: '#fff',
+                      },
+                    ]}
                   >
-                    <Text
-                      style={[
-                        styles.text,
-                        {
-                          fontSize: 20,
-                          fontWeight: '800',
-                          paddingLeft: 25,
-                        },
-                      ]}
+                    <TouchableOpacity
+                      onPress={() => {
+                        navigation.navigate('InstructorActivityDetail', {
+                          data: item,
+                          activitiesCount: activitiesCount,
+                        });
+                      }}
                     >
-                      {item?.activityName}
-                    </Text>
+                      <Text
+                        style={[
+                          styles.text,
+                          {
+                            fontSize: 20,
+                            fontWeight: '800',
+                            paddingLeft: 25,
+                          },
+                        ]}
+                      >
+                        {item?.activityName}
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          paddingBottom: 20,
+                          borderBottomWidth: 0.5,
+                          paddingHorizontal: 10,
+                          borderColor: Colors.borderGrey,
+                        }}
+                      >
+                        <Image
+                          source={require('@/Assets/Images/circle-dashed.png')}
+                          style={{
+                            height: 40,
+                            width: 40,
+                            resizeMode: 'contain',
+                            // marginRight: 10,
+                          }}
+                        />
+                        <View>
+                          <Text style={styles.text}>{`${moment
+                            .utc(item?.fromDate == 'string' ? new Date() : item?.fromDate)
+                            .format('MMM DD, YYYY')} at ${moment
+                            .utc(item?.fromDate == 'string' ? new Date() : item?.fromDate)
+                            .format('hh:mm a')} `}</Text>
+                          <Text style={styles.text}>{`${moment(
+                            item?.toDate == 'string' ? new Date() : item?.toDate
+                          ).format('MMM DD, YYYY')} at ${moment
+                            .utc(item?.toDate == 'string' ? new Date() : item?.toDate)
+                            .format('hh:mm a')} `}</Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+
                     <View
                       style={{
                         flexDirection: 'row',
-                        alignItems: 'center',
-                        paddingBottom: 20,
-                        borderBottomWidth: 0.5,
-                        paddingHorizontal: 10,
-                        borderColor: Colors.borderGrey,
+                        justifyContent: 'space-around',
                       }}
                     >
-                      <Image
-                        source={require('@/Assets/Images/circle-dashed.png')}
+                      <View
                         style={{
-                          height: 40,
-                          width: 40,
-                          resizeMode: 'contain',
-                          // marginRight: 10,
+                          alignItems: 'center',
                         }}
-                      />
-                      <View>
-                        <Text style={styles.text}>{`${moment
-                          .utc(item?.fromDate == 'string' ? new Date() : item?.fromDate)
-                          .format('MMM DD, YYYY')} at ${moment
-                          .utc(item?.fromDate == 'string' ? new Date() : item?.fromDate)
-                          .format('hh:mm a')} `}</Text>
-                        <Text style={styles.text}>{`${moment(
-                          item?.toDate == 'string' ? new Date() : item?.toDate
-                        ).format('MMM DD, YYYY')} at ${moment
-                          .utc(item?.toDate == 'string' ? new Date() : item?.toDate)
-                          .format('hh:mm a')} `}</Text>
+                      >
+                        <Text style={styles.footerText}>{`Approved`}</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: 'approved',
+                                type: 'student',
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.footerText}>{`${
+                              activitiesCount[item.activityId]?.countApprovedStudents || '0'
+                            }`}</Text>
+                            <Image source={bookImage} style={styles.iconImages} />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: 'approved',
+                                type: 'instructor',
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>
+                              {activitiesCount[item.activityId]?.countApprovedInstructors || '0'}
+                            </Text>
+                            <Image source={instructorImage} style={styles.iconImages} />
+                          </TouchableOpacity>
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
 
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-around',
-                    }}
-                  >
-                    <View
-                      style={{
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Text style={styles.footerText}>{`Approved`}</Text>
-                      <View style={{ flexDirection: 'row' }}>
-                        <TouchableOpacity
-                          style={styles.horizontal}
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: 'approved',
-                              type: 'student',
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                        >
-                          <Text style={styles.footerText}>{`${
-                            activitiesCount[item.activityId]?.countApprovedStudents || '0'
-                          }`}</Text>
-                          <Image source={bookImage} style={styles.iconImages} />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.horizontal}
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: 'approved',
-                              type: 'instructor',
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                        >
-                          <Text style={styles.text}>
-                            {activitiesCount[item.activityId]?.countApprovedInstructors || '0'}
-                          </Text>
-                          <Image source={instructorImage} style={styles.iconImages} />
-                        </TouchableOpacity>
+                      <View style={{ alignItems: 'center' }}>
+                        <Text style={styles.footerText}>{`Declined`}</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: 'declined',
+                                type: 'student',
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>{`${
+                              activitiesCount[item.activityId]?.countDeclinedStudents || '0'
+                            }`}</Text>
+                            <Image source={bookImage} style={styles.iconImages} />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: 'declined',
+                                type: 'instructor',
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>
+                              {activitiesCount[item.activityId]?.countDeclinedInstructors || '0'}
+                            </Text>
+                            <Image source={instructorImage} style={styles.iconImages} />
+                          </TouchableOpacity>
+                        </View>
                       </View>
-                    </View>
 
-                    <View style={{ alignItems: 'center' }}>
-                      <Text style={styles.footerText}>{`Declined`}</Text>
-                      <View style={{ flexDirection: 'row' }}>
-                        <TouchableOpacity
-                          style={styles.horizontal}
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: 'declined',
-                              type: 'student',
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                        >
-                          <Text style={styles.text}>{`${
-                            activitiesCount[item.activityId]?.countDeclinedStudents || '0'
-                          }`}</Text>
-                          <Image source={bookImage} style={styles.iconImages} />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.horizontal}
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: 'declined',
-                              type: 'instructor',
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                        >
-                          <Text style={styles.text}>
-                            {activitiesCount[item.activityId]?.countDeclinedInstructors || '0'}
-                          </Text>
-                          <Image source={instructorImage} style={styles.iconImages} />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-
-                    <View style={{ alignItems: 'center' }}>
-                      <Text style={styles.footerText}>{`Pending`}</Text>
-                      <View style={{ flexDirection: 'row' }}>
-                        <TouchableOpacity
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: 'pending',
-                              type: 'student',
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                          style={styles.horizontal}
-                        >
-                          <Text style={styles.text}>
-                            {`${activitiesCount[item.activityId]?.countPendingStudents || '0'}`}
-                          </Text>
-                          <Image source={bookImage} style={styles.iconImages} />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.horizontal}
-                          onPress={() => {
-                            _dispatch({
-                              type: actions.SET_SELECTED_ACTIVITY,
-                              payload: item,
-                            });
-                            setSelectionData({
-                              status: 'pending',
-                              type: 'instructor',
-                            });
-                            setShowStudentsInstructorsModal(true);
-                          }}
-                        >
-                          <Text style={styles.text}>
-                            {activitiesCount[item.activityId]?.countPendingInstructors || '0'}
-                            {/* {item.countPendingInstructors || `0`} */}
-                          </Text>
-                          <Image source={instructorImage} style={styles.iconImages} />
-                        </TouchableOpacity>
+                      <View style={{ alignItems: 'center' }}>
+                        <Text style={styles.footerText}>{`Pending`}</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: 'pending',
+                                type: 'student',
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                            style={styles.horizontal}
+                          >
+                            <Text style={styles.text}>
+                              {`${activitiesCount[item.activityId]?.countPendingStudents || '0'}`}
+                            </Text>
+                            <Image source={bookImage} style={styles.iconImages} />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.horizontal}
+                            onPress={() => {
+                              _dispatch({
+                                type: actions.SET_SELECTED_ACTIVITY,
+                                payload: item,
+                              });
+                              setSelectionData({
+                                status: 'pending',
+                                type: 'instructor',
+                              });
+                              setShowStudentsInstructorsModal(true);
+                            }}
+                          >
+                            <Text style={styles.text}>
+                              {activitiesCount[item.activityId]?.countPendingInstructors || '0'}
+                              {/* {item.countPendingInstructors || `0`} */}
+                            </Text>
+                            <Image source={instructorImage} style={styles.iconImages} />
+                          </TouchableOpacity>
+                        </View>
                       </View>
                     </View>
                   </View>
-                </View>
-              </Swipeable>
-            );
+                </Swipeable>
+              );
+            }
           }}
           onEndReached={async () => {
             if (totalRecords > originalActivities?.result?.length) {

@@ -1,5 +1,5 @@
-import api from "@/Services";
+import api from '@/Services';
 
 export default async (body: any) => {
-  return await api.post(`/attendance/update`, body);
+  return await api.put(`/attendance/update`, body);
 };

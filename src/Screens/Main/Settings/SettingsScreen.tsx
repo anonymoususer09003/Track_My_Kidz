@@ -45,9 +45,7 @@ const SettingsScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (verifyType) {
-      dispatch(
-        ChangeModalState.action({ verifyYourselfModalVisibility: true }),
-      );
+      dispatch(ChangeModalState.action({ verifyYourselfModalVisibility: true }));
     }
   }, [verifyType]);
 
@@ -78,7 +76,6 @@ const SettingsScreen = ({ navigation }) => {
     },
   });
 
-
   const onShare = async () => {
     Share.open(
       // options
@@ -86,22 +83,24 @@ const SettingsScreen = ({ navigation }) => {
         message: `${user?.firstname} ${user?.lastname} would like to invite you to TrackMyKidz. Give yourself some peace of mind, keep your kids safe and know their whereabouts even when you are not physically with them. Keep track of their in-school and out-of-school activities and schedule. You may download TrackMyKidz from the Apple App Store or Google PlayStore or by simply clicking on this link -`,
         url: 'https://trackmykidz.com/app',
 
-        activityItemSources: [{
-          placeholderItem: {
-            type: 'url',
-            content: require('@/Assets/AppIcons/appstore.png'),
+        activityItemSources: [
+          {
+            placeholderItem: {
+              type: 'url',
+              content: require('@/Assets/AppIcons/appstore.png'),
+            },
+            item: {
+              default: { type: 'url', content: require('@/Assets/AppIcons/appstore.png') },
+            },
+            linkMetadata: {
+              title: 'TrackMykidz',
+              // todo solve this
+              // subject: 'trackmykidz.com',
+              icon: require('@/Assets/AppIcons/appstore.png'),
+            },
           },
-          item: {
-            default: { type: 'url', content: require('@/Assets/AppIcons/appstore.png') },
-          },
-          linkMetadata: {
-            title: 'TrackMykidz',
-            // todo solve this
-            // subject: 'trackmykidz.com',
-            icon: require('@/Assets/AppIcons/appstore.png'),
-          },
-        }],
-      },
+        ],
+      }
     )
       .then((res) => {
         Toast.show({
@@ -113,12 +112,9 @@ const SettingsScreen = ({ navigation }) => {
           autoHide: true,
           topOffset: 30,
           bottomOffset: 40,
-          onShow: () => {
-          },
-          onHide: () => {
-          },
-          onPress: () => {
-          },
+          onShow: () => {},
+          onHide: () => {},
+          onPress: () => {},
         });
         console.log(res);
       })
@@ -128,8 +124,7 @@ const SettingsScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    if(false)
-    getUserId();
+    if (false) getUserId();
   }, [isFocuesed]);
 
   return (
@@ -145,16 +140,11 @@ const SettingsScreen = ({ navigation }) => {
         backdropStyle={styles.backdrop}
         onBackdropPress={() => setopenDeactivateModal(false)}
       >
-        <Card
-          disabled={true}
-          style={{ minHeight: 100, width: 300, borderRadius: 10 }}
-        >
+        <Card disabled={true} style={{ minHeight: 100, width: 300, borderRadius: 10 }}>
           {isSending ? (
             isSent ? (
               <View style={styles.sppinerContainer}>
-                <Text style={styles.sent}>
-                  Your account has been successfully deactivated.
-                </Text>
+                <Text style={styles.sent}>Your account has been successfully deactivated.</Text>
               </View>
             ) : (
               <View style={styles.sppinerContainer}>
@@ -163,9 +153,7 @@ const SettingsScreen = ({ navigation }) => {
             )
           ) : (
             <>
-              <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
-                Account Deactivation
-              </Text>
+              <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Account Deactivation</Text>
               <Text
                 style={{
                   fontSize: 15,
@@ -187,9 +175,20 @@ const SettingsScreen = ({ navigation }) => {
                 <TouchableOpacity
                   onPress={async () => {
                     const userId = await loadId();
+
                     if (!userId) return;
                     DeleteUser(parseInt(userId, 0))
                       .then((res) => {
+                        dispatch(
+                          ChangeUserState.action({
+                            // @ts-ignore
+                            userType: '',
+                          })
+                        );
+
+                        // @ts-ignore
+                        dispatch(LogoutStore.action());
+                        setopenDeactivateModal(false);
                       })
                       .catch((err) => {
                         console.log(err);
@@ -221,11 +220,7 @@ const SettingsScreen = ({ navigation }) => {
               ]}
             >
               <Text style={{ fontSize: 16 }}>Profile</Text>
-              <Icon
-                style={styles.icon}
-                fill={Colors.gray}
-                name="chevron-right-outline"
-              />
+              <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate('ChangePassword')}
@@ -239,11 +234,7 @@ const SettingsScreen = ({ navigation }) => {
               ]}
             >
               <Text style={{ fontSize: 16 }}>Reset Password</Text>
-              <Icon
-                style={styles.icon}
-                fill={Colors.gray}
-                name="chevron-right-outline"
-              />
+              <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate('Notifications')}
@@ -257,11 +248,7 @@ const SettingsScreen = ({ navigation }) => {
               ]}
             >
               <Text style={{ fontSize: 16 }}>Notifications</Text>
-              <Icon
-                style={styles.icon}
-                fill={Colors.gray}
-                name="chevron-right-outline"
-              />
+              <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
             </TouchableOpacity>
             {/* <View style={[[Layout.row, Layout.justifyContentBetween, Layout.alignItemsCenter, { marginTop: 15 }]]}>
                         <Text style={{ fontSize: 16 }}>2 Factor Authentication</Text>
@@ -302,11 +289,7 @@ const SettingsScreen = ({ navigation }) => {
               ]}
             >
               <Text style={{ fontSize: 16 }}>Your Reference Code</Text>
-              <Icon
-                style={styles.icon}
-                fill={Colors.gray}
-                name="chevron-right-outline"
-              />
+              <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate('DependentInfo')}
@@ -320,11 +303,7 @@ const SettingsScreen = ({ navigation }) => {
               ]}
             >
               <Text style={{ fontSize: 16 }}>Dependent Information</Text>
-              <Icon
-                style={styles.icon}
-                fill={Colors.gray}
-                name="chevron-right-outline"
-              />
+              <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate('PaymentInfo')}
@@ -338,11 +317,7 @@ const SettingsScreen = ({ navigation }) => {
               ]}
             >
               <Text style={{ fontSize: 16 }}>Payment Information</Text>
-              <Icon
-                style={styles.icon}
-                fill={Colors.gray}
-                name="chevron-right-outline"
-              />
+              <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate('ReportProblem')}
@@ -356,11 +331,7 @@ const SettingsScreen = ({ navigation }) => {
               ]}
             >
               <Text style={{ fontSize: 16 }}>Report a problem</Text>
-              <Icon
-                style={styles.icon}
-                fill={Colors.gray}
-                name="chevron-right-outline"
-              />
+              <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate('ContactUs')}
@@ -374,11 +345,7 @@ const SettingsScreen = ({ navigation }) => {
               ]}
             >
               <Text style={{ fontSize: 16 }}>Contact Us</Text>
-              <Icon
-                style={styles.icon}
-                fill={Colors.gray}
-                name="chevron-right-outline"
-              />
+              <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={onShare}
@@ -392,11 +359,7 @@ const SettingsScreen = ({ navigation }) => {
               ]}
             >
               <Text style={{ fontSize: 16 }}>Share with Friends</Text>
-              <Icon
-                style={styles.icon}
-                fill={Colors.gray}
-                name="chevron-right-outline"
-              />
+              <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate('AppList')}
@@ -410,11 +373,7 @@ const SettingsScreen = ({ navigation }) => {
               ]}
             >
               <Text style={{ fontSize: 16 }}>Our Other Apps</Text>
-              <Icon
-                style={styles.icon}
-                fill={Colors.gray}
-                name="chevron-right-outline"
-              />
+              <Icon style={styles.icon} fill={Colors.gray} name="chevron-right-outline" />
             </TouchableOpacity>
             <View style={styles.buttonsContainer}>
               <View style={{ marginVertical: 15 }}>
@@ -432,7 +391,7 @@ const SettingsScreen = ({ navigation }) => {
                       ChangeUserState.action({
                         // @ts-ignore
                         userType: '',
-                      }),
+                      })
                     );
 
                     // @ts-ignore

@@ -1,9 +1,7 @@
-import api from "@/Services";
+import api from '@/Services';
 
 export default async (data: any) => {
-  const response = await api.post(
-    `/activity/sendEmailToPendingStudentParents`,
-    data
-  );
+  console.log('data', data);
+  const response = await api.post(`/activity/sendEmailToPendingStudentParents`, data);
   return response;
 };

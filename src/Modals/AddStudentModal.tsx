@@ -257,7 +257,7 @@ const AddStudentModal = () => {
                           type: 'image/png',
                         }
                   );
-                  formData.append('parentId', parseInt(userId, 0));
+                  formData.append('parentId1', parseInt(userId, 0));
                   formData.append('firstname', values.firstName);
                   formData.append('lastname', values.lastName);
                   formData.append('phone', values.phoneNumber);

@@ -29,22 +29,21 @@ type InstructorActivityModal = {
   showCancelModal?: any;
   getActivities?: any;
   setSelectedActivity?: any;
-}
+};
 
-const InstructorActivityModal = (
-  {
-    selectedInstructions,
-    setSelectedInstructions,
-    visible,
-    item,
-    hide,
-    prevOpenedRow,
-    buses,
-    showCancelModal,
-    getActivities,
-    row,
-    setSelectedActivity,
-  }: InstructorActivityModal) => {
+const InstructorActivityModal = ({
+  selectedInstructions,
+  setSelectedInstructions,
+  visible,
+  item,
+  hide,
+  prevOpenedRow,
+  buses,
+  showCancelModal,
+  getActivities,
+  row,
+  setSelectedActivity,
+}: InstructorActivityModal) => {
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const user: any = useSelector((state: { user: UserState }) => state.user.item);
 
@@ -74,85 +73,6 @@ const InstructorActivityModal = (
           <TouchableOpacity
             style={styles.buttonStyle}
             onPress={() => {
-              //   prevOpenedRow?.close();
-              dispatch(
-                ChangeModalState.action({
-                  requestPermissionModalVisibility: true,
-                }),
-              );
-              setSelectedActivity(item);
-              _dispatch({
-                type: actions.SET_SELECTED_ACTIVITY,
-                payload: item,
-              });
-              hide();
-            }}
-          >
-            <FontAwesome5 size={25} name="reply-all" color={Colors.primary} />
-            <Text style={styles.textStyle}>Resend Request</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            onPress={() => {
-              console.log(item, buses);
-
-              // / // console.log();
-              console.log('item-------', item);
-
-              if (
-                item?.countApprovedInstructors ||
-                item?.countApprovedStudents
-              ) {
-                _dispatch({
-                  type: actions.SET_SELECTED_ACTIVITY,
-                  payload: item,
-                });
-                setSelectedActivity(item);
-                dispatch(
-                  ChangeModalState.action({ rollCallModalVisibility: true }),
-                );
-              } else {
-                Alert.alert(`You don't have any approved participant `);
-              }
-              // else {
-              //   setSelectedActivity(item);
-              // }
-              hide();
-            }}
-          >
-            <Ionicons size={25} color={Colors.primary} name="checkbox" />
-            <Text style={styles.textStyle}>Attendance</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            onPress={() => {
-              if (prevOpenedRow) {
-                prevOpenedRow?.close();
-              }
-              hide();
-              setSelectedActivity(item);
-              navigation.navigate('CreateActivity', {
-                isEdit: true,
-              });
-              _dispatch({
-                type: actions.SET_SELECTED_ACTIVITY,
-                payload: item,
-              });
-              if (prevOpenedRow) {
-                prevOpenedRow?.close();
-              }
-            }}
-          >
-            <Icon
-              style={{ width: 25, height: 25 }}
-              fill={Colors.primary}
-              name="edit-2"
-            />
-            <Text style={styles.textStyle}>Edit Activity</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            onPress={() => {
               if (prevOpenedRow) {
                 prevOpenedRow?.close();
               }
@@ -168,45 +88,29 @@ const InstructorActivityModal = (
           <TouchableOpacity
             style={styles.buttonStyle}
             onPress={() => {
-              setSelectedActivity(item);
-              _dispatch({
-                type: actions.SET_SELECTED_ACTIVITY,
-                payload: item,
-              });
-              dispatch(
-                ChangeModalState.action({
-                  journeyTrackerModalVisibility: true,
-                }),
-              );
+              console.log(item, buses);
 
-              hide();
-              if (prevOpenedRow) {
-                prevOpenedRow?.close();
+              // / // console.log();
+              console.log('item-------', item);
+
+              if (item?.countApprovedInstructors || item?.countApprovedStudents) {
+                _dispatch({
+                  type: actions.SET_SELECTED_ACTIVITY,
+                  payload: item,
+                });
+                setSelectedActivity(item);
+                dispatch(ChangeModalState.action({ rollCallModalVisibility: true }));
+              } else {
+                Alert.alert(`You don't have any approved participant `);
               }
+              // else {
+              //   setSelectedActivity(item);
+              // }
+              hide();
             }}
           >
-            <Entypo size={25} color={Colors.primary} name="clock" />
-            <Text style={styles.textStyle}>Journey Tracker</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            onPress={() => {
-              if (prevOpenedRow) {
-                prevOpenedRow?.close();
-              }
-              hide();
-              navigation.navigate('CreateActivity', {
-                isEdit: false,
-              });
-              _dispatch({
-                type: actions.SET_SELECTED_ACTIVITY,
-                payload: item,
-              });
-            }}
-          >
-            <FontAwesome5 size={25} color={Colors.primary} name="copy" />
-            <Text style={styles.textStyle}>Copy Activity</Text>
+            <Ionicons size={25} color={Colors.primary} name="checkbox" />
+            <Text style={styles.textStyle}>Attendance</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -231,52 +135,64 @@ const InstructorActivityModal = (
                     avatar: user?.imageurl,
                     name: user?.firstname
                       ? user?.firstname[0].toUpperCase() +
-                      user?.firstname.slice(1) +
-                      ' ' +
-                      user?.lastname[0]?.toUpperCase()
+                        user?.firstname.slice(1) +
+                        ' ' +
+                        user?.lastname[0]?.toUpperCase()
                       : user?.firstname + '' + user?.lastname,
                   },
-                }),
+                })
               );
               navigation.navigate('InstructorChatNavigator', {
                 title: item?.activityName,
               });
             }}
           >
-            <Ionicons
-              size={25}
-              color={Colors.primary}
-              name="chatbox-ellipses"
-            />
+            <Ionicons size={25} color={Colors.primary} name="chatbox-ellipses" />
             <Text style={styles.textStyle}>Chat</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.buttonStyle}
+            onPress={() => {
+              setSelectedActivity(item);
+              _dispatch({
+                type: actions.SET_SELECTED_ACTIVITY,
+                payload: item,
+              });
+              dispatch(
+                ChangeModalState.action({
+                  journeyTrackerModalVisibility: true,
+                })
+              );
 
-          {!item?.status && (
-            <TouchableOpacity
-              style={styles.buttonStyle}
-              onPress={() => {
-                if (prevOpenedRow) {
-                  prevOpenedRow?.close();
-                }
-                hide();
-                showCancelModal(true);
-                DeleteActivity(item?.activityId)
-                  .then((res) => {
-                    console.log(res);
-
-                    getActivities();
-                  })
-                  .catch((err) => console.log(err));
-              }}
-            >
-              <Icon
-                style={{ width: 25, height: 25 }}
-                fill={Colors.primary}
-                name="trash"
-              />
-              <Text style={styles.textStyle}>Delete Activity</Text>
-            </TouchableOpacity>
-          )}
+              hide();
+              if (prevOpenedRow) {
+                prevOpenedRow?.close();
+              }
+            }}
+          >
+            <Entypo size={25} color={Colors.primary} name="clock" />
+            <Text style={styles.textStyle}>Journey Tracker</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.buttonStyle}
+            onPress={() => {
+              //   prevOpenedRow?.close();
+              dispatch(
+                ChangeModalState.action({
+                  requestPermissionModalVisibility: true,
+                })
+              );
+              setSelectedActivity(item);
+              _dispatch({
+                type: actions.SET_SELECTED_ACTIVITY,
+                payload: item,
+              });
+              hide();
+            }}
+          >
+            <FontAwesome5 size={25} name="reply-all" color={Colors.primary} />
+            <Text style={styles.textStyle}>Resend Request</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.buttonStyle}
@@ -285,19 +201,96 @@ const InstructorActivityModal = (
                 prevOpenedRow?.close();
               }
               hide();
-              showCancelModal(true);
-              // DeleteActivity(item?.activityId)
-              //   .then((res) => {
-              //     console.log(res);
-
-              //     getActivities();
-              //   })
-              //   .catch((err) => console.log(err));
+              setSelectedActivity(item);
+              navigation.navigate('CreateActivity', {
+                isEdit: true,
+              });
+              _dispatch({
+                type: actions.SET_SELECTED_ACTIVITY,
+                payload: item,
+              });
+              if (prevOpenedRow) {
+                prevOpenedRow?.close();
+              }
             }}
           >
-            <Entypo size={30} color={Colors.primary} name="circle-with-cross" />
-            <Text style={styles.textStyle}>End Activity</Text>
+            <Icon style={{ width: 25, height: 25 }} fill={Colors.primary} name="edit-2" />
+            <Text style={styles.textStyle}>Edit Event</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.buttonStyle}
+            onPress={() => {
+              if (prevOpenedRow) {
+                prevOpenedRow?.close();
+              }
+              hide();
+              navigation.navigate('CreateActivity', {
+                isEdit: false,
+              });
+              _dispatch({
+                type: actions.SET_SELECTED_ACTIVITY,
+                payload: item,
+              });
+            }}
+          >
+            <FontAwesome5 size={25} color={Colors.primary} name="copy" />
+            <Text style={styles.textStyle}>Copy Event</Text>
+          </TouchableOpacity>
+
+          {item?.status === 'cancel' && (
+            <TouchableOpacity
+              style={styles.buttonStyle}
+              onPress={() => {
+                Alert.alert('Delete this event?', '.', [
+                  { text: 'CANCEL', style: 'cancel' },
+                  {
+                    text: 'YES',
+                    onPress: async () => {
+                      if (prevOpenedRow) {
+                        prevOpenedRow?.close();
+                      }
+
+                      DeleteActivity(item?.activityId)
+                        .then((res) => {
+                          console.log(res);
+                          hide();
+
+                          getActivities();
+                        })
+                        .catch((err) => console.log(err));
+                    },
+                  },
+                ]);
+              }}
+            >
+              <Icon style={{ width: 25, height: 25 }} fill={Colors.primary} name="trash" />
+              <Text style={styles.textStyle}>Delete Event</Text>
+            </TouchableOpacity>
+          )}
+
+          {item?.status != 'cancel' && (
+            <TouchableOpacity
+              style={styles.buttonStyle}
+              onPress={() => {
+                if (prevOpenedRow) {
+                  prevOpenedRow?.close();
+                }
+                hide();
+                showCancelModal(true);
+                // DeleteActivity(item?.activityId)
+                //   .then((res) => {
+                //     console.log(res);
+
+                //     getActivities();
+                //   })
+                //   .catch((err) => console.log(err));
+              }}
+            >
+              <Entypo size={30} color={Colors.primary} name="circle-with-cross" />
+              <Text style={styles.textStyle}>End Event</Text>
+            </TouchableOpacity>
+          )}
           <View style={{ width: '100%' }}>
             <LinearGradientButton
               onPress={() => {

@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, Keyboard, StyleSheet, TouchableOpacity, View ,Dimensions} from 'react-native';
+import {
+  Alert,
+  Image,
+  Keyboard,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Dimensions,
+} from 'react-native';
 import { useTheme } from '@/Theme';
 import { AppHeader, LinearGradientButton, ProfileAvatarPicker } from '@/Components';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -48,30 +56,24 @@ const PersonalProfileScreen = () => {
   const phone = require('@/Assets/Images/phone.png');
   const marker = require('@/Assets/Images/marker.png');
   const email = require('@/Assets/Images/email.png');
-  const {Layout} = useTheme();
+  const { Layout } = useTheme();
   const isFocused = useIsFocused();
-  const countries = useSelector(
-    (state: {places: PlaceState}) => state.places.countries,
-  );
+  const countries = useSelector((state: { places: PlaceState }) => state.places.countries);
   const [isEditMode, setisEditMode] = useState<boolean>(false);
   const [visible, setVisible] = useState<boolean>(false);
   const [isSending, setisSending] = useState<boolean>(false);
-  const user: any = useSelector((state: {user: UserState}) => state.user.item);
+  const user: any = useSelector((state: { user: UserState }) => state.user.item);
   const [userId, setuserId] = useState<any>(null);
-  const isLoading = useSelector(
-    (state: {user: UserState}) => state.user.fetchOne.loading,
-  );
+  const isLoading = useSelector((state: { user: UserState }) => state.user.fetchOne.loading);
   const dispatch = useDispatch();
-const[showResult,setShowResult]=useState(false)
+  const [showResult, setShowResult] = useState(false);
   const [placement, setPlacement] = React.useState<string>('bottom');
   const [countriesData, setCountriesData] = React.useState(countries);
   const [states, setStates] = useState<any[]>([]);
   const [cities, setCities] = useState<any[]>([]);
   const [statesData, setStatesData] = React.useState<any[]>([]);
   const [citiesData, setCitiesData] = React.useState<any[]>([]);
-  const currentUser: any = useSelector(
-    (state: {user: UserState}) => state.user.item,
-  );
+  const currentUser: any = useSelector((state: { user: UserState }) => state.user.item);
   const [selectedImage, setSelectedImage] = React.useState<string>('');
 
   const [uploadedImage, setUploadedImage] = React.useState<any>();
@@ -90,9 +92,9 @@ const[showResult,setShowResult]=useState(false)
       height: 130,
       compressImageQuality: 0.2,
       loadingLabelText: 'Loading image',
-    }).then(image => {
+    }).then((image) => {
       if (image != null) {
-        const source = {uri: image?.path};
+        const source = { uri: image?.path };
         setUploadedImage(image);
         setSelectedImage(source.uri);
         // uploadAvatarToAWS(source.uri).then(r => { console.log('here', r) }).catch((err) => { console.log('Errorr', err) })
@@ -107,9 +109,9 @@ const[showResult,setShowResult]=useState(false)
       height: 130,
       compressImageQuality: 0.2,
       loadingLabelText: 'Loading image',
-    }).then(image => {
+    }).then((image) => {
       if (image != null) {
-        const source = {uri: image?.path};
+        const source = { uri: image?.path };
         setSelectedImage(source.uri);
       }
     });
@@ -123,8 +125,7 @@ const[showResult,setShowResult]=useState(false)
     />
   );
   const renderEditButtonElement = (): ButtonElement => {
-    const buttonElement: React.ReactElement<ButtonProps> =
-      renderEditAvatarButton();
+    const buttonElement: React.ReactElement<ButtonProps> = renderEditAvatarButton();
 
     return React.cloneElement(buttonElement, {
       style: [buttonElement.props.style, styles.editButton],
@@ -134,56 +135,36 @@ const[showResult,setShowResult]=useState(false)
   const renderPersonIcon = () => (
     <Image
       source={userIcon}
-      style={{height: 18, width: 18, marginRight: 10}}
+      style={{ height: 18, width: 18, marginRight: 10 }}
       resizeMode="contain"
     />
   );
   const renderLocationIcon = () => (
-    <Image
-      source={marker}
-      style={{height: 20, width: 20}}
-      resizeMode="contain"
-    />
+    <Image source={marker} style={{ height: 20, width: 20 }} resizeMode="contain" />
   );
   const renderEmailIcon = () => (
-    <Image
-      source={email}
-      style={{height: 18, width: 18, marginRight: 12}}
-      resizeMode="contain"
-    />
+    <Image source={email} style={{ height: 18, width: 18, marginRight: 12 }} resizeMode="contain" />
   );
   const renderPhoneIcon = () => (
-    <Image
-      source={phone}
-      style={{height: 20, width: 20, marginRight: 10}}
-      resizeMode="contain"
-    />
+    <Image source={phone} style={{ height: 20, width: 20, marginRight: 10 }} resizeMode="contain" />
   );
   const renderSchoolIcon = () => (
     <FA5
       name="school"
       size={15}
-
-      style={{height: 20, width: 20, marginRight: 10}}
+      style={{ height: 20, width: 20, marginRight: 10 }}
       color={Colors.secondaryDark}
       adjustsFontSizeToFit
     />
   );
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        setKeyboardVisible(true); // or some other action
-      },
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setKeyboardVisible(false); // or some other action
-      },
-    );
-
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true); // or some other action
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false); // or some other action
+    });
 
     return () => {
       keyboardDidHideListener.remove();
@@ -198,49 +179,38 @@ const[showResult,setShowResult]=useState(false)
     // }
     // await BackgroundService.stop();
 
-    GetAllStates(currentUser?.country?.trim()).then(res => {
+    GetAllStates(currentUser?.country?.trim()).then((res) => {
       setStates(res.data);
       setStatesData(states);
     });
-    GetAllCities(currentUser?.country?.trim(), currentUser?.state?.trim()).then(
-      res => {
-        setCities(res.data);
-      },
-    );
+    GetAllCities(currentUser?.country?.trim(), currentUser?.state?.trim()).then((res) => {
+      setCities(res.data);
+    });
   }, []);
-  const fetchState=async()=>{
-    try{
-  let res=await    GetAllStates(
-        currentUser?.country)
-        setStates(res.data);
-        setStatesData(res.data);
+  const fetchState = async () => {
+    try {
+      let res = await GetAllStates(currentUser?.country);
+      setStates(res.data);
+      setStatesData(res.data);
+    } catch (err) {
+      console.log('err', err);
     }
-    catch(err)
-    {
-      console.log('err',err)
+  };
+  const fetchCity = async () => {
+    try {
+      let res = await GetAllCities(currentUser?.country, currentUser?.state);
+      setCities(res.data);
+      setCitiesData(res.data);
+    } catch (err) {
+      console.log('err', err);
     }
-  }
-  const fetchCity=async()=>{
-    try{
-  let res=await    GetAllCities( currentUser?.country,
-        currentUser?.state)
-        setCities(res.data);
-        setCitiesData(res.data);
+  };
+  useEffect(() => {
+    if (currentUser && isEditMode) {
+      fetchState();
+      fetchCity();
     }
-    catch(err)
-    {
-      console.log('err',err)
-    }
-  }
-    useEffect(()=>{
-    if(currentUser&& isEditMode)
-    {
-      fetchState()
-      fetchCity()
-    }
-  
-                          
-  },[currentUser && isEditMode])
+  }, [currentUser && isEditMode]);
   return (
     <>
       {visible && (
@@ -254,22 +224,18 @@ const[showResult,setShowResult]=useState(false)
 
       {isLoading ? (
         <View style={styles.sppinerContainer}>
-          <View style={styles.sppinerContainer}>
-            {/* <Spinner status="primary" /> */}
-          </View>
+          <View style={styles.sppinerContainer}>{/* <Spinner status="primary" /> */}</View>
         </View>
       ) : (
         <BackgroundLayout title="Profile">
-          <View style={{width: '100%', marginBottom: 20}}>
+          <View style={{ width: '100%', marginBottom: 20 }}>
             {(selectedImage != '' || currentUser?.imageurl?.length > 0) && (
               <ProfileAvatarPicker
                 style={styles.profileImage}
                 // resizeMode='center'
                 source={{
-                  uri:
-                    selectedImage ||
-                    currentUser?.imageurl + '?time' + new Date().getTime(),
-                  headers: {Pragma: 'no-cache'},
+                  uri: selectedImage || currentUser?.imageurl + '?time' + new Date().getTime(),
+                  headers: { Pragma: 'no-cache' },
                 }}
                 editButton={isEditMode ? renderEditAvatarButton : null}
               />
@@ -283,8 +249,9 @@ const[showResult,setShowResult]=useState(false)
                     justifyContent: 'center',
                     backgroundColor: Colors.lightgray,
                   },
-                ]}>
-                <Text style={{fontSize: 30}}>
+                ]}
+              >
+                <Text style={{ fontSize: 30 }}>
                   {currentUser?.firstname?.substring(0, 1)?.toUpperCase()}{' '}
                   {currentUser?.lastname?.substring(0, 1)?.toUpperCase()}
                 </Text>
@@ -294,14 +261,11 @@ const[showResult,setShowResult]=useState(false)
           </View>
           <KeyboardAwareScrollView
             style={styles.layout}
-          enableAutomaticScroll
-          keyboardShouldPersistTaps={"handled"}
+            enableAutomaticScroll
+            keyboardShouldPersistTaps={'handled'}
             // extraScrollHeight={10}
-          
           >
-            {
-              console.log('current user',currentUser)
-            }
+            {console.log('current user', currentUser)}
             <View style={[[Layout.column, Layout.justifyContentCenter]]}>
               {isFocused && (
                 <Formik
@@ -323,7 +287,7 @@ const[showResult,setShowResult]=useState(false)
                     selectedCity: '',
                     schoolName: currentUser?.schoolName || '',
                   }}
-                  onSubmit={(values, {resetForm}) => {
+                  onSubmit={(values, { resetForm }) => {
                     setisSending(true);
 
                     let formData = new FormData();
@@ -341,12 +305,12 @@ const[showResult,setShowResult]=useState(false)
                               'https://pictures-tmk.s3.amazonaws.com/images/image/man.png',
                             name: 'avatar',
                             type: 'image/png',
-                          },
+                          }
                     );
                     formData.append('firstname', values.firstName);
                     formData.append('lastname', values.lastName);
-formData.append('phone',values.phone);
-formData.append('school',values?.schoolName);
+                    formData.append('phone', values.phone);
+                    formData.append('school', values?.schoolName);
                     formData.append('address', values?.address || '');
                     formData.append('email', currentUser?.email || '');
                     formData.append('state', values.state);
@@ -363,7 +327,6 @@ formData.append('school',values?.schoolName);
 
                     UpdateUser(formData, 'instructor')
                       .then(async (response: any) => {
-              
                         if (response.status == 200) {
                           // setisSent(true)
                           setisEditMode(false);
@@ -371,7 +334,7 @@ formData.append('school',values?.schoolName);
                           getUserId();
                         }
                         let res = await fetchOneUserService();
-                   
+
                         // if (!res?.childTrackHistory) {
                         //   // await BackgroundService.stop();
                         // }
@@ -379,8 +342,8 @@ formData.append('school',values?.schoolName);
                         dispatch(
                           ChangeUserState.action({
                             item: res,
-                            fetchOne: {loading: false, error: null},
-                          }),
+                            fetchOne: { loading: false, error: null },
+                          })
                         );
                       })
                       .catch((error: any) => {
@@ -394,15 +357,9 @@ formData.append('school',values?.schoolName);
                         setisSending(false);
                         setisEditMode(!isEditMode);
                       });
-                  }}>
-                  {({
-                    handleChange,
-                    handleSubmit,
-                    setFieldValue,
-                    values,
-                    errors,
-                    touched,
-                  }) => (
+                  }}
+                >
+                  {({ handleChange, handleSubmit, setFieldValue, values, errors, touched }) => (
                     <>
                       {isSending ? (
                         <View style={styles.sppinerContainer}>
@@ -410,85 +367,73 @@ formData.append('school',values?.schoolName);
                         </View>
                       ) : (
                         <>
-                          <View style={{flexDirection: 'column'}}>
+                          <View style={{ flexDirection: 'column' }}>
                             <Text style={styles.editLabel}>Email</Text>
                             <View style={[styles.editField]}>
                               {renderEmailIcon()}
-                              <Text style={{fontSize: 15,opacity:0.2}}>{values.email}</Text>
+                              <Text style={{ fontSize: 15, opacity: 0.2 }}>{values.email}</Text>
                             </View>
                           </View>
                           <View
                             style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
                               width: '100%',
-                            }}>
+                            }}
+                          >
                             {!isEditMode ? (
                               <View
                                 style={{
                                   flexDirection: 'column',
-                                  width: '45%',
-                                }}>
+                                  width: '100%',
+                                }}
+                              >
                                 <Text style={styles.editLabel}>First Name</Text>
 
                                 <View style={styles.editField}>
                                   {renderPersonIcon()}
-                                  <Text style={{fontSize: 15}}>
-                                    {' '}
-                                    {values.firstName}
-                                  </Text>
+                                  <Text style={{ fontSize: 15 }}> {values.firstName}</Text>
                                 </View>
                               </View>
                             ) : (
                               <Input
                                 accessoryLeft={renderPersonIcon}
-                                style={[styles.inputSettings, {width: '45%'}]}
+                                style={[styles.inputSettings, { width: '45%' }]}
                                 autoCapitalize="none"
-                                label={evaProps => (
-                                  <Text {...evaProps}>First Name</Text>
-                                )}
+                                label={(evaProps) => <Text {...evaProps}>First Name</Text>}
                                 value={values.firstName}
                                 onChangeText={handleChange('firstName')}
                               />
                             )}
-
-                            {!isEditMode ? (
-                              <View
-                                style={{
-                                  flexDirection: 'column',
-                                  width: '45%',
-                                }}>
-                                <Text style={styles.editLabel}>Last Name</Text>
-
-                                <View style={styles.editField}>
-                                  {renderPersonIcon()}
-                                  <Text style={{fontSize: 15}}>
-                                    {values.lastName}
-                                  </Text>
-                                </View>
-                              </View>
-                            ) : (
-                              <Input
-                                accessoryLeft={renderPersonIcon}
-                                style={[styles.inputSettings, {width: '45%'}]}
-                                autoCapitalize="none"
-                                label={evaProps => (
-                                  <Text {...evaProps}>Last Name</Text>
-                                )}
-                                value={values.lastName}
-                                onChangeText={handleChange('lastName')}
-                              />
-                            )}
                           </View>
-
                           {!isEditMode ? (
-                            <View style={{flexDirection: 'column'}}>
+                            <View
+                              style={{
+                                flexDirection: 'column',
+                                width: '100%',
+                              }}
+                            >
+                              <Text style={styles.editLabel}>Last Name</Text>
+
+                              <View style={styles.editField}>
+                                {renderPersonIcon()}
+                                <Text style={{ fontSize: 15 }}>{values.lastName}</Text>
+                              </View>
+                            </View>
+                          ) : (
+                            <Input
+                              accessoryLeft={renderPersonIcon}
+                              style={[styles.inputSettings, { width: '45%' }]}
+                              autoCapitalize="none"
+                              label={(evaProps) => <Text {...evaProps}>Last Name</Text>}
+                              value={values.lastName}
+                              onChangeText={handleChange('lastName')}
+                            />
+                          )}
+                          {!isEditMode ? (
+                            <View style={{ flexDirection: 'column' }}>
                               <Text style={styles.editLabel}>Phone Number</Text>
                               <View style={styles.editField}>
                                 {renderPhoneIcon()}
-                                <Text style={{fontSize: 15}}>
-                                  {values.phone}
-                                </Text>
+                                <Text style={{ fontSize: 15 }}>{values.phone}</Text>
                               </View>
                             </View>
                           ) : (
@@ -497,95 +442,76 @@ formData.append('school',values?.schoolName);
                               style={styles.inputSettings}
                               accessoryLeft={renderPhoneIcon}
                               autoCapitalize="none"
-                              label={evaProps => (
-                                <Text {...evaProps}>Phone Number</Text>
-                              )}
+                              label={(evaProps) => <Text {...evaProps}>Phone Number</Text>}
                               value={values.phone}
                               onChangeText={handleChange('phone')}
                             />
                           )}
 
-                          {false &&!isEditMode && (
+                          {false && !isEditMode && (
                             <>
-                              <View style={{flexDirection: 'column'}}>
-                                <Text style={styles.editLabel}>
-                                  School Name
-                                </Text>
+                              <View style={{ flexDirection: 'column' }}>
+                                <Text style={styles.editLabel}>School Name</Text>
                                 <View style={styles.editField}>
                                   {renderSchoolIcon()}
-                                  <Text style={{fontSize: 15}}>
-                                    {values?.schoolName}
-                                  </Text>
+                                  <Text style={{ fontSize: 15 }}>{values?.schoolName}</Text>
                                 </View>
                               </View>
-                              <View style={{flexDirection: 'column'}}>
-                                <Text style={styles.editLabel}>
-                                  {' '}
-                                  Street Address
-                                </Text>
+                              <View style={{ flexDirection: 'column' }}>
+                                <Text style={styles.editLabel}> Street Address</Text>
                                 <View style={styles.editField}>
                                   {renderLocationIcon()}
-                                  <Text style={{fontSize: 15}}>
-                                    {values.address}
-                                  </Text>
+                                  <Text style={{ fontSize: 15 }}>{values.address}</Text>
                                 </View>
                               </View>
                               <Autocomplete
-                              data={[]}
+                                data={[]}
                                 label={() => (
                                   <Text
-                                  
                                     style={{
                                       fontSize: 15,
                                       color: '#8f9bb3',
                                       marginBottom: 4,
 
                                       fontWeight: 'bold',
-                                    }}>
+                                    }}
+                                  >
                                     City
                                   </Text>
                                 )}
                                 disabled={!isEditMode}
                                 placeholder="Enter City"
                                 value={values.city}
-                                
-                               
                                 icon={renderLocationIcon}
                                 // label={evaProps => <Text {...evaProps}>City</Text>}
-                                
-                                onSelect={query => {
+
+                                onSelect={(query) => {
                                   setFieldValue('city', citiesData[query]);
-                                  setFieldValue(
-                                    'selectedCity',
-                                    citiesData[query],
-                                  );
-                                }}/>
-                               
-                             
+                                  setFieldValue('selectedCity', citiesData[query]);
+                                }}
+                              />
 
                               <Autocomplete
                                 label={() => (
                                   <Text
-                                  
                                     style={{
                                       fontSize: 15,
                                       color: '#8f9bb3',
                                       marginBottom: 4,
 
                                       fontWeight: 'bold',
-                                    }}>
+                                    }}
+                                  >
                                     State
                                   </Text>
                                 )}
                                 disabled={!isEditMode}
                                 placeholder="Enter State*"
                                 value={values.state}
-                        
-                               
                                 icon={renderLocationIcon}
                                 // label={evaProps => <Text {...evaProps}>State</Text>}
-                               data={[]}
-                                onSelect={query => {
+                                data={[]}
+                                onSelect={(query) => {
                                   const selectedState = statesData[query];
                                   setFieldValue('state', selectedState);
                                   setFieldValue('selectedState', selectedState);
@@ -594,21 +520,18 @@ formData.append('school',values?.schoolName);
                                   setCities([]);
                                   GetAllCities(
                                     values.selectedCountry.trim(),
-                                    selectedState.trim(),
-                                  ).then(res => {
+                                    selectedState.trim()
+                                  ).then((res) => {
                                     setCities(res.data);
                                   });
-                                }}/>
-                             
+                                }}
+                              />
 
-                              <View style={{flexDirection: 'column'}}>
-                                <Text style={styles.editLabel}>
-                                  {' '}
-                                  Zip/Post code
-                                </Text>
+                              <View style={{ flexDirection: 'column' }}>
+                                <Text style={styles.editLabel}> Zip/Post code</Text>
                                 <View style={styles.editField}>
                                   {renderLocationIcon()}
-                                  <Text style={{fontSize: 15, marginLeft: 10}}>
+                                  <Text style={{ fontSize: 15, marginLeft: 10 }}>
                                     {values.zipcode}
                                   </Text>
                                 </View>
@@ -616,59 +539,47 @@ formData.append('school',values?.schoolName);
                               <Autocomplete
                                 label={() => (
                                   <Text
-                                 
                                     style={{
                                       fontSize: 15,
                                       color: '#8f9bb3',
                                       marginBottom: 4,
 
                                       fontWeight: 'bold',
-                                    }}>
+                                    }}
+                                  >
                                     Country
                                   </Text>
                                 )}
                                 disabled={!isEditMode}
                                 placeholder="Enter Country*"
                                 value={values.country}
-                               data={[]}
-                               
+                                data={[]}
                                 icon={renderLocationIcon}
-                               
-                                onSelect={query => {
+                                onSelect={(query) => {
                                   const selectedCountry = countriesData[query];
-                                  setFieldValue(
-                                    'country',
-                                    selectedCountry.name,
-                                  );
-                                  setFieldValue(
-                                    'selectedCountry',
-                                    selectedCountry.name,
-                                  );
+                                  setFieldValue('country', selectedCountry.name);
+                                  setFieldValue('selectedCountry', selectedCountry.name);
                                   setFieldValue('selectedState', '');
                                   setFieldValue('state', '');
                                   setFieldValue('city', '');
                                   setStates([]);
-                                  GetAllStates(
-                                    selectedCountry.name.trim(),
-                                  ).then(res => {
+                                  GetAllStates(selectedCountry.name.trim()).then((res) => {
                                     setStates(res.data);
                                     setStatesData(states);
                                   });
-                                }}/>
-                                
+                                }}
+                              />
                             </>
                           )}
 
                           {false && isEditMode && (
                             <>
-                                <Input
-                                 disabled={true}
+                              <Input
+                                disabled={true}
                                 accessoryLeft={renderSchoolIcon()}
                                 style={styles.inputSettings}
                                 autoCapitalize="none"
-                                label={evaProps => (
-                                  <Text {...evaProps}>School Information</Text>
-                                )}
+                                label={(evaProps) => <Text {...evaProps}>School Information</Text>}
                                 value={values?.schoolName}
                                 onChangeText={handleChange('schoolName')}
                               />
@@ -684,12 +595,10 @@ formData.append('school',values?.schoolName);
                                 value={values.address}
                                 onChangeText={handleChange('address')}
                               /> */}
-
-                          
                             </>
                           )}
 
-                          {false &&isEditMode && (
+                          {false && isEditMode && (
                             <>
                               {/* <Autocomplete
                                 disabled={!currentUser?.isAdmin}
@@ -746,27 +655,26 @@ formData.append('school',values?.schoolName);
                                   );
                                 })}
                               </Autocomplete> */}
-                               <Autocomplete     disabled={true}  placeholder="Enter Country*" data={countriesData} onSelect={(item)=>{
-                                const selectedCountry = item;
-                                setFieldValue(
-                                  'country',
-                                  selectedCountry.name,
-                                );
-                                setFieldValue(
-                                  'selectedCountry',
-                                  selectedCountry.name,
-                                );
-                                setFieldValue('selectedState', '');
-                                setFieldValue('state', '');
-                                setFieldValue('city', '');
-                                setStates([]);
-                                GetAllStates(
-                                  selectedCountry.name.trim(),
-                                ).then(res => {
-                                  setStates(res.data);
-                                  setStatesData(res.data);
-                                });
-                               }} icon={()=> renderLocationIcon()} value={values.country}/>
+                              <Autocomplete
+                                disabled={true}
+                                placeholder="Enter Country*"
+                                data={countriesData}
+                                onSelect={(item) => {
+                                  const selectedCountry = item;
+                                  setFieldValue('country', selectedCountry.name);
+                                  setFieldValue('selectedCountry', selectedCountry.name);
+                                  setFieldValue('selectedState', '');
+                                  setFieldValue('state', '');
+                                  setFieldValue('city', '');
+                                  setStates([]);
+                                  GetAllStates(selectedCountry.name.trim()).then((res) => {
+                                    setStates(res.data);
+                                    setStatesData(res.data);
+                                  });
+                                }}
+                                icon={() => renderLocationIcon()}
+                                value={values.country}
+                              />
                               {/* <AutocompleteInput
                                inputContainerStyle={{
                                 marginVertical: 5,
@@ -790,23 +698,28 @@ formData.append('school',values?.schoolName);
       hideResults={showResult}
     /> */}
 
-<Autocomplete data={statesData}        disabled={true} placeholder="Enter State*" onSelect={(item)=>{
-                                 const selectedState = item;
-                             
-                                setFieldValue('state', selectedState);
-                                setFieldValue('selectedState', selectedState);
-                                setFieldValue('selectedCity', '');
-                                setFieldValue('city', '');
-                                setCities([]);
-                                GetAllCities(
-                                  values.selectedCountry.trim(),
-                                  selectedState.trim(),
-                                ).then(res => {
+                              <Autocomplete
+                                data={statesData}
+                                disabled={true}
+                                placeholder="Enter State*"
+                                onSelect={(item) => {
+                                  const selectedState = item;
 
-
-                                  setCitiesData(res.data);
-                                });
-                               }} icon={()=> renderLocationIcon()} value={values.state}/>
+                                  setFieldValue('state', selectedState);
+                                  setFieldValue('selectedState', selectedState);
+                                  setFieldValue('selectedCity', '');
+                                  setFieldValue('city', '');
+                                  setCities([]);
+                                  GetAllCities(
+                                    values.selectedCountry.trim(),
+                                    selectedState.trim()
+                                  ).then((res) => {
+                                    setCitiesData(res.data);
+                                  });
+                                }}
+                                icon={() => renderLocationIcon()}
+                                value={values.state}
+                              />
 
                               {/* <Autocomplete
                                 disabled={!currentUser?.isAdmin}
@@ -856,7 +769,7 @@ formData.append('school',values?.schoolName);
                                   );
                                 })}
                               </Autocomplete> */}
-                                {/* <AutocompleteInput
+                              {/* <AutocompleteInput
       data={statesData.filter((item)=>item?.name?.startsWith(values.state))}
       value={values.state}
       onChangeText={(text) =>  setFieldValue('state', text)}
@@ -910,16 +823,20 @@ formData.append('school',values?.schoolName);
                                 })}
                               </Autocomplete> */}
 
-
-<Autocomplete data={citiesData} disableColor="transparent"     disabled={true} placeholder="Enter City*" onSelect={(item)=>{
+                              <Autocomplete
+                                data={citiesData}
+                                disableColor="transparent"
+                                disabled={true}
+                                placeholder="Enter City*"
+                                onSelect={(item) => {
                                   setFieldValue('city', item);
-                                  setFieldValue(
-                                    'selectedCity',
-                                    item.name,
-                                  );
-                               }} icon={()=> renderLocationIcon()} value={values.city}/>
+                                  setFieldValue('selectedCity', item.name);
+                                }}
+                                icon={() => renderLocationIcon()}
+                                value={values.city}
+                              />
 
-  {/* <AutocompleteInput
+                              {/* <AutocompleteInput
       data={countriesData.filter((item)=>item?.name?.startsWith(values.city))}
       value={values.city}
       onChangeText={(text) =>  setFieldValue('city', text)}
@@ -936,7 +853,6 @@ formData.append('school',values?.schoolName);
                                 accessoryLeft={renderLocationIcon}
                                 style={styles.inputSettings}
                                 autoCapitalize="none"
-                             
                                 value={values.zipcode}
                                 onChangeText={handleChange('zipcode')}
                               />
@@ -961,7 +877,7 @@ formData.append('school',values?.schoolName);
                           />
                         )} */}
                           {isEditMode ? (
-                            <View style={{marginVertical: 10}}>
+                            <View style={{ marginVertical: 10 }}>
                               <LinearGradientButton onPress={handleSubmit}>
                                 Submit
                               </LinearGradientButton>
@@ -975,33 +891,34 @@ formData.append('school',values?.schoolName);
                                   setFieldValue('city', user?.city);
                                   setisEditMode(false);
                                 }}
-                                style={{width: '100%', marginTop: 10}}>
+                                style={{ width: '100%', marginTop: 10 }}
+                              >
                                 <Text
                                   style={{
                                     color: Colors.primary,
                                     textAlign: 'center',
-                                  }}>
+                                  }}
+                                >
                                   Cancel
                                 </Text>
                               </TouchableOpacity>
                             </View>
                           ) : (
-                            <View style={{marginTop: 10}}>
-                              <LinearGradientButton
-                                onPress={() => setisEditMode(true)}>
+                            <View style={{ marginTop: 10 }}>
+                              <LinearGradientButton onPress={() => setisEditMode(true)}>
                                 Edit
                               </LinearGradientButton>
                               <View style={styles.background}></View>
                             </View>
                           )}
-                          <View style={{height: 100}} />
+                          <View style={{ height: 100 }} />
                         </>
                       )}
                     </>
                   )}
                 </Formik>
               )}
-              {isKeyboardVisible && <View style={{height: 100}} />}
+              {isKeyboardVisible && <View style={{ height: 100 }} />}
             </View>
           </KeyboardAwareScrollView>
         </BackgroundLayout>
@@ -1147,13 +1064,10 @@ const styles = StyleSheet.create({
     top: 70,
     left: 80,
   },
-  editButton: {
-
-  },
+  editButton: {},
   autoCompleteItem: {
     // elevation: 2,
-  
-    width: Dimensions.get('screen').width*0.9
-  },
 
+    width: Dimensions.get('screen').width * 0.9,
+  },
 });

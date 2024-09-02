@@ -1,4 +1,5 @@
 import api from '@/Services';
+import { Alert } from 'react-native';
 
 export default async (id: number, page: number, pageSize: number, config: any) => {
   const response = await api.get(

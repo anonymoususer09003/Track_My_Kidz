@@ -159,7 +159,7 @@ const RightDrawerNavigator = () => {
         locationPermission();
       });
     };
-    setTimeout(connectToSocket, 15000);
+    setTimeout(connectToSocket, 300000);
   }, []);
   const disconnectStompClient = () => {
     if (stompClient.current && stompClient.current.connected) {

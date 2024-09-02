@@ -21,7 +21,7 @@ import {
 
 const RequestPermissionModal = () => {
   const [{ selectedActivity }, _dispatch]: any = useStateValue();
-  console.log("selectedActivity", selectedActivity);
+  console.log('selectedActivity', selectedActivity);
 
   const dispatch = useDispatch();
   const [pageStudents, pageNumberStudents] = useState<number>(0);
@@ -34,11 +34,10 @@ const RequestPermissionModal = () => {
   const [instructors, setInstructors] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
-  const [selectedStatus, setSelectedStatus] = useState<string>("pending");
+  const [selectedStatus, setSelectedStatus] = useState<string>('pending');
 
   const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.requestPermissionModalVisibility
+    (state: { modal: ModalState }) => state.modal.requestPermissionModalVisibility
   );
 
   const handleSelectAll = () => {
@@ -73,7 +72,7 @@ const RequestPermissionModal = () => {
       );
       setStudents(_data);
       const instructorData = [...instructors];
-      const __data:any[] = [];
+      const __data: any[] = [];
       instructorData.forEach((i) =>
         __data.push({
           ...i,
@@ -102,8 +101,8 @@ const RequestPermissionModal = () => {
 
   const handleSubmit = async () => {
     try {
-      console.log("instructors", instructors);
-      let ids :any[]= [];
+      let ids: any[] = [];
+      console.log('students', students);
       let filterStudents =
         students &&
         students?.map((item: any) => {
@@ -111,7 +110,7 @@ const RequestPermissionModal = () => {
             ids.push(item.studentId);
           }
         });
-      console.log("isntructors", instructors);
+      console.log('isntructors', instructors);
       let body = {
         activityId: selectedActivity.activityId,
         pendingStudents: ids,
@@ -120,7 +119,7 @@ const RequestPermissionModal = () => {
         let res = await SendEmailToPendingStudent(body);
       }
 
-      let instructor_ids :any[]= [];
+      let instructor_ids: any[] = [];
       let filterInstructors =
         instructors &&
         instructors?.map((item: any) => {
@@ -132,27 +131,24 @@ const RequestPermissionModal = () => {
       let instructorBody = {
         activityId: selectedActivity.activityId,
         pendingInstructors: instructor_ids,
-        studentId: 0,
       };
       if (instructor_ids.length > 0) {
         let response = await SendEmailToPenidngInstructor(instructorBody);
       }
 
-      dispatch(
-        ChangeModalState.action({ requestPermissionModalVisibility: false })
-      );
+      dispatch(ChangeModalState.action({ requestPermissionModalVisibility: false }));
       _dispatch({
         type: actions.SET_SELECTED_ACTIVITY,
         payload: null,
       });
       setSelectAll(false);
       Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Permission request resent successfully.",
+        type: 'success',
+        text1: 'Success',
+        text2: 'Permission request resent successfully.',
       });
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
 
     // console.log("id", ids);
@@ -168,13 +164,9 @@ const RequestPermissionModal = () => {
 
   const RightDrawerAction = () => (
     <TopNavigationAction
-      icon={(props: any) => (
-        <Icon {...props} name="close-circle-outline" fill={Colors.white} />
-      )}
+      icon={(props: any) => <Icon {...props} name="close-circle-outline" fill={Colors.white} />}
       onPress={() => {
-        dispatch(
-          ChangeModalState.action({ requestPermissionModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ requestPermissionModalVisibility: false }));
         _dispatch({
           type: actions.SET_SELECTED_ACTIVITY,
           payload: null,
@@ -190,13 +182,13 @@ const RequestPermissionModal = () => {
     let pageNumberStudentCount = refreshing ? pageStudents : 0;
     let body = {
       activityId: selectedActivity?.activityId,
-      status: "pending",
+      status: 'pending',
       page: pageNumberStudentCount,
       page_size: pageSizeStudents,
     };
     FindAllStudentsWhichActivity(body)
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         setTotalRecordsStudents(res.length == 0 ? false : true);
         setRefreshing(false);
         setPageSizeStudents(10);
@@ -209,23 +201,20 @@ const RequestPermissionModal = () => {
         }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log('err', err);
       });
   };
   const getPendingInstructors = async (refreshing?: any) => {
     let pageNumberStudentCount: number = refreshing ? pageInstructors : 0;
     let body = {
       activityId: selectedActivity?.activityId,
-      status: "pending",
+      status: 'pending',
       page: pageNumberStudentCount,
       page_size: pageSizeStudents,
     };
     FindAllIstructorActivities(body)
       .then((res) => {
-        console.log(
-          "res ins==============00000000303399398983983899839839838998393",
-          res
-        );
+        ``;
         setTotalRecordsInstructors(res.length);
         setRefreshing(false);
         setPageSizeInstructors(10);
@@ -238,7 +227,7 @@ const RequestPermissionModal = () => {
         }
       })
       .catch((err) => {
-        console.log("err9999999999999999999999999999999999999", err);
+        console.log('err9999999999999999999999999999999999999', err);
       });
   };
   useEffect(() => {
@@ -255,27 +244,21 @@ const RequestPermissionModal = () => {
       style={{ margin: 0, marginTop: 50 }}
       swipeDirection="down"
       onSwipeComplete={() => {
-        dispatch(
-          ChangeModalState.action({ requestPermissionModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ requestPermissionModalVisibility: false }));
         _dispatch({
           type: actions.SET_SELECTED_ACTIVITY,
           payload: null,
         });
       }}
       onBackdropPress={() => {
-        dispatch(
-          ChangeModalState.action({ requestPermissionModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ requestPermissionModalVisibility: false }));
         _dispatch({
           type: actions.SET_SELECTED_ACTIVITY,
           payload: null,
         });
       }}
       onBackButtonPress={() => {
-        dispatch(
-          ChangeModalState.action({ requestPermissionModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ requestPermissionModalVisibility: false }));
         _dispatch({
           type: actions.SET_SELECTED_ACTIVITY,
           payload: null,
@@ -292,10 +275,10 @@ const RequestPermissionModal = () => {
                   color: Colors.white,
                   marginLeft: 20,
                   fontSize: 18,
-                  textAlign: "center",
+                  textAlign: 'center',
                 }}
               >
-                Resend Permission Request
+                Resend Request
               </Text>
             )}
             appearance="control"
@@ -357,21 +340,19 @@ const RequestPermissionModal = () => {
               </TouchableOpacity>
             </View> */}
             <View style={{ flex: 1, paddingHorizontal: 20 }}>
-              {selectedStatus !== "approved" && (
+              {selectedStatus !== 'approved' && (
                 <View
                   style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     marginTop: 10,
                   }}
                 >
                   <CheckBox checked={selectAll} onChange={handleSelectAll}>
-                    {""}
+                    {''}
                   </CheckBox>
-                  <Text
-                    style={{ marginLeft: 10, fontSize: 13, fontWeight: "bold" }}
-                  >
+                  <Text style={{ marginLeft: 10, fontSize: 13, fontWeight: 'bold' }}>
                     Select All
                   </Text>
                 </View>
@@ -385,14 +366,12 @@ const RequestPermissionModal = () => {
                         style={{
                           marginVertical: 2,
                           padding: 2,
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                         }}
                       >
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Entypo
                             name="book"
                             color={Colors.primary}
@@ -407,7 +386,7 @@ const RequestPermissionModal = () => {
                           checked={item.selected}
                           onChange={() => handleCheckboxChange(index)}
                         >
-                          {""}
+                          {''}
                         </CheckBox>
                       </View>
                     )}
@@ -432,14 +411,12 @@ const RequestPermissionModal = () => {
                         style={{
                           marginVertical: 2,
                           padding: 2,
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                         }}
                       >
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Ionicons
                             name="person"
                             color={Colors.primary}
@@ -447,14 +424,14 @@ const RequestPermissionModal = () => {
                             style={{ marginHorizontal: 5 }}
                           />
                           <Text
-                            style={{ marginLeft: 5, fontSize: 13 }}
+                            style={{ marginLeft: 5 }}
                           >{`${item.firstName} ${item.lastName}`}</Text>
                         </View>
                         <CheckBox
                           checked={item.selected}
                           onChange={() => handleCheckboxInstructorChange(index)}
                         >
-                          {""}
+                          {''}
                         </CheckBox>
                       </View>
                     )}
@@ -472,20 +449,26 @@ const RequestPermissionModal = () => {
                   />
                 )}
               </View>
+              <View style={{ flex: 1, justifyContent: 'center' }}>
+                {students.length === 0 && instructors.length === 0 && (
+                  <Text style={{ textAlign: 'center' }}>
+                    {' '}
+                    All recipients have accepted or declined. There are no pending recipients to
+                    send request to.
+                  </Text>
+                )}
+              </View>
             </View>
-            {refreshing && (
-              <ActivityIndicator size="large" color={Colors.primary} />
-            )}
-            {selectedStatus !== "approved" && (
+            {refreshing && <ActivityIndicator size="large" color={Colors.primary} />}
+            {selectedStatus !== 'approved' && (
               <View style={{ marginVertical: 5 }}>
-                <Text style={{ textAlign: "center", fontSize: 13 }}>
-                  These are yet to respond to your invitation. Select to resend
-                  permission request
+                <Text style={{ textAlign: 'center', fontSize: 13 }}>
+                  These are yet to respond to your invitation. Select to resend permission request
                 </Text>
               </View>
             )}
             <View style={styles.buttonSettings}>
-              {selectedStatus !== "approved" && (
+              {selectedStatus !== 'approved' && (
                 <LinearGradientButton
                   disabled={
                     students?.filter((i) => i.selected).length === 0 &&
@@ -498,11 +481,7 @@ const RequestPermissionModal = () => {
               )}
               <View style={{ marginTop: 15 }} />
               <LinearGradientButton
-                gradient={["#EC5ADD", Colors.primary]}
-                disabled={
-                  students?.filter((i) => i.selected).length === 0 &&
-                  instructors?.filter((i) => i.selected).length === 0
-                }
+                gradient={['#EC5ADD', Colors.primary]}
                 onPress={() => {
                   dispatch(
                     ChangeModalState.action({
@@ -531,22 +510,22 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   tabButton: {
     backgroundColor: Colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "33%",
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '33%',
     paddingVertical: 10,
   },
   tabText: {
     color: Colors.white,
   },
   modal: { borderRadius: 10 },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 0,
@@ -556,47 +535,46 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
   },
-  topNav: {
-  },
+  topNav: {},
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   item: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     paddingHorizontal: 10,
     paddingTop: 10,
   },
   footer: {
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 16,
     marginVertical: 4,
   },
   bottomButton: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -607,15 +585,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   buttonSettings: {
     marginTop: 10,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     marginBottom: 10,
-    width: "90%",
-    alignSelf: "center",
+    width: '90%',
+    alignSelf: 'center',
   },
 });

@@ -65,13 +65,13 @@ const StudentActivityNavigator: FC = () => {
       })}
     </TabBar>
   );
-useEffect(()=>{
-  dispatch(
-    ChangeModalState.action({
-      showCalendar: false,
-    })
-  );
-},[])
+  useEffect(() => {
+    dispatch(
+      ChangeModalState.action({
+        showCalendar: false,
+      })
+    );
+  }, []);
   return (
     <BackgroundLayout hideLeftIcon={true} title="Event Information" rightIcon={true}>
       {isCalendarVisible && (
