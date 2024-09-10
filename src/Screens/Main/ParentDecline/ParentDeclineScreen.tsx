@@ -65,13 +65,11 @@ const ParentDeclineScreen = () => {
     let email = currentUser?.email;
     GetChildrenAcitivities(email, 'declined', pageNumberActivityCount, pageSizeActivity)
       .then((res) => {
-        console.log('res98828989899889', res);
         setTotalRecordsActivity(res.totalRecords);
         setRefreshing(false);
         setPageSizeActivity(10);
 
         pageNumberActivity(refreshing ? pageActivity + 1 : 1);
-        console.log('res', res);
 
         if (refreshing) {
           setActivities([...activities, ...res.result]);
@@ -96,13 +94,12 @@ const ParentDeclineScreen = () => {
     let email = currentUser?.email;
     GetChildrenGroups(email, 'declined', pageNumberGroupCount, pageSizeGroup)
       .then((res) => {
-        console.log('res', res);
         setTotalRecordsGroup(res.totalRecords);
         setRefreshing(false);
         setPageSizeGroup(10);
 
         pageNumberGroup(refreshing ? pageGroup + 1 : 1);
-        console.log('res', res);
+
         if (refreshing) {
           setGroups([...groups, ...res.result]);
         } else {
@@ -122,14 +119,13 @@ const ParentDeclineScreen = () => {
   const loadUserDetails = async () => {
     GetParentChildrens(currentUser?.referenceCode)
       .then((res) => {
-        console.log('children', res);
         setChildren(res);
       })
       .catch((err) => console.log('loadUserDetails', err));
   };
   const closeRow = (index?: number) => {
     if (!index) return;
-    console.log(index);
+
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
     }
@@ -220,9 +216,8 @@ const ParentDeclineScreen = () => {
           setActivity={(id: any) => {
             setSelectedChild('');
             if (activity?.activityId) {
-              console.log('declinedactivity', activity);
               closeRow();
-              console.log('activites', activities);
+
               let filter = activities?.filter((item) => item?.activityId != id);
 
               setActivities(filter);

@@ -46,14 +46,9 @@ const ResendConfirmationScreen: FC<ResendConfirmationScreenProps> = ({ navigatio
     { id: 3, label: 'Student', value: 'Student' },
   ];
   // @ts-ignore
-  const renderPersonIcon = (props: any) => (
-    <Icon {...props} name="person-outline" />
-  );
+  const renderPersonIcon = (props: any) => <Icon {...props} name="person-outline" />;
   const reactivateValidationSchema = yup.object().shape({
-    email: yup
-      .string()
-      .email('Please enter valid email')
-      .required('Email is required'),
+    email: yup.string().email('Please enter valid email').required('Email is required'),
   });
   const [isDesignatedAdmin, setIsDesignatedAdmin] = useState(false);
 
@@ -81,7 +76,6 @@ const ResendConfirmationScreen: FC<ResendConfirmationScreenProps> = ({ navigatio
             // resetForm();
             GetActivationCode({ email: values.email }, values.user_type)
               .then((res) => {
-                console.log('res----', res);
                 navigation.navigate('EmailConfirmation', {
                   emailAddress: values.email,
                   user_type: values.user_type,
@@ -101,12 +95,9 @@ const ResendConfirmationScreen: FC<ResendConfirmationScreenProps> = ({ navigatio
                   autoHide: true,
                   topOffset: 30,
                   bottomOffset: 40,
-                  onShow: () => {
-                  },
-                  onHide: () => {
-                  },
-                  onPress: () => {
-                  },
+                  onShow: () => {},
+                  onHide: () => {},
+                  onPress: () => {},
                 });
               })
               .finally(() => {
@@ -144,15 +135,15 @@ const ResendConfirmationScreen: FC<ResendConfirmationScreenProps> = ({ navigatio
           }}
         >
           {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              setFieldValue,
-              values,
-              errors,
-              touched,
-              isValid,
-            }) => (
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            setFieldValue,
+            values,
+            errors,
+            touched,
+            isValid,
+          }) => (
             <>
               <Layout style={styles.formContainer}>
                 <Select

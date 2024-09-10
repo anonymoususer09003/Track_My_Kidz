@@ -17,8 +17,8 @@ import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavig
 const gestureRootViewStyle = { flex: 1 };
 
 type DragDropStudentScreenProps = {
-  route: RouteProp<MainStackNavigatorParamsList, 'DragDropStudent'>
-}
+  route: RouteProp<MainStackNavigatorParamsList, 'DragDropStudent'>;
+};
 
 const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
   // const FirstReceivingItemList = [
@@ -43,7 +43,7 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
   //     background_color: '#ffaaff',
   //   },
   // ];
-  console.log('route', route.params);
+
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const [loading, setLoading] = useState(false);
   const isFocused = useIsFocused();
@@ -77,24 +77,16 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
     // { name: "mm", background_color: "#fff", id: 1 },
     // { name: "nm", background_color: "#fff", id: 2 },
   ]);
-  const [originaldragItemMiddleList, setOriginalDragItemListMiddle] = useState<any[]>(
-    [],
-  );
-  const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item,
-  );
+  const [originaldragItemMiddleList, setOriginalDragItemListMiddle] = useState<any[]>([]);
+  const currentUser = useSelector((state: { user: UserState }) => state.user.item);
 
   const [rearSeats, setRearSeats] = useState<any[]>([]);
   const [seats, setSeats] = useState<any[]>([]);
-  console.log('rearsetas', dragItemMiddleList);
-  console.log('rearsetas', receivingItemList);
 
   const getBusbyId = async (bus: any, busDetail: any) => {
     try {
-      let res = await GetBusByID(
-        route?.params?.bus?.busId || route?.params?.bus,
-      );
-      console.log('res0999', res);
+      let res = await GetBusByID(route?.params?.bus?.busId || route?.params?.bus);
+
       if (res.data.length > 0) {
         getSeatsList(res.data, busDetail);
       }
@@ -108,8 +100,6 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
     setLoading(true);
     FindAllBus(currentUser?.instructorId, 0, 100)
       .then(async (res) => {
-        console.log('00000000000000res', res);
-
         // console.log("88989389398938", res?.data);
         // setBus(
         //   {
@@ -125,15 +115,11 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
         //     busSeatsReserved: [],
         //   }
         // res?.data?.result[0];
-        console.log('result', res?.data?.result);
-        console.log('route', route?.params?.bus);
-        const bus = res?.data?.result?.find(
-          (b: any) => b?.busId === route?.params.bus?.busId,
-        );
+
+        const bus = res?.data?.result?.find((b: any) => b?.busId === route?.params.bus?.busId);
         setBus(bus);
         // let response = await getBusbyId(res, bus);
         setLoading(false);
-        console.log('bus---', bus);
       })
       .catch((err) => {
         console.log('getBuses Error:', err);
@@ -156,8 +142,6 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
         obj[`${item[1]}_${item[2]}`] = item;
       });
 
-      console.log('seats', seats);
-      console.log('obj00', obj);
       let data = [];
       const temp = [];
       let users = [...dragItemMiddleList];
@@ -166,19 +150,11 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
 
       if (busInfo.longSeat) {
         for (let j = 0; j < busInfo?.numberOfKidsOnLongSeat; j++) {
-          let lgValue =
-            JSON.stringify(busInfo?.numberOfRows + 1) +
-            '_' +
-            JSON.stringify(j + 1);
+          let lgValue = JSON.stringify(busInfo?.numberOfRows + 1) + '_' + JSON.stringify(j + 1);
           if (obj[lgValue]) {
-            let personObj = dragItemMiddleList.find(
-              (person) => person.id == obj[lgValue][0],
-            );
-            console.log('0000', dragItemMiddleList);
-            console.log('000082828', obj[lgValue]);
-            console.log('personob99j', personObj);
+            let personObj = dragItemMiddleList.find((person) => person.id == obj[lgValue][0]);
+
             users = users.filter((per) => per.id != obj[lgValue][0]);
-            console.log('user', users);
 
             rearSeats.push({
               id: personObj?.id,
@@ -202,18 +178,11 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
           : busInfo?.numberOfSeatsPerRow;
         for (let j = 0; j < comparisonValue; j++) {
           let k = JSON.stringify(i + 1) + '_' + JSON.stringify(j + 1);
-          console.log('00000---k', k);
-          console.log('los-000-0--0-0', obj[k]);
-          console.log('909090909090', obj[k]);
+
           if (obj[k]) {
-            let personObj = dragItemMiddleList.find(
-              (person) => person.id == obj[k][0],
-            );
-            console.log('0000', dragItemMiddleList);
-            console.log('000082828', obj[k]);
-            console.log('personob99j', personObj);
+            let personObj = dragItemMiddleList.find((person) => person.id == obj[k][0]);
+
             users = users.filter((per) => per.id != obj[k][0]);
-            console.log('user', users);
 
             data.push({
               id: personObj?.id,
@@ -232,14 +201,9 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
           temp.push(data);
           data = [];
         }
-        console.log('longseat', longSeat);
-        longSeat = false;
 
-        console.log('longseat-----', longSeat);
+        longSeat = false;
       }
-      console.log('middle', users);
-      console.log('rear seats', rearSeats);
-      console.log('data', temp);
 
       let temp1 = seats.map((item, index) => ({
         name: '-',
@@ -277,20 +241,15 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
           setOriginalDragItemListMiddle(temp);
         } else {
           const temp = route?.params?.students.map((item: any) => ({
-            name:
-              item?.firstName ||
-              item?.firstname + item?.lastName ||
-              item?.lastname,
+            name: item?.firstName || item?.firstname + item?.lastName || item?.lastname,
             background_color: '#fff',
             id: item?.studentId || item?.id,
           }));
-          console.log('if88888888888', temp);
+
           setDragItemListMiddle(temp);
           setOriginalDragItemListMiddle(temp);
         }
       } else {
-        console.log('else000000000000000000');
-
         getApprovedStudents();
       }
     }
@@ -301,7 +260,7 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
     }
   }, [originaldragItemMiddleList]);
 
-  const DragUIComponent = ({ item, index }: { item: any, index: number }) => {
+  const DragUIComponent = ({ item, index }: { item: any; index: number }) => {
     return (
       <DraxView
         style={[
@@ -327,11 +286,10 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
       page: 0,
       page_size: 1000,
     };
-    console.log('body', body);
+
     // console.log("body", body);
     FindAllStudentsWhichActivity(body)
       .then((res) => {
-        console.log('res--------------------------', res);
         const temp = res.map((item: any) => ({
           name: item?.firstName + item?.lastName,
           background_color: '#fff',
@@ -345,18 +303,17 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
         console.log('err99099009990', err);
       });
   };
-  const ReceivingZoneUIComponent = (
-    {
-      item,
-      index,
-      parentIndex,
-      isRear = false,
-    }: {
-      item: any;
-      index: number;
-      parentIndex: number;
-      isRear?: boolean;
-    }) => {
+  const ReceivingZoneUIComponent = ({
+    item,
+    index,
+    parentIndex,
+    isRear = false,
+  }: {
+    item: any;
+    index: number;
+    parentIndex: number;
+    isRear?: boolean;
+  }) => {
     // console.log("item", item);
     return (
       <DraxView
@@ -377,14 +334,12 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
         }}
         key={index}
         onReceiveDragDrop={(event) => {
-          console.log('event', event);
           let selected_item = dragItemMiddleList[event.dragged.payload];
 
           let newReceivingItemList = [...receivingItemList];
           if (isRear) {
             let newRearSeats = [...rearSeats];
-            console.log('onReceiveDragDrop :: newRearSeats', newRearSeats);
-            console.log('parentIndex', parentIndex);
+
             newRearSeats[index] = selected_item;
             setRearSeats(newRearSeats);
           } else {
@@ -399,16 +354,14 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
 
           if (parentIndex >= 0) {
             // Alert.alert("akk");
-            console.log('sleceteditem', selected_item);
-            console.log('recieving list', receivingItemList);
 
             newDragItemMiddleList[event.dragged.payload] =
               selected_item.name != '-'
                 ? {
-                  id: 0,
-                  name: '-',
-                  background_color: '#fff',
-                }
+                    id: 0,
+                    name: '-',
+                    background_color: '#fff',
+                  }
                 : originaldragItemMiddleList[event.dragged.payload];
             // receivingItemList[parentIndex][index];
             // console.log("prnet", receivingItemList[parentIndex][index]);
@@ -440,12 +393,8 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
     const data = [];
     for (let i = 0; i < bus?.numberOfRows; i++) {
       const innerData = [];
-      console.log('here', bus?.numberOfKidsPerSeat * bus?.numberOfSeatsPerRow);
-      for (
-        let j = 0;
-        j < bus?.numberOfKidsPerSeat * bus?.numberOfSeatsPerRow;
-        j++
-      ) {
+
+      for (let j = 0; j < bus?.numberOfKidsPerSeat * bus?.numberOfSeatsPerRow; j++) {
         innerData.push({
           id: parseInt(`${i}${j}` + 1, 0),
           name: '-',
@@ -454,7 +403,7 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
       }
       data.push(innerData);
     }
-    console.log('data', data);
+
     setSeats(data);
     setReceivedItemList(data);
   };
@@ -478,11 +427,10 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
   //     getRearSeats();
   //   }
   // }, [bus]);
-  console.log('rearseats', rearSeats);
+
   // console.log("acitivtyId", route.params.activity);
   const allocateSeats = async () => {
     try {
-      console.log('recicved list', receivingItemList);
       let temp = [];
       let innerArr = [];
       let rearSeatsArr = [];
@@ -504,15 +452,10 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
         });
         // temp=[...temp,...rearSeatsArr]
       }
-      console.log('busId', route?.params.bus);
-      console.log('temp', temp);
-      let res = await SaveStudentSeats(
-        route?.params?.bus?.busId || route?.params?.bus,
-        temp,
-      );
-      console.log('res--------------8', res);
+
+      let res = await SaveStudentSeats(route?.params?.bus?.busId || route?.params?.bus, temp);
+
       // getSeats();
-      console.log('temp', temp);
     } catch (err) {
       console.log('err', err);
     }
@@ -523,9 +466,7 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
       <GestureHandlerRootView style={gestureRootViewStyle}>
         <AppHeader hideCenterIcon={true} hideCalendar={true} />
         {loading ? (
-          <View
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-          >
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <ActivityIndicator size={'large'} color={Colors.primary} />
           </View>
         ) : (
@@ -545,17 +486,13 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
                 onValueChange={() => {
                   setThumbnail(!thumbnail);
                   navigation.goBack();
-                  dispatch(
-                    ChangeModalState.action({ rollCallModalVisibility: true }),
-                  );
+                  dispatch(ChangeModalState.action({ rollCallModalVisibility: true }));
                 }}
                 value={thumbnail}
               />
             </View>
             <View>
-              <Text style={styles.headerStyle}>
-                {'Drag drop students on seats'}
-              </Text>
+              <Text style={styles.headerStyle}>{'Drag drop students on seats'}</Text>
             </View>
             <DraxProvider>
               <View style={styles.container}>
@@ -578,7 +515,7 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
                         index,
                         isRear: true,
                         parentIndex: -1,
-                      }),
+                      })
                     )}
                 </View>
                 <View style={styles.receivingContainer}>
@@ -614,7 +551,7 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
                                 item,
                                 index,
                                 parentIndex,
-                              }),
+                              })
                             )}
                         </View>
                       ))}
@@ -648,9 +585,9 @@ const DragDropStudentScreen: FC<DragDropStudentScreenProps> = ({ route }) => {
       </GestureHandlerRootView>
     </BackgroundLayout>
   );
-}
+};
 
-export default DragDropStudentScreen
+export default DragDropStudentScreen;
 
 const styles = StyleSheet.create({
   container: {

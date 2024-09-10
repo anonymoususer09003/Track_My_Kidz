@@ -44,7 +44,6 @@ const ParentDeletePermissionScreen = () => {
           if (!userId) return;
           DeleteStudent(route?.params?.dependentId, userId)
             .then((response) => {
-              console.log('response', response);
               navigation.goBack();
             })
             .catch((error) => console.log(error));

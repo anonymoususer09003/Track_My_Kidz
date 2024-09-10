@@ -22,7 +22,7 @@ const StudentActivityNavigator: FC = () => {
   const TabNavigator = createMaterialTopTabNavigator<StudentActivityNavigatorProp>();
   const tabNames = ['Activity', 'Group'];
   const [selectedMonth, setSelectedMonth] = useState(moment(new Date()).month());
-  console.log('selectedMonth', selectedMonth);
+
   const dispatch = useDispatch();
   const { hideCalendar, showFamilyMap, showParticipantMap } = useSelector(
     (state: { studentActivity: StudentState }) => state.studentActivity

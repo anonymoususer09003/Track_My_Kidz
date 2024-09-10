@@ -51,6 +51,8 @@ const InstructorActivityModal = ({
   const dispatch = useDispatch();
   const [{ item: activity }, _dispatch]: any = useStateValue();
   // @ts-ignore
+  let newDate = new Date(item.fromDate);
+  let currentDate = new Date();
   return (
     <Modal
       style={styles.container}
@@ -88,10 +90,7 @@ const InstructorActivityModal = ({
           <TouchableOpacity
             style={styles.buttonStyle}
             onPress={() => {
-              console.log(item, buses);
-
               // / // console.log();
-              console.log('item-------', item);
 
               if (item?.countApprovedInstructors || item?.countApprovedStudents) {
                 _dispatch({
@@ -253,7 +252,6 @@ const InstructorActivityModal = ({
 
                       DeleteActivity(item?.activityId)
                         .then((res) => {
-                          console.log(res);
                           hide();
 
                           getActivities();
@@ -288,7 +286,9 @@ const InstructorActivityModal = ({
               }}
             >
               <Entypo size={30} color={Colors.primary} name="circle-with-cross" />
-              <Text style={styles.textStyle}>End Event</Text>
+              <Text style={styles.textStyle}>
+                {currentDate >= newDate ? 'End' : 'Cancel'} Event
+              </Text>
             </TouchableOpacity>
           )}
           <View style={{ width: '100%' }}>

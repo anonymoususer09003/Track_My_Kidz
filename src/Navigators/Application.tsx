@@ -5,7 +5,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { navigationRef } from '@/Navigators/Functions';
 import { Platform, SafeAreaView, StatusBar, View } from 'react-native';
-import { getCountryDetail, loadUserId, loadUserType, storeCountryDetail } from '@/Storage/MainAppStorage';
+import {
+  getCountryDetail,
+  loadUserId,
+  loadUserType,
+  storeCountryDetail,
+} from '@/Storage/MainAppStorage';
 // import ChangeUserState from '@/Store/User/FetchOne';
 import ChangeCountryState from '../Store/Places/FetchCountries';
 import { useTheme } from '@/Theme';
@@ -33,11 +38,10 @@ const Application = () => {
 
   const { Layout, NavigationTheme } = useTheme();
   const applicationIsLoading = useSelector(
-    (state: { startup: StartupState }) => state.startup.loadingInitialData,
+    (state: { startup: StartupState }) => state.startup.loadingInitialData
   );
   const loggedIn = useSelector(
-    (state: { authentication: AuthenticationState }) =>
-      state.authentication.loggedIn,
+    (state: { authentication: AuthenticationState }) => state.authentication.loggedIn
   );
 
   const config = {
@@ -65,8 +69,6 @@ const Application = () => {
 
   const MainStackNavigator = createStackNavigator();
 
-  console.log('Application.tsx line 68 applicationIsLoading',applicationIsLoading);
-  console.log('Application.tsx line 68 loggedIn',loggedIn);
   const MainStack = () => (
     <MainStackNavigator.Navigator
       screenOptions={{
@@ -74,7 +76,8 @@ const Application = () => {
 
         headerBackTitleVisible: false,
         headerBackTitle: ' ',
-      }}>
+      }}
+    >
       {applicationIsLoading && (
         <MainStackNavigator.Screen name="Startup" component={StartUpScreen} />
       )}
@@ -105,9 +108,7 @@ const Application = () => {
         dispatch(ChangeCountryState.action({ countries: res }));
         await storeCountryDetail(JSON.stringify(res));
       } else {
-        dispatch(
-          ChangeCountryState.action({ countries: JSON.parse(countiresList) }),
-        );
+        dispatch(ChangeCountryState.action({ countries: JSON.parse(countiresList) }));
       }
       const userType = await loadUserType();
       const userId = await loadUserId();
@@ -153,17 +154,10 @@ const Application = () => {
             </View>
           )}
           {Platform.OS === 'android' && (
-            <StatusBar
-              animated={true}
-              backgroundColor={Colors.primary}
-              barStyle="light-content"
-            />
+            <StatusBar animated={true} backgroundColor={Colors.primary} barStyle="light-content" />
           )}
           <SafeAreaView style={[{ flex: 1 }, { backgroundColor: Colors.primary }]}>
-            <NavigationContainer
-              linking={linking}
-              theme={NavigationTheme}
-              ref={navigationRef}>
+            <NavigationContainer linking={linking} theme={NavigationTheme} ref={navigationRef}>
               {/* <AddBusInformation /> */}
               <LoadingModal />
               {/*<TwoFACodeModal />*/}

@@ -202,7 +202,6 @@ const PersonalProfileScreen = () => {
                     UpdateUser(objectToPass, 'parent')
                       .then(async (response: any) => {
                         if (response.status == 200) {
-                          console.log('response', response);
                           setisEditMode(false);
                           setisSending(false);
                           getUserId();

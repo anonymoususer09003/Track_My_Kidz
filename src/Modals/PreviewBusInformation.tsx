@@ -1,22 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { Text, Input, TopNavigationAction, Icon } from "@ui-kitten/components";
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  Dimensions,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import Colors from "@/Theme/Colors";
-import { ModalState } from "@/Store/Modal";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import Modal from "react-native-modal";
-import { CreateBus, PutBus } from "@/Services/BusConfiguration";
-import { UserState } from "@/Store/User";
-import FetchOne from "@/Services/User/FetchOne";
-import { useNavigation } from "@react-navigation/native";
-import { LinearGradientButton } from "@/Components";
+import React, { useEffect, useState } from 'react';
+import { Text, Input, TopNavigationAction, Icon } from '@ui-kitten/components';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import Colors from '@/Theme/Colors';
+import { ModalState } from '@/Store/Modal';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import Modal from 'react-native-modal';
+import { CreateBus, PutBus } from '@/Services/BusConfiguration';
+import { UserState } from '@/Store/User';
+import FetchOne from '@/Services/User/FetchOne';
+import { useNavigation } from '@react-navigation/native';
+import { LinearGradientButton } from '@/Components';
 const PreviewBusInformation = ({
   isLongSeat,
   numberOfKidsLongSeat,
@@ -52,43 +46,40 @@ const PreviewBusInformation = ({
   setNumberOfKidsLongSeat: Function;
   activity?: any;
   selectedItem: any;
-  fromActivity?: any
+  fromActivity?: any;
 }) => {
-  const deviceWidth = Dimensions.get("screen").width;
+  const deviceWidth = Dimensions.get('screen').width;
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [rearSeats, setRearSeats] = useState([]);
   const [seats, setSeats] = useState([]);
-  const currentUser = useSelector(
-    (state: { user: UserState }) => state.user.item
-  );
+  const currentUser = useSelector((state: { user: UserState }) => state.user.item);
   // console.log("currentUser00000000000000000000000", currentUser);
   const getRearSeats = () => {
     const data = [];
     for (let i = 0; i < numberOfKidsLongSeat; i++) {
-      data.push("");
+      data.push('');
     }
     setRearSeats(data);
   };
 
   const getSeats = () => {
     const data = [];
-    console.log(numberOfKidsInRow, numberOfSeatsPerRow);
+
     const rowsInSeat = numberOfKidsInRow * numberOfSeatsPerRow;
     for (let i = 0; i < numberOfRows; i++) {
       const innerData = [];
       for (let j = 0; j < rowsInSeat; j++) {
-        innerData.push("");
+        innerData.push('');
       }
       data.push(innerData);
     }
-    console.log(data);
+
     setSeats(data);
   };
 
   const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.previewButInformationModalVisibility
+    (state: { modal: ModalState }) => state.modal.previewButInformationModalVisibility
   );
 
   useEffect(() => {
@@ -140,17 +131,17 @@ const PreviewBusInformation = ({
               <View horizontal style={{ flex: 1, paddingBottom: 5 }}>
                 <View
                   style={{
-                    width: "100%",
-                    alignSelf: "center",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
+                    width: '100%',
+                    alignSelf: 'center',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
                   }}
                 >
                   {isLongSeat &&
                     rearSeats.map((item) => (
                       <View
                         style={{
-                          flexDirection: "row",
+                          flexDirection: 'row',
                           // alignItems: "center",
                           // justifyContent: "space-between",
                           // marginRight: 10,
@@ -160,10 +151,10 @@ const PreviewBusInformation = ({
                           style={{
                             margin: 5,
                             height: 40,
-                            width: "12%",
+                            width: '12%',
                             borderWidth: 1,
                             borderRadius: 10,
-                            borderColor: "#000",
+                            borderColor: '#000',
                             padding: 20,
                             backgroundColor: Colors.textInputBackgroundColor,
                           }}
@@ -174,15 +165,15 @@ const PreviewBusInformation = ({
               </View>
 
               <View horizontal style={{ flex: 1, paddingBottom: 5 }}>
-                <View style={{ width: "100%" }}>
+                <View style={{ width: '100%' }}>
                   {seats.map((item, index) => {
-                    let width = "10%";
+                    let width = '10%';
                     return (
                       <View
                         style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                         }}
                       >
                         {item &&
@@ -195,8 +186,7 @@ const PreviewBusInformation = ({
                                 width: width,
                                 height: 40,
                                 borderRadius: 10,
-                                backgroundColor:
-                                  Colors.textInputBackgroundColor,
+                                backgroundColor: Colors.textInputBackgroundColor,
                               }}
                             ></View>
                           ))}
@@ -208,9 +198,9 @@ const PreviewBusInformation = ({
               <Text
                 style={{
                   marginVertical: 10,
-                  fontWeight: "bold",
+                  fontWeight: 'bold',
                   fontSize: 24,
-                  alignSelf: "center",
+                  alignSelf: 'center',
                 }}
               >
                 Front
@@ -219,9 +209,9 @@ const PreviewBusInformation = ({
             </ScrollView>
             <View
               style={{
-                alignItems: "center",
-                width: "90%",
-                alignSelf: "center",
+                alignItems: 'center',
+                width: '90%',
+                alignSelf: 'center',
               }}
             >
               <LinearGradientButton
@@ -241,24 +231,20 @@ const PreviewBusInformation = ({
                       instructorId: currentUser?.instructorId || null,
                     })
                       .then((res) => {
-                        console.log(res.data);
-                        const data =
-                          buses && buses?.length > 0 ? [...buses] : [];
-                        let index = data.findIndex(
-                          (item) => item?.busId == selectedItem?.busId
-                        );
+                        const data = buses && buses?.length > 0 ? [...buses] : [];
+                        let index = data.findIndex((item) => item?.busId == selectedItem?.busId);
                         let temp = [...data];
 
                         temp[index] = res?.data;
 
                         // data.push(res?.data);
                         setBuses(temp);
-                        setBusName("");
-                        setNumberOfRows("");
-                        setNumberOfSeatsPerRow("");
-                        setNumberOfKidsPerSeat("");
+                        setBusName('');
+                        setNumberOfRows('');
+                        setNumberOfSeatsPerRow('');
+                        setNumberOfKidsPerSeat('');
                         setIsLongSeat(false);
-                        setNumberOfKidsLongSeat("");
+                        setNumberOfKidsLongSeat('');
 
                         dispatch(
                           ChangeModalState.action({
@@ -268,7 +254,7 @@ const PreviewBusInformation = ({
                         );
                       })
                       .catch((err) => {
-                        console.log("err", err);
+                        console.log('err', err);
                       });
                   } else {
                     CreateBus({
@@ -284,17 +270,15 @@ const PreviewBusInformation = ({
                       instructorId: currentUser?.instructorId || 0,
                     })
                       .then((res) => {
-                        console.log(res.data);
-                        const data =
-                          buses && buses?.length > 0 ? [...buses] : [];
+                        const data = buses && buses?.length > 0 ? [...buses] : [];
                         data.push(res?.data);
                         setBuses(data);
-                        setBusName("");
-                        setNumberOfRows("");
-                        setNumberOfSeatsPerRow("");
-                        setNumberOfKidsPerSeat("");
+                        setBusName('');
+                        setNumberOfRows('');
+                        setNumberOfSeatsPerRow('');
+                        setNumberOfKidsPerSeat('');
                         setIsLongSeat(false);
-                        setNumberOfKidsLongSeat("");
+                        setNumberOfKidsLongSeat('');
 
                         dispatch(
                           ChangeModalState.action({
@@ -304,12 +288,12 @@ const PreviewBusInformation = ({
                         );
                       })
                       .catch((err) => {
-                        setBusName("");
-                        setNumberOfRows("");
-                        setNumberOfSeatsPerRow("");
-                        setNumberOfKidsPerSeat("");
+                        setBusName('');
+                        setNumberOfRows('');
+                        setNumberOfSeatsPerRow('');
+                        setNumberOfKidsPerSeat('');
                         setIsLongSeat(false);
-                        setNumberOfKidsLongSeat("");
+                        setNumberOfKidsLongSeat('');
 
                         dispatch(
                           ChangeModalState.action({
@@ -317,7 +301,7 @@ const PreviewBusInformation = ({
                             addButInformationModalVisibility: false,
                           })
                         );
-                        console.log("err", err);
+                        console.log('err', err);
                       });
                   }
                 }}
@@ -326,7 +310,7 @@ const PreviewBusInformation = ({
               </LinearGradientButton>
               <View style={{ marginVertical: 10 }} />
               <LinearGradientButton
-                gradient={["#EC5ADD", Colors.primary]}
+                gradient={['#EC5ADD', Colors.primary]}
                 onPress={() => {
                   if (selectedItem) {
                     PutBus({
@@ -343,24 +327,20 @@ const PreviewBusInformation = ({
                       instructorId: currentUser?.instructorId || null,
                     })
                       .then((res) => {
-                        console.log(res.data);
-                        const data =
-                          buses && buses?.length > 0 ? [...buses] : [];
-                        let index = data.findIndex(
-                          (item) => item?.busId == selectedItem?.busId
-                        );
+                        const data = buses && buses?.length > 0 ? [...buses] : [];
+                        let index = data.findIndex((item) => item?.busId == selectedItem?.busId);
                         let temp = [...data];
 
                         temp[index] = res?.data;
 
                         // data.push(res?.data);
                         setBuses(temp);
-                        setBusName("");
-                        setNumberOfRows("");
-                        setNumberOfSeatsPerRow("");
-                        setNumberOfKidsPerSeat("");
+                        setBusName('');
+                        setNumberOfRows('');
+                        setNumberOfSeatsPerRow('');
+                        setNumberOfKidsPerSeat('');
                         setIsLongSeat(false);
-                        setNumberOfKidsLongSeat("");
+                        setNumberOfKidsLongSeat('');
 
                         dispatch(
                           ChangeModalState.action({
@@ -370,7 +350,7 @@ const PreviewBusInformation = ({
                         );
                       })
                       .catch((err) => {
-                        console.log("err", err);
+                        console.log('err', err);
                       });
                   } else {
                     CreateBus({
@@ -386,17 +366,15 @@ const PreviewBusInformation = ({
                       instructorId: currentUser?.instructorId || 0,
                     })
                       .then((res) => {
-                        console.log(res.data);
                         // console.log("data", data);
-                        console.log("buses", buses);
-                        const data =
-                          buses && buses?.length > 0 ? [...buses] : [];
-                        console.log("data", data);
+
+                        const data = buses && buses?.length > 0 ? [...buses] : [];
+
                         // console.log("data",data)
                         // console.log("buses",buses)
                         data.push(res?.data);
                         if (fromActivity) {
-                          navigation.navigate("DragDropStudent", {
+                          navigation.navigate('DragDropStudent', {
                             bus: data?.busId,
                             activity: activity,
                           });
@@ -407,12 +385,12 @@ const PreviewBusInformation = ({
                           );
                         }
                         setBuses(data);
-                        setBusName("");
-                        setNumberOfRows("");
-                        setNumberOfSeatsPerRow("");
-                        setNumberOfKidsPerSeat("");
+                        setBusName('');
+                        setNumberOfRows('');
+                        setNumberOfSeatsPerRow('');
+                        setNumberOfKidsPerSeat('');
                         setIsLongSeat(false);
-                        setNumberOfKidsLongSeat("");
+                        setNumberOfKidsLongSeat('');
 
                         dispatch(
                           ChangeModalState.action({
@@ -421,7 +399,7 @@ const PreviewBusInformation = ({
                         );
                       })
                       .catch((err) => {
-                        console.log("err", err);
+                        console.log('err', err);
                       });
                   }
                 }}
@@ -438,12 +416,7 @@ const PreviewBusInformation = ({
                     );
                   }}
                 >
-                  <Text
-                    style={[
-                      styles.button,
-                      { color: Colors.primaryTint, fontSize: 17 },
-                    ]}
-                  >
+                  <Text style={[styles.button, { color: Colors.primaryTint, fontSize: 17 }]}>
                     Back
                   </Text>
                 </TouchableOpacity>
@@ -461,12 +434,12 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   modal: { borderRadius: 10 },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 0,
@@ -481,33 +454,33 @@ const styles = StyleSheet.create({
   },
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     paddingTop: 20,
   },
   item: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     paddingHorizontal: 10,
     paddingTop: 10,
   },
   footer: {
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginVertical: 5,
   },
   text: {
@@ -515,12 +488,12 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   bottomButton: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -531,6 +504,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

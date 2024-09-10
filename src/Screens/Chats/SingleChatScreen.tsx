@@ -31,7 +31,6 @@ type SingleChatScreenProps = {
 };
 
 const SingleChatScreen: FC<SingleChatScreenProps> = ({ route, navigation }) => {
-  console.log('route--2-2-2--2-2', route);
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [mainReceiverUser, setReceiverUser] = useState<any>(null);
@@ -105,7 +104,7 @@ const SingleChatScreen: FC<SingleChatScreenProps> = ({ route, navigation }) => {
       return () => unsubscribe();
     }
   }, [isFocused]);
-  console.log('000000000', chat?.chatId);
+
   const getAllMessages = () => {
     setLoading(true);
     firestore()
@@ -133,7 +132,6 @@ const SingleChatScreen: FC<SingleChatScreenProps> = ({ route, navigation }) => {
   };
 
   const updateChat = () => {
-    console.log('logsgsgs', chat?.chatId);
     firestore()
       .collection('MESSAGE')
       .doc(chat?.chatId)
@@ -158,7 +156,6 @@ const SingleChatScreen: FC<SingleChatScreenProps> = ({ route, navigation }) => {
       });
   };
 
-  console.log('user', user);
   const sendChatMessage = (message: any) => {
     const newMessage = {
       _id: message._id,
@@ -166,7 +163,7 @@ const SingleChatScreen: FC<SingleChatScreenProps> = ({ route, navigation }) => {
       createdAt: moment().toISOString(),
       user: chat?.user,
     };
-    console.log(`----sssss-,${chat?.subcollection}${'_messages'}`);
+
     return new Promise((resolve, reject) => {
       firestore()
         .collection('MESSAGE')

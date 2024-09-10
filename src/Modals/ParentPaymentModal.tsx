@@ -24,7 +24,7 @@ interface ParentPaymentModalProps {
 
 const ParentPaymentModal = ({ onCancel, loginObj, userEmail, onPay }: ParentPaymentModalProps) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);
-  console.log(user);
+
   // const {createToken} = useStripe();
   const { confirmPayment } = useConfirmPayment();
 
@@ -53,12 +53,10 @@ const ParentPaymentModal = ({ onCancel, loginObj, userEmail, onPay }: ParentPaym
   const isVisible = useSelector(
     (state: { modal: ModalState }) => state.modal.parentPaymentModalVisibility
   );
-  console.log('isVisible', isVisible);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log('----------------------------');
-    console.log('inside useEffect');
     setPayment(false);
     setIsValid(false);
     setSelectedAmountIndex(null);
@@ -93,7 +91,6 @@ const ParentPaymentModal = ({ onCancel, loginObj, userEmail, onPay }: ParentPaym
   const getUser = async () => {
     const id = (await loadUserId()) || '';
     GetParent(parseInt(id, 0)).then((response) => {
-      console.log('ParentPaymentModal.tsx line 104', response);
       setParent(response);
     });
   };
@@ -130,13 +127,6 @@ const ParentPaymentModal = ({ onCancel, loginObj, userEmail, onPay }: ParentPaym
       },
     });
 
-    console.log('method', clientSecret, {
-      paymentMethodType: 'Card',
-      paymentMethodData: {
-        billingDetails,
-      },
-    });
-    console.log('paymentIntent', paymentIntent);
     if (error) {
       console.log('err', error);
       setIsLoading(false);
@@ -162,7 +152,6 @@ const ParentPaymentModal = ({ onCancel, loginObj, userEmail, onPay }: ParentPaym
   };
   const updateUser = async () => {
     try {
-      console.log('userrrrr', loginObj);
       let data = { ...loginObj };
       if (!userEmail) {
         data = {

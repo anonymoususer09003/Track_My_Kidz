@@ -43,6 +43,9 @@ const CancelActivityModal = ({
   const dispatch = useDispatch();
   const [{ item: activity }, _dispatch]: any = useStateValue();
   // @ts-ignore
+
+  let newDate = new Date(item.fromDate);
+  let currentDate = new Date();
   return (
     <Modal
       style={styles.container}
@@ -52,7 +55,6 @@ const CancelActivityModal = ({
         hide();
       }}
     >
-      {console.log('item----', item)}
       <Card style={styles.modal} disabled={true}>
         <View
           style={{
@@ -63,7 +65,7 @@ const CancelActivityModal = ({
         >
           <Text style={{ textAlign: 'center', marginVertical: 20, fontSize: 20 }}>
             {' '}
-            Cancel this Activity?
+            {currentDate >= newDate ? 'End' : 'Cancel'} this Event?
           </Text>
           <TouchableOpacity
             style={[

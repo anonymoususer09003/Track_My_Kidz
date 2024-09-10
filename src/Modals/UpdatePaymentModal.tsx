@@ -1,36 +1,29 @@
-import { LinearGradientButton } from "@/Components";
-import { UserState } from "@/Store/User";
-import { useTheme } from "@/Theme";
-import Colors from "@/Theme/Colors";
-import {
-  CardField, createToken
-} from "@stripe/stripe-react-native";
-import {
-  Card,
-  IndexPath,
-  Modal, Text
-} from "@ui-kitten/components";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { LinearGradientButton } from '@/Components';
+import { UserState } from '@/Store/User';
+import { useTheme } from '@/Theme';
+import Colors from '@/Theme/Colors';
+import { CardField, createToken } from '@stripe/stripe-react-native';
+import { Card, IndexPath, Modal, Text } from '@ui-kitten/components';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 
 const ParentPaymentModal = ({ onPay, onCancel, isVisible }) => {
   const user = useSelector((state: { user: UserState }) => state.user.item);
   const amountValues = [
-    { id: 0, amount: 500, label: "$5" },
-    { id: 1, amount: 1000, label: "$10" },
+    { id: 0, amount: 500, label: '$5' },
+    { id: 1, amount: 1000, label: '$10' },
     {
       id: 3,
       amount: 2000,
-      label: "$20",
+      label: '$20',
     },
-    { id: 4, amount: 5000, label: "$50" },
-    { id: 5, amount: 10000, label: "$100" },
+    { id: 4, amount: 5000, label: '$50' },
+    { id: 5, amount: 10000, label: '$100' },
   ];
 
   const { Layout } = useTheme();
-  const [selectedAmountIndex, setSelectedAmountIndex] =
-    useState<IndexPath | null>(null);
+  const [selectedAmountIndex, setSelectedAmountIndex] = useState<IndexPath | null>(null);
   const [cardData, setCardData] = useState({});
   const [isValid, setIsValid] = useState(false);
   const [payment, setPayment] = useState(false);
@@ -39,11 +32,11 @@ const ParentPaymentModal = ({ onPay, onCancel, isVisible }) => {
   const availableAmounts = [
     {
       amount: 1,
-      label: "$50 - Annually (Best Deal)",
+      label: '$50 - Annually (Best Deal)',
     },
     {
       amount: 5,
-      label: "$4.99 - Monthly",
+      label: '$4.99 - Monthly',
     },
   ];
 
@@ -58,9 +51,8 @@ const ParentPaymentModal = ({ onPay, onCancel, isVisible }) => {
   const createStripeToken = async (data) => {
     try {
       let token = await createToken(data);
-      console.log("token", token);
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
     }
   };
   // @ts-ignore
@@ -80,10 +72,10 @@ const ParentPaymentModal = ({ onPay, onCancel, isVisible }) => {
         <View style={styles.body}>
           <View style={{ paddingBottom: 10, paddingTop: 10 }}>
             <Text
-              textBreakStrategy={"highQuality"}
+              textBreakStrategy={'highQuality'}
               style={{
-                textAlign: "center",
-                color: "#606060",
+                textAlign: 'center',
+                color: '#606060',
                 fontSize: 18,
               }}
             >
@@ -95,19 +87,18 @@ const ParentPaymentModal = ({ onPay, onCancel, isVisible }) => {
           <CardField
             postalCodeEnabled={true}
             placeholder={{
-              number: "4242 4242 4242 4242",
+              number: '4242 4242 4242 4242',
             }}
             cardStyle={{
               backgroundColor: Colors.white,
               textColor: Colors.black,
             }}
             style={{
-              width: "100%",
+              width: '100%',
               height: 50,
               marginVertical: 30,
             }}
             onCardChange={(cardDetails) => {
-              console.log("cardDetails", cardDetails);
               setIsCardCompleted(cardDetails?.complete);
               setCardData(cardDetails);
               if (cardDetails.complete) {
@@ -164,16 +155,16 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   modal: { borderRadius: 10 },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     color: Colors.white,
     zIndex: -1,
   },
@@ -182,7 +173,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.white,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 18,
   },
   bottom: {
@@ -191,24 +182,24 @@ const styles = StyleSheet.create({
     minHeight: 50,
     // maxHeight: 58,
     marginTop: 10,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   buttonText: {
     flex: 1,
     borderRadius: 25,
-    fontFamily: "Gill Sans",
-    textAlign: "center",
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
     margin: 2,
-    shadowColor: "rgba(0,0,0, .4)", // IOS
+    shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
     shadowOpacity: 1, // IOS
     shadowRadius: 1, //IOS
-    justifyContent: "center",
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

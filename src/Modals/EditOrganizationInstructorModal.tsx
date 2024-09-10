@@ -58,7 +58,7 @@ const EditOrgInstructorsModal = ({
     lastName: yup.string().required('Last name is required'),
     email: yup.string().required('Email is required'),
   });
-  // console.log("s--------------------------------------------------", orgInfo);
+
   const handleDelete = () => {
     DeleteInstructor(instructors?.instructorId)
       .then((res) => {

@@ -8,7 +8,6 @@ import Colors from '@/Theme/Colors';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import Autocomplete from '@/Components/CustomAutocomplete';
 import {
-
   AutocompleteItem,
   CheckBox,
   Datepicker,
@@ -59,9 +58,7 @@ const CreateParentActivityScreen = () => {
   const [groups, setGroups] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
   const [studentsData, setStudentsData] = useState<any[]>([]);
-  const countries: any[] = useSelector(
-    (state: { places: any }) => state.places.countries,
-  );
+  const countries: any[] = useSelector((state: { places: any }) => state.places.countries);
   const [statesData, setStatesData] = React.useState<any[]>([]);
   const [citiesData, setCitiesData] = React.useState<any[]>([]);
   const [countriesData, setCountriesData] = React.useState<any[]>(countries);
@@ -105,14 +102,10 @@ const CreateParentActivityScreen = () => {
     }
   }, [isFocused]);
 
-
   return (
     <BackgroundLayout title="Create Event">
       <GroupSelectionModal individuals={groups} setIndividuals={setGroups} />
-      <AddIndividialMembersModal
-        individuals={students}
-        setIndividuals={setStudents}
-      />
+      <AddIndividialMembersModal individuals={students} setIndividuals={setStudents} />
 
       <ScrollView style={styles.layout} keyboardShouldPersistTaps="handled">
         <Formik
@@ -153,32 +146,26 @@ const CreateParentActivityScreen = () => {
                 ? values.fromTime.includes('AM')
                   ? values.fromTime.split('AM')[0]
                   : parseInt(values.fromTime.split(':')[0], 0) +
-                  12 +
-                  ':' +
-                  values.fromTime.split(':')[1].split('PM')[0]
+                    12 +
+                    ':' +
+                    values.fromTime.split(':')[1].split('PM')[0]
                 : '';
             const toTime =
               values.toTime.length > 0
                 ? values.toTime.includes('AM')
                   ? values.toTime.split('AM')[0]
                   : parseInt(values.toTime.split(':')[0], 0) +
-                  12 +
-                  ':' +
-                  values.toTime.split(':')[1].split('PM')[0]
+                    12 +
+                    ':' +
+                    values.toTime.split(':')[1].split('PM')[0]
                 : '';
             const fromDateTime =
               fromTime.length > 0
-                ? moment(values.from).format('yyyy-MM-DD') +
-                'T' +
-                fromTime +
-                ':00.000Z'
+                ? moment(values.from).format('yyyy-MM-DD') + 'T' + fromTime + ':00.000Z'
                 : values.from;
             const toDateTime =
               toTime.length > 0
-                ? moment(values.to).format('yyyy-MM-DD') +
-                'T' +
-                toTime +
-                ':00.000Z'
+                ? moment(values.to).format('yyyy-MM-DD') + 'T' + toTime + ':00.000Z'
                 : values.to;
             const unixFrom = moment(fromDateTime).unix();
             const unixTo = moment(toDateTime).unix();
@@ -206,10 +193,7 @@ const CreateParentActivityScreen = () => {
                 recurrence: timeSelectedIndex === 2 ? 1 : 0,
                 fromDate: unixFrom,
                 toDate: values.noEnd ? '9999-12-31T12:00.000Z' : unixTo,
-                days:
-                  timeSelectedIndex === 2
-                    ? days.map((d) => (d.selected ? 1 : 0)).join('')
-                    : 0,
+                days: timeSelectedIndex === 2 ? days.map((d) => (d.selected ? 1 : 0)).join('') : 0,
                 status: 'enabled',
               },
               optin: {
@@ -248,14 +232,7 @@ const CreateParentActivityScreen = () => {
               });
           }}
         >
-          {({
-              handleChange,
-              handleSubmit,
-              setFieldValue,
-              values,
-              errors,
-              isValid,
-            }) => (
+          {({ handleChange, handleSubmit, setFieldValue, values, errors, isValid }) => (
             <>
               <View style={styles.formContainer}>
                 <Input
@@ -264,9 +241,7 @@ const CreateParentActivityScreen = () => {
                   onChangeText={handleChange('name')}
                   value={values.name}
                 />
-                {errors.name ? (
-                  <Text style={styles.errorText}>{errors.name}</Text>
-                ) : null}
+                {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
                 <View
                   style={{
                     flexDirection: 'column',
@@ -276,10 +251,7 @@ const CreateParentActivityScreen = () => {
                     width: '100%',
                   }}
                 >
-                  <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}>
-                    {' '}
-                    Event Type*
-                  </Text>
+                  <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}> Event Type*</Text>
                   <RadioGroup
                     selectedIndex={selectedIndex}
                     style={{
@@ -297,16 +269,12 @@ const CreateParentActivityScreen = () => {
                       style={[
                         styles.radioButton,
                         {
-                          borderColor:
-                            selectedIndex == 0 ? Colors.primary : 'transparent',
+                          borderColor: selectedIndex == 0 ? Colors.primary : 'transparent',
                         },
                       ]}
                     >
                       {(evaProps) => (
-                        <Text
-                          {...evaProps}
-                          style={{ fontSize: 14, marginLeft: 10 }}
-                        >
+                        <Text {...evaProps} style={{ fontSize: 14, marginLeft: 10 }}>
                           {' '}
                           Activity
                         </Text>
@@ -317,16 +285,12 @@ const CreateParentActivityScreen = () => {
                       style={[
                         styles.radioButton,
                         {
-                          borderColor:
-                            selectedIndex == 2 ? Colors.primary : 'transparent',
+                          borderColor: selectedIndex == 2 ? Colors.primary : 'transparent',
                         },
                       ]}
                     >
                       {(evaProps) => (
-                        <Text
-                          {...evaProps}
-                          style={{ fontSize: 14, marginLeft: 10 }}
-                        >
+                        <Text {...evaProps} style={{ fontSize: 14, marginLeft: 10 }}>
                           Trip
                         </Text>
                       )}
@@ -351,18 +315,12 @@ const CreateParentActivityScreen = () => {
                       style={[
                         styles.radioButton,
                         {
-                          borderColor:
-                            timeSelectedIndex == 0
-                              ? Colors.primary
-                              : 'transparent',
+                          borderColor: timeSelectedIndex == 0 ? Colors.primary : 'transparent',
                         },
                       ]}
                     >
                       {(evaProps) => (
-                        <Text
-                          {...evaProps}
-                          style={{ fontSize: 14, marginLeft: 10 }}
-                        >
+                        <Text {...evaProps} style={{ fontSize: 14, marginLeft: 10 }}>
                           {' '}
                           One-Time
                         </Text>
@@ -373,18 +331,12 @@ const CreateParentActivityScreen = () => {
                       style={[
                         styles.radioButton,
                         {
-                          borderColor:
-                            timeSelectedIndex == 2
-                              ? Colors.primary
-                              : 'transparent',
+                          borderColor: timeSelectedIndex == 2 ? Colors.primary : 'transparent',
                         },
                       ]}
                     >
                       {(evaProps) => (
-                        <Text
-                          {...evaProps}
-                          style={{ fontSize: 14, marginLeft: 10 }}
-                        >
+                        <Text {...evaProps} style={{ fontSize: 14, marginLeft: 10 }}>
                           {' '}
                           Recurring
                         </Text>
@@ -481,13 +433,20 @@ const CreateParentActivityScreen = () => {
                       >
                         <TimeStampSelect timeStamp={timeStamp} />
                       </Select> */}
-                            <View style={{width:'50%',marginTop:22,}}>
-                            <CustomTextDropDown   value={typeof values?.fromTime=='object'?values.fromTime?.name:values?.fromTime}  placeholder="Time" dropDownList={timeStamp} 
-onSelect={(name:any)=>    {  
-  setFieldValue('fromTime', name)
-
-}}/>
-</View>
+                      <View style={{ width: '50%', marginTop: 22 }}>
+                        <CustomTextDropDown
+                          value={
+                            typeof values?.fromTime == 'object'
+                              ? values.fromTime?.name
+                              : values?.fromTime
+                          }
+                          placeholder="Time"
+                          dropDownList={timeStamp}
+                          onSelect={(name: any) => {
+                            setFieldValue('fromTime', name);
+                          }}
+                        />
+                      </View>
                     </View>
                     <View
                       style={{
@@ -519,13 +478,18 @@ onSelect={(name:any)=>    {
                       >
                         <TimeStampSelect timeStamp={timeStamp} />
                       </Select> */}
-                            <View style={{width:'50%',marginTop:22,}}>
-                            <CustomTextDropDown   value={typeof values?.toTime=='object'?values.toTime?.name:values?.toTime}  placeholder="Time" dropDownList={timeStamp} 
-onSelect={(name:any)=>    {  
-  setFieldValue('toTime', name)
-
-}}/>
-</View>
+                      <View style={{ width: '50%', marginTop: 22 }}>
+                        <CustomTextDropDown
+                          value={
+                            typeof values?.toTime == 'object' ? values.toTime?.name : values?.toTime
+                          }
+                          placeholder="Time"
+                          dropDownList={timeStamp}
+                          onSelect={(name: any) => {
+                            setFieldValue('toTime', name);
+                          }}
+                        />
+                      </View>
                     </View>
                   </>
                 )}
@@ -566,13 +530,20 @@ onSelect={(name:any)=>    {
                         >
                           <TimeStampSelect timeStamp={timeStamp} />
                         </Select> */}
-                              <View style={{width:'50%',marginTop:22,}}>
-                            <CustomTextDropDown   value={typeof values?.fromTime=='object'?values.fromTime?.name:values?.fromTime}  placeholder="Time" dropDownList={timeStamp} 
-onSelect={(name:any)=>    {  
-  setFieldValue('fromTime', name)
-
-}}/>
-</View>
+                        <View style={{ width: '50%', marginTop: 22 }}>
+                          <CustomTextDropDown
+                            value={
+                              typeof values?.fromTime == 'object'
+                                ? values.fromTime?.name
+                                : values?.fromTime
+                            }
+                            placeholder="Time"
+                            dropDownList={timeStamp}
+                            onSelect={(name: any) => {
+                              setFieldValue('fromTime', name);
+                            }}
+                          />
+                        </View>
                       </View>
                       <View
                         style={{
@@ -610,13 +581,20 @@ onSelect={(name:any)=>    {
                         >
                           <TimeStampSelect timeStamp={timeStamp} />
                         </Select> */}
-                              <View style={{width:'50%',marginTop:22,}}>
-                            <CustomTextDropDown   value={typeof values?.toTime=='object'?values.toTime?.name:values?.toTime}  placeholder="Time" dropDownList={timeStamp} 
-onSelect={(name:any)=>    {  
-  setFieldValue('toTime', name)
-
-}}/>
-</View>
+                        <View style={{ width: '50%', marginTop: 22 }}>
+                          <CustomTextDropDown
+                            value={
+                              typeof values?.toTime == 'object'
+                                ? values.toTime?.name
+                                : values?.toTime
+                            }
+                            placeholder="Time"
+                            dropDownList={timeStamp}
+                            onSelect={(name: any) => {
+                              setFieldValue('toTime', name);
+                            }}
+                          />
+                        </View>
                       </View>
                     </>
 
@@ -627,16 +605,13 @@ onSelect={(name:any)=>    {
                         alignItems: 'center',
                       }}
                     >
-                      <Text style={{ marginHorizontal: 15, marginTop: 10 }}>
-                        No end
-                      </Text>
+                      <Text style={{ marginHorizontal: 15, marginTop: 10 }}>No end</Text>
                       <CheckBox
                         style={[{ flex: 1, marginTop: 15 }]}
                         checked={values?.noEnd}
                         onChange={(checked) => {
                           setFieldValue('noEnd', checked);
 
-                          console.log('checked', checked);
                           // if (checked) {
                           //   Alert.alert(checked);
                           // } else {
@@ -666,14 +641,10 @@ onSelect={(name:any)=>    {
                       {days &&
                         days.map((day) => (
                           <TouchableOpacity
-                            style={
-                              day.selected ? styles.selectedDay : styles.day
-                            }
+                            style={day.selected ? styles.selectedDay : styles.day}
                             onPress={() => {
                               const data = [...days];
-                              const index = data.findIndex(
-                                (i) => i.name === day.name,
-                              );
+                              const index = data.findIndex((i) => i.name === day.name);
                               data[index].selected = !day.selected;
                               setDays(data);
                             }}
@@ -716,9 +687,7 @@ onSelect={(name:any)=>    {
                       alignItems: 'center',
                     }}
                   >
-                    <Text style={{ marginRight: 20, marginTop: 10 }}>
-                      Use my address
-                    </Text>
+                    <Text style={{ marginRight: 20, marginTop: 10 }}>Use my address</Text>
                     <CheckBox
                       disabled={toCheckBox}
                       style={[{ flex: 1, marginTop: 15 }]}
@@ -744,7 +713,7 @@ onSelect={(name:any)=>    {
                           setFieldValue('fromCity', '');
                           setFieldValue('fromZipCode', '');
                         }
-                        console.log('checked', checked);
+
                         // if (checked) {
                         //   Alert.alert(checked);
                         // } else {
@@ -774,20 +743,14 @@ onSelect={(name:any)=>    {
                     onChangeText={handleChange('fromVenueName')}
                     value={values.fromVenueName}
                   />
-                  {errors.venueName &&
-                    (
-                      <Text style={styles.errorText}>{errors.venueName}</Text>
-                    )}
+                  {errors.venueName && <Text style={styles.errorText}>{errors.venueName}</Text>}
                   <Input
                     style={styles.textInput}
                     placeholder="Address*"
                     onChangeText={handleChange('fromAddress')}
                     value={values.fromAddress}
                   />
-                  {errors.venueName &&
-                    (
-                      <Text style={styles.errorText}>{errors.address}</Text>
-                    )}
+                  {errors.venueName && <Text style={styles.errorText}>{errors.address}</Text>}
                   {/* <Select
                     style={[styles.selectSettings, { marginVertical: 5 }]}
                     value={values.fromState}
@@ -804,34 +767,36 @@ onSelect={(name:any)=>    {
                   <Autocomplete
                     placeholder="Country*"
                     value={(values as any)?.fromCountry}
-              
-                    style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
-                  
+                    style={{
+                      input: { ...styles.textInput, marginTop: 0 },
+                      list: { marginHorizontal: 10 },
+                    }}
                     // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                 data={countriesData}
+                    data={countriesData}
                     onSelect={(query) => {
                       const selectedCountry = query;
-                      console.log('000000', selectedCountry.name);
+
                       setFieldValue('fromCountry', selectedCountry.name);
                       setFieldValue('selectedCountry', selectedCountry.name);
                       setFieldValue('fromSelectedState', '');
                       setFieldValue('fromState', '');
                       setStates([]);
-                      GetAllStates(selectedCountry.name.replace(/ /g, '')).then(
-                        (res) => {
-                          setStates(res.data);
-                          setStatesData(res.data);
-                        },
-                      );
+                      GetAllStates(selectedCountry.name.replace(/ /g, '')).then((res) => {
+                        setStates(res.data);
+                        setStatesData(res.data);
+                      });
                     }}
                   />
-                  
+
                   <Autocomplete
                     placeholder="State"
                     value={values.fromState}
-                    style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
+                    style={{
+                      input: { ...styles.textInput, marginTop: 0 },
+                      list: { marginHorizontal: 10 },
+                    }}
                     // label={evaProps => <Text {...evaProps}>State</Text>}
-                  data={statesData}
+                    data={statesData}
                     onSelect={(query) => {
                       const selectedState = query;
                       setFieldValue('fromState', selectedState);
@@ -839,28 +804,28 @@ onSelect={(name:any)=>    {
                       setFieldValue('fromSelectedCity', '');
                       setFieldValue('fromCity', '');
                       setCities([]);
-                      GetAllCities((values as any).selectedCountry, selectedState).then(
-                        (res) => {
-                          setCities(res.data);
-                        },
-                      );
+                      GetAllCities((values as any).selectedCountry, selectedState).then((res) => {
+                        setCities(res.data);
+                      });
                     }}
                   />
-                    
+
                   <Autocomplete
                     placeholder="City"
                     value={values.fromCity}
-                   data={cities}
-                   style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
-                  
+                    data={cities}
+                    style={{
+                      input: { ...styles.textInput, marginTop: 0 },
+                      list: { marginHorizontal: 10 },
+                    }}
                     // label={evaProps => <Text {...evaProps}>City</Text>}
-                   
+
                     onSelect={(query) => {
                       setFieldValue('fromCity', query);
                       setFieldValue('fromSelectedCity', query);
                     }}
                   />
-                   
+
                   <Input
                     style={styles.textInput}
                     placeholder="Zip/Post Code"
@@ -897,9 +862,7 @@ onSelect={(name:any)=>    {
                           alignItems: 'center',
                         }}
                       >
-                        <Text style={{ marginRight: 20, marginTop: 10 }}>
-                          Use my address
-                        </Text>
+                        <Text style={{ marginRight: 20, marginTop: 10 }}>Use my address</Text>
                         <CheckBox
                           disabled={fromCheckBox}
                           style={[{ flex: 1, marginTop: 15 }]}
@@ -925,7 +888,7 @@ onSelect={(name:any)=>    {
                               setFieldValue('city', '');
                               setFieldValue('zipCode', '');
                             }
-                            console.log('checked', checked);
+
                             // if (checked) {
                             //   Alert.alert(checked);
                             // } else {
@@ -965,36 +928,37 @@ onSelect={(name:any)=>    {
                         placeholder="Country*"
                         value={(values as any).country}
                         data={countriesData}
-                        style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
+                        style={{
+                          input: { ...styles.textInput, marginTop: 0 },
+                          list: { marginHorizontal: 10 },
+                        }}
                         // label={evaProps => <Text {...evaProps}>Country*</Text>}
-                       
+
                         onSelect={(query) => {
-                          const selectedCountry =query;
+                          const selectedCountry = query;
 
                           setFieldValue('country', selectedCountry.name);
-                          setFieldValue(
-                            'selectedCountry',
-                            selectedCountry.name,
-                          );
+                          setFieldValue('selectedCountry', selectedCountry.name);
                           setFieldValue('toSelectedState', '');
                           setFieldValue('state', '');
                           setStates([]);
-                          GetAllStates(
-                            selectedCountry.name.replace(/ /g, ''),
-                          ).then((res) => {
+                          GetAllStates(selectedCountry.name.replace(/ /g, '')).then((res) => {
                             setStates(res.data);
                             setStatesData(res.data);
                           });
                         }}
                       />
-                       
+
                       <Autocomplete
                         placeholder="State"
                         value={values.state}
-                 data={statesData}
-                        style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
+                        data={statesData}
+                        style={{
+                          input: { ...styles.textInput, marginTop: 0 },
+                          list: { marginHorizontal: 10 },
+                        }}
                         // label={evaProps => <Text {...evaProps}>State</Text>}
-                      
+
                         onSelect={(query) => {
                           const selectedState = query;
                           setFieldValue('state', selectedState);
@@ -1002,28 +966,29 @@ onSelect={(name:any)=>    {
                           setFieldValue('toSelectedCity', '');
                           setFieldValue('city', '');
                           setCities([]);
-                          GetAllCities(
-                            (values as any).selectedCountry,
-                            selectedState,
-                          ).then((res) => {
-                            setCities(res.data);
-                          });
+                          GetAllCities((values as any).selectedCountry, selectedState).then(
+                            (res) => {
+                              setCities(res.data);
+                            }
+                          );
                         }}
                       />
-                      
+
                       <Autocomplete
                         placeholder="City"
                         value={values.city}
-                  data={cities}
-                        style={{input:{...styles.textInput,marginTop:0},list:{marginHorizontal:10}}}
+                        data={cities}
+                        style={{
+                          input: { ...styles.textInput, marginTop: 0 },
+                          list: { marginHorizontal: 10 },
+                        }}
                         // label={evaProps => <Text {...evaProps}>City</Text>}
-                       
+
                         onSelect={(query) => {
                           setFieldValue('city', query);
                           setFieldValue('toSelectedCity', query);
                         }}
                       />
-                       
 
                       <Input
                         style={styles.textInput}
@@ -1063,9 +1028,7 @@ onSelect={(name:any)=>    {
                   maxLength={500}
                 />
                 {students && students.length > 0 && (
-                  <View
-                    style={{ width: '100%', marginTop: 15, marginLeft: '5%' }}
-                  >
+                  <View style={{ width: '100%', marginTop: 15, marginLeft: '5%' }}>
                     <Text
                       style={{
                         color: Colors.primary,
@@ -1136,13 +1099,12 @@ onSelect={(name:any)=>    {
                     setFieldValue('students', '');
                     const _students = studentsData;
                     let newValue: string[] = [];
-                    Array.isArray(indexes) && indexes.forEach((index) => {
-                      newValue.push(
-                        _students[index.row]?.firstname +
-                        ' ' +
-                        _students[index.row]?.lastname,
-                      );
-                    });
+                    Array.isArray(indexes) &&
+                      indexes.forEach((index) => {
+                        newValue.push(
+                          _students[index.row]?.firstname + ' ' + _students[index.row]?.lastname
+                        );
+                      });
                     setFieldValue('students', newValue);
                   }}
                 >
@@ -1153,15 +1115,11 @@ onSelect={(name:any)=>    {
                         title: c?.firstname + ' ' + c?.lastname,
                       }))
                       .map((student, index) => {
-                        return (
-                          <SelectItem key={index} title={student?.title} />
-                        );
+                        return <SelectItem key={index} title={student?.title} />;
                       })}
                 </Select>
                 {groups && groups.length > 0 && (
-                  <View
-                    style={{ width: '100%', marginTop: 15, marginLeft: '5%' }}
-                  >
+                  <View style={{ width: '100%', marginTop: 15, marginLeft: '5%' }}>
                     <Text
                       style={{
                         color: Colors.primary,

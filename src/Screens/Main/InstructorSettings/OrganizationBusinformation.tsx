@@ -19,8 +19,8 @@ import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavig
 
 // const height = Dimensions.get('screen').height;
 type OrgBusDetailProps = {
-  route: RouteProp<MainStackNavigatorParamsList, 'BusInfo'>
-}
+  route: RouteProp<MainStackNavigatorParamsList, 'BusInfo'>;
+};
 
 const OrgBusDetail: FC<OrgBusDetailProps> = ({ route }) => {
   const dispatch = useDispatch();
@@ -28,11 +28,10 @@ const OrgBusDetail: FC<OrgBusDetailProps> = ({ route }) => {
   // const [visible, setVisible] = useState(false);
   const [buses, setBuses] = useState<any>(route.params.data.buses);
   const isVisibleViewBusInfo = useSelector(
-    (state: { modal: ModalState }) => state.modal.viewBusInformationModal,
+    (state: { modal: ModalState }) => state.modal.viewBusInformationModal
   );
   const showAddModal = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.addButInformationModalVisibility,
+    (state: { modal: ModalState }) => state.modal.addButInformationModalVisibility
   );
   // const [SelectedBusInfo, setSelectedBusInfo] = useState({
   //   busName: '',
@@ -49,7 +48,6 @@ const OrgBusDetail: FC<OrgBusDetailProps> = ({ route }) => {
         let temp = [...buses];
         temp.splice(index, 1);
         setBuses(temp);
-        console.log('res', res);
       })
       .catch((err) => console.log('err', err));
   };
@@ -58,7 +56,6 @@ const OrgBusDetail: FC<OrgBusDetailProps> = ({ route }) => {
     try {
       let res = await GetBusBySchoolId(route?.params?.data?.schoolId, 0, 60);
       setBuses(res.data.result);
-      console.log('res---', res);
     } catch (err) {
       console.log('err', err);
     }
@@ -111,7 +108,7 @@ const OrgBusDetail: FC<OrgBusDetailProps> = ({ route }) => {
                       dispatch(
                         ChangeModalState.action({
                           viewBusInformationModal: true,
-                        }),
+                        })
                       );
                     }}
                     style={{ width: '50%' }}
@@ -135,7 +132,7 @@ const OrgBusDetail: FC<OrgBusDetailProps> = ({ route }) => {
                         dispatch(
                           ChangeModalState.action({
                             addButInformationModalVisibility: true,
-                          }),
+                          })
                         );
                         // dispatch(ChangeModalState.action({ addStudentModal: true }))
                       }}
@@ -159,7 +156,7 @@ const OrgBusDetail: FC<OrgBusDetailProps> = ({ route }) => {
             dispatch(
               ChangeModalState.action({
                 addButInformationModalVisibility: true,
-              }),
+              })
             );
 
             // dispatch(ChangeModalState.action({ addStudentModal: true }))

@@ -16,7 +16,6 @@ const NotificationsScreen = () => {
   let row: Array<any> = [];
 
   const closeRow = (index: number) => {
-    console.log(index);
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
     }
@@ -106,9 +105,7 @@ const NotificationsScreen = () => {
                     renderRightActions={(e) => RightActions(e, item)}
                   >
                     <View style={styles.card}>
-                      <Text style={styles.text}>
-                        {item?.dateTime?.split(' ')[0]}
-                      </Text>
+                      <Text style={styles.text}>{item?.dateTime?.split(' ')[0]}</Text>
                       <Text style={styles.text}>{item?.title}</Text>
                       <Text style={styles.text}>{item?.message}</Text>
                     </View>

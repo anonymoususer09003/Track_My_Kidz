@@ -265,7 +265,6 @@ const PersonalProfileScreen = () => {
             keyboardShouldPersistTaps={'handled'}
             // extraScrollHeight={10}
           >
-            {console.log('current user', currentUser)}
             <View style={[[Layout.column, Layout.justifyContentCenter]]}>
               {isFocused && (
                 <Formik
@@ -323,7 +322,6 @@ const PersonalProfileScreen = () => {
                     formData.append('id', currentUser?.instructorId);
                     formData.append('schoolId', currentUser?.schoolId || '');
                     formData.append('orgId', currentUser?.orgId || '');
-                    console.log('form data', JSON.stringify(formData));
 
                     UpdateUser(formData, 'instructor')
                       .then(async (response: any) => {

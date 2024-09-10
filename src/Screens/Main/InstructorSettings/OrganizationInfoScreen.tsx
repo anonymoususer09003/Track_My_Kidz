@@ -89,7 +89,7 @@ const OrganizationInfoScreen: FC<OrganizationInfoScreenProps> = ({ navigation })
       row.push([firstname, lastname, email, phone ? phone : '', isAdmin, state]);
       rowItem.push(item);
     });
-    console.log('row', row);
+
     temp.tableData = row;
     temp.item = rowItem;
     setTableData(temp);

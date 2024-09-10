@@ -48,8 +48,6 @@ const StudentActivationCodeModal = ({
     }
   }, [isVisible]);
 
-  console.log(activationCode);
-
   // @ts-ignore
   return (
     <Modal

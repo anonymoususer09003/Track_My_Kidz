@@ -112,7 +112,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
   const [selectedInstructor, setSelectedInstructor] = useState<string | null>('');
   const [visible, setVisible] = useState<boolean>(false);
   const [page, pageNumber] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(20);
+  const [pageSize, setPageSize] = useState<number>(15);
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [selectedInstructorActivities, setSelectedInstructorActivities] = useState<any>(null);
@@ -797,6 +797,7 @@ const InstructorActivityScreen: FC<InstructorActivityScreenProps> = ({ route }) 
           getActivities={getActivities}
         />
       )}
+
       {showStudentsInstructorsModal && (
         <ShowInstructorsStudentsModal
           isVisible={showStudentsInstructorsModal}

@@ -69,7 +69,7 @@ const DependentInfoScreen = () => {
   const getChildrens = async (referCode: string) => {
     try {
       let res = await GetParentChildrens(referCode);
-      console.log('res', res);
+
       setChildren(res);
     } catch (err) {
       console.log('err in children', err);
@@ -125,7 +125,7 @@ const DependentInfoScreen = () => {
         coordinates?.latitude || null,
         coordinates?.longitude || null
       );
-      console.log('res', res);
+
       if (res && status) {
         Toast.show({
           type: 'success',
@@ -157,7 +157,6 @@ const DependentInfoScreen = () => {
     _data[index] = item;
     setChildren(_data);
 
-    console.log('coordinates', coordinates);
     let lang = coordinates?.longitude || position?.longitude || '0.000';
     let lat = coordinates?.latitude || position?.latitude || '0.000';
     try {

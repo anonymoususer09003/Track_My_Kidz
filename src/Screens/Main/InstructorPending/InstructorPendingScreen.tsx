@@ -1,7 +1,14 @@
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Icon, Text } from '@ui-kitten/components';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 // import axios from "axios";
 import { useStateValue } from '@/Context/state/State';
@@ -23,7 +30,7 @@ const InstructorGroupPendingScreen = () => {
   const isFocused = useIsFocused();
   const swipeableRef = useRef(null);
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility,
+    (state: { modal: ModalState }) => state.modal.instructionsModalVisibility
   );
   let prevOpenedRow: any;
   let row: Array<any> = [];
@@ -56,7 +63,7 @@ const InstructorGroupPendingScreen = () => {
 
   const closeRow = (index?: number) => {
     if (!index) return;
-    console.log(index);
+
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow.close();
     }
@@ -68,18 +75,12 @@ const InstructorGroupPendingScreen = () => {
       setRefreshing(true);
     }
     const userId = await loadUserId();
-    console.log('userId', userId);
+
     let pageNumberActivityCount = refreshing ? pageActivity : 0;
     if (!userId) return;
 
-    GetActivitiesByInsructorId(
-      userId,
-      'pending',
-      pageNumberActivityCount,
-      pageSizeActivity,
-    )
+    GetActivitiesByInsructorId(userId, 'pending', pageNumberActivityCount, pageSizeActivity)
       .then((res) => {
-        console.log('res', res.data);
         setTotalRecordsActivity(res.data.totalRecords);
         setRefreshing(false);
         setPageSizeActivity(20);
@@ -117,7 +118,7 @@ const InstructorGroupPendingScreen = () => {
       instructorDetail?.instructorId,
       'pending',
       pageNumberGroupCount,
-      pageSizeGroup,
+      pageSizeGroup
     )
       .then((res) => {
         setTotalRecordsGroup(res.totalRecords);
@@ -144,7 +145,6 @@ const InstructorGroupPendingScreen = () => {
         console.log('getActivities Error:', err);
       });
   };
-  console.log('groups', groups);
 
   useEffect(() => {
     // Alert.alert("kk");
@@ -185,7 +185,7 @@ const InstructorGroupPendingScreen = () => {
                 dispatch(
                   ChangeModalState.action({
                     approveActivityModalVisibility: true,
-                  }),
+                  })
                 );
                 setActivity(item);
                 setShowAcceptModal(true);
@@ -203,7 +203,7 @@ const InstructorGroupPendingScreen = () => {
                 dispatch(
                   ChangeModalState.action({
                     declineActivityModalVisibility: true,
-                  }),
+                  })
                 );
                 setDeclineActivity(item);
               }}
@@ -213,11 +213,7 @@ const InstructorGroupPendingScreen = () => {
           </View>
         )}
         {!item.status && (
-          <Icon
-            style={{ width: 30, height: 30 }}
-            fill={Colors.primary}
-            name="trash"
-          />
+          <Icon style={{ width: 30, height: 30 }} fill={Colors.primary} name="trash" />
         )}
       </View>
     );
@@ -243,12 +239,7 @@ const InstructorGroupPendingScreen = () => {
             onClose={() => setShowAcceptModal(false)}
             setActivity={(id: any) => {
               if (activity?.activityId) {
-                console.log('declinedactivity', activity);
-
-                console.log('activites', activities);
-                let filter = activities?.filter(
-                  (item) => item?.activityId != id,
-                );
+                let filter = activities?.filter((item) => item?.activityId != id);
 
                 setActivities(filter);
               } else {
@@ -264,12 +255,7 @@ const InstructorGroupPendingScreen = () => {
             activity={declineActivity}
             setActivity={(id: any) => {
               if (declineActivity?.activityId) {
-                console.log('declinedactivity', declineActivity);
-
-                console.log('activites', activities);
-                let filter = activities?.filter(
-                  (item) => item?.activityId != id,
-                );
+                let filter = activities?.filter((item) => item?.activityId != id);
                 setDeclineActivity(false);
                 setActivities(filter);
               } else {
@@ -311,9 +297,7 @@ const InstructorGroupPendingScreen = () => {
                         }}
                         style={[styles.item]}
                       >
-                        <Text style={[styles.text, { fontSize: 25 }]}>
-                          {item?.activityName}
-                        </Text>
+                        <Text style={[styles.text, { fontSize: 25 }]}>{item?.activityName}</Text>
                         <View style={styles.horizontal}>
                           {/* <Image
                             source={calendarIcon}
@@ -332,20 +316,14 @@ const InstructorGroupPendingScreen = () => {
 
                           <View>
                             <Text style={styles.text}>{`${moment(
-                              item?.fromDate == 'string'
-                                ? new Date()
-                                : item?.fromDate,
-                            ).format('MMM DD, YYYY')} at ${moment.utc(
-                              item?.fromDate == 'string'
-                                ? new Date()
-                                : item?.fromDate,
-                            )
+                              item?.fromDate == 'string' ? new Date() : item?.fromDate
+                            ).format('MMM DD, YYYY')} at ${moment
+                              .utc(item?.fromDate == 'string' ? new Date() : item?.fromDate)
                               .format('hh:mm a')} `}</Text>
                             <Text style={styles.text}>{`${moment(
-                              item?.toDate == 'string' ? new Date() : item?.toDate,
-                            ).format('MMM DD, YYYY')} at ${moment.utc(
-                              item?.toDate == 'string' ? new Date() : item?.toDate,
-                            )
+                              item?.toDate == 'string' ? new Date() : item?.toDate
+                            ).format('MMM DD, YYYY')} at ${moment
+                              .utc(item?.toDate == 'string' ? new Date() : item?.toDate)
                               .format('hh:mm a')} `}</Text>
                           </View>
                           {/* <Text style={styles.text}>{`Date: ${date} `}</Text> */}
@@ -389,7 +367,7 @@ const InstructorGroupPendingScreen = () => {
                           dispatch(
                             ChangeModalState.action({
                               instructionsModalVisibility: true,
-                            }),
+                            })
                           );
                           setSelectedInstructions(item);
                         }}
@@ -410,18 +388,11 @@ const InstructorGroupPendingScreen = () => {
                       onSwipeableOpen={() => closeRow(item?.groupId)}
                     >
                       <View style={[styles.item]}>
-                        <Text style={[styles.text, { fontSize: 25 }]}>
-                          {item?.groupName}
-                        </Text>
+                        <Text style={[styles.text, { fontSize: 25 }]}>{item?.groupName}</Text>
 
                         <View style={styles.horizontal}>
-                          <Image
-                            source={instructorImage}
-                            style={styles.iconStyle}
-                          />
-                          <Text style={styles.text}>
-                            {item?.status ? 'Active' : 'Inactive'}
-                          </Text>
+                          <Image source={instructorImage} style={styles.iconStyle} />
+                          <Text style={styles.text}>{item?.status ? 'Active' : 'Inactive'}</Text>
                         </View>
                       </View>
                       <TouchableOpacity
@@ -455,9 +426,7 @@ const InstructorGroupPendingScreen = () => {
             <Text style={{ marginVertical: 10, mar }}>Groups</Text>
           )} */}
 
-          {refreshing && (
-            <ActivityIndicator size="large" color={Colors.primary} />
-          )}
+          {refreshing && <ActivityIndicator size="large" color={Colors.primary} />}
         </View>
       </View>
     </>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import {
   View,
   KeyboardAvoidingView,
@@ -6,19 +6,19 @@ import {
   TouchableOpacity,
   Linking,
   ScrollView,
-} from "react-native";
-import { UserState } from "@/Store/User";
-import { useSelector } from "react-redux";
-import { AppHeader } from "@/Components";
-import { StyleService, useStyleSheet, Text } from "@ui-kitten/components";
-import Colors from "@/Theme/Colors";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { useNavigation } from "@react-navigation/native";
+} from 'react-native';
+import { UserState } from '@/Store/User';
+import { useSelector } from 'react-redux';
+import { AppHeader } from '@/Components';
+import { StyleService, useStyleSheet, Text } from '@ui-kitten/components';
+import Colors from '@/Theme/Colors';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
 
 const MyProfileScreen = () => {
   const navigation = useNavigation();
   const user = useSelector((state: { user: UserState }) => state.user.item);
-  console.log("user---", user);
+
   const styles = useStyleSheet(themedStyles);
 
   const changeUrl = (e: any) => {
@@ -29,7 +29,7 @@ const MyProfileScreen = () => {
 
     if (urlPattern.test(string)) {
       ///clear http && https from string
-      string = string.replace("https://", "").replace("http://", "");
+      string = string.replace('https://', '').replace('http://', '');
 
       //add https to string
     }
@@ -52,13 +52,13 @@ const MyProfileScreen = () => {
             {user?.verifiedProfessional ? (
               <Image
                 style={styles.verifiedImage}
-                source={require("../../../Assets/Images/verified.png")}
+                source={require('../../../Assets/Images/verified.png')}
               />
             ) : null}
           </View>
 
           <View style={styles.socialIcons}>
-            {user?.fbAccount && user?.fbAccount !== "" ? (
+            {user?.fbAccount && user?.fbAccount !== '' ? (
               <TouchableOpacity
                 onPress={() => {
                   const tempUrl = changeUrl(user?.fbAccount);
@@ -67,11 +67,11 @@ const MyProfileScreen = () => {
               >
                 <Image
                   style={styles.icon}
-                  source={require("../../../Assets/Images/facebook.png")}
+                  source={require('../../../Assets/Images/facebook.png')}
                 />
               </TouchableOpacity>
             ) : null}
-            {user?.instagramAccount && user?.instagramAccount !== "" ? (
+            {user?.instagramAccount && user?.instagramAccount !== '' ? (
               <TouchableOpacity
                 onPress={() => {
                   const tempUrl = changeUrl(user?.instagramAccount);
@@ -80,78 +80,61 @@ const MyProfileScreen = () => {
               >
                 <Image
                   style={styles.icon}
-                  source={require("../../../Assets/Images/instagram.png")}
+                  source={require('../../../Assets/Images/instagram.png')}
                 />
               </TouchableOpacity>
             ) : null}
-            {user?.email && user?.email !== "" ? (
+            {user?.email && user?.email !== '' ? (
               <TouchableOpacity
                 onPress={() => {
                   Linking.openURL(`mailto:${user?.email}`);
                 }}
               >
-                <Image
-                  style={styles.icon}
-                  source={require("../../../Assets/Images/email.png")}
-                />
+                <Image style={styles.icon} source={require('../../../Assets/Images/email.png')} />
               </TouchableOpacity>
             ) : null}
 
-            {user?.websiteUrl && user?.websiteUrl !== "" ? (
+            {user?.websiteUrl && user?.websiteUrl !== '' ? (
               <TouchableOpacity
                 onPress={() => {
                   const tempUrl = changeUrl(user?.websiteUrl);
                   Linking.openURL(tempUrl);
                 }}
               >
-                <Image
-                  style={styles.icon}
-                  source={require("../../../Assets/Images/web.png")}
-                />
+                <Image style={styles.icon} source={require('../../../Assets/Images/web.png')} />
               </TouchableOpacity>
             ) : null}
-            {user?.twitterAccount && user?.twitterAccount !== "" ? (
+            {user?.twitterAccount && user?.twitterAccount !== '' ? (
               <TouchableOpacity
                 onPress={() => {
                   const tempUrl = changeUrl(user?.twitterAccount);
                   Linking.openURL(tempUrl);
                 }}
               >
-                <Image
-                  style={styles.icon}
-                  source={require("../../../Assets/Images/twitter.png")}
-                />
+                <Image style={styles.icon} source={require('../../../Assets/Images/twitter.png')} />
               </TouchableOpacity>
             ) : null}
           </View>
-          <ScrollView style={{ flex: 1, width: "100%", marginTop: -520 }}>
+          <ScrollView style={{ flex: 1, width: '100%', marginTop: -520 }}>
             <View
               style={{
-                flexDirection: "row",
+                flexDirection: 'row',
                 paddingHorizontal: 70,
-                justifyContent: "space-between",
+                justifyContent: 'space-between',
               }}
             >
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("Following", { id: user?.id })
-                }
-              >
+              <TouchableOpacity onPress={() => navigation.navigate('Following', { id: user?.id })}>
                 <Text style={styles.title}>Following</Text>
                 <Text style={styles.number}>{user?.noFollowing}</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("Followers", { id: user?.id })
-                }
-              >
+              <TouchableOpacity onPress={() => navigation.navigate('Followers', { id: user?.id })}>
                 <Text style={styles.title}>Followers</Text>
                 <Text style={styles.number}>{user?.noFollowers}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.mainInfo}>
               <Text style={styles.label}>Username</Text>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={styles.info}>{user?.username}</Text>
                 <MaterialCommunityIcons
                   name="shield"
@@ -161,13 +144,13 @@ const MyProfileScreen = () => {
                 />
               </View>
             </View>
-            {user?.city && user?.city !== "" ? (
+            {user?.city && user?.city !== '' ? (
               <View style={styles.mainInfo}>
                 <Text style={styles.label}>City</Text>
                 <Text style={styles.info}>{user?.city}</Text>
               </View>
             ) : null}
-            {user?.state && user?.state !== "" ? (
+            {user?.state && user?.state !== '' ? (
               <View style={styles.mainInfo}>
                 <Text style={styles.label}>State</Text>
                 <Text style={styles.info}>{user?.state}</Text>
@@ -185,9 +168,9 @@ const MyProfileScreen = () => {
                 styles.label,
                 {
                   marginTop: 20,
-                  fontWeight: "bold",
+                  fontWeight: 'bold',
                   marginLeft: 50,
-                  color: "#000",
+                  color: '#000',
                 },
               ]}
             >
@@ -230,9 +213,9 @@ const MyProfileScreen = () => {
                 styles.label,
                 {
                   marginTop: 20,
-                  fontWeight: "bold",
+                  fontWeight: 'bold',
                   marginLeft: 50,
-                  color: "#000",
+                  color: '#000',
                 },
               ]}
             >
@@ -296,53 +279,53 @@ export default MyProfileScreen;
 const themedStyles = StyleService.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   mainLayout: {
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   container: {
     flex: 2,
-    flexDirection: "column",
-    backgroundColor: "background-basic-color-1",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    backgroundColor: 'background-basic-color-1',
+    justifyContent: 'flex-start',
   },
   headerContainer: {
     flex: 2,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   socialIcons: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "80%",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '80%',
     minHeight: 50,
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 16,
     marginLeft: 10,
     marginTop: 10,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.gray,
-    textAlign: "center",
+    textAlign: 'center',
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
   },
   button: {
@@ -352,9 +335,9 @@ const themedStyles = StyleService.create({
     borderRadius: 10,
   },
   userImageContainer: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 20,
     marginBottom: 30,
   },
@@ -362,7 +345,7 @@ const themedStyles = StyleService.create({
     height: 100,
     width: 100,
     borderRadius: 100 / 2,
-    overflow: "hidden",
+    overflow: 'hidden',
     borderWidth: 2,
     borderColor: Colors.primary,
   },
@@ -370,20 +353,20 @@ const themedStyles = StyleService.create({
     height: 20,
     width: 20,
     borderRadius: 20 / 2,
-    overflow: "hidden",
+    overflow: 'hidden',
     marginTop: 10,
   },
   icon: {
-    justifyContent: "center",
+    justifyContent: 'center',
     maxHeight: 30,
     maxWidth: 30,
   },
-  title: { textAlign: "center", width: 100, color: "darkgrey" },
+  title: { textAlign: 'center', width: 100, color: 'darkgrey' },
   number: {
-    textAlign: "center",
+    textAlign: 'center',
     width: 100,
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.primary,
   },
   mainInfo: {
@@ -393,7 +376,7 @@ const themedStyles = StyleService.create({
     paddingVertical: 7,
   },
   label: {
-    color: "darkgrey",
+    color: 'darkgrey',
     fontSize: 14,
     marginBottom: 5,
   },

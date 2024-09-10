@@ -31,7 +31,7 @@ const SettingsScreen = ({ navigation }) => {
   const [openDeactivateModal, setopenDeactivateModal] = useState<boolean>(false);
   // const [canAdvertise, setcanAdvertise] = useState(false);
   const user: any = useSelector((state: { user: UserState }) => state.user.item);
-  console.log('user', user);
+
   // const [twoFAActive, setTwoFAActive] = useState(user?.isTwoFA);
   const [isSending, setisSending] = useState<boolean>(false);
   const [isSent, setisSent] = useState<boolean>(false);
@@ -116,7 +116,6 @@ const SettingsScreen = ({ navigation }) => {
           onHide: () => {},
           onPress: () => {},
         });
-        console.log(res);
       })
       .catch((err) => {
         err && console.log(err);

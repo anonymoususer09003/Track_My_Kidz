@@ -5,6 +5,7 @@ export const actions = {
   SET_SELECTED_DEPENDENT_ACTIVITY: 'SET_SELECTED_DEPENDENT_ACTIVITY',
   SET_CHILD_NAME: 'SET_CHILD_NAME',
   SET_SELECTED_CHILD: 'SET_SELECTED_CHILD',
+  SET_PARENTS_CHILDREN: 'SET_PARENT_CHILDRENS',
   INSTRUCTOR_DETAIL: 'INSTRUCTOR_DETAIL',
   ORG_INSTRUCTORS: 'ORG_INSTRUCTORS',
   SET_TOGGLE: 'SET_TOGGLE',
@@ -27,6 +28,12 @@ export const reducer = (state, action) => {
         ...state,
         user: action.payload,
       };
+    case actions.SET_PARENTS_CHILDREN:
+      return {
+        ...state,
+        childrens: action.payload,
+      };
+
     case actions.SET_GROUPS_STUDENTS:
       return {
         ...state,

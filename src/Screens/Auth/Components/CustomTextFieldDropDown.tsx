@@ -1,13 +1,7 @@
-import Colors from "@/Theme/Colors";
-import React, { useEffect, useState } from "react";
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+import Colors from '@/Theme/Colors';
+import React, { useEffect, useState } from 'react';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 const CustomDropdown: React.FC = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
@@ -24,7 +18,6 @@ const CustomDropdown: React.FC = (props) => {
     if (props?.value) {
       setSelectedValue(props?.value);
     }
-    console.log("props", props);
   }, [props?.value]);
 
   return (
@@ -44,7 +37,7 @@ const CustomDropdown: React.FC = (props) => {
           {selectedValue || props.placeholder}
         </Text>
         <Icon
-          name={isOpen ? "chevron-up" : "chevron-down"}
+          name={isOpen ? 'chevron-up' : 'chevron-down'}
           size={18}
           color={Colors.black}
           style={styles.rightIcon}
@@ -59,7 +52,6 @@ const CustomDropdown: React.FC = (props) => {
               data={props?.dropDownList}
               keyExtractor={(item, index) => index}
               renderItem={({ item, index }) => {
-                console.log("index", index);
                 return (
                   <TouchableOpacity
                     key={index}
@@ -77,7 +69,7 @@ const CustomDropdown: React.FC = (props) => {
 
             {/* <ScrollView nestedScrollEnabled={true}>
               {props?.dropDownList?.map((item, index) => {
-                console.log("itm", item);
+        
                 return (
                   <TouchableOpacity
                     key={index}
@@ -102,26 +94,25 @@ const CustomDropdown: React.FC = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 1,
-    width:'90%',
-  
+    width: '90%',
+
     // position: "relative",
   },
   dropdownHeader: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 10,
-    backgroundColor: "#f7f9fc",
+    backgroundColor: '#f7f9fc',
 
     height: 40,
     borderRadius: 10,
     elevation: 5,
     marginTop: 10,
-    alignSelf: "center",
+    alignSelf: 'center',
     width: '90%',
-
   },
   leftIcon: {
     marginRight: 10,
@@ -135,28 +126,28 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   dropdownContainer: {
-    position: "absolute",
-    top: "100%",
+    position: 'absolute',
+    top: '100%',
     left: 10,
     right: 0,
     zIndex: 2,
     borderWidth: 0,
-    width: "95%",
+    width: '95%',
   },
   dropdownOptions: {
     marginTop: 10,
     borderWidth: 0,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 5,
-    backgroundColor: "white",
+    backgroundColor: 'white',
     zIndex: 2,
     maxHeight: 200,
     // position: "absolute",
     // overflow: "hidden",
   },
   dropdownOption: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 10,
     zIndex: 2,
   },

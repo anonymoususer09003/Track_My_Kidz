@@ -81,7 +81,6 @@ const ParentApprovalScreen = () => {
         setPageSizeActivity(10);
 
         pageNumberActivity(refreshing ? pageActivity + 1 : 1);
-        console.log('res', res.result);
 
         if (refreshing) {
           setActivities([...activities, ...res.result]);
@@ -132,7 +131,6 @@ const ParentApprovalScreen = () => {
   const loadUserDetails = async () => {
     GetParentChildrens(currentUser?.referenceCode)
       .then((res) => {
-        console.log('children', res);
         setChildren(res);
       })
       .catch((err) => console.log('loadUserDetails', err));
@@ -238,7 +236,7 @@ const ParentApprovalScreen = () => {
           }}
         />
       )}
-      {console.log('groups', groups)}
+
       <View style={styles.layout}>
         {activities.length === 0 && groups.length == 0 && (
           <View style={{ padding: 10, backgroundColor: Colors.newBackgroundColor }}>
@@ -255,7 +253,7 @@ const ParentApprovalScreen = () => {
             renderItem={({ item }) => {
               if (item?.activity?.activityId) {
                 let date = item?.activity?.fromDate;
-                console.log(item);
+
                 return (
                   <Swipeable
                     ref={(ref) => (row[item?.activity?.activityId] = ref)}

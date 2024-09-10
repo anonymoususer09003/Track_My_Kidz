@@ -242,7 +242,7 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
   const handleDeleteBus = (bus: any, index: any) => {
     let data = [...buses];
     data = data.filter((d, ind) => ind !== index);
-    console.log(data);
+
     setBuses(data);
   };
 
@@ -311,14 +311,12 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
           schoolId: 0,
           name: 'Other',
         };
-        console.log('res school', res);
+
         const _schools = [...res];
         _schools.unshift(_data);
 
-        console.log('_school0000', _schools);
         setSchools(_schools);
         setSchoolsData(_schools);
-        console.log('_schools', _schools);
       })
       .catch((err) => {
         console.log('GetSchoolByFilters', err);
@@ -487,18 +485,18 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                 // dispatch(ChangeModalState.action({ loading: true }));
                 const school_name =
                   values.schoolName === 'Other' ? values.school_name : values.schoolName;
-                console.log('schooldata', school_name);
+
                 let schoolId =
                   values.schoolName === 'Other'
                     ? { schoolId: 0 }
                     : schoolsData.find((s) => s.name === school_name);
-                console.log('----school', schoolId);
+
                 schoolId = Array.isArray(schoolId) ? schoolId[0].schoolId : schoolId?.schoolId;
 
                 let schoolAddress = Array.isArray(schoolId)
                   ? schoolId[0]?.address
                   : schoolId?.address;
-                console.log('----888school', schoolId);
+
                 const org_name = values.schoolName;
                 const orgId =
                   values.schoolName === 'Other'
@@ -595,28 +593,21 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                 // console.log('formdata', formData);
                 Register(registerObject, 'instructor')
                   .then(async (response) => {
-                    console.log('response1111111', response.data);
                     await storeToken(response.data.token);
-                    console.log('schoolId', schoolId);
+
                     if (values.selected_entity == 'School' && (schoolId == 0 || !schoolId)) {
                       CompleteRegistration(schoolObject, 'school')
                         .then((_res) => {
-                          console.log('response1.1', {
-                            ...userObject,
-                            schoolId: _res?.data?.schoolId,
-                          });
-
                           formData.append('schoolId', _res?.data?.schoolId);
                           // formData.append('schoolId', schoolId || '');
                           formData.append('orgId', orgId || '');
-                          console.log('formdata---------------', formData);
+
                           // {
                           //   ...userObject,
                           //   schoolId: _res.data.schoolId,
                           // }
                           CompleteRegistration(formData, 'instructor')
                             .then(async (response: any) => {
-                              console.log('response1.3', response);
                               let obj = {
                                 token: response.data.token,
                                 userType: 'instructor',
@@ -635,9 +626,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                               // // todo not a priority
                               // // @ts-ignore
                               dispatch(LoginStore.action(obj));
-
-                              console.log('_instructors', _instructors);
-                              console.log('_instructors', response.data.instructorId);
 
                               if (response.status == 201) {
                                 // dispatch(
@@ -675,14 +663,13 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
 
                       CompleteRegistration(formData, 'instructor')
                         .then(async (res: any) => {
-                          console.log('response2', res);
                           let obj = {
                             token: res.data.token,
                             userType: 'instructor',
                             id: res.data.instructorId,
                             mainId: response.data?.userId,
                           };
-                          console.log('obj', obj);
+
                           let _instructors = instructors.map((item) => ({
                             firstName: item?.firstName || '',
                             lastName: item?.lastName || '',
@@ -726,11 +713,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                     } else if (values.selected_entity != 'School' && !orgId) {
                       CompleteRegistration(schoolObject, 'org')
                         .then((_res) => {
-                          console.log({
-                            ...userObject,
-                            orgId: _res.data.orgId,
-                          });
-                          console.log('response3');
                           formData.append('orgId', _res.data.orgId);
                           formData.append('schoolId', '');
                           // {
@@ -1010,8 +992,6 @@ const FinalOrgRegistrationScreen: FC<FinalOrgRegistrationScreenProps> = ({ route
                         GetAllCities(values.selectedCountry, selectedState).then((res) => {
                           setCities(res.data);
                           setDropdownCities(res.data);
-
-                          console.log(cities);
                         });
                         getSchoolsByFilter(values.selectedCountry, selectedState);
                         getOrgByFilter(values.selectedCountry, selectedState);

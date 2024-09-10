@@ -1,6 +1,14 @@
 import { Text } from '@ui-kitten/components';
 import React, { FC, useEffect, useState } from 'react';
-import { Dimensions, FlatList, ScrollView, StyleSheet, TouchableOpacity, View, Image } from 'react-native';
+import {
+  Dimensions,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Image,
+} from 'react-native';
 import * as yup from 'yup';
 import Colors from '@/Theme/Colors';
 import Icon from 'react-native-vector-icons/Entypo';
@@ -18,8 +26,8 @@ import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavig
 const height = Dimensions.get('screen').height;
 
 type OrgInstructorListFormModalProps = {
-  route: RouteProp<MainStackNavigatorParamsList, 'InstructorList'>
-}
+  route: RouteProp<MainStackNavigatorParamsList, 'InstructorList'>;
+};
 
 const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route }) => {
   // const dispatch = useDispatch();
@@ -41,7 +49,7 @@ const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route
     lastName: yup.string().required('Last name is required'),
     email: yup.string().required('Email is required'),
   });
-  console.log('instructor', selectedInstructor);
+
   // const handleGetOrganizationInfo = async () => {
   //   const userId = await loadUserId();
   // };
@@ -62,17 +70,10 @@ const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route
             let rowItem: any[] = [];
             instructors?.map((item: any, index: number) => {
               let { firstname, lastname, email, phone, isAdmin, state } = item;
-              row.push([
-                firstname,
-                lastname,
-                email,
-                phone ? phone : '',
-                isAdmin,
-                state,
-              ]);
+              row.push([firstname, lastname, email, phone ? phone : '', isAdmin, state]);
               rowItem.push(item);
             });
-            console.log('row', row);
+
             temp.tableData = row;
             temp.item = rowItem;
             setTableData(temp);
@@ -91,8 +92,7 @@ const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route
     let row: any[] = [];
     let rowItem: any[] = [];
     data.map((item: any, index: number) => {
-      let { firstname, lastname, email, phone, phoneNumber, isAdmin, state } =
-        item;
+      let { firstname, lastname, email, phone, phoneNumber, isAdmin, state } = item;
       row.push([
         firstname,
         lastname,
@@ -103,7 +103,7 @@ const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route
       ]);
       rowItem.push(item);
     });
-    console.log('row', row);
+
     temp.tableData = row;
     temp.item = rowItem;
     setTableData(temp);
@@ -119,11 +119,7 @@ const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route
   const elements = (index: number, data: any, item: any) => {
     switch (index) {
       case 4:
-        return (
-          <Text style={{ fontSize: 13, marginLeft: 5 }}>
-            {data ? 'Admin' : ' '}
-          </Text>
-        );
+        return <Text style={{ fontSize: 13, marginLeft: 5 }}>{data ? 'Admin' : ' '}</Text>;
         break;
       default:
         return (
@@ -191,7 +187,7 @@ const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route
 
           // console.log("length=-------------", temp.result.length);
           let index = temp.findIndex(
-            (item) => item?.instructorId == selectedInstructor.instructorId,
+            (item) => item?.instructorId == selectedInstructor.instructorId
           );
           let temValue = { ...temp[index] };
           temValue = schema;
@@ -225,12 +221,8 @@ const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route
           borderRadius: 20,
         }}
       >
-
-
         <FlatList
-          data={
-           instructors
-          }
+          data={instructors}
           showsVerticalScrollIndicator={false}
           style={{
             padding: 10,
@@ -239,67 +231,33 @@ const OrgInstructorListFormModal: FC<OrgInstructorListFormModalProps> = ({ route
           }}
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item, index }) => {
-          
             return (
-          
-                <View
-                  style={[
-                    styles.item,
-                    {
-                      backgroundColor: '#fff',
-                    },
-                  ]}
+              <View
+                style={[
+                  styles.item,
+                  {
+                    backgroundColor: '#fff',
+                  },
+                ]}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedInstructor(item);
+                    setVisible(true);
+                  }}
                 >
-                  <TouchableOpacity
-                    onPress={() => {
-                      setSelectedInstructor(item);
-                      setVisible(true);
-                    }}
-                  >
-                   {item?.isAdmin&& <Text
-                      style={[
-                        styles.text,
-                      {fontWeight:800}
-                      ]}
-                    >
-                      Admin
-                    </Text>}
+                  {item?.isAdmin && <Text style={[styles.text, { fontWeight: 800 }]}>Admin</Text>}
 
-                  <Text
-                      style={[
-                        styles.text,
-                        {fontWeight:800}
-                      ]}
-                    >
-                      {item?.firstname+" "+ item?.lastname}
-                    </Text>
+                  <Text style={[styles.text, { fontWeight: 800 }]}>
+                    {item?.firstname + ' ' + item?.lastname}
+                  </Text>
 
-                    <Text
-                      style={[
-                        styles.text,
-                      
-                      ]}
-                    >
-                      {item?.email}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.text,
-                      
-                      ]}
-                    >
-                      {item?.phone||''}
-                    </Text>
-
-                
-                  </TouchableOpacity>
-
-                
-                </View>
-         
+                  <Text style={[styles.text]}>{item?.email}</Text>
+                  <Text style={[styles.text]}>{item?.phone || ''}</Text>
+                </TouchableOpacity>
+              </View>
             );
           }}
-         
         />
       </View>
     </BackgroundLayout>
@@ -344,10 +302,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop:20,
-    borderRadius:10,
-    paddingHorizontal:10,
-    paddingTop:10
+    marginTop: 20,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingTop: 10,
   },
   actions: {
     flexDirection: 'row',
@@ -545,7 +503,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-
 
   text: {
     fontSize: 14,

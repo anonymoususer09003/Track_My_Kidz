@@ -20,21 +20,18 @@ type SetupVehicleModalProps = {
   buses?: any[];
   setBuses?: Function;
   fromActivity?: any;
-}
+};
 const SetupVehicleModal: FC<SetupVehicleModalProps> = ({
-                                                         activity,
-                                                         setActivity,
-                                                         buses,
-                                                         setBuses,
-                                                         fromActivity,
-                                                       }) => {
-  const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.setupVehicleModal,
-  );
+  activity,
+  setActivity,
+  buses,
+  setBuses,
+  fromActivity,
+}) => {
+  const isVisible = useSelector((state: { modal: ModalState }) => state.modal.setupVehicleModal);
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
   const isBusVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.addButInformationModalVisibility,
+    (state: { modal: ModalState }) => state.modal.addButInformationModalVisibility
   );
   // console.log("activity", activity);
   // const [password, setPassword] = useState("");
@@ -47,10 +44,9 @@ const SetupVehicleModal: FC<SetupVehicleModalProps> = ({
 
   const getBuses = async () => {
     const id = await loadUserId();
-    console.log(id);
+
     FindAllBus(id ? parseInt(id) : instructor?.instructorId, 0, 30)
       .then((res) => {
-        console.log(res.data);
         setBuses && setBuses(res?.data?.result);
       })
       .catch((err) => {
@@ -66,15 +62,6 @@ const SetupVehicleModal: FC<SetupVehicleModalProps> = ({
   };
 
   const updateBus = async (bus: any) => {
-    console.log({
-      ...bus,
-      id: bus?.busId,
-      studentsOnLongSeat: bus?.numberOfKidsOnLongSeat,
-      activityId: activity?.activityId || 0,
-      schoolId: instructor?.schoolId || 0,
-      orgId: instructor?.orgId || 0,
-      instructorId: instructor?.instructorId || 0,
-    });
     if (fromActivity) {
       navigation.navigate('DragDropStudent', {
         bus: bus?.busId,
@@ -92,9 +79,7 @@ const SetupVehicleModal: FC<SetupVehicleModalProps> = ({
       orgId: instructor?.orgId || 0,
       instructorId: instructor?.instructorId || 0,
     })
-      .then((res) => {
-        console.log(res.data);
-      })
+      .then((res) => {})
       .catch((err) => console.log(err));
   };
 
@@ -106,9 +91,7 @@ const SetupVehicleModal: FC<SetupVehicleModalProps> = ({
   // @ts-ignore
   return (
     <>
-      {isBusVisible && (
-        <AddBusInformation activity={activity} fromActivity={fromActivity} />
-      )}
+      {isBusVisible && <AddBusInformation activity={activity} fromActivity={fromActivity} />}
       <Modal
         style={styles.container}
         visible={isVisible}
@@ -133,7 +116,7 @@ const SetupVehicleModal: FC<SetupVehicleModalProps> = ({
                   ChangeModalState.action({
                     // setupVehicleModal: false,
                     addButInformationModalVisibility: true,
-                  }),
+                  })
                 );
               }}
             >

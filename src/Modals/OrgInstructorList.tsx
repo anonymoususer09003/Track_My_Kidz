@@ -1,52 +1,43 @@
-import { Input, Text, Layout, Button } from "@ui-kitten/components";
-import Modal from "react-native-modal";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, ScrollView } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { Formik } from "formik";
-import * as yup from "yup";
-import Colors from "@/Theme/Colors";
-import { Dimensions, TouchableOpacity, FlatList } from "react-native";
-import { FindInstructorBySchoolOrg } from "@/Services/Instructor";
-import Icon from "react-native-vector-icons/Entypo";
+import { Input, Text, Layout, Button } from '@ui-kitten/components';
+import Modal from 'react-native-modal';
+import { useDispatch, useSelector } from 'react-redux';
+import { ModalState } from '@/Store/Modal';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, ScrollView } from 'react-native';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { Formik } from 'formik';
+import * as yup from 'yup';
+import Colors from '@/Theme/Colors';
+import { Dimensions, TouchableOpacity, FlatList } from 'react-native';
+import { FindInstructorBySchoolOrg } from '@/Services/Instructor';
+import Icon from 'react-native-vector-icons/Entypo';
 
 // import { useTheme } from "@/Theme";
-import {
-  Table,
-  TableWrapper,
-  Row,
-  Rows,
-  Col,
-  Cols,
-  Cell,
-} from "react-native-table-component";
-import { GetInstructor } from "@/Services/Instructor";
-import { loadUserId } from "@/Storage/MainAppStorage";
-import { GetSchool, UpdateSchool } from "@/Services/School";
-const height = Dimensions.get("screen").height;
+import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
+import { GetInstructor } from '@/Services/Instructor';
+import { loadUserId } from '@/Storage/MainAppStorage';
+import { GetSchool, UpdateSchool } from '@/Services/School';
+const height = Dimensions.get('screen').height;
 
 const OrgInstructorListFormModal = ({ visible, id }: any) => {
   const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.editInstructorFormModalVisibility
+    (state: { modal: ModalState }) => state.modal.editInstructorFormModalVisibility
   );
   const dispatch = useDispatch();
   const [visibleEditModal, setEditVisible] = useState(false);
   const [selectedInstructor, setSelectedInstructor] = useState({});
   const [tableData, setTableData] = useState({
-    tableHead: ["First Name", "Last Name", "Email", "Phone", "Admin", " "],
+    tableHead: ['First Name', 'Last Name', 'Email', 'Phone', 'Admin', ' '],
     tableData: [],
     item: [],
   });
   const [instructors, setInstructors] = useState([]);
   const shoppingListValidationSchema = yup.object().shape({
-    firstName: yup.string().required("First name is required"),
-    lastName: yup.string().required("Last name is required"),
-    email: yup.string().required("Email is required"),
+    firstName: yup.string().required('First name is required'),
+    lastName: yup.string().required('Last name is required'),
+    email: yup.string().required('Email is required'),
   });
-  console.log("instructor", selectedInstructor);
+
   const handleGetOrganizationInfo = async () => {
     const userId = await loadUserId();
   };
@@ -65,17 +56,10 @@ const OrgInstructorListFormModal = ({ visible, id }: any) => {
             let rowItem = [];
             instructors?.map((item, index) => {
               let { firstname, lastname, email, phone, isAdmin, state } = item;
-              row.push([
-                firstname,
-                lastname,
-                email,
-                phone ? phone : "",
-                isAdmin,
-                state,
-              ]);
+              row.push([firstname, lastname, email, phone ? phone : '', isAdmin, state]);
               rowItem.push(item);
             });
-            console.log("row", row);
+
             temp.tableData = row;
             temp.item = rowItem;
             setTableData(temp);
@@ -86,7 +70,7 @@ const OrgInstructorListFormModal = ({ visible, id }: any) => {
       })
 
       .catch((err) => {
-        console.log("Error:", err);
+        console.log('Error:', err);
       });
   };
   const formatTableData = (data: any) => {
@@ -95,17 +79,10 @@ const OrgInstructorListFormModal = ({ visible, id }: any) => {
     let rowItem = [];
     data.result.map((item, index) => {
       let { firstname, lastname, email, phone, isAdmin, state } = item;
-      row.push([
-        firstname,
-        lastname,
-        email,
-        phone ? phone : "",
-        isAdmin,
-        state,
-      ]);
+      row.push([firstname, lastname, email, phone ? phone : '', isAdmin, state]);
       rowItem.push(item);
     });
-    console.log("row", row);
+
     temp.tableData = row;
     temp.item = rowItem;
     setTableData(temp);
@@ -120,7 +97,7 @@ const OrgInstructorListFormModal = ({ visible, id }: any) => {
     switch (index) {
       case 4:
         return (
-          <Text style={{ fontSize: 14 }}>{data ? "Admin" : " "}</Text>
+          <Text style={{ fontSize: 14 }}>{data ? 'Admin' : ' '}</Text>
           // <Select
           //   style={styles.selectSettings}
           //   value={data ? "Admin" : "Non-Admin"}
@@ -156,16 +133,14 @@ const OrgInstructorListFormModal = ({ visible, id }: any) => {
       visible={visible}
       style={styles.modal}
       onBackdropPress={() => {
-        dispatch(
-          ChangeModalState.action({ editInstructorFormModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ editInstructorFormModalVisibility: false }));
       }}
     >
       <View style={{ paddingRight: 19, marginTop: 10 }}>
         <ScrollView
           contentContainerStyle={{
             height: height * 0.3,
-            overflow: "hidden",
+            overflow: 'hidden',
           }}
           horizontal={true}
         >
@@ -212,10 +187,7 @@ const OrgInstructorListFormModal = ({ visible, id }: any) => {
                         backgroundColor: Colors.primary,
                       },
                     ]}
-                    textStyle={[
-                      styles.tableHeadertext,
-                      false ? { ...styles.textDecoration } : {},
-                    ]}
+                    textStyle={[styles.tableHeadertext, false ? { ...styles.textDecoration } : {}]}
                   />
                 ))}
               </TableWrapper>
@@ -230,10 +202,7 @@ const OrgInstructorListFormModal = ({ visible, id }: any) => {
                   renderItem={({ item, index }) => {
                     return (
                       <View key={index}>
-                        <TableWrapper
-                          key={index}
-                          style={{ flexDirection: "row" }}
-                        >
+                        <TableWrapper key={index} style={{ flexDirection: 'row' }}>
                           {item.map((cellData, cellIndex) => {
                             return (
                               <Cell
@@ -252,11 +221,7 @@ const OrgInstructorListFormModal = ({ visible, id }: any) => {
                                 key={cellIndex}
                                 data={
                                   cellIndex > 3
-                                    ? elements(
-                                        cellIndex,
-                                        cellData,
-                                        tableData.item[index]
-                                      )
+                                    ? elements(cellIndex, cellData, tableData.item[index])
                                     : cellData
                                 }
                                 textStyle={styles.text}
@@ -273,10 +238,8 @@ const OrgInstructorListFormModal = ({ visible, id }: any) => {
           </View>
         </ScrollView>
         {true && (
-          <Text
-            style={[styles.errorText, { textAlign: "center", fontSize: 18 }]}
-          >
-            {"Scroll to the right"}
+          <Text style={[styles.errorText, { textAlign: 'center', fontSize: 18 }]}>
+            {'Scroll to the right'}
           </Text>
         )}
       </View>
@@ -287,9 +250,9 @@ export default OrgInstructorListFormModal;
 
 const styles = StyleSheet.create({
   modal: {
-    height: "100%",
-    width: "100%",
-    backgroundColor: "red",
+    height: '100%',
+    width: '100%',
+    backgroundColor: 'red',
     // elevation: 5,
     shadowColor: Colors.primaryGray,
     shadowOffset: {
@@ -315,31 +278,31 @@ const styles = StyleSheet.create({
   },
 
   heading: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginTop: 10,
   },
   item: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "30%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '30%',
   },
   modalButton: {
-    width: "95%",
+    width: '95%',
     marginTop: 10,
   },
   selectInput: {
     marginTop: 10,
   },
   mainAsset: {
-    alignItems: "center",
+    alignItems: 'center',
     height: 300,
-    width: "100%",
+    width: '100%',
     flex: 3,
   },
   mainContent: {
@@ -348,45 +311,45 @@ const styles = StyleSheet.create({
   textContent: {
     fontSize: 16,
     padding: 10,
-    width: "100%",
+    width: '100%',
     borderBottomColor: Colors.lightgray,
     borderBottomWidth: 1,
   },
   extraImages: {
     flex: 1,
-    flexDirection: "row",
-    width: "100%",
+    flexDirection: 'row',
+    width: '100%',
     height: 100,
   },
   centerItems: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
   },
   formView: {
     flex: 9,
   },
   bottomView: {
-    width: "100%",
-    flexDirection: "row",
-    position: "absolute",
-    justifyContent: "center",
+    width: '100%',
+    flexDirection: 'row',
+    position: 'absolute',
+    justifyContent: 'center',
     backgroundColor: Colors.transparent,
     bottom: 0,
     height: 50,
   },
   linearBottom: {
-    width: "100%",
+    width: '100%',
 
     height: 50,
   },
   createPostButton: {
     margin: 3,
-    width: "50%",
+    width: '50%',
 
     height: 50,
     right: 0,
@@ -396,14 +359,14 @@ const styles = StyleSheet.create({
   },
   ghostButton: {
     margin: 8,
-    width: "100%",
-    alignSelf: "center",
+    width: '100%',
+    alignSelf: 'center',
   },
   buttonSettings: {
     marginTop: 20,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
 
   formContainer: {
@@ -417,39 +380,39 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   backgroundButton: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 16,
     marginLeft: 10,
     marginTop: 10,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.gray,
-    textAlign: "center",
+    textAlign: 'center',
   },
   selectSettings: {
     marginTop: 18,
   },
   tableHeadertext: {
-    textAlign: "center",
+    textAlign: 'center',
     margin: 6,
     color: Colors.white,
   },
   tableHeadertext0: {
-    textAlign: "center",
+    textAlign: 'center',
     margin: 6,
     color: Colors.black,
   },
@@ -460,7 +423,7 @@ const styles = StyleSheet.create({
     borderTopEndRadius: 5,
     borderBottomEndRadius: 5,
 
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 1,
     shadowRadius: 5,
@@ -469,19 +432,19 @@ const styles = StyleSheet.create({
   tableView: {
     marginTop: 70,
     marginBottom: 10,
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
   },
   row: {
-    display: "flex",
-    flexDirection: "row",
+    display: 'flex',
+    flexDirection: 'row',
     // justifyContent: 'space-between',
     flex: 1,
     backgroundColor: Colors.primary,
   },
   container: {
     flex: 1,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     backgroundColor: Colors.white,
     // marginBottom: 10,
     // borderRadius: 20,

@@ -20,12 +20,12 @@ import { useStateValue } from '@/Context/state/State';
 import { actions } from '@/Context/state/Reducer';
 
 type RequestPermissionModalProps = {
-  activity: any
-  setSelectedActivity?: any
-}
+  activity: any;
+  setSelectedActivity?: any;
+};
 const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) => {
   const [{ selectedActivity }, _dispatch]: any = useStateValue();
-  console.log('selectedActivity', selectedActivity);
+
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [students, setStudents] = useState<any>(activity?.studentsActivity);
@@ -35,8 +35,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
   const [selectedStatus, setSelectedStatus] = useState<string>('pending');
 
   const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.requestPermissionModalGroupVisibility,
+    (state: { modal: ModalState }) => state.modal.requestPermissionModalGroupVisibility
   );
 
   const handleSelectAll = () => {
@@ -48,7 +47,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
         _data.push({
           ...i,
           selected: true,
-        }),
+        })
       );
       setStudents(_data);
       const instructorData = [...activity?.instructorsActivity];
@@ -57,7 +56,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
         __data.push({
           ...i,
           selected: true,
-        }),
+        })
       );
       setInstructors(__data);
     } else {
@@ -67,7 +66,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
         _data.push({
           ...i,
           selected: false,
-        }),
+        })
       );
       setStudents(_data);
       const instructorData = [...activity?.instructorsActivity];
@@ -76,7 +75,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
         __data.push({
           ...i,
           selected: true,
-        }),
+        })
       );
       setInstructors(__data);
     }
@@ -178,7 +177,6 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
   // };
   const handleSubmit = async () => {
     try {
-      console.log('instructors', instructors);
       let ids: any[] = [];
       let filterStudents =
         students &&
@@ -187,7 +185,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
             ids.push(item.studentId);
           }
         });
-      console.log('isntructors', instructors);
+
       let body = {
         groupId: activity.groupId,
         pendingStudents: ids,
@@ -214,9 +212,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
         let response = await SendEmailToPendingInstructor(instructorBody);
       }
 
-      dispatch(
-        ChangeModalState.action({ requestPermissionModalVisibility: false }),
-      );
+      dispatch(ChangeModalState.action({ requestPermissionModalVisibility: false }));
       _dispatch({
         type: actions.SET_SELECTED_ACTIVITY,
         payload: null,
@@ -243,14 +239,12 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
   };
   const RightDrawerAction = () => (
     <TopNavigationAction
-      icon={(props: any) => (
-        <Icon {...props} name="close-circle-outline" fill={Colors.white} />
-      )}
+      icon={(props: any) => <Icon {...props} name="close-circle-outline" fill={Colors.white} />}
       onPress={() => {
         dispatch(
           ChangeModalState.action({
             requestPermissionModalGroupVisibility: false,
-          }),
+          })
         );
         _dispatch({
           type: actions.SET_SELECTED_ACTIVITY,
@@ -260,16 +254,15 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
       }}
     />
   );
-  console.log('selectedactvity', activity);
+
   const getPendingStudents = async () => {
     let body = {
       groupId: activity?.groupId,
       status: 'pending',
     };
-    console.log('body', body);
+
     GetPendingApprovedStudents(body)
       .then((res) => {
-        console.log('res', res);
         setStudents(res);
       })
       .catch((err) => {
@@ -283,10 +276,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
     };
     GetPendingApprovedInstructors(body)
       .then((res) => {
-        console.log(
-          'res ins==============00000000303399398983983899839839838998393',
-          res,
-        );
+        // console.log('res ins==============00000000303399398983983899839839838998393', res);
         setInstructors(res);
       })
       .catch((err) => {
@@ -310,7 +300,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
         dispatch(
           ChangeModalState.action({
             requestPermissionModalGroupVisibility: false,
-          }),
+          })
         );
         _dispatch({
           type: actions.SET_SELECTED_ACTIVITY,
@@ -321,7 +311,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
         dispatch(
           ChangeModalState.action({
             requestPermissionModalGroupVisibility: false,
-          }),
+          })
         );
         _dispatch({
           type: actions.SET_SELECTED_ACTIVITY,
@@ -332,7 +322,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
         dispatch(
           ChangeModalState.action({
             requestPermissionModalGroupVisibility: false,
-          }),
+          })
         );
         _dispatch({
           type: actions.SET_SELECTED_ACTIVITY,
@@ -443,9 +433,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
                         justifyContent: 'space-between',
                       }}
                     >
-                      <View
-                        style={{ flexDirection: 'row', alignItems: 'center' }}
-                      >
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Entypo
                           name="book"
                           color={Colors.primary}
@@ -477,9 +465,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
                         justifyContent: 'space-between',
                       }}
                     >
-                      <View
-                        style={{ flexDirection: 'row', alignItems: 'center' }}
-                      >
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Ionicons
                           name="person"
                           color={Colors.primary}
@@ -504,8 +490,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
             {selectedStatus !== 'approved' && (
               <View style={{ marginVertical: 5 }}>
                 <Text style={{ textAlign: 'center' }}>
-                  These are yet to respond to your invitation. Select to resend
-                  permission request
+                  These are yet to respond to your invitation. Select to resend permission request
                 </Text>
               </View>
             )}
@@ -546,7 +531,7 @@ const RequestPermissionModal: FC<RequestPermissionModalProps> = ({ activity }) =
                     dispatch(
                       ChangeModalState.action({
                         requestPermissionModalGroupVisibility: false,
-                      }),
+                      })
                     );
                     setSelectAll(false);
                     _dispatch({
@@ -596,8 +581,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
   },
-  topNav: {
-  },
+  topNav: {},
   layout: {
     flex: 1,
     flexDirection: 'column',

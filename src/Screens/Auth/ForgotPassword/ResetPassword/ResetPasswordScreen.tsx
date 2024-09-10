@@ -1,6 +1,6 @@
 import React, { FC, ReactElement, useState } from 'react';
 import { Image, KeyboardAvoidingView, TouchableWithoutFeedback, View } from 'react-native';
-import { Icon, Input, Layout,StyleService, Text, useStyleSheet } from '@ui-kitten/components';
+import { Icon, Input, Layout, StyleService, Text, useStyleSheet } from '@ui-kitten/components';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -13,12 +13,11 @@ import Colors from '@/Theme/Colors';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackNavigatorParamsList } from '@/Navigators/Auth/AuthNavigator';
 import { RouteProp } from '@react-navigation/native';
-import {  TouchableOpacity,  } from 'react-native'
+import { TouchableOpacity } from 'react-native';
 type ReportProblemScreenProps = {
   navigation: StackNavigationProp<AuthStackNavigatorParamsList, 'ResetPassword'>;
   route: RouteProp<AuthStackNavigatorParamsList, 'ResetPassword'>;
 };
-
 
 const ResetPasswordScreen: FC<ReportProblemScreenProps> = ({ route, navigation }) => {
   const styles = useStyleSheet(themedStyles);
@@ -27,15 +26,14 @@ const ResetPasswordScreen: FC<ReportProblemScreenProps> = ({ route, navigation }
   const arrowBackIcon = require('@/Assets/Images/arrow_back.png');
   const [inValidCode, setInvalidCode] = useState(false);
   const { emailAddress, user_type } = route.params;
-  const [confirmPasswordVisible, setConfirmPasswordVisible] =
-    React.useState<boolean>(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = React.useState<boolean>(false);
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const dispatch = useDispatch();
 
   const onSignUpButtonPress = (): void => {
     navigation && navigation.navigate('SignUp1');
   };
-  console.log('route.params', route.params);
+
   const onLoginButtonPress = (): void => {
     navigation && navigation.navigate('Login');
   };
@@ -56,7 +54,6 @@ const ResetPasswordScreen: FC<ReportProblemScreenProps> = ({ route, navigation }
     setConfirmPasswordVisible(!confirmPasswordVisible);
   };
   const validateCode = () => {
-    console.log('route', route.params);
     if (route?.params?.code == code) {
       setInvalidCode(false);
       setIsValid(true);
@@ -67,14 +64,8 @@ const ResetPasswordScreen: FC<ReportProblemScreenProps> = ({ route, navigation }
   const forgotPassValidationSchema = yup.object().shape({
     activationCode: yup
       .string()
-      .min(
-        6,
-        ({ min }) => `Verification code must be at least ${min} characters`,
-      )
-      .max(
-        6,
-        ({ max }) => `Verification code must be at least ${max} characters`,
-      )
+      .min(6, ({ min }) => `Verification code must be at least ${min} characters`)
+      .max(6, ({ max }) => `Verification code must be at least ${max} characters`)
       .required('Verification code is required'),
     password: yup
       .string()
@@ -82,27 +73,25 @@ const ResetPasswordScreen: FC<ReportProblemScreenProps> = ({ route, navigation }
       .required('Password is required'),
     confirmPassword: yup
       .string()
-      .test('password-match', 'Password & Confirm Password do not match', function(value) {
+      .test('password-match', 'Password & Confirm Password do not match', function (value) {
         const password = this.resolve(yup.ref('password'));
         return value === password;
       })
-      .when('password', (password, schema) => password && schema.required('Re-Password is required')),
+      .when(
+        'password',
+        (password, schema) => password && schema.required('Re-Password is required')
+      ),
   });
 
   return (
     <KeyboardAvoidingView style={styles.container}>
-         <TouchableOpacity onPress={() => {
-
-navigation.goBack();
-
-}}>
-
-  <Image
-    source={arrowBackIcon}
-    style={{ height: 25, width: 25 }}
-  />
-
-</TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.goBack();
+        }}
+      >
+        <Image source={arrowBackIcon} style={{ height: 25, width: 25 }} />
+      </TouchableOpacity>
       <View style={styles.headerContainer}>
         <Image
           style={{
@@ -136,7 +125,6 @@ navigation.goBack();
 
           ResetPasswordVerify(resetPasswordObject)
             .then((response) => {
-              console.log('response', response);
               Toast.show({
                 type: 'info',
                 position: 'top',
@@ -150,10 +138,7 @@ navigation.goBack();
               Toast.show({
                 type: 'info',
                 position: 'top',
-                text1:
-                  err.status == 404
-                    ? 'Invalid Activation code'
-                    : `An error occured`,
+                text1: err.status == 404 ? 'Invalid Activation code' : `An error occured`,
               });
               console.log('err', err);
             })
@@ -164,24 +149,26 @@ navigation.goBack();
         }}
       >
         {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            setFieldValue,
-            values,
-            errors,
-            touched,
-            isValid,
-          }) => (
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          setFieldValue,
+          values,
+          errors,
+          touched,
+          isValid,
+        }) => (
           <>
             {console.log('error', errors)}
             <Layout style={styles.formContainer}>
               <Input
-
-                style={[styles.inputSettings,{borderColor:Colors.white,borderWidth:0.9,color:Colors.white}]} 
+                style={[
+                  styles.inputSettings,
+                  { borderColor: Colors.white, borderWidth: 0.9, color: Colors.white },
+                ]}
                 placeholder="Activation Code"
                 placeholderTextColor={Colors.white}
-                textStyle={{color:Colors.white}}
+                textStyle={{ color: Colors.white }}
                 // accessoryRight={renderPersonIcon}
                 value={values.activationCode}
                 onChangeText={(text) => {
@@ -197,7 +184,7 @@ navigation.goBack();
               )}
 
               <Input
-                  placeholderTextColor={Colors.white}
+                placeholderTextColor={Colors.white}
                 disabled={values.activationCode.length < 6 ? true : false}
                 style={styles.inputSettings}
                 autoCapitalize="none"
@@ -205,7 +192,7 @@ navigation.goBack();
                 placeholder="New Password"
                 // accessoryRight={renderPasswordIcon}
                 value={values.password}
-                textStyle={{color:Colors.white}}
+                textStyle={{ color: Colors.white }}
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
               />
@@ -213,11 +200,11 @@ navigation.goBack();
                 <Text style={styles.errorText}>{errors.password}</Text>
               )}
               <Input
-                  placeholderTextColor={Colors.white}
+                placeholderTextColor={Colors.white}
                 disabled={values.activationCode.length < 6 ? true : false}
                 style={styles.inputSettings}
                 autoCapitalize="none"
-                textStyle={{color:Colors.white}}
+                textStyle={{ color: Colors.white }}
                 secureTextEntry={!confirmPasswordVisible}
                 placeholder="Confirm New Password"
                 // accessoryRight={renderConfirmPasswordIcon}
@@ -258,21 +245,13 @@ navigation.goBack();
               </Button> */}
 
               {inValidCode && (
-                <Text
-                  style={[
-                    styles.errorText,
-                    { marginBottom: 18, marginTop: 10 },
-                  ]}
-                >
+                <Text style={[styles.errorText, { marginBottom: 18, marginTop: 10 }]}>
                   Invalid code
                 </Text>
               )}
               {false && (
                 <LinearGradientButton
-                  style={[
-                    styles.resetButton,
-                    { backgroundColor: !isValid && Colors.gray },
-                  ]}
+                  style={[styles.resetButton, { backgroundColor: !isValid && Colors.gray }]}
                   appearance="filled"
                   size="medium"
                   onPress={validateCode}
@@ -302,13 +281,13 @@ const themedStyles = StyleService.create({
     flex: 1,
     flexDirection: 'column',
     backgroundColor: Colors.primary,
-    padding:20
+    padding: 20,
   },
   inputSettings: {
     marginTop: 7,
     backgroundColor: Colors.primary,
-    color:'white',
-    marginBottom:10
+    color: 'white',
+    marginBottom: 10,
     // maxHeight: 35
   },
   headerContainer: {
@@ -321,7 +300,6 @@ const themedStyles = StyleService.create({
   formContainer: {
     flex: 3,
     backgroundColor: Colors.primary,
-    
   },
   welcomeMessage: {
     marginTop: 16,

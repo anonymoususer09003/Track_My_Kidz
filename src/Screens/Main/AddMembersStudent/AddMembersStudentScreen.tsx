@@ -80,7 +80,7 @@ const AddMembersStudentScreen: FC<AddMembersStudentScreenProps> = ({ route }) =>
     }
     addStudents = group?.isEdit ? temp : [...students];
     let filter = addStudents.filter((s) => s?.firstName !== '');
-    console.log('filter', filter);
+
     _dispatch({
       type: actions.SET_GROUP,
       payload: {

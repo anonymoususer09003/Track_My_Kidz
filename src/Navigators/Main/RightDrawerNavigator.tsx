@@ -159,13 +159,11 @@ const RightDrawerNavigator = () => {
         locationPermission();
       });
     };
-    setTimeout(connectToSocket, 300000);
+    setTimeout(connectToSocket, 1000);
   }, []);
   const disconnectStompClient = () => {
     if (stompClient.current && stompClient.current.connected) {
-      stompClient.current.disconnect(() => {
-        console.log('Disconnected from the WebSocket');
-      });
+      stompClient.current.disconnect(() => {});
     }
   };
 
@@ -197,7 +195,7 @@ const RightDrawerNavigator = () => {
     intervalId = BackgroundTimer.setInterval(async () => {
       try {
         times = times + 1;
-        console.log('I am called for ' + times + ' times');
+
         trackAndroidAnIos();
       } catch (error) {
         console.log(error);
@@ -222,7 +220,7 @@ const RightDrawerNavigator = () => {
         Geolocation.getCurrentPosition(
           (position) => {
             // Alert.alert(JSON.stringify(position));
-            console.log('position', position);
+
             const { latitude, longitude } = position.coords;
             // console.log('coords', coords);
             sendCoordinates(latitude, longitude);

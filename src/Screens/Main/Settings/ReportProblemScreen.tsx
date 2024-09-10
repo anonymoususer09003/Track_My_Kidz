@@ -18,25 +18,25 @@ import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavig
 const Divider = () => (
   <View
     style={{
-      borderBottomColor: "#E0E0E0",
+      borderBottomColor: '#E0E0E0',
       borderBottomWidth: 1,
     }}
   />
 );
 
 const issues = [
-  "User interface issues",
-  "",
-  "App performance and response",
-  "",
-  "Functionality missing or not working properly",
-  "",
-  "Device compatibility",
-  "",
-  "Other",
+  'User interface issues',
+  '',
+  'App performance and response',
+  '',
+  'Functionality missing or not working properly',
+  '',
+  'Device compatibility',
+  '',
+  'Other',
 ];
 const initialValues = {
-  message: "",
+  message: '',
   selectedIndex: -1,
 };
 const RadioOptions = ({
@@ -48,12 +48,9 @@ const RadioOptions = ({
 }) => {
   return (
     <React.Fragment>
-      <RadioGroup
-        selectedIndex={selectedIndex}
-        onChange={(index) => setSelectedIndex(index)}
-      >
+      <RadioGroup selectedIndex={selectedIndex} onChange={(index) => setSelectedIndex(index)}>
         {issues.map((item, index) => {
-          if (item != "") {
+          if (item != '') {
             return (
               <Radio
                 key={index}
@@ -90,17 +87,16 @@ const ReportProblemScreen: FC<ReportProblemScreenProps> = ({ navigation }) => {
   const reportAProblemValidationSchema = yup.object().shape({
     message: yup
       .string()
-      .max(200, "Message cannot be more than 200 characters")
+      .max(200, 'Message cannot be more than 200 characters')
       .min(20, ({ min }) => `Message needs to be at least ${min} characters`)
-      .required("Message is required"),
+      .required('Message is required'),
   });
   const isFocused = useIsFocused();
   const [userId, setUserId] = useState<string>();
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const getUserId = async () => {
     const _id = await loadUserId();
-    if (_id)
-      setUserId(_id);
+    if (_id) setUserId(_id);
   };
 
   useEffect(() => {
@@ -133,8 +129,7 @@ const ReportProblemScreen: FC<ReportProblemScreenProps> = ({ navigation }) => {
               {isSent ? (
                 <View style={styles.sppinerContainer}>
                   <Text style={styles.sent}>
-                    The problem you are experiencing has been successfully
-                    reported
+                    The problem you are experiencing has been successfully reported
                   </Text>
                 </View>
               ) : (
@@ -144,16 +139,13 @@ const ReportProblemScreen: FC<ReportProblemScreenProps> = ({ navigation }) => {
                 //   </View>
                 // )
                 <>
-                  <RadioOptions
-                    selectedIndex={selectedIndex}
-                    setSelectedIndex={setSelectedIndex}
-                  />
+                  <RadioOptions selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} />
                   <View style={styles.formikContainer}>
                     <Text
                       style={{
                         marginVertical: 20,
                         fontSize: 13,
-                        fontWeight: "600",
+                        fontWeight: '600',
                       }}
                     >
                       Explain (Min 20 & Max 200 Characters)
@@ -174,7 +166,6 @@ const ReportProblemScreen: FC<ReportProblemScreenProps> = ({ navigation }) => {
                           };
                           CreateReport(objectToPass)
                             .then((response: any) => {
-                              console.log("res", response.status);
                               if (response.status == 201) {
                                 setisSent(true);
                                 setTimeout(() => {
@@ -191,7 +182,7 @@ const ReportProblemScreen: FC<ReportProblemScreenProps> = ({ navigation }) => {
                                 error.data.title,
 
                                 error.message,
-                                [{ text: "OK", style: "cancel" }]
+                                [{ text: 'OK', style: 'cancel' }]
                               );
                               setisSending(false);
                             });
@@ -199,40 +190,26 @@ const ReportProblemScreen: FC<ReportProblemScreenProps> = ({ navigation }) => {
                           setSelectedIndex(0);
                         }}
                       >
-                        {({
-                          handleChange,
-                          handleSubmit,
-                          values,
-                          errors,
-                          isValid,
-                        }) => (
+                        {({ handleChange, handleSubmit, values, errors, isValid }) => (
                           <>
                             <View style={styles.formContainer}>
                               <Input
                                 style={styles.textInput}
                                 textStyle={styles.textArea}
                                 placeholder="Type your feedback"
-                                onChangeText={handleChange("message")}
+                                onChangeText={handleChange('message')}
                                 value={values.message}
                                 multiline={true}
                                 maxLength={500}
-                                status={
-                                  isTouched && errors.message ? "danger" : ""
-                                }
+                                status={isTouched && errors.message ? 'danger' : ''}
                               />
                               {errors.message && isTouched ? (
-                                <Text style={styles.errorText}>
-                                  {errors.message}
-                                </Text>
+                                <Text style={styles.errorText}>{errors.message}</Text>
                               ) : null}
                               <View style={styles.buttonSettings}>
-                                <View style={{ width: "90%" }}>
+                                <View style={{ width: '90%' }}>
                                   <LinearGradientButton
-                                    disabled={
-                                      !isValid || selectedIndex == -1
-                                        ? true
-                                        : false
-                                    }
+                                    disabled={!isValid || selectedIndex == -1 ? true : false}
                                     onPress={handleSubmit}
                                   >
                                     Send
@@ -244,9 +221,7 @@ const ReportProblemScreen: FC<ReportProblemScreenProps> = ({ navigation }) => {
                                     style={styles.cancelBackground}
                                     onPress={() => navigation.goBack()}
                                   >
-                                    <Text style={styles.cancelButton}>
-                                      Cancel
-                                    </Text>
+                                    <Text style={styles.cancelButton}>Cancel</Text>
                                   </TouchableOpacity>
                                 </View>
                               </View>
@@ -272,7 +247,7 @@ export default ReportProblemScreen;
 const styles = StyleSheet.create({
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
     backgroundColor: Colors.newBackgroundColor,
     borderRadius: 25,
   },
@@ -281,16 +256,16 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   radio: {
-    flexDirection: "row",
+    flexDirection: 'row',
 
     // paddingLeft: 20,
     marginVertical: 5,
 
     borderRadius: 10,
     paddingVertical: 10,
-    width: "90%",
+    width: '90%',
     paddingHorizontal: 20,
-    alignSelf: "center",
+    alignSelf: 'center',
     backgroundColor: Colors.white,
   },
   radioText: {
@@ -298,12 +273,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   formikContainer: {
-    width: "100%",
+    width: '100%',
     paddingLeft: 20,
   },
   textInput: {
     marginRight: 20,
-    textAlignVertical: "top",
+    textAlignVertical: 'top',
     // minHeight: 200,
     borderRadius: 10,
     elevation: 1,
@@ -312,39 +287,39 @@ const styles = StyleSheet.create({
     minHeight: 100,
 
     marginLeft: -1,
-    textAlignVertical: "top",
+    textAlignVertical: 'top',
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 16,
     marginLeft: 10,
     marginTop: 10,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.gray,
-    textAlign: "center",
+    textAlign: 'center',
   },
   background: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
   cancelBackground: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
   },
   button: {
@@ -363,15 +338,15 @@ const styles = StyleSheet.create({
   },
   buttonSettings: {
     marginTop: 20,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     marginLeft: -20,
   },
 
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
     marginLeft: 10,
     marginTop: 10,
   },

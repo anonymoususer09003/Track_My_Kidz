@@ -1,34 +1,18 @@
-import { LinearGradientButton } from "@/Components";
-import { actions } from "@/Context/state/Reducer";
-import { useStateValue } from "@/Context/state/State";
-import {
-  FindAllIstructorActivities,
-  FindAllStudentsWhichActivity
-} from "@/Services/Activity";
-import Colors from "@/Theme/Colors";
-import { useNavigation } from "@react-navigation/native";
-import {
-  Text,
-  TopNavigation
-} from "@ui-kitten/components";
-import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  View
-} from "react-native";
-import Modal from "react-native-modal";
-import Entypo from "react-native-vector-icons/Entypo";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import { useDispatch } from "react-redux";
+import { LinearGradientButton } from '@/Components';
+import { actions } from '@/Context/state/Reducer';
+import { useStateValue } from '@/Context/state/State';
+import { FindAllIstructorActivities, FindAllStudentsWhichActivity } from '@/Services/Activity';
+import Colors from '@/Theme/Colors';
+import { useNavigation } from '@react-navigation/native';
+import { Text, TopNavigation } from '@ui-kitten/components';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
+import Modal from 'react-native-modal';
+import Entypo from 'react-native-vector-icons/Entypo';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useDispatch } from 'react-redux';
 
-const InstructorsStudentsModal = ({
-  isVisible,
-  setIsVisible,
-  status,
-  type,
-}: any) => {
+const InstructorsStudentsModal = ({ isVisible, setIsVisible, status, type }: any) => {
   const [{ selectedActivity }, _dispatch] = useStateValue();
   const navigation = useNavigation();
 
@@ -43,7 +27,7 @@ const InstructorsStudentsModal = ({
   const [instructors, setInstructors] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("pending");
+  const [selectedStatus, setSelectedStatus] = useState('pending');
 
   const getStudents = async (refreshing: any) => {
     if (refreshing) {
@@ -58,7 +42,6 @@ const InstructorsStudentsModal = ({
     };
     FindAllStudentsWhichActivity(body)
       .then((res) => {
-        console.log("res", res);
         setTotalRecordsStudents(res.length == 0 ? false : true);
         setRefreshing(false);
         setPageSizeStudents(10);
@@ -71,7 +54,7 @@ const InstructorsStudentsModal = ({
         }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log('err', err);
       });
   };
   const getInstructors = async (refreshing: any) => {
@@ -82,13 +65,9 @@ const InstructorsStudentsModal = ({
       page: pageNumberStudentCount,
       page_size: pageSizeStudents,
     };
-    console.log('body',body)
+
     FindAllIstructorActivities(body)
       .then((res) => {
-        console.log(
-          "res ins==============00000000303399398983983899839839838998393",
-          res
-        );
         setTotalRecordsInstructors(res.length == 0 ? false : true);
         setRefreshing(false);
         setPageSizeInstructors(10);
@@ -97,16 +76,15 @@ const InstructorsStudentsModal = ({
         if (refreshing) {
           setInstructors([...instructors, ...res]);
         } else {
-          console.log('rrrrr',res)
           setInstructors(res);
         }
       })
       .catch((err) => {
-        console.log("err9999999999999999999999999999999999999", err);
+        console.log('err9999999999999999999999999999999999999', err);
       });
   };
   useEffect(() => {
-    if (type == "student") {
+    if (type == 'student') {
       getStudents();
     } else {
       getInstructors();
@@ -146,10 +124,10 @@ const InstructorsStudentsModal = ({
                   color: Colors.white,
                   marginLeft: 20,
                   fontSize: 18,
-                  textAlign: "center",
+                  textAlign: 'center',
                 }}
               >
-                {type == "student" ? "Students List" : "Instructors List"}
+                {type == 'student' ? 'Students List' : 'Instructors List'}
               </Text>
             )}
             appearance="control"
@@ -220,14 +198,12 @@ const InstructorsStudentsModal = ({
                         style={{
                           marginVertical: 2,
                           padding: 2,
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                         }}
                       >
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Entypo
                             name="book"
                             color={Colors.primary}
@@ -242,8 +218,6 @@ const InstructorsStudentsModal = ({
                     )}
                     onEndReached={async () => {
                       if (totalRecordsStudents) {
-                        console.log("logs");
-
                         getStudents(true);
                       }
                     }}
@@ -259,14 +233,12 @@ const InstructorsStudentsModal = ({
                         style={{
                           marginVertical: 2,
                           padding: 2,
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                         }}
                       >
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Ionicons
                             name="person"
                             color={Colors.primary}
@@ -290,12 +262,8 @@ const InstructorsStudentsModal = ({
                 )}
               </View>
             </View>
-            {refreshing && (
-              <ActivityIndicator size="large" color={Colors.primary} />
-            )}
-            <View
-              style={{ width: "80%", alignSelf: "center", marginBottom: 20 }}
-            >
+            {refreshing && <ActivityIndicator size="large" color={Colors.primary} />}
+            <View style={{ width: '80%', alignSelf: 'center', marginBottom: 20 }}>
               <LinearGradientButton
                 onPress={() => {
                   setIsVisible();
@@ -321,22 +289,22 @@ const styles = StyleSheet.create({
   container: {
     minHeight: 192,
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "90%",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '90%',
   },
   tabButton: {
     backgroundColor: Colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "33%",
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '33%',
     paddingVertical: 10,
   },
   tabText: {
     color: Colors.white,
   },
   modal: { borderRadius: 10 },
-  header: { flex: 1, textAlign: "center", fontWeight: "bold", fontSize: 20 },
+  header: { flex: 1, textAlign: 'center', fontWeight: 'bold', fontSize: 20 },
   body: { flex: 3 },
   background: {
     flex: 0,
@@ -351,43 +319,43 @@ const styles = StyleSheet.create({
   },
   layout: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   item: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
+    width: '96%',
+    backgroundColor: '#fff',
     marginTop: 10,
-    marginHorizontal: "2%",
+    marginHorizontal: '2%',
     paddingHorizontal: 10,
     paddingTop: 10,
   },
   footer: {
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    width: "96%",
-    backgroundColor: "#fff",
-    marginHorizontal: "2%",
+    width: '96%',
+    backgroundColor: '#fff',
+    marginHorizontal: '2%',
     marginBottom: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: 16,
     marginVertical: 4,
   },
   bottomButton: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
@@ -398,13 +366,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   backdrop: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   buttonSettings: {
     marginTop: 10,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     marginBottom: 10,
   },
 });

@@ -249,14 +249,12 @@ const FirstSignUpScreen = ({ navigation }: FirstSignUpScreenProps) => {
                   isValid,
                 }) => (
                   <>
-                    {console.log('errors', errors)}
                     <Layout style={styles.formContainer}>
                       <View style={{ height: 30 }} />
                       <CustomDropdown
                         placeholder="Select User"
                         value={values.user_type}
                         onSelect={(index: any) => {
-                          console.log('index', index);
                           setFieldValue('user_type', user_type[index].value);
                           setSelectedUserType(user_type[index].value);
                         }}

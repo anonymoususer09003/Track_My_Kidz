@@ -17,18 +17,18 @@ const ContactUsScreen = () => {
   const contactUsValidationSchema = yup.object().shape({
     message: yup
       .string()
-      .min(50, ({min}) => `Message needs to be at least ${min} characters`)
+      .min(50, ({ min }) => `Message needs to be at least ${min} characters`)
       .required('Message is required'),
   });
   const [isTouched, setisTouched] = useState(false);
   const [isSending, setisSending] = useState(false);
   const [isSent, setisSent] = useState(false);
-  const [formikValues, setFomikValues] = useState({message: ''});
+  const [formikValues, setFomikValues] = useState({ message: '' });
   const resetErrors = () => setShowErrors(false);
 
   useEffect(() => {
     resetErrors();
-    setFomikValues({message: ''});
+    setFomikValues({ message: '' });
   }, [isFocuesed]);
 
   return (
@@ -44,7 +44,7 @@ const ContactUsScreen = () => {
                 enableReinitialize
                 validationSchema={contactUsValidationSchema}
                 initialValues={formikValues}
-                onSubmit={async (values, {resetForm}) => {
+                onSubmit={async (values, { resetForm }) => {
                   setisSending(true);
                   const userId = await loadId();
 
@@ -55,7 +55,6 @@ const ContactUsScreen = () => {
                   };
                   ContactUs(objectToPass)
                     .then((response: any) => {
-                      console.log('res', response);
                       if (response.status == 200) {
                         setisSent(true);
                         setTimeout(() => {
@@ -68,14 +67,15 @@ const ContactUsScreen = () => {
                     .catch((error: any) => {
                       console.log(error);
                       Alert.alert('An error occured', 'Please try again', [
-                        {text: 'OK', style: 'cancel'},
+                        { text: 'OK', style: 'cancel' },
                       ]);
 
                       setisSending(false);
                     });
                   resetForm();
-                }}>
-                {({handleChange, handleSubmit, values, errors, isValid}) => (
+                }}
+              >
+                {({ handleChange, handleSubmit, values, errors, isValid }) => (
                   <>
                     {isSending ? (
                       isSent ? (
@@ -112,11 +112,8 @@ const ContactUsScreen = () => {
                         ) : null}
                         <LinearGradientButton
                           onPress={() => (!isValid ? null : handleSubmit())}
-                          gradient={
-                            isValid
-                              ? [Colors.primary, '#EC5ADD']
-                              : ['grey', 'grey']
-                          }>
+                          gradient={isValid ? [Colors.primary, '#EC5ADD'] : ['grey', 'grey']}
+                        >
                           Send
                         </LinearGradientButton>
                       </View>

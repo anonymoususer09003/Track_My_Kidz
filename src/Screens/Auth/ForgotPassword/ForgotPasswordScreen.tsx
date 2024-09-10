@@ -110,7 +110,6 @@ const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = ({ navigation }) => 
                   placeholder="Select User"
                   value={values.user_type}
                   onSelect={(index: any) => {
-                    console.log('index', index);
                     setFieldValue('user_type', user_type[index].value);
                     setSelectedUserType(user_type[index].value);
                   }}

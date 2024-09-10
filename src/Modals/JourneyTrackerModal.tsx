@@ -147,21 +147,17 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
   );
   const dispatch = useDispatch();
   const getEta = async (origin: any, destination: any) => {
-    console.log(
-      `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&units=imperial&key=AIzaSyBBDJwlh5Mnc6Aa1l371eEOZ9G6Uc0ByWA`
-    );
     try {
       let res = await axios.get(
         `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&units=imperial&key=AIzaSyBBDJwlh5Mnc6Aa1l371eEOZ9G6Uc0ByWA`
       );
-      console.log(JSON.stringify(res.data));
+
       let eta = res.data;
       let splitHours = eta.rows[0].elements[0].duration.text.includes('min')
         ? eta.rows[0].elements[0].duration.text.split('min')
         : eta.rows[0].elements[0].duration.text.split('hours');
       let splitMins = splitHours[1].split('mins');
-      console.log('--eta', splitHours);
-      console.log('--eta', splitMins);
+
       var travelTime = moment()
         .add(parseInt(splitHours[0].trim()), 'hour')
         .add(parseInt(splitHours[1].trim()), 'minute')
@@ -202,7 +198,7 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
 
   const handleGetOrganizationInfo = async () => {
     const userId = await loadUserId();
-    console.log('userId', userId);
+
     GetInstructor(userId ? userId : '').then((res) => {
       if (res.schoolId) {
         GetSchool(res.schoolId)
@@ -363,7 +359,6 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
                   });
 
                   GetAllStates(selectedCountry.name.replace(/ /g, '')).then((res) => {
-                    console.log('res000', res.data);
                     setFromStates(res.data);
                     setStatesFromData(res.data);
                   });
@@ -393,7 +388,6 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
                   setCitiesFromData([]);
                   GetAllCities(fromOthersLocation.country, selectedState)
                     .then((res) => {
-                      console.log('res----', res);
                       setFromCities(res.data);
                       setCitiesFromData(res.data);
                     })
@@ -519,7 +513,6 @@ const JourneyTrackerModal = ({ selectedActivity }: any) => {
 
                   setToCities([]);
                   GetAllCities(toOthersLocation.country, selectedState).then((res) => {
-                    console.log('res,city', res.data);
                     setToCities(res.data);
                   });
                 }}

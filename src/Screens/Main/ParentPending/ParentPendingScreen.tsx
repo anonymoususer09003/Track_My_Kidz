@@ -111,13 +111,12 @@ const ParentPendingScreen = () => {
     let email = currentUser?.email;
     GetChildrenGroups(email, 'pending', pageNumberGroupCount, pageSizeGroup)
       .then((res) => {
-        console.log('res', res);
         setTotalRecordsGroup(res.totalRecords);
         setRefreshing(false);
         setPageSizeGroup(20);
 
         pageNumberGroup(refreshing ? pageGroup + 1 : 1);
-        console.log('res', res);
+
         if (refreshing) {
           setGroups([...groups, ...res?.result]);
         } else {
@@ -263,9 +262,6 @@ const ParentPendingScreen = () => {
           setActivity={(id: any) => {
             setSelectedChild('');
             if (activity?.activity) {
-              console.log('declinedactivity', activity);
-
-              console.log('activites', activities);
               getActivities();
               // let filter = activities.filter((item) => item?.activity?.activityId != id);
 
@@ -287,9 +283,6 @@ const ParentPendingScreen = () => {
           setActivity={(id: any) => {
             setSelectedChild('');
             if (declineActivity?.activity) {
-              console.log('declinedactivity', declineActivity);
-
-              console.log('activites', activities);
               let filter = activities.filter((item) => item?.activity?.activityId != id);
               setDeclineActivity(false);
               setActivities(filter);
@@ -455,8 +448,6 @@ const ParentPendingScreen = () => {
             }}
             onEndReached={async () => {
               if (totalRecordsActivity > activities.length) {
-                console.log('logs');
-
                 getActivities(true);
 
                 if (totalRecordsGroup > groups.length) {

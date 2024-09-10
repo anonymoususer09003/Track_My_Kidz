@@ -11,7 +11,7 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
-
+import { calculateDistance } from '@/Utils/DistanceCalculator';
 import * as Stomp from 'react-native-stompjs';
 import SockJS from 'sockjs-client';
 import firestore from '@react-native-firebase/firestore';
@@ -33,6 +33,7 @@ import {
   EditDependentModal,
   AddStudentModal,
   ParentPaymentModal,
+  GroupParticipantsModal,
 } from '@/Modals';
 import FA5 from 'react-native-vector-icons/FontAwesome5';
 import SearchBar from '@/Components/SearchBar/SearchBar';
@@ -55,12 +56,12 @@ import { GetAllActivity, GetChildrenAcitivities } from '@/Services/Activity';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useStateValue } from '@/Context/state/State';
 import { actions } from '@/Context/state/Reducer';
-import { color } from 'react-native-reanimated';
+
 import LogoutStore from '@/Store/Authentication/LogoutStore';
 import Geolocation from '@react-native-community/geolocation';
 import GetParentChildrens from '@/Services/Parent/GetParentChildrens';
 // import { iteratorSymbol } from 'immer/dist/internal';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import GroupMap from '../../../Components/groupMap/index';
 const window = Dimensions.get('window');
 const { width, height } = window;
 const HomeScreen = () => {
@@ -70,6 +71,10 @@ const HomeScreen = () => {
   const swipeableRef = useRef(null);
   const ref = useRef();
   const [, _dispatch] = useStateValue();
+  const [groups, setGroups] = useState<any>({});
+  const [showModal, setModal] = useState<boolean>(false);
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+  const [newParticipnatsArr, setnewParticipnatsArr] = useState<any[]>([]);
   let row: Array<any> = [];
   let prevOpenedRow: any;
   const dispatch = useDispatch();
@@ -443,10 +448,113 @@ const HomeScreen = () => {
     });
   }
 
+  useEffect(() => {
+    let temp: any[] = [];
+    let groups: any = {};
+    let trackingListKeys = Object.keys(trackingList);
+
+    if (trackingListKeys.length > 1 && children.length > 0) {
+      trackingListKeys.map((item, index) => {
+        let latitude1 = trackingList[item]?.lat;
+        let longititude1 = trackingList[item]?.lang;
+
+        for (let j = index + 1; j <= trackingListKeys.length - 1; j++) {
+          let nextParticipant = trackingList[trackingListKeys[j]];
+
+          let latitude2 = nextParticipant?.lat;
+          let longititude2 = nextParticipant?.lang;
+          let distance = calculateDistance(latitude1, longititude1, latitude2, longititude2);
+          const isUnderEqual100Meters = distance <= 100;
+          let participant = children.find(
+            (pers) => pers?.childDevice == nextParticipant?.childDevice
+          );
+
+          if (participant && isUnderEqual100Meters) {
+            participant['group'] = true;
+            participant['groupName'] = index + 1;
+            temp.push(participant);
+            if (groups[index + 1]) {
+              let tempValue = { ...groups[index + 1] };
+
+              tempValue.participants = [...tempValue.participants, participant];
+              groups[index + 1] = tempValue;
+            } else {
+              groups[index + 1] = {
+                id: index + 1,
+                participants: [participant],
+              };
+            }
+          } else {
+            temp.push(participant);
+          }
+        }
+
+        let firstPers = children.find((firPer) => firPer?.childDevice == item);
+
+        let isAnyParticipantExist = temp.find((temMember) => temMember?.groupName == index + 1);
+
+        if (firstPers && isAnyParticipantExist) {
+          // console.log('first person90390903093090390930930990309390399039030930909309', firstPers);
+
+          firstPers['group'] = true;
+          firstPers['groupName'] = index + 1;
+          temp.push(firstPers);
+
+          if (groups[index + 1]) {
+            let tempValue = { ...groups[index + 1] };
+            tempValue.participants = [...tempValue.participants, firstPers];
+            groups[index + 1] = tempValue;
+          }
+
+          // }
+          else {
+            groups[index + 1] = {
+              id: index + 1,
+              participants: [{ ...firstPers, group: true, groupName: index + 1 }],
+            };
+          }
+        }
+        //  else {
+        //   temp.push(firstPers);
+        // }
+      });
+
+      setGroups(groups);
+      let groupedArray: any[] = [];
+      let groupNames: any[] = [];
+
+      temp.forEach((item) => {
+        if (!item?.groupName || !groupNames.includes(item?.groupName)) {
+          groupedArray.push(item);
+          if (item?.groupName) {
+            groupNames.push(item?.groupName);
+          }
+        }
+      });
+
+      setnewParticipnatsArr(temp);
+
+      // setChildren(temp);
+    } else {
+      let participant = [];
+      trackingListKeys.map((item, index) => {
+        participant = children.filter((pers) => pers.childDevice == item);
+      });
+      setnewParticipnatsArr([...participant]);
+    }
+  }, [trackingList]);
+
   return (
     <>
       {/* <WelcomeMessageModal /> */}
       <AddStudentModal />
+      {selectedGroup && showModal && (
+        <GroupParticipantsModal
+          isVisible={showModal}
+          setIsVisible={() => setModal(false)}
+          participants={groups[selectedGroup]?.participants}
+        />
+      )}
       {!!selectedDependent && (
         <EditDependentModal
           selectedDependent={selectedDependent}
@@ -606,6 +714,10 @@ const HomeScreen = () => {
                         type: actions.SET_SELECTED_CHILD,
                         payload: item,
                       });
+                      _dispatch({
+                        type: actions.SET_PARENTS_CHILDREN,
+                        payload: children,
+                      });
                       navigation.navigate('Activity', {
                         dependent: item,
                       });
@@ -648,123 +760,18 @@ const HomeScreen = () => {
               <Ionicons name="accessibility" style={{ fontSize: 28 }} />
             </TouchableOpacity> */}
 
-            <MapView
-              showsUserLocation
-              // ref={ref}
-              // onLayout={() => {
-              //   let temp = studentsEmails.filter((item) => item.latitude != null);
-
-              //   // ref?.current?.fitToCoordinates(temp, {
-              //   //   edgePadding: {
-              //   //     top: 10,
-              //   //     right: 10,
-              //   //     bottom: 10,
-              //   //     left: 10,
-              //   //   },
-              //   //   animated: true,
-              //   // });
-              // }}
-              style={{ flex: 1 }}
-            >
-              {children
-                .filter(
-                  (item) =>
-                    trackingList[item.childDevice]?.lat != 'undefined' &&
-                    trackingList[item.childDevice]?.lat != null
-                )
-                .map((item, index) => {
-                  let latitude = trackingList[item.childDevice]?.lat;
-                  let longititude = trackingList[item.childDevice]?.lang;
-
-                  return (
-                    <>
-                      {/* {item?.toggleAlert && (
-                        <Circle
-                          key={index}
-                          center={{
-                            latitude: latitude ? parseFloat(latitude) : parseFloat(10),
-                            longitude: longititude ? parseFloat(longititude) : parseFloat(10),
-                          }}
-                          radius={item?.allowedDistance || 50}
-                          strokeWidth={10}
-                          strokeColor={'red'}
-                          fillColor={'rgba(230,238,255,0.5)'}
-                        />
-                      )} */}
-
-                      <Marker
-                        onSelect={() => console.log('pressed')}
-                        onPress={() => {
-                          ref.current.fitToSuppliedMarkers(
-                            [
-                              {
-                                latitude: latitude ? parseFloat(latitude) : parseFloat(10),
-                                longitude: longititude ? parseFloat(longititude) : parseFloat(10),
-                              },
-                            ]
-                            // false, // not animated
-                          );
-                        }}
-                        identifier={item.childEmail}
-                        key={item?.childDevice}
-                        coordinate={{
-                          latitude: latitude ? parseFloat(latitude) : parseFloat(10),
-                          longitude: longititude ? parseFloat(longititude) : parseFloat(10),
-                        }}
-                      >
-                        <View style={{}}>
-                          <View
-                            style={{
-                              height: 30,
-                              width: 30,
-                              borderRadius: 80,
-                              overflow: 'hidden',
-                              // top: 33,
-                              // zIndex: 10,
-                            }}
-                          >
-                            {item?.studentImage == '' && (
-                              <View
-                                style={{
-                                  height: '100%',
-                                  width: '100%',
-                                  borderRadius: 80,
-                                  backgroundColor: Colors.primary,
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                }}
-                              >
-                                <Text style={{ color: Colors.white }}>
-                                  {item?.firstname?.substring(0, 1)?.toUpperCase() || ''}
-                                  {item?.lastname?.substring(0, 1)?.toUpperCase() || ''}
-                                </Text>
-                              </View>
-                            )}
-
-                            {item?.studentImage != '' && (
-                              <Image
-                                source={{
-                                  uri: item?.studentImage,
-                                }}
-                                style={{
-                                  height: '100%',
-                                  width: '100%',
-
-                                  // aspectRatio: 1.5,
-                                }}
-                                resizeMode="contain"
-                              />
-                            )}
-                          </View>
-                          {/* <FA5 name="map-marker" size={40} color={"red"} /> */}
-                        </View>
-                      </Marker>
-                    </>
-                    // </>
-                    // </Circle>
-                  );
-                })}
-            </MapView>
+            <GroupMap
+              isChildren={true}
+              newParticipnatsArr={newParticipnatsArr}
+              trackingList={trackingList}
+              groups={groups}
+              onClick={(group: any) => {
+                {
+                  setSelectedGroup(group);
+                  setModal(true);
+                }
+              }}
+            />
           </View>
         )}
       </View>

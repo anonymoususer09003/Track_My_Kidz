@@ -1,5 +1,11 @@
 import React, { ReactElement, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import { useTheme } from '@/Theme';
 import { Icon, Input, Text } from '@ui-kitten/components';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -23,18 +29,14 @@ const ChangePasswordScreen = () => {
   const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
   const [showCodeField, setShowField] = useState(false);
   const user = useSelector((state: { user: UserState }) => state.user.item);
-  console.log('user', user);
-  const [oldPasswordVisible, setOldPasswordVisible] =
-    React.useState<boolean>(false);
-  const [newPasswordVisible, setNewPasswordVisible] =
-    React.useState<boolean>(false);
+
+  const [oldPasswordVisible, setOldPasswordVisible] = React.useState<boolean>(false);
+  const [newPasswordVisible, setNewPasswordVisible] = React.useState<boolean>(false);
   const [isEditMode, setisEditMode] = useState(false);
   const [verificationMode, setVerificationMode] = useState(false);
   const [isSending, setisSending] = useState(false);
 
-  const isLoading = useSelector(
-    (state: { user: UserState }) => state.user.fetchOne.loading,
-  );
+  const isLoading = useSelector((state: { user: UserState }) => state.user.fetchOne.loading);
   const dispatch = useDispatch();
   const getActivationCode = async () => {
     const type = await loadUserType();
@@ -45,15 +47,14 @@ const ChangePasswordScreen = () => {
       // password: values.password,
     };
     ChangePassword(body)
-      .then(response => {
-        console.log('response', response.data);
+      .then((response) => {
         Toast.show({
           type: 'success',
           position: 'top',
           text1: 'Verification Code sent successfully',
         });
       })
-      .catch(err => {
+      .catch((err) => {
         Toast.show({
           type: 'success',
           position: 'top',
@@ -73,7 +74,7 @@ const ChangePasswordScreen = () => {
     newPassword: yup
       .string()
       .min(8, ({ min }) => `Password must be at least ${min} characters`)
-      .oneOf([yup.ref('password')], 'Passwords don\'t match')
+      .oneOf([yup.ref('password')], "Passwords don't match")
       .required('Password is required'),
     verificationCode: yup.string(),
   });
@@ -87,7 +88,7 @@ const ChangePasswordScreen = () => {
       .string()
       .min(8, ({ min }) => `Password must be at least ${min} characters`)
       // todo there were null [yup.ref('password'), null
-      .oneOf([yup.ref('password')], 'Passwords don\'t match')
+      .oneOf([yup.ref('password')], "Passwords don't match")
       .required('Password is required'),
     verificationCode: yup
       .string()
@@ -125,8 +126,7 @@ const ChangePasswordScreen = () => {
   );
   const verifyActivationCode = async (resetPasswordObject: any) => {
     ResetPasswordVerify(resetPasswordObject)
-      .then(response => {
-        console.log('response', response);
+      .then((response) => {
         Toast.show({
           type: 'info',
           position: 'top',
@@ -136,14 +136,11 @@ const ChangePasswordScreen = () => {
         // @ts-ignore
         dispatch(LogoutStore.action());
       })
-      .catch(err => {
+      .catch((err) => {
         Toast.show({
           type: 'info',
           position: 'top',
-          text1:
-            err.status == 404
-              ? 'Invalid Verification code'
-              : `An error occured`,
+          text1: err.status == 404 ? 'Invalid Verification code' : `An error occured`,
         });
         console.log('err', err);
       })
@@ -157,17 +154,13 @@ const ChangePasswordScreen = () => {
       <AppHeader hideCalendar={true} hideCenterIcon={true} />
       {isLoading ? (
         <View style={styles.sppinerContainer}>
-          <View style={styles.sppinerContainer}>
-            {/* <Spinner status="primary" /> */}
-          </View>
+          <View style={styles.sppinerContainer}>{/* <Spinner status="primary" /> */}</View>
         </View>
       ) : (
         <ScrollView style={styles.container}>
           <View>
             <Formik
-              validationSchema={
-                showCodeField ? CodeValidationSchema : loginValidationSchema
-              }
+              validationSchema={showCodeField ? CodeValidationSchema : loginValidationSchema}
               validateOnMount={true}
               initialValues={{
                 oldPassword: '',
@@ -179,12 +172,12 @@ const ChangePasswordScreen = () => {
                 dispatch(ChangeModalState.action({ loading: true }));
                 if (!showCodeField) {
                   ResetPassword(values.oldPassword)
-                    .then(async res => {
+                    .then(async (res) => {
                       setShowField(true);
                       getActivationCode();
                       console.log('res', res);
                     })
-                    .catch(err => {
+                    .catch((err) => {
                       console.log('err', err);
                       Toast.show({
                         type: 'success',
@@ -232,17 +225,18 @@ const ChangePasswordScreen = () => {
                 //         setVerificationMode(true)
                 //     }).catch(err => console.log(err))
                 // }
-              }}>
+              }}
+            >
               {({
-                  handleChange,
-                  handleSubmit,
-                  handleBlur,
-                  setFieldValue,
-                  values,
-                  errors,
-                  touched,
-                  isValid,
-                }) => (
+                handleChange,
+                handleSubmit,
+                handleBlur,
+                setFieldValue,
+                values,
+                errors,
+                touched,
+                isValid,
+              }) => (
                 <>
                   {console.log('errors', errors)}
                   {isSending ? (
@@ -257,9 +251,7 @@ const ChangePasswordScreen = () => {
                           disabled={verificationMode}
                           autoCapitalize="none"
                           secureTextEntry={!oldPasswordVisible}
-                          label={evaProps => (
-                            <Text style={styles.inputLabels}>Old password</Text>
-                          )}
+                          label={(evaProps) => <Text style={styles.inputLabels}>Old password</Text>}
                           placeholder="Old password"
                           accessoryRight={renderOldPasswordIcon}
                           value={values.oldPassword}
@@ -267,9 +259,7 @@ const ChangePasswordScreen = () => {
                           onChangeText={handleChange('oldPassword')}
                         />
                         {errors.oldPassword && touched.oldPassword && (
-                          <Text style={styles.errorText}>
-                            {errors.oldPassword}
-                          </Text>
+                          <Text style={styles.errorText}>{errors.oldPassword}</Text>
                         )}
                       </View>
                       <View style={styles.inputSettings}>
@@ -278,9 +268,7 @@ const ChangePasswordScreen = () => {
                           disabled={verificationMode}
                           autoCapitalize="none"
                           secureTextEntry={!passwordVisible}
-                          label={evaProps => (
-                            <Text style={styles.inputLabels}>New password</Text>
-                          )}
+                          label={(evaProps) => <Text style={styles.inputLabels}>New password</Text>}
                           placeholder="New password"
                           accessoryRight={renderPasswordIcon}
                           value={values.password}
@@ -288,9 +276,7 @@ const ChangePasswordScreen = () => {
                           onChangeText={handleChange('password')}
                         />
                         {errors.password && touched.password && (
-                          <Text style={styles.errorText}>
-                            {errors.password}
-                          </Text>
+                          <Text style={styles.errorText}>{errors.password}</Text>
                         )}
                       </View>
                       <View style={styles.inputSettings}>
@@ -299,10 +285,8 @@ const ChangePasswordScreen = () => {
                           disabled={verificationMode}
                           autoCapitalize="none"
                           secureTextEntry={!newPasswordVisible}
-                          label={evaProps => (
-                            <Text style={styles.inputLabels}>
-                              Confirm new password
-                            </Text>
+                          label={(evaProps) => (
+                            <Text style={styles.inputLabels}>Confirm new password</Text>
                           )}
                           placeholder="Confirm new password"
                           accessoryRight={renderNewPasswordIcon}
@@ -311,9 +295,7 @@ const ChangePasswordScreen = () => {
                           onChangeText={handleChange('newPassword')}
                         />
                         {errors.newPassword && touched.newPassword && (
-                          <Text style={styles.errorText}>
-                            {errors.newPassword}
-                          </Text>
+                          <Text style={styles.errorText}>{errors.newPassword}</Text>
                         )}
                       </View>
 
@@ -322,10 +304,8 @@ const ChangePasswordScreen = () => {
                           <Input
                             textStyle={{ fontSize: 16 }}
                             autoCapitalize="none"
-                            label={evaProps => (
-                              <Text style={styles.inputLabels}>
-                                Verification Code
-                              </Text>
+                            label={(evaProps) => (
+                              <Text style={styles.inputLabels}>Verification Code</Text>
                             )}
                             style={styles.textInput}
                             placeholder="Verification Code"
@@ -333,12 +313,9 @@ const ChangePasswordScreen = () => {
                             onBlur={handleBlur('verificationCode')}
                             onChangeText={handleChange('verificationCode')}
                           />
-                          {errors.verificationCode &&
-                            touched.verificationCode && (
-                              <Text style={styles.errorText}>
-                                {errors.verificationCode}
-                              </Text>
-                            )}
+                          {errors.verificationCode && touched.verificationCode && (
+                            <Text style={styles.errorText}>{errors.verificationCode}</Text>
+                          )}
                         </View>
                       )}
                       {console.log('err', isValid)}
@@ -346,7 +323,8 @@ const ChangePasswordScreen = () => {
                         <View style={{ marginBottom: 10 }}>
                           <LinearGradientButton
                             disabled={isValid ? false : true}
-                            onPress={handleSubmit}>
+                            onPress={handleSubmit}
+                          >
                             Send Verification Code
                           </LinearGradientButton>
                         </View>
@@ -354,7 +332,8 @@ const ChangePasswordScreen = () => {
                       {showCodeField && (
                         <LinearGradientButton
                           // disabled={!isValid ? true : false}
-                          onPress={handleSubmit}>
+                          onPress={handleSubmit}
+                        >
                           Verify
                         </LinearGradientButton>
                       )}

@@ -45,7 +45,6 @@ const AddMembersInstructorScreen = () => {
   // const students = useSelector(
   //   (state: { students: AddMembersStudentsState }) => state.students?.students
   // );
-  console.log('group', group);
 
   const [askPermission, setAskPermission] = useState<boolean>(false);
   const [user, setUser] = useState<any>(null);
@@ -57,7 +56,6 @@ const AddMembersInstructorScreen = () => {
 
     GetInstructor(userId)
       .then((res) => {
-        console.log('res', res);
         setUser(res);
         FindInstructorBySchoolOrg({
           schoolId: res?.schoolId,
@@ -74,7 +72,7 @@ const AddMembersInstructorScreen = () => {
         console.log('Error:', err);
       });
   };
-  console.log('user', user);
+
   useEffect(() => {
     // loadUserDetails();
 
@@ -122,7 +120,6 @@ const AddMembersInstructorScreen = () => {
   };
 
   const handleSubmit = () => {
-    console.log('user', user);
     const data = {
       ...group,
 
@@ -152,7 +149,7 @@ const AddMembersInstructorScreen = () => {
         data['id'] = group?.isEdit?.groupId;
       }
       delete data['isEdit'];
-      console.log('989889', group?.isEdit);
+
       if (!group?.isEdit) {
         CreateGroup(data)
           .then(async (res) => {
@@ -161,8 +158,7 @@ const AddMembersInstructorScreen = () => {
               text2: 'Permission request has been sent to parents and invited instructors',
             });
 
-            console.log('group students', group);
-            const _students = group?.students?.map((item: any) => ({
+            const _students = students?.map((item: any) => ({
               firstName: item?.name?.split(' ')[0],
               lastName: item?.name?.split(' ')[1],
               parentEmail1: item?.parent1_email,

@@ -21,7 +21,6 @@ import {
 
 const RequestPermissionModal = () => {
   const [{ selectedActivity }, _dispatch]: any = useStateValue();
-  console.log('selectedActivity', selectedActivity);
 
   const dispatch = useDispatch();
   const [pageStudents, pageNumberStudents] = useState<number>(0);
@@ -102,7 +101,7 @@ const RequestPermissionModal = () => {
   const handleSubmit = async () => {
     try {
       let ids: any[] = [];
-      console.log('students', students);
+
       let filterStudents =
         students &&
         students?.map((item: any) => {
@@ -110,7 +109,7 @@ const RequestPermissionModal = () => {
             ids.push(item.studentId);
           }
         });
-      console.log('isntructors', instructors);
+
       let body = {
         activityId: selectedActivity.activityId,
         pendingStudents: ids,

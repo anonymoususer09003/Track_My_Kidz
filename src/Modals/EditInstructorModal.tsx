@@ -1,15 +1,15 @@
-import { Input, Text, Layout, Button } from "@ui-kitten/components";
-import Modal from "react-native-modal";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalState } from "@/Store/Modal";
-import React, { useState } from "react";
-import { StyleSheet, View, ScrollView } from "react-native";
-import ChangeModalState from "@/Store/Modal/ChangeModalState";
-import { Formik } from "formik";
-import * as yup from "yup";
-import Colors from "@/Theme/Colors";
-import { Instructor } from "@/Models/UserDTOs";
-import { SafeAreaView } from 'react-native'
+import { Input, Text, Layout, Button } from '@ui-kitten/components';
+import Modal from 'react-native-modal';
+import { useDispatch, useSelector } from 'react-redux';
+import { ModalState } from '@/Store/Modal';
+import React, { useState } from 'react';
+import { StyleSheet, View, ScrollView } from 'react-native';
+import ChangeModalState from '@/Store/Modal/ChangeModalState';
+import { Formik } from 'formik';
+import * as yup from 'yup';
+import Colors from '@/Theme/Colors';
+import { Instructor } from '@/Models/UserDTOs';
+import { SafeAreaView } from 'react-native';
 interface InstructorModal {
   instructors: Array<Instructor>;
   setInstructors: (data: Array<Instructor>) => void;
@@ -22,48 +22,42 @@ const EditInstructorFormModal = ({
   selectedInstructor,
 }: InstructorModal) => {
   const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.editInstructorFormModalVisibility
+    (state: { modal: ModalState }) => state.modal.editInstructorFormModalVisibility
   );
   const dispatch = useDispatch();
 
   const shoppingListValidationSchema = yup.object().shape({
-    firstName: yup.string().required("First name is required"),
-    lastName: yup.string().required("Last name is required"),
-    email: yup.string().required("Email is required"),
+    firstName: yup.string().required('First name is required'),
+    lastName: yup.string().required('Last name is required'),
+    email: yup.string().required('Email is required'),
   });
-  console.log("instructor", selectedInstructor);
+
   return (
     <Modal
       isVisible={isVisible}
       style={styles.modal}
       onBackdropPress={() => {
-        dispatch(
-          ChangeModalState.action({ editInstructorFormModalVisibility: false })
-        );
+        dispatch(ChangeModalState.action({ editInstructorFormModalVisibility: false }));
       }}
     >
- <View style={{height:'80%'}}>
+      <View style={{ height: '80%' }}>
         <ScrollView
           style={{
-            height:'50%',
+            height: '50%',
             backgroundColor: Colors.white,
-            marginHorizontal:20,
+            marginHorizontal: 20,
             padding: 20,
             borderRadius: 5,
-
           }}
         >
-          <Text style={[styles.heading, { textAlign: "center" }]}>
-            Edit Instructor Detail
-          </Text>
+          <Text style={[styles.heading, { textAlign: 'center' }]}>Edit Instructor Detail</Text>
           <Formik
             validationSchema={shoppingListValidationSchema}
             validateOnMount={true}
             initialValues={{
-              firstName: selectedInstructor.firstName || "",
-              lastName: selectedInstructor.lastName || "",
-              email: selectedInstructor.email || "",
+              firstName: selectedInstructor.firstName || '',
+              lastName: selectedInstructor.lastName || '',
+              email: selectedInstructor.email || '',
             }}
             onSubmit={(values, { resetForm }) => {
               const item = {
@@ -105,14 +99,14 @@ const EditInstructorFormModal = ({
                     value={values.firstName}
                     style={{ marginTop: 10 }}
                     placeholder="First Name"
-                    onChangeText={handleChange("firstName")}
+                    onChangeText={handleChange('firstName')}
                   />
                   <Text style={styles.heading}>Last Name</Text>
                   <Input
                     value={values.lastName}
                     style={{ marginTop: 10 }}
                     placeholder="Last Name"
-                    onChangeText={handleChange("lastName")}
+                    onChangeText={handleChange('lastName')}
                   />
                   <Text style={styles.heading}>Email</Text>
                   <Input
@@ -122,12 +116,10 @@ const EditInstructorFormModal = ({
                     keyboardType="email-address"
                     autoCapitalize="none"
                     autoCorrect={false}
-                    onChangeText={handleChange("email")}
+                    onChangeText={handleChange('email')}
                   />
                 </Layout>
-                <View
-                  style={{ marginTop: 40, width: "100%", alignItems: "center" }}
-                >
+                <View style={{ marginTop: 40, width: '100%', alignItems: 'center' }}>
                   {/* <Button
                                         style={styles.modalButton}
                                         size="small"
@@ -173,8 +165,7 @@ const EditInstructorFormModal = ({
             )}
           </Formik>
         </ScrollView>
-        </View>
-
+      </View>
     </Modal>
   );
 };
@@ -182,8 +173,8 @@ export default EditInstructorFormModal;
 
 const styles = StyleSheet.create({
   modal: {
-    margin:0,
-    width: "100%",
+    margin: 0,
+    width: '100%',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     // height: 300,
     // elevation: 5,
@@ -211,38 +202,38 @@ const styles = StyleSheet.create({
     marginTop: 35,
   },
   container: {
-    width: "100%",
+    width: '100%',
     marginTop: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   heading: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginTop: 10,
   },
   item: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "30%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '30%',
   },
   modalButton: {
-    width: "95%",
+    width: '95%',
     marginTop: 10,
   },
   selectInput: {
     marginTop: 10,
   },
   mainAsset: {
-    alignItems: "center",
+    alignItems: 'center',
     height: 300,
-    width: "100%",
+    width: '100%',
     flex: 3,
   },
   mainContent: {
@@ -251,45 +242,45 @@ const styles = StyleSheet.create({
   textContent: {
     fontSize: 16,
     padding: 10,
-    width: "100%",
+    width: '100%',
     borderBottomColor: Colors.lightgray,
     borderBottomWidth: 1,
   },
   extraImages: {
     flex: 1,
-    flexDirection: "row",
-    width: "100%",
+    flexDirection: 'row',
+    width: '100%',
     height: 100,
   },
   centerItems: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   errorText: {
     fontSize: 10,
-    color: "red",
+    color: 'red',
   },
   formView: {
     flex: 9,
   },
   bottomView: {
-    width: "100%",
-    flexDirection: "row",
-    position: "absolute",
-    justifyContent: "center",
+    width: '100%',
+    flexDirection: 'row',
+    position: 'absolute',
+    justifyContent: 'center',
     backgroundColor: Colors.transparent,
     bottom: 0,
     height: 50,
   },
   linearBottom: {
-    width: "100%",
+    width: '100%',
 
     height: 50,
   },
   createPostButton: {
     margin: 3,
-    width: "50%",
+    width: '50%',
 
     height: 50,
     right: 0,
@@ -299,14 +290,14 @@ const styles = StyleSheet.create({
   },
   ghostButton: {
     margin: 8,
-    width: "100%",
-    alignSelf: "center",
+    width: '100%',
+    alignSelf: 'center',
   },
   buttonSettings: {
     marginTop: 20,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
 
   formContainer: {
@@ -320,28 +311,28 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   backgroundButton: {
-    width: "80%",
+    width: '80%',
     borderRadius: 10,
     paddingBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     backgroundColor: Colors.primary,
   },
   sppinerContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sent: {
     fontSize: 16,
     marginLeft: 10,
     marginTop: 10,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.gray,
-    textAlign: "center",
+    textAlign: 'center',
   },
   selectSettings: {
     marginTop: 18,

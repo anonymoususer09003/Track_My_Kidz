@@ -1,7 +1,15 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { RouteProp, useIsFocused, useNavigation } from '@react-navigation/native';
 import { Icon, Text } from '@ui-kitten/components';
-import { ActivityIndicator, Alert, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import setHeaderParams from '@/Store/header/setHeaderParams';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useStateValue } from '@/Context/state/State';
@@ -12,13 +20,28 @@ import Colors from '@/Theme/Colors';
 import Entypo from 'react-native-vector-icons/Entypo';
 import ChangeUserState from '@/Store/User/FetchOne';
 import { actions } from '@/Context/state/Reducer';
-import { InstructionsModal, RequestPermissionModalGroups, ShowStudentsInstructorsGroupModal } from '@/Modals';
+import {
+  InstructionsModal,
+  RequestPermissionModalGroups,
+  ShowStudentsInstructorsGroupModal,
+} from '@/Modals';
 import { AppHeader } from '@/Components';
 import SetChatParam from '@/Store/chat/SetChatParams';
 import ChangeNavigationCustomState from '@/Store/Navigation/ChangeNavigationCustomState';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { DeleteGroup, FindGroupsByName, GetAllGroup, GetgroupByUserId, GetGroupCount } from '@/Services/Group';
-import { getHomeScreenCacheInfo, loadId, loadUserId, storeHomeScreenCacheInfo } from '@/Storage/MainAppStorage';
+import {
+  DeleteGroup,
+  FindGroupsByName,
+  GetAllGroup,
+  GetgroupByUserId,
+  GetGroupCount,
+} from '@/Services/Group';
+import {
+  getHomeScreenCacheInfo,
+  loadId,
+  loadUserId,
+  storeHomeScreenCacheInfo,
+} from '@/Storage/MainAppStorage';
 import GetGroupByInstructor from '@/Services/Group/GetGroupByInstructor';
 import { useDebouncedEffect } from '@/Utils/Hooks';
 import { FindInstructorBySchoolOrg, GetInstructor } from '@/Services/Instructor';
@@ -41,9 +64,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
   const isFocused = useIsFocused();
   // const swipeableRef = useRef(null);
   const [user, setUser] = useState<any>(null);
-  const currentUser: any = useSelector(
-    (state: { user: UserState }) => state.user.item,
-  );
+  const currentUser: any = useSelector((state: { user: UserState }) => state.user.item);
   const abortControllerRef = useRef(new AbortController());
 
   // let signal = {
@@ -53,9 +74,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
   const source = cancelToken.source();
   const [, _dispatch]: any = useStateValue();
   const dispatch = useDispatch();
-  const searchBarValue = useSelector(
-    (state: any) => state.header.searchBarValue,
-  );
+  const searchBarValue = useSelector((state: any) => state.header.searchBarValue);
   const dropDownValue = useSelector((state: any) => state.header.dropDownValue);
   const [initialize, setInitialize] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -68,23 +87,21 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
   const [groups, setGroups] = useState<any[]>([]);
   // const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedInstructions, setSelectedInstructions] = useState<any>(null);
-  const instructors = route.params.instructors;
+  const instructors = route?.params?.instructors;
   const [selectedInstructor, setSelectedInstructor] = useState<any>(null);
   const [selectedInstructorGroup, setSelectedInstructorGroup] = useState<any>(null);
   const [page, pageNumber] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [groupCount, setGroupCount] = useState<any>({});
-  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] =
-    useState<boolean>(false);
+  const [showStudentsInstructorsModal, setShowStudentsInstructorsModal] = useState<boolean>(false);
   const [selectionData, setSelectionData] = useState<any>({
     type: 'student',
     status: 'pending',
     group: null,
   });
   const isVisible = useSelector(
-    (state: { modal: ModalState }) =>
-      state.modal.requestPermissionModalGroupVisibility,
+    (state: { modal: ModalState }) => state.modal.requestPermissionModalGroupVisibility
   );
   let prevOpenedRow: any;
   let row: Array<any> = [];
@@ -107,10 +124,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
         pageNumber(refreshing ? page + 1 : 1);
         setTotalRecords(res.totalRecords);
         if (page == 0) {
-          storeHomeScreenCacheInfo(
-            'instructor_groups',
-            JSON.stringify(res?.result),
-          );
+          storeHomeScreenCacheInfo('instructor_groups', JSON.stringify(res?.result));
         }
         if (refreshing) {
           setGroups([...groups, ...res?.result]);
@@ -142,10 +156,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
         setRefreshing(false);
         setPageSize(10);
         if (page == 0) {
-          storeHomeScreenCacheInfo(
-            'instructor_groups',
-            JSON.stringify(res?.result),
-          );
+          storeHomeScreenCacheInfo('instructor_groups', JSON.stringify(res?.result));
         }
         pageNumber(refreshing ? page + 1 : 1);
         if (refreshing) {
@@ -169,7 +180,6 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
       .catch((err) => console.log('getGroupByInstructor'));
   };
 
-
   const findInstructorBySchoolId = async (res: any) => {
     try {
       let instructorsList = await FindInstructorBySchoolOrg(
@@ -181,7 +191,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
         },
         {
           cancelToken: source.token,
-        },
+        }
         // {
         //   signal: abortControllerRef.current.signal,
         // }
@@ -201,7 +211,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
 
   const getInstructor = async () => {
     const userId = await loadUserId();
-    console.log('instructor------------------', userId);
+
     if (!userId) return;
     try {
       if (Object.keys(currentUser).length == 0) {
@@ -210,14 +220,14 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
           ChangeUserState.action({
             item: res,
             fetchOne: { loading: false, error: null },
-          }),
+          })
         );
         _dispatch({
           type: actions.INSTRUCTOR_DETAIL,
           payload: res,
         });
         setUser(res);
-        console.log('res', res.isAdmin);
+
         if (res?.isAdmin) {
           await getGroups();
           findInstructorBySchoolId(res);
@@ -231,7 +241,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
         });
         setUser(currentUser);
         setUser(currentUser);
-        console.log('currentUser', currentUser.isAdmin);
+
         if (currentUser?.isAdmin) {
           getGroups();
           findInstructorBySchoolId(currentUser);
@@ -304,7 +314,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
               dispatch(
                 ChangeModalState.action({
                   requestPermissionModalGroupVisibility: true,
-                }),
+                })
               );
               setSelectedActivity(item);
             }}
@@ -324,8 +334,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
                 type: actions.SET_SELECTED_GROUP,
                 payload: item?.groupId,
               });
-             navigation.navigate('GroupScehdule',{  groupId: item?.groupId,})
-
+              navigation.navigate('GroupScehdule', { groupId: item?.groupId });
             }}
           >
             <FontAwesome5 size={25} name="calendar" color={Colors.primary} />
@@ -343,11 +352,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
               });
             }}
           >
-            <MaterialCommunity
-              size={25}
-              color={Colors.primary}
-              name="timetable"
-            />
+            <MaterialCommunity size={25} color={Colors.primary} name="timetable" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -362,11 +367,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
               justifyContent: 'center',
             }}
           >
-            <Icon
-              style={{ width: 25, height: 25 }}
-              fill={Colors.primary}
-              name="edit-2"
-            />
+            <Icon style={{ width: 25, height: 25 }} fill={Colors.primary} name="edit-2" />
           </TouchableOpacity>
           {/* <TouchableOpacity
               style={{
@@ -397,12 +398,12 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
                   avatar: user?.imageurl,
                   name: user?.firstname
                     ? user?.firstname[0].toUpperCase() +
-                    user?.firstname.slice(1) +
-                    ' ' +
-                    user?.lastname[0]?.toUpperCase()
+                      user?.firstname.slice(1) +
+                      ' ' +
+                      user?.lastname[0]?.toUpperCase()
                     : user?.firstname + ' ' + user?.lastname,
                 },
-              }),
+              })
             );
             navigation.navigate('InstructorChatNavigator', {
               title: item?.groupName,
@@ -441,11 +442,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
                   })
               }
             >
-              <Icon
-                style={{ width: 30, height: 30 }}
-                fill={Colors.primary}
-                name="trash"
-              />
+              <Icon style={{ width: 30, height: 30 }} fill={Colors.primary} name="trash" />
             </TouchableOpacity>
           </View>
         )}
@@ -463,7 +460,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
     dispatch(
       ChangeNavigationCustomState.action({
         navigationLeftDrawer: null,
-      }),
+      })
     );
     setInitialize(true);
     getCacheGroups();
@@ -487,10 +484,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
 
   useDebouncedEffect(
     () => {
-      if (
-        searchParam &&
-        (searchParam.length === 0 || searchParam.length > 3)
-      ) {
+      if (searchParam && (searchParam.length === 0 || searchParam.length > 3)) {
         search();
       } else if (searchParam == '' && initialize) {
         if (user?.isAdmin) {
@@ -501,7 +495,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
       }
     },
     [searchParam],
-    50,
+    50
   );
 
   const search = (text: string = '') => {
@@ -537,7 +531,6 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
 
   const renderIcon = (props: any) => <Icon {...props} name={'search'} />;
   const closeRow = (index: number) => {
-    console.log(index);
     if (prevOpenedRow && prevOpenedRow !== row[index]) {
       prevOpenedRow?.close();
     }
@@ -566,10 +559,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
         });
         getGroupCountApi(temp);
         // getGroupCountApi(temp);
-      } else if (
-        selectedInstructorGroup &&
-        selectedInstructorGroup?.length > 0
-      ) {
+      } else if (selectedInstructorGroup && selectedInstructorGroup?.length > 0) {
         selectedInstructorGroup?.forEach(async (element: any) => {
           temp.push(element.groupId);
         });
@@ -586,7 +576,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
         setHeaderParams.action({
           selectedDropDownOption: '',
           searchBarValue: '',
-        }),
+        })
       );
     }
     return () => source.cancel('axios request cancelled');
@@ -601,13 +591,11 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
       } else {
         setSelectedInstructor(
           instructors?.result[dropDownValue.row - 1]?.firstname +
-          ' ' +
-          instructors?.result[dropDownValue.row - 1]?.lastname,
+            ' ' +
+            instructors?.result[dropDownValue.row - 1]?.lastname
         );
 
-        getGroupByInstructor(
-          instructors?.result[dropDownValue.row]?.instructorId,
-        );
+        getGroupByInstructor(instructors?.result[dropDownValue.row]?.instructorId);
       }
     }
   }, [dropDownValue]);
@@ -650,9 +638,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
           </Text>
         )}
         <FlatList
-          data={
-            selectedInstructorGroup ? selectedInstructorGroup : groups || []
-          }
+          data={selectedInstructorGroup ? selectedInstructorGroup : groups || []}
           style={{
             padding: 10,
             width: '100%',
@@ -661,9 +647,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
           }}
           renderItem={({ item, index }) => {
             let temp: any[] = [];
-            let instructor = item?.instructors?.map((item: any) =>
-              temp.push(item?.firstName),
-            );
+            let instructor = item?.instructors?.map((item: any) => temp.push(item?.firstName));
             return (
               <Swipeable
                 ref={(ref) => (row[index] = ref)}
@@ -719,8 +703,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
                           }}
                         >
                           <Text style={styles.footerText}>{`${
-                            groupCount[item.groupId]?.countApprovedStudents ||
-                            '0'
+                            groupCount[item.groupId]?.countApprovedStudents || '0'
                           }`}</Text>
                           <Entypo
                             name="book"
@@ -741,13 +724,9 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
                           }}
                         >
                           <Text style={styles.text}>
-                            {groupCount[item.groupId]
-                              ?.countApprovedInstructors || '0'}
+                            {groupCount[item.groupId]?.countApprovedInstructors || '0'}
                           </Text>
-                          <Image
-                            source={instructorImage}
-                            style={styles.iconImages}
-                          />
+                          <Image source={instructorImage} style={styles.iconImages} />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -767,8 +746,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
                           }}
                         >
                           <Text style={styles.text}>{`${
-                            groupCount[item.groupId]?.countDeclinedStudents ||
-                            '0'
+                            groupCount[item.groupId]?.countDeclinedStudents || '0'
                           }`}</Text>
                           <Entypo
                             name="book"
@@ -789,13 +767,9 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
                           }}
                         >
                           <Text style={styles.text}>
-                            {groupCount[item.groupId]
-                              ?.countDeclinedInstructors || '0'}
+                            {groupCount[item.groupId]?.countDeclinedInstructors || '0'}
                           </Text>
-                          <Image
-                            source={instructorImage}
-                            style={styles.iconImages}
-                          />
+                          <Image source={instructorImage} style={styles.iconImages} />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -815,10 +789,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
                           style={styles.horizontal}
                         >
                           <Text style={styles.text}>
-                            {`${
-                              groupCount[item.groupId]?.countPendingStudents ||
-                              '0'
-                            }`}
+                            {`${groupCount[item.groupId]?.countPendingStudents || '0'}`}
                           </Text>
                           <Entypo
                             name="book"
@@ -839,14 +810,10 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
                           }}
                         >
                           <Text style={styles.text}>
-                            {groupCount[item.groupId]
-                              ?.countPendingInstructors || '0'}
+                            {groupCount[item.groupId]?.countPendingInstructors || '0'}
                             {/* {item.countPendingInstructors || `0`} */}
                           </Text>
-                          <Image
-                            source={instructorImage}
-                            style={styles.iconImages}
-                          />
+                          <Image source={instructorImage} style={styles.iconImages} />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -859,7 +826,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
                       dispatch(
                         ChangeModalState.action({
                           instructionsModalVisibility: true,
-                        }),
+                        })
                       );
                     }}
                     style={{ width: '100%', alignItems: 'center' }}
@@ -882,9 +849,7 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
           onEndReached={async () => {
             // console.log("logs", originalActivities.result.length);
 
-            console.log('logs', totalRecords);
             if (totalRecords > groups.length) {
-              console.log('logs');
               const userId = await loadUserId();
               user?.isAdmin ? getGroups(true) : getGroupsByUserId(userId);
             }
@@ -892,13 +857,11 @@ const InstructorGroupScreen: FC<InstructorGroupScreenProps> = ({ route }) => {
           refreshing={false}
           onRefresh={() => null}
         />
-        {refreshing && (
-          <ActivityIndicator size="large" color={Colors.primary} />
-        )}
+        {refreshing && <ActivityIndicator size="large" color={Colors.primary} />}
       </View>
 
       <AppHeader
-      hideCalendar={true}
+        hideCalendar={true}
         onAddPress={() => {
           navigation.navigate('CreateGroup');
         }}

@@ -17,17 +17,16 @@ const user_types = [
   { id: 2, label: 'Instructor', value: 'Instructor' },
   { id: 3, label: 'Student', value: 'Student' },
 ];
-interface EmailConfirmationScreenProps{
- route: any
- navigation: any
+interface EmailConfirmationScreenProps {
+  route: any;
+  navigation: any;
 }
 
 const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenProps) => {
   const styles = useStyleSheet(themedStyles);
   const [resendCode, setResendCode] = useState(false);
-  const { emailAddress, user_type, activation_code, student, isDesignatedAdmin } =
-    route.params;
-  console.log('email address', emailAddress);
+  const { emailAddress, user_type, activation_code, student, isDesignatedAdmin } = route.params;
+
   const [activationCode, setActivationCode] = useState(activation_code);
   const { reactivate } = route.params;
 
@@ -48,7 +47,7 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
     if (emailAddress) {
       let res = await GetActivationCode({ email: emailAddress }, user_type);
       setResendCode(true);
-      console.log('res----', res);
+
       setActivationCode(res.activation_code);
     }
   };
@@ -66,7 +65,7 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
         activationCode: code,
         message: emailAddress,
       });
-      console.log('res', res.data);
+
       return true;
     } catch (err) {
       console.log('err', err);
@@ -81,10 +80,11 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
 
   return (
     <BackgroundLayout>
-      <KeyboardAwareScrollView             
-            enableOnAndroid={true}
-            keyboardShouldPersistTaps="handled"
-    style={styles.container}>
+      <KeyboardAwareScrollView
+        enableOnAndroid={true}
+        keyboardShouldPersistTaps="handled"
+        style={styles.container}
+      >
         <View style={styles.headerContainer}>
           <Image
             style={{
@@ -102,13 +102,10 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
 
         <Formik
           validationSchema={
-            user_type == 'Student'
-              ? codeValidationSchemaStudents
-              : codeValidationSchema
+            user_type == 'Student' ? codeValidationSchemaStudents : codeValidationSchema
           }
           initialValues={{
-            code:
-              user_type == 'Student' && activationCode ? activationCode : '',
+            code: user_type == 'Student' && activationCode ? activationCode : '',
           }}
           validateOnMount={true}
           onSubmit={async (values, { resetForm }) => {
@@ -118,7 +115,6 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
 
             if (isDesignatedAdmin) {
               if (res) {
-                console.log('EmailConfirmationScreen.tsx line 118 navigation to FinalOrgRegistrationScreen');
                 navigation.navigate('FinalOrgRegistrationScreen', {
                   emailAddress: emailAddress,
                   registrationId: 'test',
@@ -131,13 +127,13 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
               if (!reactivate) {
                 if (res) {
                   navigation &&
-                  navigation.navigate('FinalRegistrationScreen', {
-                    emailAddress: emailAddress,
-                    registrationId: 'test',
-                    user_type: user_type,
-                    activation_code: values.code,
-                    student: student,
-                  });
+                    navigation.navigate('FinalRegistrationScreen', {
+                      emailAddress: emailAddress,
+                      registrationId: 'test',
+                      user_type: user_type,
+                      activation_code: values.code,
+                      student: student,
+                    });
                 }
               } else {
                 // let object = {
@@ -147,17 +143,18 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
               }
               resetForm();
             }
-          }}>
+          }}
+        >
           {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              setFieldValue,
-              values,
-              errors,
-              touched,
-              isValid,
-            }) => (
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            setFieldValue,
+            values,
+            errors,
+            touched,
+            isValid,
+          }) => (
             <>
               <Layout style={styles.formContainer}>
                 <View style={{ marginTop: 80, marginBottom: 30 }}>
@@ -166,7 +163,6 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
                     placeholder="Select User"
                     value={user_type}
                     onSelect={(index: any) => {
-                      console.log('index', index);
                       setFieldValue('user_type', user_type[index].value).catch(console.error);
                     }}
                     dropDownList={user_types}
@@ -192,7 +188,8 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
                   style={[
                     styles.errorText,
                     { textAlign: 'center', fontSize: 15, marginBottom: 10 },
-                  ]}>
+                  ]}
+                >
                   Check email for activation code
                 </Text>
                 <LinearGradientButton
@@ -200,7 +197,8 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
                   style={styles.signUpButton}
                   size="medium"
                   onPress={handleSubmit}
-                  disabled={!isValid || values.code.length === 0}>
+                  disabled={!isValid || values.code.length === 0}
+                >
                   Confirm
                 </LinearGradientButton>
               </Layout>
@@ -209,33 +207,20 @@ const EmailConfirmationScreen = ({ route, navigation }: EmailConfirmationScreenP
         </Formik>
 
         {resendCode && (
-          <Text
-            style={[styles.buttonMessage, { textAlign: 'center', color: 'red' }]}>
+          <Text style={[styles.buttonMessage, { textAlign: 'center', color: 'red' }]}>
             {' '}
             Check email for activation code*
           </Text>
         )}
         <View style={styles.bottomView}>
-          <Button
-            appearance="ghost"
-            status="basic"
-            size="medium"
-            onPress={openLogin}>
+          <Button appearance="ghost" status="basic" size="medium" onPress={openLogin}>
             {() => <Text style={styles.buttonMessage}> Login </Text>}
           </Button>
-          <Button
-            appearance="ghost"
-            status="basic"
-            size="medium"
-            onPress={openSignUp}>
+          <Button appearance="ghost" status="basic" size="medium" onPress={openSignUp}>
             {() => <Text style={styles.buttonMessage}> Register </Text>}
           </Button>
           {emailAddress.length > 0 && (
-            <Button
-              appearance="ghost"
-              status="basic"
-              size="medium"
-              onPress={onResendButtonPress}>
+            <Button appearance="ghost" status="basic" size="medium" onPress={onResendButtonPress}>
               {() => <Text style={styles.buttonMessage}> Resend Code </Text>}
             </Button>
           )}

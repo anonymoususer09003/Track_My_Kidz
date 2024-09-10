@@ -14,16 +14,15 @@ type ViewBusInformationProps = {
   numberOfKidsInRow: number;
   busName: string;
   numberOfSeatsPerRow: number;
-}
-const ViewBusInformation: FC<ViewBusInformationProps> = (
-  {
-    isLongSeat,
-    numberOfKidsLongSeat,
-    numberOfRows,
-    numberOfKidsInRow,
-    numberOfSeatsPerRow,
-    busName,
-  }) => {
+};
+const ViewBusInformation: FC<ViewBusInformationProps> = ({
+  isLongSeat,
+  numberOfKidsLongSeat,
+  numberOfRows,
+  numberOfKidsInRow,
+  numberOfSeatsPerRow,
+  busName,
+}) => {
   // const deviceWidth = Dimensions.get('screen').width;
   const dispatch = useDispatch();
   // const navigation = useNavigation();
@@ -32,7 +31,7 @@ const ViewBusInformation: FC<ViewBusInformationProps> = (
   // const currentUser = useSelector(
   //   (state: { user: UserState }) => state.user.item,
   // );
-  console.log('currentUser00000000000000000000000', numberOfKidsLongSeat);
+
   const getRearSeats = () => {
     const data = [];
     for (let i = 0; i < numberOfKidsLongSeat; i++) {
@@ -43,7 +42,7 @@ const ViewBusInformation: FC<ViewBusInformationProps> = (
 
   const getSeats = () => {
     const data = [];
-    console.log(numberOfKidsInRow, numberOfSeatsPerRow);
+
     const rowsInSeat = numberOfKidsInRow * numberOfSeatsPerRow;
     for (let i = 0; i < numberOfRows; i++) {
       const innerData = [];
@@ -52,12 +51,12 @@ const ViewBusInformation: FC<ViewBusInformationProps> = (
       }
       data.push(innerData);
     }
-    console.log(data);
+
     setSeats(data);
   };
 
   const isVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.viewBusInformationModal,
+    (state: { modal: ModalState }) => state.modal.viewBusInformationModal
   );
 
   useEffect(() => {
@@ -77,21 +76,21 @@ const ViewBusInformation: FC<ViewBusInformationProps> = (
         dispatch(
           ChangeModalState.action({
             viewBusInformationModal: false,
-          }),
+          })
         );
       }}
       onBackdropPress={() => {
         dispatch(
           ChangeModalState.action({
             viewBusInformationModal: false,
-          }),
+          })
         );
       }}
       onBackButtonPress={() => {
         dispatch(
           ChangeModalState.action({
             viewBusInformationModal: false,
-          }),
+          })
         );
       }}
     >
@@ -163,8 +162,7 @@ const ViewBusInformation: FC<ViewBusInformationProps> = (
                                 width: 40,
                                 height: 40,
                                 borderRadius: 10,
-                                backgroundColor:
-                                Colors.textInputBackgroundColor,
+                                backgroundColor: Colors.textInputBackgroundColor,
                               }}
                             ></View>
                           ))}
@@ -220,10 +218,12 @@ const ViewBusInformation: FC<ViewBusInformationProps> = (
                     {''}
                   </CheckBox>
                 </View> */}
-               {numberOfKidsLongSeat&& <View style={styles.horizonatal}>
-                  <Text style={styles.label}>Number of kids long seat:</Text>
-                  <Text style={styles.textLabel}>{numberOfKidsLongSeat}</Text>
-                </View>}
+                {numberOfKidsLongSeat && (
+                  <View style={styles.horizonatal}>
+                    <Text style={styles.label}>Number of kids long seat:</Text>
+                    <Text style={styles.textLabel}>{numberOfKidsLongSeat}</Text>
+                  </View>
+                )}
               </View>
               <View style={{ height: 70 }} />
             </ScrollView>
@@ -245,7 +245,7 @@ const ViewBusInformation: FC<ViewBusInformationProps> = (
                     dispatch(
                       ChangeModalState.action({
                         viewBusInformationModal: false,
-                      }),
+                      })
                     );
                   }}
                 >

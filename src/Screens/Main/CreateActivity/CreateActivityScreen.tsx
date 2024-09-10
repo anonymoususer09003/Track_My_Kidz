@@ -1153,8 +1153,6 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                               placeholder="Time"
                               dropDownList={timeStamp}
                               onSelect={(name: any) => {
-                                console.log('name----00', name);
-
                                 setFieldValue('toTime', name);
                               }}
                             />
@@ -1333,7 +1331,6 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                             onChange={(checked) => {
                               setFieldValue('noEnd', checked);
 
-                              console.log('checked', checked);
                               // if (checked) {
                               //   Alert.alert(checked);
                               // } else {
@@ -1435,7 +1432,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                               setFieldValue('fromCity', '');
                               setFieldValue('fromZipCode', '');
                             }
-                            console.log('checked', checked);
+
                             // if (checked) {
                             //   Alert.alert(checked);
                             // } else {
@@ -1503,7 +1500,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
 
                         onSelect={(query) => {
                           const selectedCountry = query;
-                          console.log('000000', selectedCountry.name);
+
                           setFieldValue('fromCountry', selectedCountry.name);
                           setFieldValue('selectedCountry', selectedCountry.name);
                           setFieldValue('fromSelectedState', '');
@@ -1618,7 +1615,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
                                   setFieldValue('city', '');
                                   setFieldValue('zipCode', '');
                                 }
-                                console.log('checked', checked);
+
                                 // if (checked) {
                                 //   Alert.alert(checked);
                                 // } else {
@@ -1666,7 +1663,7 @@ const CreateActivityScreen: FC<CreateActivityScreenProps> = ({ route }) => {
 
                             onSelect={(query) => {
                               const selectedCountry = query;
-                              console.log('000000', selectedCountry.name);
+
                               setFieldValue('country', selectedCountry.name);
                               setFieldValue('selectedCountry', selectedCountry.name);
                               setFieldValue('toSelectedState', '');

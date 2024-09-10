@@ -51,7 +51,6 @@ const PaymentInformationScreen = ({ navigation }) => {
 
     cardDetail ? updateCardInfo({ ...cardDetail, ...body }) : saveCardInfo(body);
     // setPayment(paymentIntent);
-    // console.log("paymentIntent", paymentIntent);
   };
   // useEffect(() => {
   //   setPayment(false);

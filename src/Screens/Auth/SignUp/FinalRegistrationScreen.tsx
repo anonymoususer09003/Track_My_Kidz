@@ -261,7 +261,6 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
     };
     GetOrgByFilters(query)
       .then((res) => {
-        console.log('res', res);
         // const _data = {
         //   schoolId: 0,
         //   name: 'Other',
@@ -350,9 +349,9 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
         activationCode: user?.referenceCode,
         term: null,
       };
-      console.log('data000000', data);
+
       let res = await UpdateUser({ ...data, isSubscribed: true }, 'parent');
-      console.log('res', res);
+
       await storeIsSubscribed(true);
     } catch (err) {
       console.log('err', err);
@@ -539,8 +538,6 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
 
                         // setLoginObj(obj);
                         if (response.status == 201) {
-                          console.log(emailAddress);
-                          console.log(values.password);
                           await updateUser(response?.data);
                           let res = await Login(
                             {
@@ -943,18 +940,10 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
 
                 Register(registerObject, 'instructor')
                   .then(async (res) => {
-                    console.log(
-                      'FinalRegistrationScreen.tsx line 916 Register(registerObject, instructor) res?.data ---',
-                      res?.data
-                    );
                     await storeToken(res?.data?.token);
-                    console.log(
-                      'FinalRegistrationScreen.tsx line 918  formData',
-                      JSON.stringify(formData)
-                    );
+
                     CompleteRegistration(formData, 'instructor')
                       .then(async (response: any) => {
-                        console.log('responsefromback', response);
                         await Login(loginObject, user_type.toLowerCase());
                         dispatch(
                           // todo not a priority
@@ -1394,8 +1383,6 @@ const FinalRegistrationScreen: FC<FinalRegistrationScreenProps> = ({ navigation,
 
                 Register(registerObject, 'student')
                   .then(async (response) => {
-                    console.log('response--', response.data);
-
                     await Login(loginObject, user_type.toLowerCase());
                     dispatch(
                       // todo not a priority

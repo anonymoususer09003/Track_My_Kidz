@@ -13,24 +13,19 @@ import { useDispatch, useSelector } from 'react-redux';
 // @refresh reset
 
 type ActivityNavigatorPramList = {
-  ActivityInner: undefined
-  Group: undefined
-}
+  ActivityInner: undefined;
+  Group: undefined;
+};
 
 const ActivityNavigator = () => {
   const TabNavigator = createMaterialTopTabNavigator<ActivityNavigatorPramList>();
   const tabNames = ['Activity', 'Group'];
   const dispatch = useDispatch();
 
-  const [selectedMonth, setSelectedMonth] = useState(
-    moment(new Date()).month(),
-  );
+  const [selectedMonth, setSelectedMonth] = useState(moment(new Date()).month());
   const [selectedDay, setSelectedDay] = useState(moment().format('D'));
 
-  const isCalendarVisible = useSelector(
-    (state: { modal: ModalState }) => state.modal.showCalendar,
-  );
-
+  const isCalendarVisible = useSelector((state: { modal: ModalState }) => state.modal.showCalendar);
 
   // const [{ childName }]: any = useStateValue();
   //@ts-ignore
@@ -45,10 +40,7 @@ const ActivityNavigator = () => {
         if (state.index == index) {
           return (
             <View key={index} style={styles.background}>
-              <LinearGradientButton
-                onPress={() => null}
-                textStyle={{ fontSize: 14 }}
-              >
+              <LinearGradientButton onPress={() => null} textStyle={{ fontSize: 14 }}>
                 {tabName}
               </LinearGradientButton>
             </View>
@@ -80,13 +72,11 @@ const ActivityNavigator = () => {
           selectedMonthForFilter: moment().subtract(1, 'M').format('M'),
           // @ts-ignore
           selectedDayForFilter: moment().format('DD'),
-        }),
+        })
       );
     }
   }, [isCalendarVisible]);
 
-
-  console.log('isCalendarVisible', isCalendarVisible);
   return (
     <BackgroundLayout title="Event Information" rightIcon={true}>
       {isCalendarVisible && (
@@ -99,17 +89,16 @@ const ActivityNavigator = () => {
               ChangeInstructorActivityState.action({
                 // @ts-ignore
                 selectedMonthForFilter: value,
-              }),
+              })
             );
           }}
           selectedDay={parseInt(selectedDay)}
           setSelectedDay={(value: any) => {
-            console.log('value', value);
             setSelectedDay(value);
             dispatch(
               ChangeInstructorActivityState.action({
                 selectedDayForFilter: value,
-              }),
+              })
             );
           }}
         />
@@ -123,11 +112,7 @@ const ActivityNavigator = () => {
           options={{ title: 'Activity' }}
           component={ActivityScreen}
         />
-        <TabNavigator.Screen
-          name="Group"
-          options={{ title: 'Groups' }}
-          component={GroupScreen}
-        />
+        <TabNavigator.Screen name="Group" options={{ title: 'Groups' }} component={GroupScreen} />
       </TabNavigator.Navigator>
     </BackgroundLayout>
   );

@@ -110,8 +110,6 @@ const PersonalProfileScreen = () => {
   //   </TouchableWithoutFeedback>
   // );
 
-  console.log('user', user);
-
   const updateProfilePic = async (image: any) => {
     let formData = new FormData();
     formData.append('image', {
@@ -145,8 +143,6 @@ const PersonalProfileScreen = () => {
     //   state: values.state,
     //   city: values.city,
     // };
-
-    console.log('form daata', formData);
 
     UpdateStudent(formData)
       .then(async (response: any) => {

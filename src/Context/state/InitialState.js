@@ -11,4 +11,5 @@ export const initialState = {
   orgInstructors: {},
   toggle: false,
   thumbnail: false,
+  childrens: [],
 };

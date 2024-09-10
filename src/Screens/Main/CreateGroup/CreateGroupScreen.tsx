@@ -17,13 +17,13 @@ import { GetGroup, GetOptInGroup } from '@/Services/Group';
 import { MainStackNavigatorParamsList } from '@/Navigators/Main/RightDrawerNavigator';
 
 type CreateGroupScreenProps = {
-  route: RouteProp<MainStackNavigatorParamsList, 'CreateGroup'>
-}
+  route: RouteProp<MainStackNavigatorParamsList, 'CreateGroup'>;
+};
 const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
   const isFocused = useIsFocused();
   const navigation = useNavigation<StackNavigationProp<MainStackNavigatorParamsList>>();
 
-  const [, _dispatch] : any= useStateValue();
+  const [, _dispatch]: any = useStateValue();
   const dispatch = useDispatch();
   const [selectedDependent] = useState<any>(null);
   const [groupDetail, setGroupDetail] = useState<any>({});
@@ -41,11 +41,9 @@ const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
   };
 
   const getGroupDetail = async () => {
-    if (!route?.params?.data?.groupId) return
+    if (!route?.params?.data?.groupId) return;
     GetGroup(route.params.data.groupId)
       .then((res) => {
-        console.log('groupinfo', res);
-
         let students = res?.studentsGroupList?.map((item: any) => ({
           name: item?.firstName + ' ' + item.lastName,
 
@@ -60,7 +58,7 @@ const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
           instructorId: item?.instructorGroupId,
           isEdit: true,
         }));
-        console.log('instructors', instructors);
+
         setGroupDetail({ instructors, students });
       })
       .catch((err) => {
@@ -82,7 +80,7 @@ const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
       dispatch(ChangeModalState.action({ editDependentModalVisibility: true }));
     }
   }, [selectedDependent]);
-  console.log('9099090099099', infomation);
+
   return (
     <BackgroundLayout title="Create Group">
       <ScrollView style={styles.layout}>
@@ -116,9 +114,7 @@ const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
                   agreement: values.agreement,
                   status: true,
                 },
-                isEdit: route?.params
-                  ? { ...route?.params?.data, ...groupDetail }
-                  : false,
+                isEdit: route?.params ? { ...route?.params?.data, ...groupDetail } : false,
               };
               _dispatch({
                 type: actions.SET_GROUP,
@@ -126,21 +122,13 @@ const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
               });
 
               navigation.navigate('AddMembers', {
-                isEdit: !!(route?.params),
+                isEdit: !!route?.params,
                 data: { ...route?.params?.data, ...groupDetail },
               });
               resetForm();
             }}
           >
-            {({
-                handleChange,
-                handleSubmit,
-                values,
-                errors,
-                isValid,
-                touched,
-                handleBlur,
-              }) => (
+            {({ handleChange, handleSubmit, values, errors, isValid, touched, handleBlur }) => (
               <>
                 <View style={styles.formContainer}>
                   <Input
@@ -183,10 +171,7 @@ const CreateGroupScreen: FC<CreateGroupScreenProps> = ({ route }) => {
                   />
 
                   <View style={styles.buttonSettings}>
-                    <LinearGradientButton
-                      disabled={!isValid}
-                      onPress={handleSubmit}
-                    >
+                    <LinearGradientButton disabled={!isValid} onPress={handleSubmit}>
                       {route?.params ? 'Edit Members' : 'Add Members'}
                     </LinearGradientButton>
                   </View>

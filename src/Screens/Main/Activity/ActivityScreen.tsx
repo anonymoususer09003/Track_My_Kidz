@@ -156,6 +156,7 @@ const ActivityScreen = () => {
       </>
     );
   };
+  // console.log('participants ids', getParticipantsIds);
   const getParticipantLocation = async (activityId: any) => {
     try {
       let res: any[] = await ParticipantLocation(activityId);
@@ -246,13 +247,12 @@ const ActivityScreen = () => {
         lang: messageBody.longitude,
       },
     });
-    console.log('Update Received iin actiivty screen', messageBody);
   };
-  useEffect(() => {
-    if (!isFocused) {
-      unsubscribeSockets();
-    }
-  }, [isFocused]);
+  // useEffect(() => {
+  //   if (!isFocused) {
+  //     unsubscribeSockets();
+  //   }
+  // }, [isFocused]);
   const search = (text: String) => {
     let allActivities = { ...activities };
 
@@ -332,17 +332,20 @@ const ActivityScreen = () => {
       trackingListKeys.map((item, index) => {
         let latitude1 = trackingList[item]?.lat;
         let longititude1 = trackingList[item]?.lang;
-        for (let j = index + 1; j < trackingListKeys.length - 1; j++) {
+
+        for (let j = index + 1; j <= trackingListKeys.length - 1; j++) {
           let nextParticipant = trackingList[trackingListKeys[j]];
+
           let latitude2 = nextParticipant?.lat;
           let longititude2 = nextParticipant?.lang;
           let distance = calculateDistance(latitude1, longititude1, latitude2, longititude2);
           const isUnderEqual100Meters = distance <= 100;
           let participant = partcipants.find(
-            (pers) => pers.childDeviceId == nextParticipant.childDeviceId
+            (pers) => pers?.childDeviceId == nextParticipant?.childDeviceId
           );
-
-          if (isUnderEqual100Meters) {
+          // console.log('participants---------', partcipants);
+          // Alert.alert(JSON.stringify(participant));
+          if (participant && isUnderEqual100Meters) {
             participant['group'] = true;
             participant['groupName'] = index + 1;
             temp.push(participant);
@@ -511,7 +514,6 @@ const ActivityScreen = () => {
       )}
 
       <View style={styles.layout}>
-        {console.log('new ', newParticipnatsArr)}
         {!showParticipantMap ? (
           <>
             <FlatList
@@ -756,6 +758,12 @@ const ActivityScreen = () => {
             newParticipnatsArr={newParticipnatsArr}
             trackingList={trackingList}
             groups={groups}
+            onClick={(group: any) => {
+              {
+                setSelectedGroup(group);
+                setModal(true);
+              }
+            }}
           />
         )}
       </View>
